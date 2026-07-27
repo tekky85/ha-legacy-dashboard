@@ -1,0 +1,890 @@
+/*
+ * HA Legacy Dashboard
+ * Lightweight dashboards for legacy devices.
+ *
+ * Legacy-compatible CSS:
+ * - no CSS custom properties
+ * - no CSS Grid dependency
+ * - no flex gap
+ * - Safari iOS 9 compatible Flexbox
+ */
+
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
+html {
+
+    width: 100%;
+    min-height: 100%;
+
+    background: #eef2f7;
+
+}
+
+body {
+
+    width: 100%;
+    min-height: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    background: #eef2f7;
+    color: #172033;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    font-size: 16px;
+    line-height: 1.4;
+
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+
+}
+
+* {
+
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+
+}
+
+button,
+input,
+select,
+textarea {
+
+    font: inherit;
+
+}
+
+
+/* =========================================================
+   APPLICATION
+   ========================================================= */
+
+.app {
+
+    width: 100%;
+    max-width: 1180px;
+
+    margin: 0 auto;
+    padding: 24px;
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.app-header {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+
+    width: 100%;
+
+    margin: 0 0 24px 0;
+
+}
+
+.brand {
+
+    min-width: 0;
+    padding-right: 18px;
+
+}
+
+.app-header h1 {
+
+    margin: 0;
+
+    color: inherit;
+
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.15;
+
+    letter-spacing: -0.02em;
+
+}
+
+.subtitle {
+
+    margin: 7px 0 0 0;
+
+    color: #667085;
+
+    font-size: 15px;
+    font-weight: 400;
+
+}
+
+
+/* =========================================================
+   THEME SWITCH
+   ========================================================= */
+
+.theme-toggle {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    min-width: 116px;
+    height: 46px;
+
+    margin: 0;
+    padding: 0 16px;
+
+    border: 1px solid #dce2ea;
+    border-radius: 15px;
+
+    background: #ffffff;
+    color: #344054;
+
+    box-shadow: 0 4px 14px rgba(23, 32, 51, 0.08);
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+    appearance: none;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        -webkit-transform 0.1s ease;
+
+}
+
+.theme-toggle:active {
+
+    -webkit-transform: scale(0.96);
+    transform: scale(0.96);
+
+}
+
+.theme-toggle:focus {
+
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+
+}
+
+.theme-toggle svg {
+
+    display: block;
+
+    width: 20px;
+    height: 20px;
+
+    margin-right: 8px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+}
+
+.theme-toggle-label {
+
+    font-size: 14px;
+    font-weight: 600;
+
+}
+
+.theme-icon-sun {
+
+    display: none !important;
+
+}
+
+.theme-icon-moon {
+
+    display: block !important;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE CARD GRID
+   ========================================================= */
+
+/*
+ * Kein CSS Grid und kein gap.
+ * Dadurch funktioniert das Layout auch in Safari unter iOS 9.
+ */
+
+.grid {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+
+    width: auto;
+
+    margin: -10px;
+
+}
+
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.card {
+
+    position: relative;
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex-direction: column;
+    flex-direction: column;
+
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+
+    width: calc(100% - 20px);
+    min-height: 220px;
+
+    margin: 10px;
+    padding: 26px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+    color: #172033;
+
+    border: 1px solid rgba(23, 32, 51, 0.06);
+    border-radius: 22px;
+
+    box-shadow:
+        0 10px 30px rgba(23, 32, 51, 0.08),
+        0 2px 8px rgba(23, 32, 51, 0.04);
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        -webkit-transform 0.1s ease;
+
+}
+
+.card:active {
+
+    -webkit-transform: scale(0.985);
+    transform: scale(0.985);
+
+}
+
+
+/* =========================================================
+   CARD HEADER AND ICON
+   ========================================================= */
+
+.card-header {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: flex-start;
+    justify-content: flex-start;
+
+    min-height: 54px;
+
+    margin: 0 0 22px 0;
+
+}
+
+.icon {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    width: 54px;
+    height: 54px;
+
+    border-radius: 17px;
+
+    background: #edf1f6;
+    color: #526071;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+
+}
+
+.icon svg {
+
+    display: block;
+
+    width: 29px;
+    height: 29px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+}
+
+
+/* Temperature */
+
+.icon.temperature {
+
+    background: #e5efff;
+    color: #2f6fed;
+
+}
+
+
+/* Humidity */
+
+.icon.humidity {
+
+    background: #e4f7ff;
+    color: #1681b3;
+
+}
+
+
+/* Neutral window */
+
+.icon.window {
+
+    background: #edf1f6;
+    color: #526071;
+
+}
+
+
+/* Closed / normal */
+
+.icon.green {
+
+    background: #e3f7eb;
+    color: #16824a;
+
+}
+
+
+/* Open / warning */
+
+.icon.red {
+
+    background: #ffe8ea;
+    color: #d73a49;
+
+}
+
+
+/* =========================================================
+   SENSOR VALUES
+   ========================================================= */
+
+.value {
+
+    margin: auto 0 24px 0;
+
+    color: inherit;
+
+    font-size: 62px;
+    font-weight: 300;
+    line-height: 1;
+
+    letter-spacing: -0.045em;
+
+    white-space: nowrap;
+
+}
+
+.value span {
+
+    margin-left: 6px;
+
+    color: #667085;
+
+    font-size: 23px;
+    font-weight: 500;
+
+    letter-spacing: 0;
+
+    vertical-align: baseline;
+
+}
+
+
+/* =========================================================
+   TITLES
+   ========================================================= */
+
+.title {
+
+    margin: 0;
+
+    color: inherit;
+
+    font-size: 21px;
+    font-weight: 650;
+    line-height: 1.25;
+
+}
+
+.subtitle {
+
+    margin-top: 5px;
+
+    color: #667085;
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.35;
+
+}
+
+
+/* =========================================================
+   BINARY STATUS
+   ========================================================= */
+
+.status {
+
+    margin: auto 0 24px 0;
+
+    color: inherit;
+
+    font-size: 38px;
+    font-weight: 350;
+    line-height: 1.1;
+
+    letter-spacing: -0.025em;
+
+}
+
+.status-success {
+
+    color: #16824a;
+
+}
+
+.status-danger {
+
+    color: #d73a49;
+
+}
+
+
+/* =========================================================
+   UPDATED STATUS
+   ========================================================= */
+
+.updated {
+
+    margin: 22px 0 0 0;
+    padding: 0 4px;
+
+    color: #667085;
+
+    font-size: 13px;
+    font-weight: 400;
+
+    text-align: center;
+
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer {
+
+    margin: 18px 0 0 0;
+    padding: 10px 0;
+
+    color: #8a94a3;
+
+    font-size: 12px;
+    font-weight: 400;
+
+    text-align: center;
+
+}
+
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+body.theme-dark {
+
+    background: #0d131c;
+    color: #f1f5f9;
+
+}
+
+body.theme-dark .subtitle {
+
+    color: #9aa6b5;
+
+}
+
+body.theme-dark .theme-toggle {
+
+    background: #1a2432;
+    color: #e5ebf3;
+
+    border-color: #303d4e;
+
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.32);
+
+}
+
+body.theme-dark .theme-icon-sun {
+
+    display: block !important;
+
+}
+
+body.theme-dark .theme-icon-moon {
+
+    display: none !important;
+
+}
+
+body.theme-dark .card {
+
+    background: #182230;
+    color: #f1f5f9;
+
+    border-color: rgba(255, 255, 255, 0.065);
+
+    box-shadow:
+        0 12px 34px rgba(0, 0, 0, 0.32),
+        0 2px 8px rgba(0, 0, 0, 0.22);
+
+}
+
+body.theme-dark .value span,
+body.theme-dark .card .subtitle {
+
+    color: #98a5b5;
+
+}
+
+body.theme-dark .icon {
+
+    background: #273343;
+    color: #b4c0cf;
+
+}
+
+body.theme-dark .icon.temperature {
+
+    background: #1d3763;
+    color: #79aaff;
+
+}
+
+body.theme-dark .icon.humidity {
+
+    background: #153b4d;
+    color: #63c9f4;
+
+}
+
+body.theme-dark .icon.window {
+
+    background: #283443;
+    color: #bdc8d5;
+
+}
+
+body.theme-dark .icon.green {
+
+    background: #153d2b;
+    color: #63d796;
+
+}
+
+body.theme-dark .icon.red {
+
+    background: #4a2228;
+    color: #ff7b84;
+
+}
+
+body.theme-dark .status-success {
+
+    color: #63d796;
+
+}
+
+body.theme-dark .status-danger {
+
+    color: #ff7b84;
+
+}
+
+body.theme-dark .updated {
+
+    color: #8f9baa;
+
+}
+
+body.theme-dark .footer {
+
+    color: #748092;
+
+}
+
+
+/* =========================================================
+   TABLET PORTRAIT AND MEDIUM SCREENS
+   ========================================================= */
+
+@media screen and (min-width: 600px) {
+
+    .card {
+
+        width: calc(50% - 20px);
+
+    }
+
+}
+
+
+/* =========================================================
+   TABLET LANDSCAPE AND DESKTOP
+   ========================================================= */
+
+@media screen and (min-width: 900px) {
+
+    .card {
+
+        width: calc(33.3333% - 20px);
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL SCREENS
+   ========================================================= */
+
+@media screen and (max-width: 599px) {
+
+    .app {
+
+        padding: 16px;
+
+    }
+
+    .app-header {
+
+        margin-bottom: 18px;
+
+    }
+
+    .app-header h1 {
+
+        font-size: 25px;
+
+    }
+
+    .brand {
+
+        padding-right: 10px;
+
+    }
+
+    .app-header .subtitle {
+
+        font-size: 13px;
+
+    }
+
+    .theme-toggle {
+
+        width: 46px;
+        min-width: 46px;
+
+        padding: 0;
+
+    }
+
+    .theme-toggle svg {
+
+        margin-right: 0;
+
+    }
+
+    .theme-toggle-label {
+
+        display: none;
+
+    }
+
+    .card {
+
+        min-height: 195px;
+        padding: 22px;
+
+        border-radius: 20px;
+
+    }
+
+    .card-header {
+
+        margin-bottom: 17px;
+
+    }
+
+    .icon {
+
+        width: 50px;
+        height: 50px;
+
+        border-radius: 15px;
+
+    }
+
+    .value {
+
+        margin-bottom: 20px;
+
+        font-size: 53px;
+
+    }
+
+    .value span {
+
+        font-size: 20px;
+
+    }
+
+    .status {
+
+        margin-bottom: 20px;
+
+        font-size: 34px;
+
+    }
+
+    .title {
+
+        font-size: 19px;
+
+    }
+
+}
+
+
+/* =========================================================
+   LANDSCAPE OPTIMIZATION
+   ========================================================= */
+
+@media screen and (orientation: landscape) and (min-width: 900px) {
+
+    .app {
+
+        padding-top: 18px;
+        padding-bottom: 18px;
+
+    }
+
+    .app-header {
+
+        margin-bottom: 15px;
+
+    }
+
+    .card {
+
+        min-height: 195px;
+        padding: 22px;
+
+    }
+
+    .card-header {
+
+        min-height: 48px;
+        margin-bottom: 15px;
+
+    }
+
+    .icon {
+
+        width: 48px;
+        height: 48px;
+
+        border-radius: 15px;
+
+    }
+
+    .value {
+
+        margin-bottom: 18px;
+
+        font-size: 54px;
+
+    }
+
+    .status {
+
+        margin-bottom: 18px;
+
+        font-size: 34px;
+
+    }
+
+}

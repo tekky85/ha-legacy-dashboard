@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>
+HA Legacy Dashboard
+</title>
+
+<link rel="stylesheet" href="css/style.css?v=4">
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+<header class="app-header">
+
+    <div class="brand">
+
+        <h1>HA Legacy Dashboard</h1>
+
+        <div class="subtitle">
+            Lightweight dashboards for legacy devices
+        </div>
+
+    </div>
+
+    <button
+        id="themeButton"
+        class="theme-toggle"
+        type="button"
+        aria-label="Darstellung wechseln"
+        aria-pressed="false"
+    >
+
+        <svg
+            class="theme-icon-moon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <path
+                d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79"
+            ></path>
+        </svg>
+
+        <svg
+            class="theme-icon-sun"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <circle cx="12" cy="12" r="4"></circle>
+            <line x1="12" y1="2" x2="12" y2="4"></line>
+            <line x1="12" y1="20" x2="12" y2="22"></line>
+            <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
+            <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
+            <line x1="2" y1="12" x2="4" y2="12"></line>
+            <line x1="20" y1="12" x2="22" y2="12"></line>
+            <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
+            <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+        </svg>
+
+        <span
+            id="themeButtonLabel"
+            class="theme-toggle-label"
+        >
+            Dunkel
+        </span>
+
+    </button>
+
+</header>
+
+<main id="dashboard" class="grid"></main>
+
+<div id="updated" class="updated">
+    Wird geladen …
+</div>
+
+<footer class="footer">
+    HA Legacy Dashboard v0.1
+</footer>
+
+</div>
+
+<script src="js/core/widget.js?v=4"></script>
+<script src="js/core/compat.js?v=4"></script>
+<script src="js/core/theme.js?v=4"></script>
+
+<script src="js/widgets/sensor.js?v=4"></script>
+<script src="js/widgets/binary.js?v=4"></script>
+
+<script src="js/core/dashboard.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
+
+</body>
+
+</html>
