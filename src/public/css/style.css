@@ -922,3 +922,451 @@ body.theme-dark .status-neutral {
     color: #98a5b5;
 
 }
+
+/* =========================================================
+   CLIMATE WIDGET
+   ========================================================= */
+
+.card-climate {
+
+    min-height: 290px;
+
+}
+
+.card-climate .card-header {
+
+    -webkit-justify-content:
+        space-between;
+
+    justify-content:
+        space-between;
+
+}
+
+
+/* Climate icon */
+
+.icon.heating {
+
+    background: #fff0dc;
+    color: #c96d08;
+
+}
+
+.icon.heating.heating {
+
+    background: #ffe7d2;
+    color: #df5b16;
+
+}
+
+.icon.heating.cooling {
+
+    background: #e2f3ff;
+    color: #1677aa;
+
+}
+
+.icon.heating.off,
+.icon.heating.neutral {
+
+    background: #edf1f6;
+    color: #667085;
+
+}
+
+
+/* State badge */
+
+.climate-state {
+
+    min-width: 64px;
+
+    padding: 7px 11px;
+
+    border-radius: 999px;
+
+    background: #edf1f6;
+    color: #526071;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-align: center;
+
+}
+
+.climate-state-heating {
+
+    background: #fff0dc;
+    color: #b85e00;
+
+}
+
+.climate-state-cooling {
+
+    background: #e2f3ff;
+    color: #126f9c;
+
+}
+
+.climate-state-idle {
+
+    background: #e8f1ff;
+    color: #346ac3;
+
+}
+
+.climate-state-off,
+.climate-state-neutral {
+
+    background: #edf1f6;
+    color: #667085;
+
+}
+
+
+/* Current temperature */
+
+.climate-current {
+
+    position: relative;
+
+    margin: 2px 0 24px 0;
+
+}
+
+.climate-current-value {
+
+    color: inherit;
+
+    font-size: 54px;
+    font-weight: 300;
+    line-height: 1;
+
+    letter-spacing: -0.045em;
+
+}
+
+.climate-current-unit {
+
+    margin-left: 5px;
+
+    color: #667085;
+
+    font-size: 22px;
+    font-weight: 500;
+
+}
+
+.climate-current-label {
+
+    display: block;
+
+    margin-top: 5px;
+
+    color: #667085;
+
+    font-size: 13px;
+    font-weight: 500;
+
+}
+
+
+/* Target temperature controls */
+
+.climate-target-row {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content:
+        space-between;
+
+    justify-content:
+        space-between;
+
+    margin: 0 0 24px 0;
+    padding: 10px;
+
+    border: 1px solid #e1e7ef;
+    border-radius: 18px;
+
+    background: #f6f8fb;
+
+}
+
+.climate-control {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    width: 54px;
+    height: 54px;
+
+    margin: 0;
+    padding: 0;
+
+    border: 1px solid #dce3ec;
+    border-radius: 16px;
+
+    background: #ffffff;
+    color: #27364a;
+
+    box-shadow:
+        0 3px 10px
+        rgba(23, 32, 51, 0.08);
+
+    font-size: 31px;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+    appearance: none;
+
+    -webkit-user-select: none;
+    user-select: none;
+
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease,
+        -webkit-transform 0.1s ease;
+
+}
+
+.climate-control:active {
+
+    -webkit-transform:
+        scale(0.92);
+
+    transform:
+        scale(0.92);
+
+    background: #e8f1ff;
+
+}
+
+.climate-control[disabled] {
+
+    opacity: 0.38;
+
+    cursor: default;
+
+    box-shadow: none;
+
+}
+
+.climate-control.is-busy {
+
+    opacity: 0.45;
+
+}
+
+.climate-target {
+
+    display: block;
+
+    min-width: 92px;
+
+    padding: 0 10px;
+
+    text-align: center;
+
+}
+
+.climate-target-label {
+
+    display: block;
+
+    color: #667085;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.07em;
+
+}
+
+.climate-target-value {
+
+    display: block;
+
+    margin-top: 2px;
+
+    color: inherit;
+
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+
+}
+
+.climate-target-value small {
+
+    margin-left: 3px;
+
+    color: #667085;
+
+    font-size: 15px;
+    font-weight: 500;
+
+}
+
+
+/* =========================================================
+   CLIMATE DARK MODE
+   ========================================================= */
+
+body.theme-dark .icon.heating {
+
+    background: #49311d;
+    color: #ffad55;
+
+}
+
+body.theme-dark .icon.heating.heating {
+
+    background: #56301f;
+    color: #ff955c;
+
+}
+
+body.theme-dark .icon.heating.cooling {
+
+    background: #17384b;
+    color: #6bc9f4;
+
+}
+
+body.theme-dark .icon.heating.off,
+body.theme-dark .icon.heating.neutral {
+
+    background: #283443;
+    color: #aab6c5;
+
+}
+
+body.theme-dark .climate-state {
+
+    background: #283443;
+    color: #b7c2cf;
+
+}
+
+body.theme-dark .climate-state-heating {
+
+    background: #4a2e1b;
+    color: #ffae64;
+
+}
+
+body.theme-dark .climate-state-cooling {
+
+    background: #17384b;
+    color: #6bc9f4;
+
+}
+
+body.theme-dark .climate-state-idle {
+
+    background: #203656;
+    color: #83adf5;
+
+}
+
+body.theme-dark .climate-current-unit,
+body.theme-dark .climate-current-label,
+body.theme-dark .climate-target-label,
+body.theme-dark .climate-target-value small {
+
+    color: #98a5b5;
+
+}
+
+body.theme-dark .climate-target-row {
+
+    background: #111a26;
+
+    border-color: #303c4c;
+
+}
+
+body.theme-dark .climate-control {
+
+    background: #253142;
+    color: #f0f4f8;
+
+    border-color: #39475a;
+
+    box-shadow:
+        0 4px 12px
+        rgba(0, 0, 0, 0.24);
+
+}
+
+body.theme-dark .climate-control:active {
+
+    background: #30435d;
+
+}
+
+
+/* =========================================================
+   CLIMATE RESPONSIVE LAYOUT
+   ========================================================= */
+
+@media screen and (min-width: 900px) {
+
+    .card-climate {
+
+        width:
+            calc(66.6666% - 20px);
+
+    }
+
+}
+
+@media screen and (max-width: 599px) {
+
+    .card-climate {
+
+        min-height: 270px;
+
+    }
+
+    .climate-current-value {
+
+        font-size: 48px;
+
+    }
+
+    .climate-control {
+
+        width: 50px;
+        height: 50px;
+
+        border-radius: 15px;
+
+    }
+
+    .climate-target-value {
+
+        font-size: 25px;
+
+    }
+
+}
