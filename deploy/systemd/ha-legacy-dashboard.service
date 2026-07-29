@@ -1,0 +1,36 @@
+[Unit]
+Description=HA Legacy Dashboard Gateway
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+
+User=dashboard
+Group=dashboard
+
+WorkingDirectory=/home/dashboard/ha-legacy-dashboard
+
+Environment=NODE_ENV=production
+
+ExecStartPre=/usr/bin/test -r /home/dashboard/ha-legacy-dashboard/.env
+ExecStartPre=/usr/bin/test -r /home/dashboard/ha-legacy-dashboard/src/server.js
+
+ExecStart=/usr/bin/node /home/dashboard/ha-legacy-dashboard/src/server.js
+
+Restart=on-failure
+RestartSec=5
+
+TimeoutStopSec=15
+KillSignal=SIGTERM
+
+SyslogIdentifier=ha-legacy-dashboard
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
