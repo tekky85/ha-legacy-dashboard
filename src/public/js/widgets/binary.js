@@ -1,32 +1,72 @@
+/*
+ * Binary sensor widget.
+ */
+
 function BinaryWidget(config) {
 
-    Widget.call(this, config);
+    Widget.call(
+        this,
+        config
+    );
 
 }
 
+
 BinaryWidget.prototype =
-    Object.create(Widget.prototype);
+    Object.create(
+        Widget.prototype
+    );
+
+
+BinaryWidget.prototype.constructor =
+    BinaryWidget;
+
 
 BinaryWidget.prototype.render =
     function (data) {
 
-        var open =
-            data.state === "on";
+        var state =
+            data && data.state
+                ? data.state
+                : "unknown";
 
-        var text =
-            open
-                ? "Offen"
-                : "Geschlossen";
+        var text = "";
+        var iconClass = "";
+        var statusClass = "";
 
-        var iconClass =
-            open
-                ? "red"
-                : "green";
 
-        var statusClass =
-            open
-                ? "status-danger"
-                : "status-success";
+        if (state === "on") {
+
+            text = "Offen";
+
+            iconClass =
+                this.iconClass + " red";
+
+            statusClass =
+                "status-danger";
+
+        } else if (state === "off") {
+
+            text = "Geschlossen";
+
+            iconClass =
+                this.iconClass + " green";
+
+            statusClass =
+                "status-success";
+
+        } else {
+
+            text = "Nicht verfügbar";
+
+            iconClass =
+                this.iconClass;
+
+            statusClass =
+                "status-neutral";
+
+        }
+
 
         return "" +
 
@@ -34,31 +74,44 @@ BinaryWidget.prototype.render =
 
                 '<div class="card-header">' +
 
-                    '<div class="icon window ' +
-                        iconClass +
+                    '<div class="icon ' +
+                        Legacy.html.escape(
+                            iconClass
+                        ) +
                     '">' +
+
+                        this.getIcon() +
 
                     '</div>' +
 
                 '</div>' +
 
+
                 '<div class="status ' +
                     statusClass +
                 '">' +
 
-                    text +
+                    Legacy.html.escape(
+                        text
+                    ) +
 
                 '</div>' +
+
 
                 '<div class="title">' +
 
-                    this.title +
+                    Legacy.html.escape(
+                        this.title
+                    ) +
 
                 '</div>' +
 
+
                 '<div class="subtitle">' +
 
-                    "Fenster" +
+                    Legacy.html.escape(
+                        this.subtitle
+                    ) +
 
                 '</div>' +
 

@@ -888,3 +888,37 @@ body.theme-dark .footer {
     }
 
 }
+
+/* =========================================================
+   SVG ICON AND UNAVAILABLE STATES
+   ======================================================= */
+
+.icon svg {
+
+    pointer-events: none;
+
+}
+
+.value-unavailable {
+
+    color: #98a2b3;
+
+    font-size: 52px;
+    font-weight: 300;
+
+    letter-spacing: 0;
+
+}
+
+.status-neutral {
+
+    color: #667085;
+
+}
+
+body.theme-dark .value-unavailable,
+body.theme-dark .status-neutral {
+
+    color: #98a5b5;
+
+}
