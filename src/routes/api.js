@@ -5,20 +5,12 @@ const router = express.Router();
 const ha =
     require("../services/homeassistant");
 
+const dashboardConfig =
+    require("../config/dashboard");
 
-const DASHBOARD_ENTITIES = [
 
-    "sensor.badezimmer_smart_indoor_module_temperatur",
-
-    "sensor.badezimmer_smart_indoor_module_luftfeuchtigkeit",
-
-    "binary_sensor.kuche_fenster_rechts",
-
-    "light.esszimmer_lampen",
-
-    "climate.esszimmer_thermostate"
-
-];
+const DASHBOARD_ENTITIES =
+    dashboardConfig.getVisibleEntityIds();
 
 
 /*
@@ -225,6 +217,28 @@ async function waitForTargetTemperature(
     };
 
 }
+
+/* =========================================================
+   DASHBOARD CONFIGURATION
+   ========================================================= */
+
+router.get(
+
+    "/dashboard/config",
+
+    function (req, res) {
+
+        res.json({
+
+            widgets:
+                dashboardConfig.getPublicWidgets()
+
+        });
+
+    }
+
+);
+
 
 /* =========================================================
    DASHBOARD DATA

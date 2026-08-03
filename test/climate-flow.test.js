@@ -14,6 +14,7 @@ function createHarness() {
     const posts = [];
     const timers = [];
     const intervals = [];
+    const configurations = [];
 
     const status = {
         innerHTML: ""
@@ -206,6 +207,10 @@ function createHarness() {
         },
         Dashboard: {
             addWidget: function () {},
+            configure: function (widgets) {
+                configurations.push(widgets);
+                return widgets.length;
+            },
             render: function () {}
         },
         SensorWidget: function () {},
@@ -246,6 +251,7 @@ function createHarness() {
 
     return {
         dashboard: dashboard,
+        configurations: configurations,
         display: display,
         gets: gets,
         intervals: intervals,
@@ -257,6 +263,16 @@ function createHarness() {
         plus: plus,
         posts: posts,
         status: status,
+        completeConfiguration: function () {
+            gets[0].success({
+                widgets: [
+                    {
+                        entity: "light.esszimmer_lampen",
+                        type: "light"
+                    }
+                ]
+            });
+        },
         advanceTo: function (milliseconds) {
             now = milliseconds;
         },
@@ -285,14 +301,61 @@ function createHarness() {
 }
 
 
+test("Dashboard-Konfiguration wird vor Zuständen geladen", function () {
+
+    const harness = createHarness();
+
+    assert.equal(harness.gets.length, 1);
+    assert.equal(
+        harness.gets[0].url,
+        "/api/dashboard/config"
+    );
+
+    harness.intervals[0]();
+    assert.equal(harness.gets.length, 1);
+
+    harness.completeConfiguration();
+
+    assert.equal(harness.configurations.length, 1);
+    assert.equal(harness.gets.length, 2);
+    assert.equal(harness.gets[1].url, "/api/dashboard");
+
+});
+
+
+test("fehlerhafte Dashboard-Konfiguration wird erneut geladen", function () {
+
+    const harness = createHarness();
+
+    harness.gets[0].error({
+        message: "Konfiguration nicht erreichbar"
+    });
+
+    assert.equal(
+        harness.status.innerHTML,
+        "Fehler: Konfiguration nicht erreichbar"
+    );
+
+    harness.intervals[0]();
+
+    assert.equal(harness.gets.length, 2);
+    assert.equal(
+        harness.gets[1].url,
+        "/api/dashboard/config"
+    );
+
+});
+
+
 test("schnelle Climate-Klicks werden zusammengefasst", function () {
 
     const harness = createHarness();
 
-    harness.gets[0].success({});
+    harness.completeConfiguration();
+    harness.gets[1].success({});
 
     harness.intervals[0]();
-    assert.equal(harness.gets.length, 2);
+    assert.equal(harness.gets.length, 3);
 
     harness.click(harness.plus);
     assert.equal(
@@ -352,7 +415,7 @@ test("schnelle Climate-Klicks werden zusammengefasst", function () {
     assert.equal(harness.minus.disabled, false);
 
     harness.advanceTo(6000);
-    harness.gets[1].success({});
+    harness.gets[2].success({});
 
     assert.equal(
         harness.display.innerHTML,
@@ -360,7 +423,7 @@ test("schnelle Climate-Klicks werden zusammengefasst", function () {
     );
 
     harness.runLatestTimer(5000);
-    assert.equal(harness.gets.length, 3);
+    assert.equal(harness.gets.length, 4);
 
 });
 
@@ -369,7 +432,8 @@ test("Climate-Fehler bleibt sichtbar und löst Refresh aus", function () {
 
     const harness = createHarness();
 
-    harness.gets[0].success({});
+    harness.completeConfiguration();
+    harness.gets[1].success({});
     harness.click(harness.plus);
     harness.runLatestTimer(500);
 
@@ -384,11 +448,11 @@ test("Climate-Fehler bleibt sichtbar und löst Refresh aus", function () {
     assert.equal(harness.plus.disabled, false);
 
     harness.intervals[0]();
-    assert.equal(harness.gets.length, 1);
+    assert.equal(harness.gets.length, 2);
 
     harness.advanceTo(4000);
     harness.runLatestTimer(3000);
-    assert.equal(harness.gets.length, 2);
+    assert.equal(harness.gets.length, 3);
 
 });
 
@@ -397,7 +461,8 @@ test("schnelle Licht-Taps bleiben reaktionsfähig", function () {
 
     const harness = createHarness();
 
-    harness.gets[0].success({});
+    harness.completeConfiguration();
+    harness.gets[1].success({});
 
     harness.click(harness.lightButton);
 
@@ -446,7 +511,8 @@ test("Lichtfehler bleibt sichtbar und löst Refresh aus", function () {
 
     const harness = createHarness();
 
-    harness.gets[0].success({});
+    harness.completeConfiguration();
+    harness.gets[1].success({});
     harness.click(harness.lightButton);
 
     harness.posts[0].error({
@@ -460,10 +526,10 @@ test("Lichtfehler bleibt sichtbar und löst Refresh aus", function () {
     assert.equal(harness.lightButton.disabled, false);
 
     harness.intervals[0]();
-    assert.equal(harness.gets.length, 1);
+    assert.equal(harness.gets.length, 2);
 
     harness.advanceTo(2000);
     harness.runLatestTimer(1000);
-    assert.equal(harness.gets.length, 2);
+    assert.equal(harness.gets.length, 3);
 
 });

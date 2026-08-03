@@ -34,139 +34,11 @@ if (themeButton) {
    WIDGET CONFIGURATION
    ========================================================= */
 
-Dashboard.addWidget(
+var dashboardConfigured =
+    false;
 
-    new SensorWidget({
-
-        entity:
-
-            "sensor.badezimmer_" +
-            "smart_indoor_module_" +
-            "temperatur",
-
-        title:
-            "Badezimmer",
-
-        subtitle:
-            "Temperatur",
-
-        icon:
-            "temperature",
-
-        iconClass:
-            "temperature"
-
-    })
-
-);
-
-
-Dashboard.addWidget(
-
-    new SensorWidget({
-
-        entity:
-
-            "sensor.badezimmer_" +
-            "smart_indoor_module_" +
-            "luftfeuchtigkeit",
-
-        title:
-            "Badezimmer",
-
-        subtitle:
-            "Luftfeuchtigkeit",
-
-        icon:
-            "humidity",
-
-        iconClass:
-            "humidity"
-
-    })
-
-);
-
-
-Dashboard.addWidget(
-
-    new BinaryWidget({
-
-        entity:
-
-            "binary_sensor." +
-            "kuche_fenster_rechts",
-
-        title:
-            "Küche",
-
-        subtitle:
-            "Fenster rechts",
-
-        icon:
-            "window",
-
-        iconClass:
-            "window"
-
-    })
-
-);
-
-
-Dashboard.addWidget(
-
-    new LightWidget({
-
-        entity:
-
-            "light." +
-            "esszimmer_lampen",
-
-        title:
-            "Esszimmer",
-
-        subtitle:
-            "Licht",
-
-        icon:
-            "light",
-
-        iconClass:
-            "light"
-
-    })
-
-);
-
-
-Dashboard.addWidget(
-
-    new ClimateWidget({
-
-        entity:
-
-            "climate." +
-            "esszimmer_thermostate",
-
-        title:
-            "Esszimmer",
-
-        subtitle:
-            "Thermostate",
-
-        icon:
-            "heating",
-
-        iconClass:
-            "heating",
-
-        unit:
-            "°C"
-
-    })
-
-);
+var dashboardConfigurationLoading =
+    false;
 
 
 /* =========================================================
@@ -1655,6 +1527,124 @@ if (dashboardElement) {
    DATA LOADING
    ========================================================= */
 
+function loadDashboardConfiguration() {
+
+    var status =
+
+        Legacy.dom.byId(
+            "updated"
+        );
+
+
+    if (dashboardConfigurationLoading) {
+
+        return;
+
+    }
+
+
+    dashboardConfigurationLoading =
+        true;
+
+
+    if (status) {
+
+        status.innerHTML =
+            "Lade Dashboard-Konfiguration …";
+
+    }
+
+
+    Legacy.http.get(
+
+        "/api/dashboard/config",
+
+        function (data) {
+
+            var widgetCount = 0;
+
+
+            dashboardConfigurationLoading =
+                false;
+
+
+            if (
+
+                data &&
+                data.widgets &&
+                data.widgets.length
+
+            ) {
+
+                widgetCount =
+
+                    Dashboard.configure(
+                        data.widgets
+                    );
+
+            }
+
+
+            if (!widgetCount) {
+
+                dashboardConfigured =
+                    false;
+
+
+                if (status) {
+
+                    status.innerHTML =
+                        "Fehler: Keine Dashboard-Konfiguration";
+
+                }
+
+
+                return;
+
+            }
+
+
+            dashboardConfigured =
+                true;
+
+
+            loadDashboard();
+
+        },
+
+        function (error) {
+
+            dashboardConfigurationLoading =
+                false;
+
+            dashboardConfigured =
+                false;
+
+
+            if (status) {
+
+                status.innerHTML =
+
+                    "Fehler: " +
+
+                    (
+                        error &&
+                        error.message
+
+                            ? error.message
+
+                            : "Konfiguration nicht verfügbar"
+                    );
+
+            }
+
+        }
+
+    );
+
+}
+
+
 function loadDashboard() {
 
     var status =
@@ -1665,6 +1655,15 @@ function loadDashboard() {
 
 
     var requestStartedAt;
+
+
+    if (!dashboardConfigured) {
+
+        loadDashboardConfiguration();
+
+        return;
+
+    }
 
 
     /*

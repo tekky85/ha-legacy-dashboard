@@ -30,7 +30,7 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 4 | Climate-Widget und Solltemperatur | abgeschlossen |
 | 5 | Standalone-Web-App für iOS 9 | abgeschlossen |
 | 6 | Weitere steuerbare Entitäten | abgeschlossen |
-| 7 | Konfigurationsgetriebene Dashboards | vorgeschlagen |
+| 7 | Konfigurationsgetriebene Dashboards | abgeschlossen |
 | 8 | Robustheit und Sicherheit | vorgeschlagen |
 | 9 | Lokale Mock- und Integrationstests | abgeschlossen |
 | 10 | Deployment und Betrieb | vorgeschlagen |
@@ -257,12 +257,29 @@ generische Browser-API für beliebige HA-Services geben.
 
 # Sprint 7 – Konfigurationsgetriebene Dashboards
 
-## Vorgeschlagen
+## Umgesetzt
 
-Eine Konfiguration soll Entity-ID, Widget-Typ, Titel, Icon, Einheit,
-Reihenfolge und Sichtbarkeit definieren.
+- zentrale Konfiguration in `src/config/dashboard.js`
+- Entity-ID, Widget-Typ, Titel, Untertitel, Icon, Icon-Klasse, Einheit,
+  Reihenfolge und Sichtbarkeit je Eintrag
+- sichtbare Entity-Liste für `/api/dashboard` wird aus der Konfiguration
+  abgeleitet
+- eigener read-only Endpunkt `GET /api/dashboard/config`
+- Frontend lädt Konfiguration vor den Zustandsdaten
+- explizite Zuordnung der erlaubten Typen `sensor`, `binary`, `light` und
+  `climate`
+- unbekannte Widget-Typen werden ignoriert und nicht dynamisch ausgeführt
+- fehlgeschlagene Konfigurationsabfragen werden beim nächsten Intervall erneut
+  versucht
+- automatisierte Tests für Reihenfolge, Sichtbarkeit, Typ-Allowlist,
+  API-Ausgabe und Ladeabfolge
 
-Frontend-Konfiguration und Backend-Schreibrechte bleiben strikt getrennt.
+## Sicherheitstrennung
+
+Die Dashboard-Konfiguration steuert ausschließlich Anzeige und lesende
+Entity-Abfragen. Sie enthält keine Services und gewährt keine Schreibrechte.
+Die Allowlisten für `climate` und `light` verbleiben separat in
+`src/routes/api.js`.
 
 ---
 

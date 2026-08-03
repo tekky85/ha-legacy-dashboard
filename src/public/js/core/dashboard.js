@@ -16,6 +16,131 @@ var Dashboard = {
     },
 
 
+    createWidget: function (config) {
+
+        if (!config || !config.type) {
+
+            return null;
+
+        }
+
+
+        if (config.type === "sensor") {
+
+            return new SensorWidget(config);
+
+        }
+
+
+        if (config.type === "binary") {
+
+            return new BinaryWidget(config);
+
+        }
+
+
+        if (config.type === "light") {
+
+            return new LightWidget(config);
+
+        }
+
+
+        if (config.type === "climate") {
+
+            return new ClimateWidget(config);
+
+        }
+
+
+        return null;
+
+    },
+
+
+    configure: function (configs) {
+
+        var orderedConfigs;
+        var config;
+        var widget;
+        var index;
+
+
+        this.widgets = [];
+
+
+        if (!configs || !configs.length) {
+
+            return 0;
+
+        }
+
+
+        orderedConfigs =
+
+            configs.slice(0)
+
+                .sort(function (first, second) {
+
+                    return (
+
+                        parseFloat(first.order) || 0
+
+                    ) - (
+
+                        parseFloat(second.order) || 0
+
+                    );
+
+                });
+
+
+        for (
+
+            index = 0;
+
+            index < orderedConfigs.length;
+
+            index++
+
+        ) {
+
+            config =
+                orderedConfigs[index];
+
+
+            if (
+
+                !config ||
+                config.visible === false ||
+                typeof config.entity !== "string" ||
+                !config.entity
+
+            ) {
+
+                continue;
+
+            }
+
+
+            widget =
+                this.createWidget(config);
+
+
+            if (widget) {
+
+                this.addWidget(widget);
+
+            }
+
+        }
+
+
+        return this.widgets.length;
+
+    },
+
+
     render: function (states) {
 
         var container =

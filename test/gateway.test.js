@@ -491,7 +491,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=10"
+                "/js/app.js?v=11"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -502,7 +502,7 @@ test(
 
         });
 
-        await t.test("Status und Dashboard", async function () {
+        await t.test("Status, Konfiguration und Dashboard", async function () {
 
             resetMock();
 
@@ -514,6 +514,44 @@ test(
 
             assert.equal(status.status, 200);
             assert.equal(status.json.status, "online");
+
+            const configuration = await request(
+                gatewayPort,
+                "GET",
+                "/api/dashboard/config"
+            );
+
+            assert.equal(configuration.status, 200);
+            assert.equal(configuration.json.widgets.length, 5);
+            assert.deepEqual(
+                configuration.json.widgets.map(function (widget) {
+                    return widget.entity;
+                }),
+                [
+                    TEMPERATURE_ENTITY,
+                    HUMIDITY_ENTITY,
+                    "binary_sensor.kuche_fenster_rechts",
+                    LIGHT_ENTITY,
+                    CLIMATE_ENTITY
+                ]
+            );
+            assert.deepEqual(
+                configuration.json.widgets.map(function (widget) {
+                    return widget.type;
+                }),
+                [
+                    "sensor",
+                    "sensor",
+                    "binary",
+                    "light",
+                    "climate"
+                ]
+            );
+            assert.equal(
+                JSON.stringify(configuration.json)
+                    .indexOf(TEST_TOKEN),
+                -1
+            );
 
             const dashboard = await request(
                 gatewayPort,

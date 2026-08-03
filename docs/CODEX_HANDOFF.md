@@ -100,6 +100,7 @@ Important files:
 
 ```text
 src/server.js
+src/config/dashboard.js
 src/routes/api.js
 src/services/homeassistant.js
 ```
@@ -153,6 +154,7 @@ src/public/js/widgets/climate.js
 - binary window sensor card
 - allowlisted Esszimmer light card
 - responsive optimistic light on/off control
+- server-side dashboard widget configuration
 - climate card
 - target-temperature controls
 - automatic refresh
@@ -171,7 +173,26 @@ climate.esszimmer_thermostate
 ```
 
 Codex must inspect the actual entity list in `src/routes/api.js` and
-`src/public/js/app.js`.
+`src/config/dashboard.js`.
+
+## Dashboard configuration
+
+Visible widgets and read-only entity selection are centrally defined in:
+
+```text
+src/config/dashboard.js
+```
+
+The browser obtains the sanitized visible configuration from:
+
+```text
+GET /api/dashboard/config
+```
+
+The supported widget types are explicitly mapped in
+`src/public/js/core/dashboard.js`. Unknown types are ignored. Display
+configuration never grants write access; the climate and light write
+allowlists remain separate in `src/routes/api.js`.
 
 ## Legacy-browser constraints
 

@@ -47,6 +47,7 @@ browser.
 - binary sensor card
 - allowlisted Esszimmer light card
 - responsive optimistic light on/off control
+- server-side dashboard widget configuration
 - climate card
 - climate target-temperature controls
 - iOS home-screen standalone mode
@@ -185,6 +186,12 @@ Dashboard data:
 GET /api/dashboard
 ```
 
+Dashboard widget configuration:
+
+```text
+GET /api/dashboard/config
+```
+
 Set climate target temperature:
 
 ```text
@@ -217,6 +224,34 @@ Example body:
 
 Writable entities must be explicitly allowlisted in the backend.
 
+## Dashboard configuration
+
+Visible widgets are defined in:
+
+```text
+src/config/dashboard.js
+```
+
+Each entry defines:
+
+- `entity`
+- `type`
+- `title`
+- `subtitle`
+- `icon`
+- `iconClass`
+- `unit`
+- `order`
+- `visible`
+
+Set `visible` to `false` to remove a widget from both the browser
+configuration and the dashboard state query. Supported frontend widget types
+are explicitly limited to `sensor`, `binary`, `light`, and `climate`.
+
+This configuration controls display and read access only. Adding an entity
+here does not make it writable. Climate and light write permissions remain in
+the separate allowlists in `src/routes/api.js`.
+
 ## Security model
 
 - The Home Assistant token exists only in `.env`.
@@ -237,6 +272,8 @@ ha-legacy-dashboard/
 ├── docs/
 │   └── CODEX_HANDOFF.md
 └── src/
+    ├── config/
+    │   └── dashboard.js
     ├── server.js
     ├── routes/
     ├── services/
