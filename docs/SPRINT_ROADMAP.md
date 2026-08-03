@@ -27,12 +27,12 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 1 | Express-Gateway und HA-Anbindung | abgeschlossen |
 | 2 | Legacy-kompatibles Dashboard | abgeschlossen |
 | 3 | Modulare Widgets, Icons und Theme | abgeschlossen |
-| 4 | Climate-Widget und Solltemperatur | Verifikation offen |
+| 4 | Climate-Widget und Solltemperatur | abgeschlossen |
 | 5 | Standalone-Web-App für iOS 9 | geplant |
 | 6 | Weitere steuerbare Entitäten | vorgeschlagen |
 | 7 | Konfigurationsgetriebene Dashboards | vorgeschlagen |
 | 8 | Robustheit und Sicherheit | vorgeschlagen |
-| 9 | Lokale Mock- und Integrationstests | geplant |
+| 9 | Lokale Mock- und Integrationstests | abgeschlossen |
 | 10 | Deployment und Betrieb | vorgeschlagen |
 | 11 | Wall-Display-Betrieb | vorgeschlagen |
 | 12 | Release und Dokumentation | vorgeschlagen |
@@ -176,10 +176,14 @@ Die Erfolgsmeldung und der neue Zielwert wurden zunächst nicht sichtbar.
 - HTTP 200 bei Bestätigung
 - HTTP 202 bei noch ausstehender Bestätigung
 
-## Offene Codex-Aufgabe
+## Abschluss
 
-Codex soll prüfen, welche Teile bereits implementiert sind, den vollständigen
-Ablauf nachvollziehen und nur den kleinsten zuverlässigen Fix umsetzen.
+- Zielwert wird optimistisch aktualisiert
+- schnelle Plus-/Minus-Klicks werden zusammengefasst
+- Bedienelemente bleiben während der HA-Bestätigung aktiv
+- veraltete Refresh-Antworten werden verworfen
+- HTTP 200 und HTTP 202 werden korrekt verarbeitet
+- Funktion auf dem iPad unter iOS 9 abgenommen
 
 ## Abnahmekriterien
 
@@ -262,9 +266,21 @@ Frontend-Konfiguration und Backend-Schreibrechte bleiben strikt getrennt.
 
 # Sprint 9 – Lokale Mock- und Integrationstests
 
-## Geplant
+## Umgesetzt
 
-Codex darf lokale Mock-HTTP-Server verwenden.
+- integrierter Node-Test-Runner ohne zusätzliche Testabhängigkeiten
+- Frontend-Test mit Fake-DOM und kontrollierten Timern
+- echter Gateway-Prozess gegen lokalen Mock-Home-Assistant
+- Test-Gateway startet in einem leeren temporären Arbeitsverzeichnis
+- ausschließlich gefälschter HA-Token
+- Mock-Server bindet nur an `127.0.0.1`
+- automatische Bereinigung aller Testprozesse und temporären Dateien
+
+Ausführung:
+
+```bash
+npm test
+```
 
 ## Verbindliche Regeln
 
