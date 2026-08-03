@@ -153,6 +153,15 @@ var climateRequestActive =
 var dashboardRefreshBlockedUntil =
     0;
 
+var pendingClimateUpdate =
+    null;
+
+var climateUpdateTimer =
+    null;
+
+var climateUpdateDelay =
+    500;
+
 function hasClass(
     element,
     className
@@ -516,6 +525,234 @@ function updateClimateTargetDisplay(
    CLIMATE CONTROL
    ========================================================= */
 
+function climateUpdateInProgress() {
+
+    return (
+
+        climateRequestActive ||
+
+        pendingClimateUpdate !== null ||
+
+        climateUpdateTimer !== null
+
+    );
+
+}
+
+
+function scheduleClimateTemperatureUpdate() {
+
+    if (climateUpdateTimer !== null) {
+
+        window.clearTimeout(
+            climateUpdateTimer
+        );
+
+    }
+
+
+    climateUpdateTimer =
+
+        window.setTimeout(
+
+            function () {
+
+                climateUpdateTimer =
+                    null;
+
+                sendPendingClimateTemperature();
+
+            },
+
+            climateUpdateDelay
+
+        );
+
+}
+
+
+function sendPendingClimateTemperature() {
+
+    var status =
+
+        Legacy.dom.byId(
+            "updated"
+        );
+
+
+    var update;
+
+
+    if (
+
+        climateRequestActive ||
+
+        pendingClimateUpdate === null
+
+    ) {
+
+        return;
+
+    }
+
+
+    update =
+        pendingClimateUpdate;
+
+    pendingClimateUpdate =
+        null;
+
+    climateRequestActive =
+        true;
+
+
+    Legacy.http.post(
+
+        "/api/climate/temperature",
+
+        {
+
+            entity_id:
+                update.entityId,
+
+            temperature:
+                update.temperature
+
+        },
+
+        function (response) {
+
+            var acceptedTemperature =
+                update.temperature;
+
+
+            climateRequestActive =
+                false;
+
+
+            if (pendingClimateUpdate !== null) {
+
+                scheduleClimateTemperatureUpdate();
+
+                return;
+
+            }
+
+
+            if (
+
+                response &&
+
+                typeof response.temperature ===
+                    "number" &&
+
+                isFinite(
+                    response.temperature
+                )
+
+            ) {
+
+                acceptedTemperature =
+                    response.temperature;
+
+            }
+
+
+            dashboardRefreshBlockedUntil =
+
+                new Date().getTime() +
+                5000;
+
+
+            updateClimateTargetDisplay(
+
+                update.entityId,
+
+                acceptedTemperature,
+
+                update.step
+
+            );
+
+
+            if (status) {
+
+                status.innerHTML =
+
+                    "Zieltemperatur wurde gesetzt";
+
+            }
+
+
+            window.setTimeout(
+
+                loadDashboard,
+
+                5000
+
+            );
+
+        },
+
+        function (error) {
+
+            climateRequestActive =
+                false;
+
+            pendingClimateUpdate =
+                null;
+
+
+            if (climateUpdateTimer !== null) {
+
+                window.clearTimeout(
+                    climateUpdateTimer
+                );
+
+                climateUpdateTimer =
+                    null;
+
+            }
+
+
+            dashboardRefreshBlockedUntil =
+
+                new Date().getTime() +
+                3000;
+
+
+            if (status) {
+
+                status.innerHTML =
+
+                    "Fehler: " +
+
+                    (
+                        error &&
+                        error.message
+
+                            ? error.message
+
+                            : "Befehl fehlgeschlagen"
+                    );
+
+            }
+
+
+            window.setTimeout(
+
+                loadDashboard,
+
+                3000
+
+            );
+
+        }
+
+    );
+
+}
+
 function setClimateTemperature(
     button
 ) {
@@ -596,8 +833,6 @@ function setClimateTemperature(
 
     if (
 
-        climateRequestActive ||
-
         button.disabled
 
     ) {
@@ -675,144 +910,57 @@ function setClimateTemperature(
     );
 
 
-    climateRequestActive =
-        true;
+    updateClimateTargetDisplay(
 
+        entityId,
 
-    setClimateControlsBusy(
-        true
+        nextTemperature,
+
+        step
+
     );
+
+
+    pendingClimateUpdate = {
+
+        entityId:
+            entityId,
+
+        temperature:
+            nextTemperature,
+
+        step:
+            step
+
+    };
+
+
+    dashboardRefreshBlockedUntil =
+
+        new Date().getTime() +
+        5000;
 
 
     if (status) {
 
         status.innerHTML =
 
-            "Setze Zieltemperatur auf " +
+            "Zieltemperatur " +
 
             nextTemperature.toFixed(
                 displayDecimals
             ) +
 
-            " °C …";
+            " °C wird gespeichert …";
 
     }
 
 
-    Legacy.http.post(
+    if (!climateRequestActive) {
 
-        "/api/climate/temperature",
+        scheduleClimateTemperatureUpdate();
 
-        {
-
-            entity_id:
-                entityId,
-
-            temperature:
-                nextTemperature
-
-        },
-
-        function (response) {
-
-            var acceptedTemperature =
-                nextTemperature;
-
-
-            if (
-
-                response &&
-
-                typeof response.temperature ===
-                    "number" &&
-
-                isFinite(
-                    response.temperature
-                )
-
-            ) {
-
-                acceptedTemperature =
-                    response.temperature;
-
-            }
-
-            climateRequestActive =
-                false;
-
-
-            dashboardRefreshBlockedUntil =
-
-                new Date().getTime() +
-                5000;
-
-
-            updateClimateTargetDisplay(
-
-                entityId,
-
-                acceptedTemperature,
-
-                step
-
-            );
-
-
-            setClimateControlsBusy(
-                false
-            );
-
-
-            if (status) {
-
-                status.innerHTML =
-
-                    "Zieltemperatur wurde gesetzt";
-
-            }
-
-
-            window.setTimeout(
-
-                loadDashboard,
-
-                5000
-
-            );
-
-        },
-
-        function (error) {
-
-            climateRequestActive =
-                false;
-
-
-            setClimateControlsBusy(
-                false
-            );
-
-
-            if (status) {
-
-                status.innerHTML =
-
-                    "Fehler: " +
-
-                    (
-                        error &&
-                        error.message
-
-                            ? error.message
-
-                            : "Befehl fehlgeschlagen"
-                    );
-
-            }
-
-        }
-
-    );
+    }
 
 }
 
@@ -927,7 +1075,7 @@ function loadDashboard() {
 
     if (
 
-        climateRequestActive ||
+        climateUpdateInProgress() ||
 
         new Date().getTime() <
             dashboardRefreshBlockedUntil
@@ -960,7 +1108,7 @@ function loadDashboard() {
 
             if (
 
-                climateRequestActive ||
+                climateUpdateInProgress() ||
 
                 requestStartedAt <
                     dashboardRefreshBlockedUntil
@@ -993,7 +1141,7 @@ function loadDashboard() {
 
             if (
 
-                climateRequestActive ||
+                climateUpdateInProgress() ||
 
                 requestStartedAt <
                     dashboardRefreshBlockedUntil
