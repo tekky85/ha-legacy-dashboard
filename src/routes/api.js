@@ -98,6 +98,119 @@ function normalizeToStep(
 
 }
 
+function sleep(milliseconds) {
+
+    return new Promise(function (resolve) {
+
+        setTimeout(
+            resolve,
+            milliseconds
+        );
+
+    });
+
+}
+
+
+function temperaturesEqual(
+    firstValue,
+    secondValue
+) {
+
+    const first =
+        toFiniteNumber(firstValue);
+
+    const second =
+        toFiniteNumber(secondValue);
+
+
+    if (
+        first === null ||
+        second === null
+    ) {
+
+        return false;
+
+    }
+
+
+    return Math.abs(
+        first - second
+    ) < 0.001;
+
+}
+
+
+async function waitForTargetTemperature(
+    entityId,
+    requestedTemperature
+) {
+
+    let state = null;
+
+    /*
+     * Sofort prüfen und anschließend bis zu
+     * fünf weitere Male im Abstand von 500 ms.
+     *
+     * Maximale zusätzliche Wartezeit:
+     * ungefähr 2,5 Sekunden.
+     */
+
+    for (
+        let attempt = 0;
+        attempt < 6;
+        attempt++
+    ) {
+
+        state =
+            await ha.getEntity(entityId);
+
+
+        if (
+
+            state &&
+
+            state.attributes &&
+
+            temperaturesEqual(
+
+                state.attributes.temperature,
+
+                requestedTemperature
+
+            )
+
+        ) {
+
+            return {
+
+                confirmed: true,
+
+                state: state
+
+            };
+
+        }
+
+
+        if (attempt < 5) {
+
+            await sleep(500);
+
+        }
+
+    }
+
+
+    return {
+
+        confirmed: false,
+
+        state: state
+
+    };
+
+}
 
 /* =========================================================
    DASHBOARD DATA
@@ -342,41 +455,87 @@ router.post(
 
             await ha.callService(
 
-                "climate",
+    "climate",
 
-                "set_temperature",
+    "set_temperature",
 
-                {
+    {
 
-                    entity_id:
-                        entityId,
+        entity_id:
+            entityId,
 
-                    temperature:
-                        temperature
+        temperature:
+            temperature
 
-                }
+    }
 
-            );
-
-
-            const updatedState =
-                await ha.getEntity(entityId);
+);
 
 
-            return res.json({
+const confirmation =
 
-                ok: true,
+    await waitForTargetTemperature(
 
-                entity_id:
-                    entityId,
+        entityId,
 
-                temperature:
-                    temperature,
+        temperature
 
-                state:
-                    updatedState
+    );
 
-            });
+
+console.log(
+
+    "Climate target:",
+
+    entityId,
+
+    temperature,
+
+    "confirmed:",
+
+    confirmation.confirmed
+
+);
+
+
+/*
+ * HTTP 200:
+ * Home Assistant meldet bereits den neuen Wert.
+ *
+ * HTTP 202:
+ * Der Befehl wurde angenommen, aber die Entity
+ * meldet noch den vorherigen Sollwert.
+ */
+
+return res
+
+    .status(
+
+        confirmation.confirmed
+
+            ? 200
+
+            : 202
+
+    )
+
+    .json({
+
+        ok: true,
+
+        confirmed:
+            confirmation.confirmed,
+
+        entity_id:
+            entityId,
+
+        temperature:
+            temperature,
+
+        state:
+            confirmation.state
+
+    });
 
         } catch (error) {
 

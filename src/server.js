@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use("/api", apiRoutes);
+app.use(express.static("src/public"));
 
 app.get('/api/status', (req, res) => {
 

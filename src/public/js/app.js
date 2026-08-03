@@ -150,6 +150,8 @@ Dashboard.addWidget(
 var climateRequestActive =
     false;
 
+var dashboardRefreshBlockedUntil =
+    0;
 
 function hasClass(
     element,
@@ -359,6 +361,156 @@ function setClimateControlsBusy(
 
 }
 
+function updateClimateTargetDisplay(
+    entityId,
+    temperature,
+    step
+) {
+
+    var buttons =
+
+        document.getElementsByClassName(
+
+            "climate-control"
+
+        );
+
+
+    var card = null;
+
+    var display = null;
+
+    var currentElement = null;
+
+    var decimals = Math.max(
+
+        1,
+
+        decimalPlaces(step)
+
+    );
+
+
+    var index;
+
+
+    /*
+     * Neuen Zielwert in beiden Buttons speichern.
+     * Dadurch funktioniert der nächste Plus-/Minus-
+     * Klick bereits mit dem neuen Wert.
+     */
+
+    for (
+
+        index = 0;
+
+        index < buttons.length;
+
+        index++
+
+    ) {
+
+        if (
+
+            buttons[index].getAttribute(
+                "data-entity"
+            ) === entityId
+
+        ) {
+
+            buttons[index].setAttribute(
+
+                "data-target",
+
+                String(temperature)
+
+            );
+
+
+            if (!card) {
+
+                currentElement =
+                    buttons[index];
+
+
+                while (
+
+                    currentElement &&
+
+                    currentElement !==
+                        document.body
+
+                ) {
+
+                    if (
+
+                        hasClass(
+
+                            currentElement,
+
+                            "card-climate"
+
+                        )
+
+                    ) {
+
+                        card =
+                            currentElement;
+
+                        break;
+
+                    }
+
+
+                    currentElement =
+
+                        currentElement.parentNode;
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    if (!card) {
+
+        return;
+
+    }
+
+
+    display =
+
+        card.getElementsByClassName(
+
+            "climate-target-value"
+
+        )[0];
+
+
+    if (!display) {
+
+        return;
+
+    }
+
+
+    display.innerHTML =
+
+        Legacy.html.escape(
+
+            Number(temperature).toFixed(
+                decimals
+            )
+
+        ) +
+
+        "<small>°C</small>";
+
+}
 
 /* =========================================================
    CLIMATE CONTROL
