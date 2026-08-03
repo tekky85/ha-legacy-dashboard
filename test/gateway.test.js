@@ -95,6 +95,7 @@ function request(port, method, requestPath, body, rawBody) {
 
                     resolve({
                         status: res.statusCode,
+                        headers: res.headers,
                         text: responseText,
                         json: json
                     });
@@ -406,6 +407,51 @@ test(
             ),
             false
         );
+
+        await t.test("Standalone-Dateien und Cache-Header", async function () {
+
+            const index = await request(
+                gatewayPort,
+                "GET",
+                "/"
+            );
+
+            assert.equal(index.status, 200);
+            assert.equal(
+                index.headers["cache-control"],
+                "no-cache, no-store, must-revalidate"
+            );
+            assert.match(
+                index.text,
+                /apple-mobile-web-app-capable/
+            );
+
+            const manifest = await request(
+                gatewayPort,
+                "GET",
+                "/manifest.json"
+            );
+
+            assert.equal(manifest.status, 200);
+            assert.equal(
+                manifest.headers["cache-control"],
+                "no-cache, no-store, must-revalidate"
+            );
+            assert.equal(manifest.json.display, "standalone");
+
+            const applicationScript = await request(
+                gatewayPort,
+                "GET",
+                "/js/app.js?v=9"
+            );
+
+            assert.equal(applicationScript.status, 200);
+            assert.equal(
+                applicationScript.headers["cache-control"],
+                "public, max-age=31536000, immutable"
+            );
+
+        });
 
         await t.test("Status und Dashboard", async function () {
 

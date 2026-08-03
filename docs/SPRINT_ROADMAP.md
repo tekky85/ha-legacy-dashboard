@@ -28,7 +28,7 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 2 | Legacy-kompatibles Dashboard | abgeschlossen |
 | 3 | Modulare Widgets, Icons und Theme | abgeschlossen |
 | 4 | Climate-Widget und Solltemperatur | abgeschlossen |
-| 5 | Standalone-Web-App für iOS 9 | geplant |
+| 5 | Standalone-Web-App für iOS 9 | abgeschlossen |
 | 6 | Weitere steuerbare Entitäten | vorgeschlagen |
 | 7 | Konfigurationsgetriebene Dashboards | vorgeschlagen |
 | 8 | Robustheit und Sicherheit | vorgeschlagen |
@@ -199,16 +199,20 @@ Die Erfolgsmeldung und der neue Zielwert wurden zunächst nicht sichtbar.
 
 # Sprint 5 – Standalone-Web-App für iOS 9
 
-## Geplant
+## Umgesetzt
 
 - Apple-Web-App-Meta-Tags
 - `apple-mobile-web-app-capable`
 - `apple-mobile-web-app-title`
-- Apple-Touch-Icons
-- Start über Home-Bildschirm
-- Vollbildmodus soweit iOS 9 unterstützt
-- Manifest für moderne Browser
-- Cache-Steuerung
+- Statusbalkenstil für den Standalone-Modus
+- lokale Apple-Touch-Icons in 76, 120, 152 und 180 Pixeln
+- Start über den Home-Bildschirm
+- Vollbildmodus ohne Safari-Adress- und Buttonleisten
+- Manifest und Icons in 192 und 512 Pixeln für moderne Browser
+- keine Service-Worker-Registrierung
+- HTML und Manifest werden nicht dauerhaft gecacht
+- versionierte statische Assets erhalten langfristige Cache-Header
+- automatisierte Tests für Metadaten, Manifest, Icons und Cache-Header
 
 ## Einschränkung
 

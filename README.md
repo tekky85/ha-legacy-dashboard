@@ -47,6 +47,9 @@ browser.
 - binary sensor card
 - climate card
 - climate target-temperature controls
+- iOS home-screen standalone mode
+- local Apple touch icons
+- web app manifest for modern browsers
 - automatic refresh
 - Safari iOS 9 compatibility
 - systemd service deployment
@@ -119,6 +122,20 @@ Open:
 ```text
 http://gateway-address:3000/
 ```
+
+## iPad home-screen installation
+
+On the iPad, open the dashboard URL in Safari and select:
+
+```text
+Share -> Add to Home Screen
+```
+
+Start the dashboard from the new home-screen icon. On iOS 9 it then runs as a
+classic standalone web app without Safari's address and button bars.
+
+iOS 9 does not support service workers. The dashboard therefore remains an
+online application and requires access to the gateway.
 
 ## Production deployment
 
