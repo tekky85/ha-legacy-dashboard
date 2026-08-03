@@ -48,6 +48,10 @@ browser.
 - allowlisted Esszimmer light card
 - responsive optimistic light on/off control
 - server-side dashboard widget configuration
+- Home Assistant reachability status
+- stale-data indicator with last successful refresh
+- structured JSON logs with secret-field redaction
+- security headers, payload limit, and write rate limit
 - climate card
 - climate target-temperature controls
 - iOS home-screen standalone mode
@@ -180,6 +184,10 @@ Gateway status:
 GET /api/status
 ```
 
+The response reports the gateway and Home Assistant status separately. A
+reachable gateway with an unavailable Home Assistant reports `degraded` while
+remaining available for diagnostics.
+
 Dashboard data:
 
 ```text
@@ -260,6 +268,21 @@ the separate allowlists in `src/routes/api.js`.
 - Browser input is validated.
 - Arbitrary Home Assistant services are not exposed.
 - `.env` is excluded from Git.
+- JSON request bodies are limited to 16 KB.
+- Allowed HA writes are limited to 10 calls per entity in 10 seconds.
+- API responses are not cached.
+- CSP, frame, referrer, and MIME-sniffing protection headers are sent.
+
+## Failure handling
+
+Home Assistant requests and browser requests use a 10-second timeout. The
+dashboard response contains a `_meta` object with HA status, fetch time, and
+failed visible entities. When HA is completely unavailable, the frontend keeps
+the last successful cards on screen and shows the time of the last complete
+refresh. Partial failures are marked as partially available.
+
+Application events are written as one-line JSON logs. Request bodies,
+authorization headers, and Home Assistant tokens are never logged.
 
 ## Project structure
 

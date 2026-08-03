@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const apiRoutes = require("./routes/api");
+const logger = require("./services/logger");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -37,8 +38,67 @@ function setStaticHeaders(res, filePath) {
 }
 
 
-app.use(express.json());
-app.use("/api", apiRoutes);
+function setSecurityHeaders(req, res, next) {
+
+    res.setHeader(
+        "Content-Security-Policy",
+        "default-src 'self'; " +
+        "base-uri 'none'; " +
+        "connect-src 'self'; " +
+        "font-src 'self'; " +
+        "frame-ancestors 'none'; " +
+        "img-src 'self' data:; " +
+        "object-src 'none'; " +
+        "script-src 'self'; " +
+        "style-src 'self'"
+    );
+
+    res.setHeader(
+        "Referrer-Policy",
+        "no-referrer"
+    );
+
+    res.setHeader(
+        "X-Content-Type-Options",
+        "nosniff"
+    );
+
+    res.setHeader(
+        "X-Frame-Options",
+        "DENY"
+    );
+
+    next();
+
+}
+
+
+function setApiHeaders(req, res, next) {
+
+    res.setHeader(
+        "Cache-Control",
+        "no-store"
+    );
+
+    next();
+
+}
+
+
+app.disable("x-powered-by");
+app.use(setSecurityHeaders);
+app.use(express.json({
+    limit: "16kb",
+    strict: true
+}));
+app.use("/api", setApiHeaders, apiRoutes);
+app.use("/api", function (req, res) {
+
+    res.status(404).json({
+        error: "API-Endpunkt nicht gefunden"
+    });
+
+});
 app.use(express.static(
     PUBLIC_PATH,
     {
@@ -46,22 +106,57 @@ app.use(express.static(
     }
 ));
 
-app.get('/api/status', (req, res) => {
+app.use(function (error, req, res, next) {
 
-    res.json({
-        status: "online",
-        service: "ha-dashboard-gateway",
-        version: "0.1.0",
-        timestamp: new Date()
+    let status = 500;
+    let message = "Interner Gateway-Fehler";
+
+
+    if (error && error.type === "entity.too.large") {
+        status = 413;
+        message = "Anfrage ist zu groß";
+    } else if (
+        error &&
+        error.status === 400 &&
+        error instanceof SyntaxError
+    ) {
+        status = 400;
+        message = "Ungültiges JSON";
+    }
+
+
+    logger[status >= 500 ? "error" : "warn"](
+        "request_failed",
+        {
+            method: req.method,
+            path: req.path,
+            status: status,
+            error_type:
+                error && error.type
+                    ? error.type
+                    : error && error.name
+                        ? error.name
+                        : "unknown"
+        }
+    );
+
+
+    if (res.headersSent) {
+        return next(error);
+    }
+
+
+    return res.status(status).json({
+        error: message
     });
 
 });
 
 
-app.listen(PORT, () => {
+app.listen(PORT, function () {
 
-    console.log(
-        `HA Dashboard Gateway läuft auf Port ${PORT}`
-    );
+    logger.info("server_started", {
+        port: Number(PORT)
+    });
 
 });

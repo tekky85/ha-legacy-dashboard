@@ -31,7 +31,7 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 5 | Standalone-Web-App für iOS 9 | abgeschlossen |
 | 6 | Weitere steuerbare Entitäten | abgeschlossen |
 | 7 | Konfigurationsgetriebene Dashboards | abgeschlossen |
-| 8 | Robustheit und Sicherheit | vorgeschlagen |
+| 8 | Robustheit und Sicherheit | abgeschlossen |
 | 9 | Lokale Mock- und Integrationstests | abgeschlossen |
 | 10 | Deployment und Betrieb | vorgeschlagen |
 | 11 | Wall-Display-Betrieb | vorgeschlagen |
@@ -285,19 +285,27 @@ Die Allowlisten für `climate` und `light` verbleiben separat in
 
 # Sprint 8 – Robustheit, Fehlerbehandlung und Sicherheit
 
-## Vorgeschlagen
+## Umgesetzt
 
-- zentrale Fehlerbehandlung
-- Request-Timeouts
-- definierte HTTP-Statuscodes
-- strukturierte Logs
-- HA-Erreichbarkeitsstatus
-- Anzeige veralteter Daten
-- letzter erfolgreicher Refresh
-- Rate-Limit für schreibende Endpunkte
-- Payload-Begrenzung
-- sichere HTTP-Header
-- keine Secrets in Logs
+- zentrale Express-Fehlerbehandlung für ungültiges JSON und zu große Payloads
+- 10-Sekunden-Timeouts für Browser- und HA-Requests
+- definierte Statuscodes einschließlich 400, 403, 404, 413, 429, 502 und 503
+- strukturierte einzeilige JSON-Logs
+- zusätzliche Redaktion von Feldnamen wie Token, Authorization, Password und
+  Secret
+- `GET /api/status` mit getrenntem Gateway- und HA-Erreichbarkeitsstatus
+- `_meta` in Dashboard-Antworten mit HA-Status, Abrufzeit und ausgefallenen
+  sichtbaren Entities
+- letzte erfolgreiche Kacheln bleiben bei vollständigem HA-Ausfall sichtbar
+- Anzeige des letzten vollständigen erfolgreichen Refreshs
+- Kennzeichnung teilweiser Erreichbarkeit
+- Rate-Limit von 10 tatsächlichen HA-Schreibaufrufen je Entity und 10 Sekunden
+- JSON-Payload-Limit von 16 KB
+- `Cache-Control: no-store` für API-Antworten
+- Content-Security-Policy, `X-Frame-Options: DENY`, `Referrer-Policy:
+  no-referrer` und `X-Content-Type-Options: nosniff`
+- Express-Technologieheader deaktiviert
+- automatisierte Sicherheits-, Gateway- und Frontendtests
 
 ---
 

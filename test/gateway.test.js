@@ -169,6 +169,7 @@ test(
         const mock = {
             authorizationHeaders: [],
             confirmationMode: "immediate",
+            connectionError: false,
             hangEntity: null,
             lightServiceCalls: [],
             lightState: "off",
@@ -183,6 +184,7 @@ test(
 
         function resetMock() {
             mock.confirmationMode = "immediate";
+            mock.connectionError = false;
             mock.hangEntity = null;
             mock.lightServiceCalls = [];
             mock.lightState = "off";
@@ -213,6 +215,26 @@ test(
                     "Content-Type",
                     "application/json"
                 );
+
+                if (
+                    req.method === "GET" &&
+                    req.url === "/api/"
+                ) {
+
+                    if (mock.connectionError) {
+                        res.statusCode = 503;
+                        res.end(JSON.stringify({
+                            message: "simulated unavailable"
+                        }));
+                        return;
+                    }
+
+                    res.end(JSON.stringify({
+                        message: "API running"
+                    }));
+                    return;
+
+                }
 
                 if (
                     req.method === "POST" &&
@@ -394,6 +416,7 @@ test(
         );
 
         let gatewayErrorOutput = "";
+        let gatewayOutput = "";
 
         gateway.stderr.on("data", function (chunk) {
             gatewayErrorOutput += chunk.toString();
@@ -426,11 +449,8 @@ test(
             }, 5000);
 
             gateway.stdout.on("data", function (chunk) {
-                if (
-                    chunk.toString().indexOf(
-                        "läuft auf Port"
-                    ) !== -1
-                ) {
+                gatewayOutput += chunk.toString();
+                if (gatewayOutput.indexOf("server_started") !== -1) {
                     clearTimeout(startTimer);
                     resolve();
                 }
@@ -467,6 +487,22 @@ test(
 
             assert.equal(index.status, 200);
             assert.equal(
+                index.headers["x-content-type-options"],
+                "nosniff"
+            );
+            assert.equal(
+                index.headers["x-frame-options"],
+                "DENY"
+            );
+            assert.match(
+                index.headers["content-security-policy"],
+                /default-src 'self'/
+            );
+            assert.equal(
+                index.headers["x-powered-by"],
+                undefined
+            );
+            assert.equal(
                 index.headers["cache-control"],
                 "no-cache, no-store, must-revalidate"
             );
@@ -491,7 +527,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=11"
+                "/js/app.js?v=12"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -514,6 +550,14 @@ test(
 
             assert.equal(status.status, 200);
             assert.equal(status.json.status, "online");
+            assert.equal(
+                status.json.home_assistant.status,
+                "online"
+            );
+            assert.equal(
+                status.headers["cache-control"],
+                "no-store"
+            );
 
             const configuration = await request(
                 gatewayPort,
@@ -563,7 +607,40 @@ test(
             assert.ok(dashboard.json[CLIMATE_ENTITY]);
             assert.ok(dashboard.json[LIGHT_ENTITY]);
             assert.equal(
+                dashboard.json._meta.home_assistant,
+                "online"
+            );
+            assert.deepEqual(
+                dashboard.json._meta.failed_entities,
+                []
+            );
+            assert.equal(
                 JSON.stringify(dashboard.json)
+                    .indexOf(TEST_TOKEN),
+                -1
+            );
+
+        });
+
+        await t.test("HA-Erreichbarkeitsstatus", async function () {
+
+            resetMock();
+            mock.connectionError = true;
+
+            const response = await request(
+                gatewayPort,
+                "GET",
+                "/api/status"
+            );
+
+            assert.equal(response.status, 200);
+            assert.equal(response.json.status, "degraded");
+            assert.equal(
+                response.json.home_assistant.status,
+                "offline"
+            );
+            assert.equal(
+                JSON.stringify(response.json)
                     .indexOf(TEST_TOKEN),
                 -1
             );
@@ -591,6 +668,14 @@ test(
                     .gateway_error,
                 true
             );
+            assert.equal(
+                response.json._meta.home_assistant,
+                "degraded"
+            );
+            assert.deepEqual(
+                response.json._meta.failed_entities,
+                [HUMIDITY_ENTITY]
+            );
 
         });
 
@@ -603,10 +688,46 @@ test(
                 "POST",
                 "/api/climate/temperature",
                 undefined,
-                "{"
+                '{"secret":"' + TEST_TOKEN + '",'
             );
 
             assert.equal(response.status, 400);
+            assert.equal(response.json.error, "Ungültiges JSON");
+
+        });
+
+        await t.test("Payload-Begrenzung und unbekannte API", async function () {
+
+            resetMock();
+
+            const largePayload =
+                '"' + "x".repeat(17000) + '"';
+
+            const tooLarge = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                undefined,
+                largePayload
+            );
+
+            const missing = await request(
+                gatewayPort,
+                "GET",
+                "/api/not-available"
+            );
+
+            assert.equal(tooLarge.status, 413);
+            assert.equal(
+                tooLarge.json.error,
+                "Anfrage ist zu groß"
+            );
+            assert.equal(missing.status, 404);
+            assert.equal(
+                missing.json.error,
+                "API-Endpunkt nicht gefunden"
+            );
+            assert.equal(mock.lightServiceCalls.length, 0);
 
         });
 
@@ -784,6 +905,43 @@ test(
 
         });
 
+        await t.test("Rate-Limit für Lichtbefehle", async function () {
+
+            resetMock();
+
+            const responses = [];
+            let index;
+
+            for (index = 0; index < 8; index += 1) {
+                responses.push(
+                    await request(
+                        gatewayPort,
+                        "POST",
+                        "/api/light/state",
+                        {
+                            entity_id: LIGHT_ENTITY,
+                            state: index % 2 === 0
+                                ? "on"
+                                : "off"
+                        }
+                    )
+                );
+            }
+
+            assert.equal(
+                responses[responses.length - 1].status,
+                429
+            );
+            assert.ok(
+                Number(
+                    responses[responses.length - 1]
+                        .headers["retry-after"]
+                ) >= 1
+            );
+            assert.equal(mock.lightServiceCalls.length, 7);
+
+        });
+
         await t.test("Minimum und Maximum", async function () {
 
             resetMock();
@@ -934,6 +1092,10 @@ test(
                     .gateway_error,
                 true
             );
+            assert.equal(
+                response.json._meta.home_assistant,
+                "degraded"
+            );
             assert.ok(
                 Date.now() - startedAt >= 9000
             );
@@ -951,6 +1113,19 @@ test(
                         "Bearer " + TEST_TOKEN;
                 }
             )
+        );
+
+        assert.equal(
+            gatewayOutput.indexOf(TEST_TOKEN),
+            -1
+        );
+        assert.equal(
+            gatewayErrorOutput.indexOf(TEST_TOKEN),
+            -1
+        );
+        assert.match(
+            gatewayOutput,
+            /"event":"server_started"/
         );
 
     }

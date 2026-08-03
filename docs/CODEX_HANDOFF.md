@@ -155,6 +155,10 @@ src/public/js/widgets/climate.js
 - allowlisted Esszimmer light card
 - responsive optimistic light on/off control
 - server-side dashboard widget configuration
+- HA reachability status and dashboard response metadata
+- stale-data display with last successful refresh
+- structured JSON logging with secret-field redaction
+- security headers, 16 KB JSON limit, and write rate limit
 - climate card
 - target-temperature controls
 - automatic refresh
@@ -408,3 +412,16 @@ aggressively.
 - Do not accept arbitrary Home Assistant services.
 - Do not accept arbitrary writable entities.
 - Keep all control endpoints allowlisted.
+
+## Robustness and security controls
+
+- `GET /api/status` checks Home Assistant and reports `online` or `degraded`.
+- `/api/dashboard` includes `_meta.home_assistant`, `_meta.fetched_at`, and
+  `_meta.failed_entities`.
+- Fully failed refreshes preserve the last rendered cards in the browser.
+- JSON request bodies are limited to 16 KB.
+- HA writes are limited to 10 calls per allowlisted entity per 10 seconds.
+- API responses use `Cache-Control: no-store`.
+- Static and API responses receive CSP, frame, referrer, and nosniff headers.
+- Logs are one-line JSON and redact fields whose names look like secrets.
+- Browser and HA requests time out after 10 seconds.

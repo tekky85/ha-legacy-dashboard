@@ -2,6 +2,7 @@ const axios = require("axios");
 
 const HA_URL = (process.env.HA_URL || "").replace(/\/$/, "");
 const HA_TOKEN = process.env.HA_TOKEN || "";
+const HA_REQUEST_TIMEOUT_MS = 10000;
 
 if (!HA_URL || !HA_TOKEN) {
     throw new Error(
@@ -13,7 +14,7 @@ const client = axios.create({
 
     baseURL: HA_URL,
 
-    timeout: 10000,
+    timeout: HA_REQUEST_TIMEOUT_MS,
 
     headers: {
 
@@ -38,6 +39,34 @@ async function getEntity(entityId) {
     );
 
     return response.data;
+
+}
+
+
+async function checkConnection() {
+
+    try {
+
+        await client.get("/api/");
+
+        return {
+            status: "online"
+        };
+
+    } catch (error) {
+
+        return {
+            status: "offline",
+            http_status:
+                error.response &&
+                error.response.status
+
+                    ? error.response.status
+
+                    : null
+        };
+
+    }
 
 }
 
@@ -107,6 +136,8 @@ async function callService(
 
 
 module.exports = {
+
+    checkConnection: checkConnection,
 
     getEntity: getEntity,
 

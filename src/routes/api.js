@@ -8,6 +8,12 @@ const ha =
 const dashboardConfig =
     require("../config/dashboard");
 
+const logger =
+    require("../services/logger");
+
+const writeRateLimit =
+    require("../services/write-rate-limit");
+
 
 const DASHBOARD_ENTITIES =
     dashboardConfig.getVisibleEntityIds();
@@ -35,6 +41,108 @@ const ALLOWED_LIGHT_ENTITIES = [
     "light.esszimmer_lampen"
 
 ];
+
+
+function allowWrite(res, key) {
+
+    const result =
+        writeRateLimit.consume(key);
+
+
+    res.setHeader(
+        "X-RateLimit-Limit",
+        String(result.limit)
+    );
+
+
+    if (result.allowed) {
+
+        res.setHeader(
+            "X-RateLimit-Remaining",
+            String(result.remaining)
+        );
+
+        return true;
+
+    }
+
+
+    res.setHeader(
+        "Retry-After",
+        String(result.retryAfterSeconds)
+    );
+
+    res.setHeader(
+        "X-RateLimit-Remaining",
+        "0"
+    );
+
+    logger.warn(
+        "write_rate_limited",
+        {
+            key: key,
+            retry_after_seconds:
+                result.retryAfterSeconds
+        }
+    );
+
+    res.status(429).json({
+        error:
+            "Zu viele Steuerbefehle. " +
+            "Bitte kurz warten."
+    });
+
+    return false;
+
+}
+
+
+function addDashboardMeta(entities) {
+
+    const failedEntities =
+
+        DASHBOARD_ENTITIES.filter(
+
+            function (entityId) {
+
+                return Boolean(
+                    entities[entityId] &&
+                    entities[entityId]
+                        .gateway_error
+                );
+
+            }
+
+        );
+
+
+    let status = "online";
+
+
+    if (
+        failedEntities.length ===
+        DASHBOARD_ENTITIES.length
+    ) {
+
+        status = "offline";
+
+    } else if (failedEntities.length > 0) {
+
+        status = "degraded";
+
+    }
+
+
+    entities._meta = {
+        home_assistant: status,
+        fetched_at: new Date().toISOString(),
+        failed_entities: failedEntities
+    };
+
+
+    return entities;
+
+}
 
 
 function toFiniteNumber(value) {
@@ -219,6 +327,36 @@ async function waitForTargetTemperature(
 }
 
 /* =========================================================
+   GATEWAY AND HOME ASSISTANT STATUS
+   ========================================================= */
+
+router.get(
+
+    "/status",
+
+    async function (req, res) {
+
+        const homeAssistant =
+            await ha.checkConnection();
+
+
+        res.json({
+            status:
+                homeAssistant.status === "online"
+                    ? "online"
+                    : "degraded",
+            service: "ha-dashboard-gateway",
+            version: "0.1.0",
+            timestamp: new Date().toISOString(),
+            home_assistant: homeAssistant
+        });
+
+    }
+
+);
+
+
+/* =========================================================
    DASHBOARD CONFIGURATION
    ========================================================= */
 
@@ -259,17 +397,17 @@ router.get(
 
                 );
 
-            res.json(entities);
+            res.json(
+                addDashboardMeta(entities)
+            );
 
         } catch (error) {
 
-            console.error(
-
-                "Dashboard-Daten konnten " +
-                "nicht geladen werden:",
-
-                error.message
-
+            logger.error(
+                "dashboard_load_failed",
+                {
+                    error: error.message
+                }
             );
 
             res.status(502).json({
@@ -481,6 +619,18 @@ router.post(
             }
 
 
+            if (
+                !allowWrite(
+                    res,
+                    "climate:" + entityId
+                )
+            ) {
+
+                return;
+
+            }
+
+
             await ha.callService(
 
     "climate",
@@ -511,18 +661,13 @@ const confirmation =
     );
 
 
-console.log(
-
-    "Climate target:",
-
-    entityId,
-
-    temperature,
-
-    "confirmed:",
-
-    confirmation.confirmed
-
+logger.info(
+    "climate_target_set",
+    {
+        entity_id: entityId,
+        temperature: temperature,
+        confirmed: confirmation.confirmed
+    }
 );
 
 
@@ -577,16 +722,13 @@ return res
                     : null;
 
 
-            console.error(
-
-                "Zieltemperatur konnte " +
-                "nicht gesetzt werden:",
-
-                upstreamStatus ||
-                    "kein HTTP-Status",
-
-                error.message
-
+            logger.error(
+                "climate_target_failed",
+                {
+                    entity_id: entityId,
+                    upstream_status: upstreamStatus,
+                    error: error.message
+                }
             );
 
 
@@ -686,6 +828,18 @@ router.post(
             }
 
 
+            if (
+                !allowWrite(
+                    res,
+                    "light:" + entityId
+                )
+            ) {
+
+                return;
+
+            }
+
+
             await ha.callService(
 
                 "light",
@@ -704,14 +858,12 @@ router.post(
             );
 
 
-            console.log(
-
-                "Light state:",
-
-                entityId,
-
-                requestedState
-
+            logger.info(
+                "light_state_set",
+                {
+                    entity_id: entityId,
+                    state: requestedState
+                }
             );
 
 
@@ -739,16 +891,13 @@ router.post(
                     : null;
 
 
-            console.error(
-
-                "Lichtzustand konnte nicht " +
-                "gesetzt werden:",
-
-                upstreamStatus ||
-                    "kein HTTP-Status",
-
-                error.message
-
+            logger.error(
+                "light_state_failed",
+                {
+                    entity_id: entityId,
+                    upstream_status: upstreamStatus,
+                    error: error.message
+                }
             );
 
 

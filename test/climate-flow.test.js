@@ -15,8 +15,10 @@ function createHarness() {
     const timers = [];
     const intervals = [];
     const configurations = [];
+    const renders = [];
 
     const status = {
+        className: "updated",
         innerHTML: ""
     };
 
@@ -211,7 +213,9 @@ function createHarness() {
                 configurations.push(widgets);
                 return widgets.length;
             },
-            render: function () {}
+            render: function (data) {
+                renders.push(data);
+            }
         },
         SensorWidget: function () {},
         BinaryWidget: function () {},
@@ -262,6 +266,7 @@ function createHarness() {
         minus: minus,
         plus: plus,
         posts: posts,
+        renders: renders,
         status: status,
         completeConfiguration: function () {
             gets[0].success({
@@ -343,6 +348,65 @@ test("fehlerhafte Dashboard-Konfiguration wird erneut geladen", function () {
         harness.gets[1].url,
         "/api/dashboard/config"
     );
+
+});
+
+
+test("veraltete Daten bleiben mit letztem Erfolg sichtbar", function () {
+
+    const harness = createHarness();
+
+    harness.completeConfiguration();
+    harness.gets[1].success({
+        _meta: {
+            home_assistant: "online"
+        }
+    });
+
+    assert.equal(harness.renders.length, 1);
+    assert.equal(
+        harness.status.innerHTML,
+        "Aktualisiert: test-time"
+    );
+
+    harness.intervals[0]();
+    harness.gets[2].success({
+        _meta: {
+            home_assistant: "offline"
+        }
+    });
+
+    assert.equal(harness.renders.length, 1);
+    assert.equal(
+        harness.status.innerHTML,
+        "Verbindung unterbrochen – letzter Erfolg: test-time"
+    );
+    assert.ok(
+        harness.status.className.indexOf("is-stale") !== -1
+    );
+
+    harness.intervals[0]();
+    harness.gets[3].success({
+        _meta: {
+            home_assistant: "degraded"
+        }
+    });
+
+    assert.equal(harness.renders.length, 2);
+    assert.equal(
+        harness.status.innerHTML,
+        "Teilweise verfügbar – letzter voller Erfolg: test-time"
+    );
+
+    harness.intervals[0]();
+    harness.gets[4].success({
+        _meta: {
+            home_assistant: "online"
+        }
+    });
+
+    assert.equal(harness.renders.length, 3);
+    assert.equal(harness.status.className, "updated");
 
 });
 

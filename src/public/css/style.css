@@ -540,6 +540,13 @@ textarea {
 
 }
 
+.updated.is-stale {
+
+    color: #a95c08;
+    font-weight: 600;
+
+}
+
 
 /* =========================================================
    FOOTER
@@ -677,6 +684,12 @@ body.theme-dark .status-danger {
 body.theme-dark .updated {
 
     color: #8f9baa;
+
+}
+
+body.theme-dark .updated.is-stale {
+
+    color: #f0ad55;
 
 }
 

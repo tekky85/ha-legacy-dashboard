@@ -40,6 +40,12 @@ var dashboardConfigured =
 var dashboardConfigurationLoading =
     false;
 
+var dashboardHasData =
+    false;
+
+var lastSuccessfulRefreshText =
+    "";
+
 
 /* =========================================================
    HELPERS
@@ -1705,6 +1711,20 @@ function loadDashboard() {
 
         function (data) {
 
+            var metadata =
+
+                data && data._meta
+
+                    ? data._meta
+
+                    : {};
+
+
+            var homeAssistantStatus =
+
+                metadata.home_assistant ||
+                "online";
+
             if (
 
                 dashboardControlUpdateInProgress() ||
@@ -1718,19 +1738,99 @@ function loadDashboard() {
 
             }
 
+            if (homeAssistantStatus === "offline") {
+
+                if (!dashboardHasData) {
+
+                    Dashboard.render(
+                        data
+                    );
+
+                    dashboardHasData =
+                        true;
+
+                }
+
+
+                if (status) {
+
+                    addClass(
+                        status,
+                        "is-stale"
+                    );
+
+                    status.innerHTML =
+
+                        "Verbindung unterbrochen" +
+
+                        (
+                            lastSuccessfulRefreshText
+
+                                ? " – letzter Erfolg: " +
+                                    lastSuccessfulRefreshText
+
+                                : ""
+                        );
+
+                }
+
+
+                return;
+
+            }
+
+
             Dashboard.render(
                 data
             );
 
+            dashboardHasData =
+                true;
+
 
             if (status) {
+
+                if (homeAssistantStatus === "degraded") {
+
+                    addClass(
+                        status,
+                        "is-stale"
+                    );
+
+                    status.innerHTML =
+
+                        "Teilweise verfügbar" +
+
+                        (
+                            lastSuccessfulRefreshText
+
+                                ? " – letzter voller Erfolg: " +
+                                    lastSuccessfulRefreshText
+
+                                : ""
+                        );
+
+                    return;
+
+                }
+
+
+                lastSuccessfulRefreshText =
+
+                    new Date()
+                        .toLocaleTimeString();
+
+
+                removeClass(
+                    status,
+                    "is-stale"
+                );
 
                 status.innerHTML =
 
                     "Aktualisiert: " +
 
-                    new Date()
-                        .toLocaleTimeString();
+                    lastSuccessfulRefreshText;
 
             }
 
@@ -1753,17 +1853,22 @@ function loadDashboard() {
 
             if (status) {
 
+                addClass(
+                    status,
+                    "is-stale"
+                );
+
                 status.innerHTML =
 
-                    "Fehler: " +
+                    "Verbindung unterbrochen" +
 
                     (
-                        error &&
-                        error.message
+                        lastSuccessfulRefreshText
 
-                            ? error.message
+                            ? " – letzter Erfolg: " +
+                                lastSuccessfulRefreshText
 
-                            : "Keine Verbindung"
+                            : ""
                     );
 
             }
