@@ -11,6 +11,9 @@ const test = require("node:test");
 const CLIMATE_ENTITY =
     "climate.esszimmer_thermostate";
 
+const LIGHT_ENTITY =
+    "light.esszimmer_lampen";
+
 const TEMPERATURE_ENTITY =
     "sensor.badezimmer_smart_indoor_module_temperatur";
 
@@ -167,6 +170,8 @@ test(
             authorizationHeaders: [],
             confirmationMode: "immediate",
             hangEntity: null,
+            lightServiceCalls: [],
+            lightState: "off",
             missingEntity: null,
             pendingTemperature: null,
             postServiceReads: 0,
@@ -179,6 +184,8 @@ test(
         function resetMock() {
             mock.confirmationMode = "immediate";
             mock.hangEntity = null;
+            mock.lightServiceCalls = [];
+            mock.lightState = "off";
             mock.missingEntity = null;
             mock.pendingTemperature = null;
             mock.postServiceReads = 0;
@@ -206,6 +213,44 @@ test(
                     "Content-Type",
                     "application/json"
                 );
+
+                if (
+                    req.method === "POST" &&
+                    (
+                        req.url ===
+                            "/api/services/light/turn_on" ||
+                        req.url ===
+                            "/api/services/light/turn_off"
+                    )
+                ) {
+
+                    if (mock.serviceError) {
+                        res.statusCode = 500;
+                        res.end(JSON.stringify({
+                            message: "simulated service error"
+                        }));
+                        return;
+                    }
+
+                    const serviceData =
+                        JSON.parse(requestBody || "{}");
+
+                    mock.lightServiceCalls.push({
+                        service: req.url.substring(
+                            "/api/services/light/".length
+                        ),
+                        data: serviceData
+                    });
+
+                    mock.lightState =
+                        req.url.indexOf("turn_on") !== -1
+                            ? "on"
+                            : "off";
+
+                    res.end("[]");
+                    return;
+
+                }
 
                 if (
                     req.method === "POST" &&
@@ -290,12 +335,16 @@ test(
                             }
                             : {};
 
+                    const entityState =
+                        entityId === CLIMATE_ENTITY
+                            ? "heat"
+                            : entityId === LIGHT_ENTITY
+                                ? mock.lightState
+                                : "20";
+
                     res.end(JSON.stringify({
                         entity_id: entityId,
-                        state:
-                            entityId === CLIMATE_ENTITY
-                                ? "heat"
-                                : "20",
+                        state: entityState,
                         attributes: attributes
                     }));
                     return;
@@ -442,7 +491,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=9"
+                "/js/app.js?v=10"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -474,6 +523,7 @@ test(
 
             assert.equal(dashboard.status, 200);
             assert.ok(dashboard.json[CLIMATE_ENTITY]);
+            assert.ok(dashboard.json[LIGHT_ENTITY]);
             assert.equal(
                 JSON.stringify(dashboard.json)
                     .indexOf(TEST_TOKEN),
@@ -557,6 +607,142 @@ test(
 
             assert.equal(response.status, 400);
             assert.equal(mock.serviceCalls.length, 0);
+
+        });
+
+        await t.test("erlaubtes Licht ein- und ausschalten", async function () {
+
+            resetMock();
+
+            const turnOn = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {
+                    entity_id: LIGHT_ENTITY,
+                    state: "on"
+                }
+            );
+
+            const turnOff = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {
+                    entity_id: LIGHT_ENTITY,
+                    state: "off"
+                }
+            );
+
+            assert.equal(turnOn.status, 202);
+            assert.equal(turnOn.json.state, "on");
+            assert.equal(turnOff.status, 202);
+            assert.equal(turnOff.json.state, "off");
+
+            assert.deepEqual(
+                mock.lightServiceCalls,
+                [
+                    {
+                        service: "turn_on",
+                        data: {
+                            entity_id: LIGHT_ENTITY
+                        }
+                    },
+                    {
+                        service: "turn_off",
+                        data: {
+                            entity_id: LIGHT_ENTITY
+                        }
+                    }
+                ]
+            );
+
+        });
+
+        await t.test("nicht erlaubte Licht-Entity", async function () {
+
+            resetMock();
+
+            const response = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {
+                    entity_id: "light.not_allowed",
+                    state: "on"
+                }
+            );
+
+            assert.equal(response.status, 403);
+            assert.equal(mock.lightServiceCalls.length, 0);
+
+        });
+
+        await t.test("ungültiger Lichtzustand", async function () {
+
+            resetMock();
+
+            const response = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {
+                    entity_id: LIGHT_ENTITY,
+                    state: "toggle"
+                }
+            );
+
+            assert.equal(response.status, 400);
+            assert.equal(mock.lightServiceCalls.length, 0);
+
+        });
+
+        await t.test("nicht verfügbares Licht", async function () {
+
+            resetMock();
+            mock.lightState = "unavailable";
+
+            const response = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {
+                    entity_id: LIGHT_ENTITY,
+                    state: "on"
+                }
+            );
+
+            assert.equal(response.status, 503);
+            assert.equal(mock.lightServiceCalls.length, 0);
+
+        });
+
+        await t.test("Home-Assistant-Lichtfehler", async function () {
+
+            resetMock();
+            mock.serviceError = true;
+
+            const response = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {
+                    entity_id: LIGHT_ENTITY,
+                    state: "on"
+                }
+            );
+
+            assert.equal(response.status, 502);
+            assert.equal(
+                response.json.error,
+                "Home Assistant konnte den Befehl nicht ausführen"
+            );
+            assert.equal(mock.lightServiceCalls.length, 0);
+            assert.equal(
+                JSON.stringify(response.json)
+                    .indexOf(TEST_TOKEN),
+                -1
+            );
 
         });
 

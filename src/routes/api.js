@@ -14,6 +14,8 @@ const DASHBOARD_ENTITIES = [
 
     "binary_sensor.kuche_fenster_rechts",
 
+    "light.esszimmer_lampen",
+
     "climate.esszimmer_thermostate"
 
 ];
@@ -27,6 +29,18 @@ const DASHBOARD_ENTITIES = [
 const ALLOWED_CLIMATE_ENTITIES = [
 
     "climate.esszimmer_thermostate"
+
+];
+
+
+/*
+ * Nur diese Licht-Entitäten dürfen über
+ * das Gateway geschaltet werden.
+ */
+
+const ALLOWED_LIGHT_ENTITIES = [
+
+    "light.esszimmer_lampen"
 
 ];
 
@@ -553,6 +567,168 @@ return res
 
                 "Zieltemperatur konnte " +
                 "nicht gesetzt werden:",
+
+                upstreamStatus ||
+                    "kein HTTP-Status",
+
+                error.message
+
+            );
+
+
+            return res.status(502).json({
+
+                error:
+
+                    "Home Assistant konnte " +
+                    "den Befehl nicht ausführen"
+
+            });
+
+        }
+
+    }
+
+);
+
+
+/* =========================================================
+   SET LIGHT STATE
+   ========================================================= */
+
+router.post(
+
+    "/light/state",
+
+    async function (req, res) {
+
+        const body =
+            req.body || {};
+
+        const entityId =
+            body.entity_id;
+
+        const requestedState =
+            body.state;
+
+
+        if (
+
+            typeof entityId !== "string" ||
+
+            ALLOWED_LIGHT_ENTITIES
+                .indexOf(entityId) === -1
+
+        ) {
+
+            return res.status(403).json({
+
+                error:
+                    "Diese Licht-Entität ist " +
+                    "nicht freigegeben"
+
+            });
+
+        }
+
+
+        if (
+
+            requestedState !== "on" &&
+            requestedState !== "off"
+
+        ) {
+
+            return res.status(400).json({
+
+                error:
+                    "Der Lichtzustand ist ungültig"
+
+            });
+
+        }
+
+
+        try {
+
+            const currentState =
+                await ha.getEntity(entityId);
+
+
+            if (
+
+                currentState.state === "unavailable" ||
+                currentState.state === "unknown"
+
+            ) {
+
+                return res.status(503).json({
+
+                    error:
+                        "Das Licht ist nicht verfügbar"
+
+                });
+
+            }
+
+
+            await ha.callService(
+
+                "light",
+
+                requestedState === "on"
+                    ? "turn_on"
+                    : "turn_off",
+
+                {
+
+                    entity_id:
+                        entityId
+
+                }
+
+            );
+
+
+            console.log(
+
+                "Light state:",
+
+                entityId,
+
+                requestedState
+
+            );
+
+
+            return res.status(202).json({
+
+                ok: true,
+
+                entity_id:
+                    entityId,
+
+                state:
+                    requestedState
+
+            });
+
+        } catch (error) {
+
+            const upstreamStatus =
+
+                error.response &&
+                error.response.status
+
+                    ? error.response.status
+
+                    : null;
+
+
+            console.error(
+
+                "Lichtzustand konnte nicht " +
+                "gesetzt werden:",
 
                 upstreamStatus ||
                     "kein HTTP-Status",

@@ -138,6 +138,29 @@ var LegacyIcons = {
             '</svg>',
 
 
+        light:
+
+            '<svg ' +
+                'viewBox="0 0 24 24" ' +
+                'aria-hidden="true" ' +
+                'focusable="false"' +
+            '>' +
+
+                '<path ' +
+                    'd="M9 18h6"' +
+                '></path>' +
+
+                '<path ' +
+                    'd="M10 22h4"' +
+                '></path>' +
+
+                '<path ' +
+                    'd="M8.3 14.5A6 6 0 1 1 15.7 14.5C14.7 15.3 14 16.4 14 18h-4c0-1.6-.7-2.7-1.7-3.5z"' +
+                '></path>' +
+
+            '</svg>',
+
+
         sensor:
 
             '<svg ' +

@@ -45,6 +45,8 @@ browser.
 - temperature sensor card
 - humidity sensor card
 - binary sensor card
+- allowlisted Esszimmer light card
+- responsive optimistic light on/off control
 - climate card
 - climate target-temperature controls
 - iOS home-screen standalone mode
@@ -195,6 +197,21 @@ Example body:
 {
   "entity_id": "climate.esszimmer_thermostate",
   "temperature": 22.5
+}
+```
+
+Set the allowlisted Esszimmer light state:
+
+```text
+POST /api/light/state
+```
+
+Example body:
+
+```json
+{
+  "entity_id": "light.esszimmer_lampen",
+  "state": "on"
 }
 ```
 

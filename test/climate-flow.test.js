@@ -25,6 +25,57 @@ function createHarness() {
 
     const body = {};
 
+    const lightBadge = {
+        className: "light-state light-state-off",
+        innerHTML: "Aus"
+    };
+
+    const lightIcon = {
+        className: "icon light off"
+    };
+
+    const lightLabel = {
+        innerHTML: "Einschalten"
+    };
+
+    const lightCard = {
+        className: "card card-light",
+        parentNode: body,
+        getElementsByClassName: function (name) {
+            if (name === "icon") {
+                return [lightIcon];
+            }
+            if (name === "light-state") {
+                return [lightBadge];
+            }
+            if (name === "light-control-label") {
+                return [lightLabel];
+            }
+            return [];
+        }
+    };
+
+    const lightAttributes = {
+        "data-entity": "light.esszimmer_lampen",
+        "data-state": "off",
+        "data-available": "true",
+        "aria-pressed": "false",
+        "aria-label": "Einschalten"
+    };
+
+    const lightButton = {
+        className: "light-control is-off",
+        disabled: false,
+        tagName: "BUTTON",
+        parentNode: lightCard,
+        getAttribute: function (name) {
+            return lightAttributes[name];
+        },
+        setAttribute: function (name, value) {
+            lightAttributes[name] = value;
+        }
+    };
+
     const card = {
         className: "card card-climate",
         parentNode: body,
@@ -81,9 +132,13 @@ function createHarness() {
             return null;
         },
         getElementsByClassName: function (name) {
-            return name === "climate-control"
-                ? [minus, plus]
-                : [];
+            if (name === "climate-control") {
+                return [minus, plus];
+            }
+            if (name === "light-control") {
+                return [lightButton];
+            }
+            return [];
         }
     };
 
@@ -156,6 +211,7 @@ function createHarness() {
         SensorWidget: function () {},
         BinaryWidget: function () {},
         ClimateWidget: function () {},
+        LightWidget: function () {},
         document: document,
         Date: FakeDate,
         isFinite: isFinite,
@@ -193,6 +249,10 @@ function createHarness() {
         display: display,
         gets: gets,
         intervals: intervals,
+        lightBadge: lightBadge,
+        lightButton: lightButton,
+        lightIcon: lightIcon,
+        lightLabel: lightLabel,
         minus: minus,
         plus: plus,
         posts: posts,
@@ -328,6 +388,82 @@ test("Climate-Fehler bleibt sichtbar und löst Refresh aus", function () {
 
     harness.advanceTo(4000);
     harness.runLatestTimer(3000);
+    assert.equal(harness.gets.length, 2);
+
+});
+
+
+test("schnelle Licht-Taps bleiben reaktionsfähig", function () {
+
+    const harness = createHarness();
+
+    harness.gets[0].success({});
+
+    harness.click(harness.lightButton);
+
+    assert.equal(harness.posts.length, 1);
+    assert.equal(harness.posts[0].url, "/api/light/state");
+    assert.equal(harness.posts[0].payload.state, "on");
+    assert.equal(
+        harness.lightButton.getAttribute("data-state"),
+        "on"
+    );
+    assert.equal(harness.lightButton.disabled, false);
+    assert.equal(harness.lightBadge.innerHTML, "An");
+    assert.equal(harness.lightLabel.innerHTML, "Ausschalten");
+
+    harness.click(harness.lightButton);
+
+    assert.equal(harness.posts.length, 1);
+    assert.equal(
+        harness.lightButton.getAttribute("data-state"),
+        "off"
+    );
+    assert.equal(harness.lightButton.disabled, false);
+
+    harness.posts[0].success({
+        state: "on"
+    });
+
+    assert.equal(harness.posts.length, 2);
+    assert.equal(harness.posts[1].payload.state, "off");
+
+    harness.posts[1].success({
+        state: "off"
+    });
+
+    assert.equal(
+        harness.status.innerHTML,
+        "Licht wurde ausgeschaltet"
+    );
+    assert.equal(harness.lightBadge.innerHTML, "Aus");
+    assert.equal(harness.lightLabel.innerHTML, "Einschalten");
+
+});
+
+
+test("Lichtfehler bleibt sichtbar und löst Refresh aus", function () {
+
+    const harness = createHarness();
+
+    harness.gets[0].success({});
+    harness.click(harness.lightButton);
+
+    harness.posts[0].error({
+        message: "Netzwerkfehler"
+    });
+
+    assert.equal(
+        harness.status.innerHTML,
+        "Fehler: Netzwerkfehler"
+    );
+    assert.equal(harness.lightButton.disabled, false);
+
+    harness.intervals[0]();
+    assert.equal(harness.gets.length, 1);
+
+    harness.advanceTo(2000);
+    harness.runLatestTimer(1000);
     assert.equal(harness.gets.length, 2);
 
 });

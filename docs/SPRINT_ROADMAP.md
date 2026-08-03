@@ -29,7 +29,7 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 3 | Modulare Widgets, Icons und Theme | abgeschlossen |
 | 4 | Climate-Widget und Solltemperatur | abgeschlossen |
 | 5 | Standalone-Web-App für iOS 9 | abgeschlossen |
-| 6 | Weitere steuerbare Entitäten | vorgeschlagen |
+| 6 | Weitere steuerbare Entitäten | abgeschlossen |
 | 7 | Konfigurationsgetriebene Dashboards | vorgeschlagen |
 | 8 | Robustheit und Sicherheit | vorgeschlagen |
 | 9 | Lokale Mock- und Integrationstests | abgeschlossen |
@@ -223,14 +223,30 @@ iOS-Standalone-Web-App, keine moderne Offline-PWA.
 
 # Sprint 6 – Weitere steuerbare Entitäten
 
-## Vorgeschlagen
+## Umgesetzt
 
-- `light`
-- `switch`
-- `cover`
-- `weather`
-- `media_player`
-- weitere `climate`- und `binary_sensor`-Widgets
+- ES5-kompatibles `light`-Widget mit großem Touch-Schalter
+- explizit freigegebene Entity `light.esszimmer_lampen`
+- eigener Gateway-Endpunkt `POST /api/light/state`
+- ausschließlich fest zugeordnete Services `light.turn_on` und
+  `light.turn_off`
+- sofortige optimistische Anzeige ohne mehrsekündige Buttonsperre
+- schnelle Folgetaps werden auf den zuletzt gewünschten Zustand
+  zusammengeführt
+- Fehleranzeige und anschließender Zustands-Refresh
+- Light-/Dark-Mode und mindestens 44 Pixel große Touch-Ziele
+- Gateway- und Frontendtests für erlaubte und abgewiesene Befehle
+
+## Bewusst nicht freigegeben
+
+- beliebige `switch`-Entities
+- Garagentore oder andere `cover`-Entities
+- Pumpen, Server-Steckdosen und sonstige sensible Geräte
+- beliebige Home-Assistant-Domänen oder Services aus Browserdaten
+
+`weather`, `media_player`, weitere `climate`- und `binary_sensor`-Widgets
+bleiben mögliche spätere Erweiterungen und erhalten ohne konkrete Auswahl
+keine zusätzlichen Dashboard-Kacheln.
 
 ## Sicherheitsanforderung
 

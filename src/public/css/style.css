@@ -924,6 +924,263 @@ body.theme-dark .status-neutral {
 }
 
 /* =========================================================
+   LIGHT WIDGET
+   ========================================================= */
+
+.card-light {
+
+    min-height: 250px;
+
+}
+
+.card-light .card-header {
+
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+
+}
+
+.icon.light {
+
+    background: #edf1f6;
+    color: #667085;
+
+}
+
+.icon.light.on {
+
+    background: #fff3cf;
+    color: #c77a00;
+
+}
+
+.light-state {
+
+    min-width: 64px;
+
+    padding: 7px 11px;
+
+    border-radius: 999px;
+
+    background: #edf1f6;
+    color: #667085;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-align: center;
+
+}
+
+.light-state-on {
+
+    background: #fff3cf;
+    color: #a85e00;
+
+}
+
+.light-control {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+
+    width: 100%;
+    min-height: 62px;
+
+    margin: auto 0 24px 0;
+    padding: 10px 16px;
+
+    border: 1px solid #dce3ec;
+    border-radius: 18px;
+
+    background: #f6f8fb;
+    color: #344054;
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+    appearance: none;
+
+    -webkit-user-select: none;
+    user-select: none;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        -webkit-transform 0.1s ease;
+
+}
+
+.light-control:active {
+
+    -webkit-transform: scale(0.97);
+    transform: scale(0.97);
+
+}
+
+.light-control:focus {
+
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+
+}
+
+.light-control.is-on {
+
+    border-color: #f0c86b;
+
+    background: #fff8df;
+    color: #8a5100;
+
+}
+
+.light-control[disabled] {
+
+    opacity: 0.42;
+    cursor: default;
+
+}
+
+.light-control-track {
+
+    position: relative;
+
+    display: block;
+
+    width: 52px;
+    height: 30px;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    margin-right: 14px;
+
+    border-radius: 999px;
+
+    background: #b5bfcc;
+
+    transition: background-color 0.15s ease;
+
+}
+
+.light-control-knob {
+
+    position: absolute;
+
+    top: 3px;
+    left: 3px;
+
+    display: block;
+
+    width: 24px;
+    height: 24px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    box-shadow: 0 2px 5px rgba(23, 32, 51, 0.25);
+
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+
+    transition: -webkit-transform 0.15s ease;
+
+}
+
+.light-control.is-on .light-control-track {
+
+    background: #e5a11a;
+
+}
+
+.light-control.is-on .light-control-knob {
+
+    -webkit-transform: translateX(22px);
+    transform: translateX(22px);
+
+}
+
+.light-control-label {
+
+    display: block;
+
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    text-align: right;
+
+}
+
+body.theme-dark .icon.light {
+
+    background: #283443;
+    color: #aab6c5;
+
+}
+
+body.theme-dark .icon.light.on {
+
+    background: #4b3718;
+    color: #ffc75a;
+
+}
+
+body.theme-dark .light-state {
+
+    background: #283443;
+    color: #b7c2cf;
+
+}
+
+body.theme-dark .light-state-on {
+
+    background: #4b3718;
+    color: #ffd071;
+
+}
+
+body.theme-dark .light-control {
+
+    border-color: #39475a;
+
+    background: #111a26;
+    color: #e7edf5;
+
+}
+
+body.theme-dark .light-control.is-on {
+
+    border-color: #705321;
+
+    background: #392d18;
+    color: #ffd071;
+
+}
+
+body.theme-dark .light-control-track {
+
+    background: #586679;
+
+}
+
+body.theme-dark .light-control.is-on .light-control-track {
+
+    background: #d99312;
+
+}
+
+/* =========================================================
    CLIMATE WIDGET
    ========================================================= */
 

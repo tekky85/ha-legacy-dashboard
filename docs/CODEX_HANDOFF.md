@@ -151,6 +151,8 @@ src/public/js/widgets/climate.js
 - temperature sensor card
 - humidity sensor card
 - binary window sensor card
+- allowlisted Esszimmer light card
+- responsive optimistic light on/off control
 - climate card
 - target-temperature controls
 - automatic refresh
@@ -164,6 +166,7 @@ sensor.badezimmer_smart_indoor_module_temperatur
 sensor.badezimmer_smart_indoor_module_luftfeuchtigkeit
 binary_sensor.kuche_fenster_rechts
 binary_sensor.kuche_fenster_mitte
+light.esszimmer_lampen
 climate.esszimmer_thermostate
 ```
 
@@ -228,6 +231,24 @@ climate.set_temperature
 ```
 
 The entity must remain explicitly allowlisted.
+
+## Light control
+
+The light card uses:
+
+```text
+light.esszimmer_lampen
+```
+
+The backend control endpoint is:
+
+```text
+POST /api/light/state
+```
+
+Only the explicitly allowlisted entity is accepted. The requested state is
+mapped exclusively to `light.turn_on` or `light.turn_off`; the browser cannot
+select arbitrary Home Assistant services.
 
 The backend should validate:
 

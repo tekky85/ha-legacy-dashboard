@@ -116,6 +116,32 @@ Dashboard.addWidget(
 
 Dashboard.addWidget(
 
+    new LightWidget({
+
+        entity:
+
+            "light." +
+            "esszimmer_lampen",
+
+        title:
+            "Esszimmer",
+
+        subtitle:
+            "Licht",
+
+        icon:
+            "light",
+
+        iconClass:
+            "light"
+
+    })
+
+);
+
+
+Dashboard.addWidget(
+
     new ClimateWidget({
 
         entity:
@@ -161,6 +187,12 @@ var climateUpdateTimer =
 
 var climateUpdateDelay =
     500;
+
+var lightRequestActive =
+    false;
+
+var pendingLightUpdate =
+    null;
 
 function hasClass(
     element,
@@ -966,6 +998,537 @@ function setClimateTemperature(
 
 
 /* =========================================================
+   LIGHT CONTROL
+   ========================================================= */
+
+function lightUpdateInProgress() {
+
+    return (
+
+        lightRequestActive ||
+
+        pendingLightUpdate !== null
+
+    );
+
+}
+
+
+function dashboardControlUpdateInProgress() {
+
+    return (
+
+        climateUpdateInProgress() ||
+
+        lightUpdateInProgress()
+
+    );
+
+}
+
+
+function updateLightDisplay(
+    entityId,
+    state
+) {
+
+    var buttons =
+
+        document.getElementsByClassName(
+
+            "light-control"
+
+        );
+
+
+    var available =
+
+        state === "on" ||
+        state === "off";
+
+
+    var isOn =
+        state === "on";
+
+
+    var stateClass =
+
+        available
+
+            ? isOn
+
+                ? "on"
+
+                : "off"
+
+            : "neutral";
+
+
+    var stateText =
+
+        available
+
+            ? isOn
+
+                ? "An"
+
+                : "Aus"
+
+            : "Nicht verfügbar";
+
+
+    var controlText =
+
+        available
+
+            ? isOn
+
+                ? "Ausschalten"
+
+                : "Einschalten"
+
+            : "Nicht verfügbar";
+
+
+    var card = null;
+    var currentElement;
+    var icon;
+    var label;
+    var stateBadge;
+    var index;
+
+
+    for (
+
+        index = 0;
+
+        index < buttons.length;
+
+        index++
+
+    ) {
+
+        if (
+
+            buttons[index].getAttribute(
+                "data-entity"
+            ) !== entityId
+
+        ) {
+
+            continue;
+
+        }
+
+
+        buttons[index].setAttribute(
+            "data-state",
+            state
+        );
+
+        buttons[index].setAttribute(
+            "data-available",
+            available
+                ? "true"
+                : "false"
+        );
+
+        buttons[index].setAttribute(
+            "aria-pressed",
+            isOn
+                ? "true"
+                : "false"
+        );
+
+        buttons[index].setAttribute(
+            "aria-label",
+            controlText
+        );
+
+        buttons[index].className =
+            "light-control is-" +
+            stateClass;
+
+        buttons[index].disabled =
+            !available;
+
+
+        if (!card) {
+
+            currentElement =
+                buttons[index];
+
+
+            while (
+
+                currentElement &&
+
+                currentElement !==
+                    document.body
+
+            ) {
+
+                if (
+
+                    hasClass(
+
+                        currentElement,
+
+                        "card-light"
+
+                    )
+
+                ) {
+
+                    card =
+                        currentElement;
+
+                    break;
+
+                }
+
+
+                currentElement =
+                    currentElement.parentNode;
+
+            }
+
+        }
+
+    }
+
+
+    if (!card) {
+
+        return;
+
+    }
+
+
+    icon =
+
+        card.getElementsByClassName(
+            "icon"
+        )[0];
+
+
+    stateBadge =
+
+        card.getElementsByClassName(
+            "light-state"
+        )[0];
+
+
+    label =
+
+        card.getElementsByClassName(
+            "light-control-label"
+        )[0];
+
+
+    if (icon) {
+
+        icon.className =
+            "icon light " +
+            stateClass;
+
+    }
+
+
+    if (stateBadge) {
+
+        stateBadge.className =
+            "light-state light-state-" +
+            stateClass;
+
+        stateBadge.innerHTML =
+            Legacy.html.escape(
+                stateText
+            );
+
+    }
+
+
+    if (label) {
+
+        label.innerHTML =
+            Legacy.html.escape(
+                controlText
+            );
+
+    }
+
+}
+
+
+function sendPendingLightState() {
+
+    var status =
+
+        Legacy.dom.byId(
+            "updated"
+        );
+
+
+    var update;
+
+
+    if (
+
+        lightRequestActive ||
+
+        pendingLightUpdate === null
+
+    ) {
+
+        return;
+
+    }
+
+
+    update =
+        pendingLightUpdate;
+
+    pendingLightUpdate =
+        null;
+
+    lightRequestActive =
+        true;
+
+
+    Legacy.http.post(
+
+        "/api/light/state",
+
+        {
+
+            entity_id:
+                update.entityId,
+
+            state:
+                update.state
+
+        },
+
+        function () {
+
+            lightRequestActive =
+                false;
+
+
+            if (
+
+                pendingLightUpdate !== null &&
+
+                pendingLightUpdate.entityId ===
+                    update.entityId &&
+
+                pendingLightUpdate.state ===
+                    update.state
+
+            ) {
+
+                pendingLightUpdate =
+                    null;
+
+            }
+
+
+            if (pendingLightUpdate !== null) {
+
+                sendPendingLightState();
+
+                return;
+
+            }
+
+
+            dashboardRefreshBlockedUntil =
+
+                new Date().getTime() +
+                1500;
+
+
+            if (status) {
+
+                status.innerHTML =
+
+                    update.state === "on"
+
+                        ? "Licht wurde eingeschaltet"
+
+                        : "Licht wurde ausgeschaltet";
+
+            }
+
+
+            window.setTimeout(
+
+                loadDashboard,
+
+                1500
+
+            );
+
+        },
+
+        function (error) {
+
+            lightRequestActive =
+                false;
+
+            pendingLightUpdate =
+                null;
+
+
+            dashboardRefreshBlockedUntil =
+
+                new Date().getTime() +
+                1000;
+
+
+            if (status) {
+
+                status.innerHTML =
+
+                    "Fehler: " +
+
+                    (
+                        error &&
+                        error.message
+
+                            ? error.message
+
+                            : "Befehl fehlgeschlagen"
+                    );
+
+            }
+
+
+            window.setTimeout(
+
+                loadDashboard,
+
+                1000
+
+            );
+
+        }
+
+    );
+
+}
+
+
+function setLightState(button) {
+
+    var status =
+
+        Legacy.dom.byId(
+            "updated"
+        );
+
+
+    var entityId =
+
+        button.getAttribute(
+            "data-entity"
+        );
+
+
+    var currentState =
+
+        button.getAttribute(
+            "data-state"
+        );
+
+
+    var available =
+
+        button.getAttribute(
+            "data-available"
+        ) === "true";
+
+
+    var nextState;
+
+
+    if (
+
+        button.disabled ||
+        !available ||
+        !entityId ||
+
+        (
+            currentState !== "on" &&
+            currentState !== "off"
+        )
+
+    ) {
+
+        return;
+
+    }
+
+
+    nextState =
+
+        currentState === "on"
+
+            ? "off"
+
+            : "on";
+
+
+    updateLightDisplay(
+
+        entityId,
+
+        nextState
+
+    );
+
+
+    pendingLightUpdate = {
+
+        entityId:
+            entityId,
+
+        state:
+            nextState
+
+    };
+
+
+    dashboardRefreshBlockedUntil =
+
+        new Date().getTime() +
+        3000;
+
+
+    if (status) {
+
+        status.innerHTML =
+
+            nextState === "on"
+
+                ? "Licht wird eingeschaltet …"
+
+                : "Licht wird ausgeschaltet …";
+
+    }
+
+
+    if (!lightRequestActive) {
+
+        sendPendingLightState();
+
+    }
+
+}
+
+
+/* =========================================================
    EVENT DELEGATION
    ========================================================= */
 
@@ -1001,6 +1564,43 @@ if (dashboardElement) {
                     dashboardElement
 
             ) {
+
+                if (
+
+                    currentElement.tagName &&
+
+                    currentElement.tagName
+                        .toLowerCase() ===
+                            "button" &&
+
+                    hasClass(
+
+                        currentElement,
+
+                        "light-control"
+
+                    )
+
+                ) {
+
+                    if (
+                        event.preventDefault
+                    ) {
+
+                        event.preventDefault();
+
+                    }
+
+                    setLightState(
+
+                        currentElement
+
+                    );
+
+                    return;
+
+                }
+
 
                 if (
 
@@ -1075,7 +1675,7 @@ function loadDashboard() {
 
     if (
 
-        climateUpdateInProgress() ||
+        dashboardControlUpdateInProgress() ||
 
         new Date().getTime() <
             dashboardRefreshBlockedUntil
@@ -1108,7 +1708,7 @@ function loadDashboard() {
 
             if (
 
-                climateUpdateInProgress() ||
+                dashboardControlUpdateInProgress() ||
 
                 requestStartedAt <
                     dashboardRefreshBlockedUntil
@@ -1141,7 +1741,7 @@ function loadDashboard() {
 
             if (
 
-                climateUpdateInProgress() ||
+                dashboardControlUpdateInProgress() ||
 
                 requestStartedAt <
                     dashboardRefreshBlockedUntil
