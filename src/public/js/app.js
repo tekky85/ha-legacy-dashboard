@@ -713,10 +713,54 @@ function setClimateTemperature(
 
         },
 
-        function () {
+        function (response) {
+
+            var acceptedTemperature =
+                nextTemperature;
+
+
+            if (
+
+                response &&
+
+                typeof response.temperature ===
+                    "number" &&
+
+                isFinite(
+                    response.temperature
+                )
+
+            ) {
+
+                acceptedTemperature =
+                    response.temperature;
+
+            }
 
             climateRequestActive =
                 false;
+
+
+            dashboardRefreshBlockedUntil =
+
+                new Date().getTime() +
+                5000;
+
+
+            updateClimateTargetDisplay(
+
+                entityId,
+
+                acceptedTemperature,
+
+                step
+
+            );
+
+
+            setClimateControlsBusy(
+                false
+            );
 
 
             if (status) {
@@ -728,7 +772,13 @@ function setClimateTemperature(
             }
 
 
-            loadDashboard();
+            window.setTimeout(
+
+                loadDashboard,
+
+                5000
+
+            );
 
         },
 
@@ -866,17 +916,31 @@ function loadDashboard() {
         );
 
 
+    var requestStartedAt;
+
+
     /*
-     * Während eines Steuerbefehls darf der
-     * automatische Refresh die Buttons nicht
-     * neu erzeugen.
+     * Während und kurz nach einem Steuerbefehl
+     * darf der automatische Refresh die Buttons
+     * nicht neu erzeugen.
      */
 
-    if (climateRequestActive) {
+    if (
+
+        climateRequestActive ||
+
+        new Date().getTime() <
+            dashboardRefreshBlockedUntil
+
+    ) {
 
         return;
 
     }
+
+
+    requestStartedAt =
+        new Date().getTime();
 
 
     if (status) {
@@ -893,6 +957,19 @@ function loadDashboard() {
         "/api/dashboard",
 
         function (data) {
+
+            if (
+
+                climateRequestActive ||
+
+                requestStartedAt <
+                    dashboardRefreshBlockedUntil
+
+            ) {
+
+                return;
+
+            }
 
             Dashboard.render(
                 data
@@ -913,6 +990,19 @@ function loadDashboard() {
         },
 
         function (error) {
+
+            if (
+
+                climateRequestActive ||
+
+                requestStartedAt <
+                    dashboardRefreshBlockedUntil
+
+            ) {
+
+                return;
+
+            }
 
             if (status) {
 
