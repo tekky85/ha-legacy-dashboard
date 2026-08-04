@@ -1,0 +1,1 @@
+dashboard ALL=(root) NOPASSWD: /usr/bin/systemctl restart ha-legacy-dashboard.service

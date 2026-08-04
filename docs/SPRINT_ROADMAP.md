@@ -33,7 +33,7 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 7 | Konfigurationsgetriebene Dashboards | abgeschlossen |
 | 8 | Robustheit und Sicherheit | abgeschlossen |
 | 9 | Lokale Mock- und Integrationstests | abgeschlossen |
-| 10 | Deployment und Betrieb | vorgeschlagen |
+| 10 | Deployment und Betrieb | abgeschlossen |
 | 11 | Wall-Display-Betrieb | vorgeschlagen |
 | 12 | Release und Dokumentation | vorgeschlagen |
 
@@ -354,7 +354,7 @@ npm test
 
 # Sprint 10 – Deployment und Betrieb
 
-## Aktueller Ablauf
+## Bisheriger Ablauf
 
 Mac:
 
@@ -379,14 +379,21 @@ systemctl restart ha-legacy-dashboard.service
 systemctl status ha-legacy-dashboard.service --no-pager -l
 ```
 
-## Vorgeschlagen
+## Umgesetzt
 
-- Deployment-Checkliste
-- Syntaxprüfung vor Neustart
-- Health-Check danach
-- Rollback
-- Release-Tags
-- optionales Deployment-Skript
+- ausführbare Deployment-Checkliste in `deploy/check.sh`
+- Syntaxprüfung aller JavaScript-Dateien vor einem Neustart
+- vollständige Mock- und Integrationstests vor einem Neustart
+- ausschließlich Fast-Forward von `origin/main`
+- optionales `npm ci --omit=dev` bei geänderter Lockdatei
+- read-only Health-Check für Dienst, APIs, Dashboard-Metadaten und Header
+- explizites Rollback auf Commit oder Tag mittels Detached HEAD
+- kein `git reset --hard`, kein Force-Push und kein Überschreiben von Branches
+- Dokumentation für Release-Tags
+- GitHub-CI für Pushes und Pull Requests ohne produktive Credentials
+- eng begrenzte optionale sudoers-Regel ausschließlich für den Neustart von
+  `ha-legacy-dashboard.service`
+- vollständige Betriebsanleitung in `docs/DEPLOYMENT.md`
 
 ---
 

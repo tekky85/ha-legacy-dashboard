@@ -176,6 +176,17 @@ Logs:
 journalctl -u ha-legacy-dashboard.service -f
 ```
 
+Automated deployment, health checks, rollback, and the optional narrowly
+scoped sudoers rule are documented in
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+After the one-time sudoers installation, production deployment is:
+
+```bash
+cd /home/dashboard/ha-legacy-dashboard
+./deploy/deploy.sh
+```
+
 ## API
 
 Gateway status:

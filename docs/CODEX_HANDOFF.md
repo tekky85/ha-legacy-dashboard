@@ -103,6 +103,11 @@ src/server.js
 src/config/dashboard.js
 src/routes/api.js
 src/services/homeassistant.js
+deploy/check.sh
+deploy/deploy.sh
+deploy/health-check.sh
+deploy/rollback.sh
+docs/DEPLOYMENT.md
 ```
 
 ## Current frontend
@@ -403,6 +408,12 @@ src/public/index.html
 
 This is necessary because Safari on iOS 9 caches JavaScript and CSS
 aggressively.
+
+The automated production workflow is documented in `docs/DEPLOYMENT.md`.
+After installing the exact sudoers rule from `deploy/sudoers/`, the `dashboard`
+user can run `./deploy/deploy.sh`. The rule permits only restarting
+`ha-legacy-dashboard.service`; it does not grant a shell or arbitrary systemctl
+commands.
 
 ## Security reminders
 
