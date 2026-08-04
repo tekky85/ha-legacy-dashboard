@@ -69,6 +69,60 @@ test("Backend-Konfiguration liefert sichtbare Widgets in Reihenfolge", function 
         );
     });
 
+    assert.equal(
+        dashboardConfig.getRefreshIntervalMs(),
+        5000
+    );
+
+});
+
+
+test("Refresh-Intervall wird serverseitig begrenzt", function () {
+
+    const dashboardConfig = require(
+        path.join(
+            __dirname,
+            "..",
+            "src",
+            "config",
+            "dashboard.js"
+        )
+    );
+
+    const previous =
+        process.env.DASHBOARD_REFRESH_INTERVAL_MS;
+
+
+    try {
+
+        process.env.DASHBOARD_REFRESH_INTERVAL_MS = "12000";
+        assert.equal(
+            dashboardConfig.getRefreshIntervalMs(),
+            12000
+        );
+
+        process.env.DASHBOARD_REFRESH_INTERVAL_MS = "1000";
+        assert.equal(
+            dashboardConfig.getRefreshIntervalMs(),
+            5000
+        );
+
+        process.env.DASHBOARD_REFRESH_INTERVAL_MS = "secret";
+        assert.equal(
+            dashboardConfig.getRefreshIntervalMs(),
+            5000
+        );
+
+    } finally {
+
+        if (typeof previous === "undefined") {
+            delete process.env.DASHBOARD_REFRESH_INTERVAL_MS;
+        } else {
+            process.env.DASHBOARD_REFRESH_INTERVAL_MS = previous;
+        }
+
+    }
+
 });
 
 

@@ -50,6 +50,10 @@ browser.
 - server-side dashboard widget configuration
 - Home Assistant reachability status
 - stale-data indicator with last successful refresh
+- wall-display clock and German date
+- visible gateway and Home Assistant connection badge
+- network error banner with automatic recovery
+- configurable, server-validated refresh interval
 - structured JSON logs with secret-field redaction
 - security headers, payload limit, and write rate limit
 - climate card
@@ -114,6 +118,8 @@ Create `.env`:
 PORT=3000
 HA_URL=http://home-assistant-address:8123
 HA_TOKEN=your-long-lived-access-token
+# Optional: 3000 to 300000 milliseconds, default 5000
+DASHBOARD_REFRESH_INTERVAL_MS=5000
 ```
 
 Never commit `.env`.
@@ -262,6 +268,11 @@ Each entry defines:
 - `unit`
 - `order`
 - `visible`
+
+The optional backend environment value `DASHBOARD_REFRESH_INTERVAL_MS`
+controls the automatic browser refresh between 3000 and 300000 milliseconds.
+Invalid values fall back to 5000 milliseconds. The browser receives only this
+sanitized interval and the public widget configuration.
 
 Set `visible` to `false` to remove a widget from both the browser
 configuration and the dashboard state query. Supported frontend widget types

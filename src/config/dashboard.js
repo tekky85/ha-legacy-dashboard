@@ -83,6 +83,35 @@ const WIDGETS = [
 ];
 
 
+const DEFAULT_REFRESH_INTERVAL_MS = 5000;
+const MINIMUM_REFRESH_INTERVAL_MS = 3000;
+const MAXIMUM_REFRESH_INTERVAL_MS = 300000;
+
+
+function getRefreshIntervalMs() {
+
+    const configured =
+        Number(
+            process.env.DASHBOARD_REFRESH_INTERVAL_MS
+        );
+
+
+    if (
+        !Number.isFinite(configured) ||
+        configured < MINIMUM_REFRESH_INTERVAL_MS ||
+        configured > MAXIMUM_REFRESH_INTERVAL_MS
+    ) {
+
+        return DEFAULT_REFRESH_INTERVAL_MS;
+
+    }
+
+
+    return Math.round(configured);
+
+}
+
+
 function getVisibleWidgets() {
 
     return WIDGETS
@@ -143,6 +172,7 @@ function getPublicWidgets() {
 module.exports = {
 
     getPublicWidgets: getPublicWidgets,
-    getVisibleEntityIds: getVisibleEntityIds
+    getVisibleEntityIds: getVisibleEntityIds,
+    getRefreshIntervalMs: getRefreshIntervalMs
 
 };

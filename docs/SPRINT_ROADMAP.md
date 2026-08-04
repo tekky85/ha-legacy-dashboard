@@ -34,7 +34,7 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 8 | Robustheit und Sicherheit | abgeschlossen |
 | 9 | Lokale Mock- und Integrationstests | abgeschlossen |
 | 10 | Deployment und Betrieb | abgeschlossen |
-| 11 | Wall-Display-Betrieb | vorgeschlagen |
+| 11 | Wall-Display-Betrieb | abgeschlossen |
 | 12 | Release und Dokumentation | vorgeschlagen |
 
 ---
@@ -399,16 +399,18 @@ systemctl status ha-legacy-dashboard.service --no-pager -l
 
 # Sprint 11 – Wall-Display-Betrieb
 
-## Vorgeschlagen
+## Umgesetzt
 
-- Uhr und Datum
-- Verbindungsstatus
-- letzter erfolgreicher Refresh
-- automatische Wiederverbindung
-- konfigurierbares Refresh-Intervall
-- Tag-/Nacht-Darstellung
-- Netzwerkfehler-Banner
-- große Touch-Ziele
+- gut lesbare Uhr und deutsches Datum im Kopfbereich
+- sichtbarer Zustand für Gateway und Home Assistant
+- letzter erfolgreicher Refresh bleibt unter den Kacheln sichtbar
+- automatische Wiederverbindung durch Intervall und Online-Ereignis
+- serverseitig validiertes Refresh-Intervall über
+  `DASHBOARD_REFRESH_INTERVAL_MS` von 3000 bis 300000 Millisekunden
+- bestehende manuelle Tag-/Nacht-Darstellung mit sicherer Persistenz
+- Netzwerkfehler-Banner, das nach erfolgreicher Verbindung verschwindet
+- bestehende große Touch-Ziele bleiben erhalten
+- automatisierte Frontend- und Gateway-Tests für Status, Erholung und Intervall
 
 Echte Kiosk- und Bildschirmsteuerung bleibt durch iOS 9 begrenzt.
 

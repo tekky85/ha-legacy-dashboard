@@ -162,6 +162,10 @@ src/public/js/widgets/climate.js
 - server-side dashboard widget configuration
 - HA reachability status and dashboard response metadata
 - stale-data display with last successful refresh
+- wall-display clock and German date
+- visible gateway and Home Assistant connection state
+- network error banner with automatic recovery
+- server-validated configurable refresh interval
 - structured JSON logging with secret-field redaction
 - security headers, 16 KB JSON limit, and write rate limit
 - climate card
@@ -197,6 +201,11 @@ The browser obtains the sanitized visible configuration from:
 ```text
 GET /api/dashboard/config
 ```
+
+The same response contains only the sanitized refresh interval. It is read
+from the optional backend value `DASHBOARD_REFRESH_INTERVAL_MS`, is limited to
+3000 through 300000 milliseconds, and defaults to 5000 milliseconds. No Home
+Assistant credentials are part of this response.
 
 The supported widget types are explicitly mapped in
 `src/public/js/core/dashboard.js`. Unknown types are ignored. Display

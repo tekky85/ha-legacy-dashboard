@@ -72,6 +72,228 @@ var lightRequestActive =
 var pendingLightUpdate =
     null;
 
+var dashboardRefreshIntervalMs =
+    5000;
+
+var dashboardRefreshTimer =
+    null;
+
+
+function twoDigits(value) {
+
+    return value < 10
+
+        ? "0" + value
+
+        : String(value);
+
+}
+
+
+function updateWallClock() {
+
+    var clock =
+
+        Legacy.dom.byId(
+            "wallClock"
+        );
+
+
+    var date =
+
+        Legacy.dom.byId(
+            "wallDate"
+        );
+
+
+    var now =
+        new Date();
+
+
+    var weekdays = [
+        "Sonntag",
+        "Montag",
+        "Dienstag",
+        "Mittwoch",
+        "Donnerstag",
+        "Freitag",
+        "Samstag"
+    ];
+
+
+    var months = [
+        "Januar",
+        "Februar",
+        "März",
+        "April",
+        "Mai",
+        "Juni",
+        "Juli",
+        "August",
+        "September",
+        "Oktober",
+        "November",
+        "Dezember"
+    ];
+
+
+    if (clock) {
+
+        clock.innerHTML =
+
+            twoDigits(
+                now.getHours()
+            ) +
+            ":" +
+            twoDigits(
+                now.getMinutes()
+            );
+
+    }
+
+
+    if (date) {
+
+        date.innerHTML =
+
+            weekdays[now.getDay()] +
+            ", " +
+            now.getDate() +
+            ". " +
+            months[now.getMonth()];
+
+    }
+
+}
+
+
+function setConnectionDisplay(
+    state,
+    label,
+    message
+) {
+
+    var badge =
+
+        Legacy.dom.byId(
+            "connectionBadge"
+        );
+
+
+    var labelElement =
+
+        Legacy.dom.byId(
+            "connectionLabel"
+        );
+
+
+    var banner =
+
+        Legacy.dom.byId(
+            "networkBanner"
+        );
+
+
+    if (
+        state !== "online" &&
+        state !== "degraded" &&
+        state !== "offline"
+    ) {
+
+        state = "connecting";
+
+    }
+
+
+    if (badge) {
+
+        badge.className =
+            "connection-badge is-" + state;
+
+    }
+
+
+    if (labelElement) {
+
+        labelElement.innerHTML =
+            Legacy.html.escape(label);
+
+    }
+
+
+    if (banner) {
+
+        banner.className =
+
+            message
+
+                ? "network-banner is-visible is-" +
+                    state
+
+                : "network-banner";
+
+
+        banner.innerHTML =
+
+            message
+
+                ? Legacy.html.escape(message)
+
+                : "";
+
+    }
+
+}
+
+
+function normalizeRefreshInterval(value) {
+
+    var parsed =
+        Number(value);
+
+
+    if (
+        !isFinite(parsed) ||
+        parsed < 3000 ||
+        parsed > 300000
+    ) {
+
+        return 5000;
+
+    }
+
+
+    return Math.round(parsed);
+
+}
+
+
+function startDashboardRefreshTimer() {
+
+    if (
+        dashboardRefreshTimer !== null &&
+        window.clearInterval
+    ) {
+
+        window.clearInterval(
+            dashboardRefreshTimer
+        );
+
+    }
+
+
+    dashboardRefreshTimer =
+
+        window.setInterval(
+
+            loadDashboard,
+
+            dashboardRefreshIntervalMs
+
+        );
+
+}
+
 function hasClass(
     element,
     className
@@ -1553,6 +1775,13 @@ function loadDashboardConfiguration() {
         true;
 
 
+    setConnectionDisplay(
+        "connecting",
+        "Verbinde …",
+        ""
+    );
+
+
     if (status) {
 
         status.innerHTML =
@@ -1569,9 +1798,31 @@ function loadDashboardConfiguration() {
 
             var widgetCount = 0;
 
+            var configuredRefreshInterval =
+
+                normalizeRefreshInterval(
+
+                    data &&
+                    data.refresh_interval_ms
+
+                );
+
 
             dashboardConfigurationLoading =
                 false;
+
+
+            if (
+                configuredRefreshInterval !==
+                    dashboardRefreshIntervalMs
+            ) {
+
+                dashboardRefreshIntervalMs =
+                    configuredRefreshInterval;
+
+                startDashboardRefreshTimer();
+
+            }
 
 
             if (
@@ -1603,6 +1854,13 @@ function loadDashboardConfiguration() {
                         "Fehler: Keine Dashboard-Konfiguration";
 
                 }
+
+
+                setConnectionDisplay(
+                    "offline",
+                    "Konfiguration fehlt",
+                    "Dashboard-Konfiguration ist nicht verfügbar."
+                );
 
 
                 return;
@@ -1643,6 +1901,13 @@ function loadDashboardConfiguration() {
                     );
 
             }
+
+
+            setConnectionDisplay(
+                "offline",
+                "Gateway offline",
+                "Keine Verbindung zum Dashboard-Gateway. Neuer Versuch läuft automatisch."
+            );
 
         }
 
@@ -1740,6 +2005,12 @@ function loadDashboard() {
 
             if (homeAssistantStatus === "offline") {
 
+                setConnectionDisplay(
+                    "offline",
+                    "Home Assistant offline",
+                    "Home Assistant ist nicht erreichbar. Die letzten Werte bleiben sichtbar."
+                );
+
                 if (!dashboardHasData) {
 
                     Dashboard.render(
@@ -1792,6 +2063,12 @@ function loadDashboard() {
 
                 if (homeAssistantStatus === "degraded") {
 
+                    setConnectionDisplay(
+                        "degraded",
+                        "Teilweise online",
+                        "Einige Home-Assistant-Entitäten sind derzeit nicht erreichbar."
+                    );
+
                     addClass(
                         status,
                         "is-stale"
@@ -1831,6 +2108,13 @@ function loadDashboard() {
                     "Aktualisiert: " +
 
                     lastSuccessfulRefreshText;
+
+
+                setConnectionDisplay(
+                    "online",
+                    "Online",
+                    ""
+                );
 
             }
 
@@ -1873,6 +2157,13 @@ function loadDashboard() {
 
             }
 
+
+            setConnectionDisplay(
+                "offline",
+                "Gateway offline",
+                "Keine Verbindung zum Dashboard-Gateway. Neuer Versuch läuft automatisch."
+            );
+
         }
 
     );
@@ -1885,12 +2176,46 @@ function loadDashboard() {
 loadDashboard();
 
 
-/* Refresh every five seconds */
+/* Configurable automatic refresh and wall clock */
+
+startDashboardRefreshTimer();
+
+
+updateWallClock();
+
 
 window.setInterval(
 
-    loadDashboard,
+    updateWallClock,
 
-    5000
+    30000
 
 );
+
+
+window.ononline =
+
+    function () {
+
+        setConnectionDisplay(
+            "connecting",
+            "Verbinde …",
+            ""
+        );
+
+        loadDashboard();
+
+    };
+
+
+window.onoffline =
+
+    function () {
+
+        setConnectionDisplay(
+            "offline",
+            "Netzwerk offline",
+            "Dieses Gerät hat derzeit keine Netzwerkverbindung. Neuer Versuch läuft automatisch."
+        );
+
+    };

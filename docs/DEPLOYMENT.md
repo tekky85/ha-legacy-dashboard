@@ -136,3 +136,16 @@ Ein veröffentlichter Tag wird nicht nachträglich verschoben oder erzwungen.
 - vollständige lokale Mock- und Integrationstests
 
 Die CI benötigt keine Home-Assistant-Zugangsdaten.
+
+## Wall-Display-Intervall
+
+Ohne weitere Einstellung aktualisiert das Dashboard alle fünf Sekunden. Ein
+anderes Intervall kann ausschließlich im Backend in `.env` gesetzt werden:
+
+```ini
+DASHBOARD_REFRESH_INTERVAL_MS=10000
+```
+
+Erlaubt sind 3000 bis 300000 Millisekunden. Ungültige Werte fallen auf 5000
+Millisekunden zurück. Nach einer Änderung ist ein Dienstneustart erforderlich.
+Der Browser erhält nur den validierten Zahlenwert, keine Zugangsdaten.

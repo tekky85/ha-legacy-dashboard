@@ -143,6 +143,185 @@ textarea {
 
 
 /* =========================================================
+   WALL DISPLAY HEADER
+   ========================================================= */
+
+.wall-header {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+}
+
+.wall-clock {
+
+    min-width: 108px;
+    margin-right: 14px;
+
+    text-align: right;
+
+}
+
+.wall-clock-time,
+.wall-clock-date {
+
+    display: block;
+
+}
+
+.wall-clock-time {
+
+    color: inherit;
+
+    font-size: 28px;
+    font-weight: 650;
+    line-height: 1;
+
+    letter-spacing: -0.025em;
+
+}
+
+.wall-clock-date {
+
+    margin-top: 5px;
+
+    color: #667085;
+
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+
+    white-space: nowrap;
+
+}
+
+.connection-badge {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    min-height: 34px;
+
+    margin-right: 12px;
+    padding: 0 12px;
+
+    border: 1px solid #dce3ec;
+    border-radius: 12px;
+
+    background: #ffffff;
+    color: #526071;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+}
+
+.connection-dot {
+
+    display: block;
+
+    width: 9px;
+    height: 9px;
+
+    margin-right: 7px;
+
+    border-radius: 50%;
+
+    background: #98a2b3;
+
+}
+
+.connection-badge.is-online {
+
+    border-color: #b8dfc9;
+    color: #137044;
+
+}
+
+.connection-badge.is-online .connection-dot {
+
+    background: #20a464;
+
+}
+
+.connection-badge.is-degraded {
+
+    border-color: #f0cf9f;
+    color: #9a570c;
+
+}
+
+.connection-badge.is-degraded .connection-dot {
+
+    background: #e18a24;
+
+}
+
+.connection-badge.is-offline {
+
+    border-color: #efbdc3;
+    color: #bd3444;
+
+}
+
+.connection-badge.is-offline .connection-dot {
+
+    background: #d94a59;
+
+}
+
+.network-banner {
+
+    display: none;
+
+    margin: -8px 0 20px 0;
+    padding: 13px 16px;
+
+    border: 1px solid #efbdc3;
+    border-radius: 14px;
+
+    background: #fff1f2;
+    color: #a92d3c;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+
+    text-align: center;
+
+}
+
+.network-banner.is-visible {
+
+    display: block;
+
+}
+
+.network-banner.is-degraded {
+
+    border-color: #f0cf9f;
+
+    background: #fff8eb;
+    color: #8d520f;
+
+}
+
+
+/* =========================================================
    THEME SWITCH
    ========================================================= */
 
@@ -584,6 +763,59 @@ body.theme-dark .subtitle {
 
 }
 
+body.theme-dark .wall-clock-date {
+
+    color: #9aa6b5;
+
+}
+
+body.theme-dark .connection-badge {
+
+    background: #1a2432;
+    border-color: #303d4e;
+    color: #aeb9c7;
+
+}
+
+body.theme-dark .connection-badge.is-online {
+
+    border-color: #275b43;
+    color: #63d796;
+
+}
+
+body.theme-dark .connection-badge.is-degraded {
+
+    border-color: #684b28;
+    color: #f0ad55;
+
+}
+
+body.theme-dark .connection-badge.is-offline {
+
+    border-color: #6a343b;
+    color: #ff7b84;
+
+}
+
+body.theme-dark .network-banner {
+
+    border-color: #6a343b;
+
+    background: #3c2026;
+    color: #ff9ba2;
+
+}
+
+body.theme-dark .network-banner.is-degraded {
+
+    border-color: #684b28;
+
+    background: #39291b;
+    color: #f0b767;
+
+}
+
 body.theme-dark .theme-toggle {
 
     background: #1a2432;
@@ -744,6 +976,9 @@ body.theme-dark .footer {
 
     .app-header {
 
+        -webkit-align-items: flex-start;
+        align-items: flex-start;
+
         margin-bottom: 18px;
 
     }
@@ -762,7 +997,60 @@ body.theme-dark .footer {
 
     .app-header .subtitle {
 
-        font-size: 13px;
+        display: none;
+
+    }
+
+    .wall-header {
+
+        -webkit-align-items: flex-end;
+        align-items: flex-end;
+
+    }
+
+    .wall-clock {
+
+        min-width: 82px;
+        margin-right: 9px;
+
+    }
+
+    .wall-clock-time {
+
+        font-size: 24px;
+
+    }
+
+    .wall-clock-date {
+
+        max-width: 90px;
+        overflow: hidden;
+
+        font-size: 11px;
+
+        text-overflow: ellipsis;
+
+    }
+
+    .connection-badge {
+
+        position: absolute;
+        top: 76px;
+        left: 16px;
+        right: 16px;
+
+        -webkit-justify-content: center;
+        justify-content: center;
+
+        min-height: 32px;
+
+        margin: 0;
+
+    }
+
+    .network-banner {
+
+        margin-top: 24px;
 
     }
 

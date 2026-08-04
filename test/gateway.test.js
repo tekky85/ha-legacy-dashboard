@@ -527,7 +527,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=12"
+                "/js/app.js?v=13"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -567,6 +567,10 @@ test(
 
             assert.equal(configuration.status, 200);
             assert.equal(configuration.json.widgets.length, 5);
+            assert.equal(
+                configuration.json.refresh_interval_ms,
+                5000
+            );
             assert.deepEqual(
                 configuration.json.widgets.map(function (widget) {
                     return widget.entity;

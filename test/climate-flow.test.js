@@ -22,6 +22,27 @@ function createHarness() {
         innerHTML: ""
     };
 
+    const clock = {
+        innerHTML: ""
+    };
+
+    const date = {
+        innerHTML: ""
+    };
+
+    const connectionBadge = {
+        className: "connection-badge is-connecting"
+    };
+
+    const connectionLabel = {
+        innerHTML: "Verbinde …"
+    };
+
+    const networkBanner = {
+        className: "network-banner",
+        innerHTML: ""
+    };
+
     const display = {
         innerHTML: ""
     };
@@ -132,6 +153,21 @@ function createHarness() {
             if (id === "dashboard") {
                 return dashboard;
             }
+            if (id === "wallClock") {
+                return clock;
+            }
+            if (id === "wallDate") {
+                return date;
+            }
+            if (id === "connectionBadge") {
+                return connectionBadge;
+            }
+            if (id === "connectionLabel") {
+                return connectionLabel;
+            }
+            if (id === "networkBanner") {
+                return networkBanner;
+            }
             return null;
         },
         getElementsByClassName: function (name) {
@@ -153,6 +189,26 @@ function createHarness() {
 
     FakeDate.prototype.toLocaleTimeString = function () {
         return "test-time";
+    };
+
+    FakeDate.prototype.getHours = function () {
+        return 9;
+    };
+
+    FakeDate.prototype.getMinutes = function () {
+        return 5;
+    };
+
+    FakeDate.prototype.getDay = function () {
+        return 2;
+    };
+
+    FakeDate.prototype.getDate = function () {
+        return 4;
+    };
+
+    FakeDate.prototype.getMonth = function () {
+        return 7;
     };
 
     function setTimer(callback, delay) {
@@ -231,8 +287,16 @@ function createHarness() {
         Math: Math,
         window: {
             event: null,
-            setInterval: function (callback) {
+            setInterval: function (callback, delay) {
+                callback.delay = delay;
+                callback.cleared = false;
                 intervals.push(callback);
+                return intervals.length;
+            },
+            clearInterval: function (id) {
+                if (intervals[id - 1]) {
+                    intervals[id - 1].cleared = true;
+                }
             },
             setTimeout: setTimer,
             clearTimeout: clearTimer
@@ -255,6 +319,11 @@ function createHarness() {
 
     return {
         dashboard: dashboard,
+        clock: clock,
+        date: date,
+        connectionBadge: connectionBadge,
+        connectionLabel: connectionLabel,
+        networkBanner: networkBanner,
         configurations: configurations,
         display: display,
         gets: gets,
@@ -270,6 +339,7 @@ function createHarness() {
         status: status,
         completeConfiguration: function () {
             gets[0].success({
+                refresh_interval_ms: 5000,
                 widgets: [
                     {
                         entity: "light.esszimmer_lampen",
@@ -324,6 +394,52 @@ test("Dashboard-Konfiguration wird vor Zuständen geladen", function () {
     assert.equal(harness.configurations.length, 1);
     assert.equal(harness.gets.length, 2);
     assert.equal(harness.gets[1].url, "/api/dashboard");
+
+});
+
+
+test("Wall-Display zeigt Uhr, Status und automatische Wiederverbindung", function () {
+
+    const harness = createHarness();
+
+    assert.equal(harness.clock.innerHTML, "09:05");
+    assert.equal(harness.date.innerHTML, "Dienstag, 4. August");
+    assert.equal(harness.intervals[0].delay, 5000);
+    assert.equal(harness.intervals[1].delay, 30000);
+
+    harness.completeConfiguration();
+    harness.gets[1].success({
+        _meta: {
+            home_assistant: "online"
+        }
+    });
+
+    assert.equal(harness.connectionLabel.innerHTML, "Online");
+    assert.equal(
+        harness.connectionBadge.className,
+        "connection-badge is-online"
+    );
+    assert.equal(harness.networkBanner.className, "network-banner");
+
+    harness.intervals[0]();
+    harness.gets[2].error({
+        message: "Netzwerkfehler"
+    });
+
+    assert.equal(harness.connectionLabel.innerHTML, "Gateway offline");
+    assert.ok(
+        harness.networkBanner.className.indexOf("is-visible") !== -1
+    );
+
+    harness.intervals[0]();
+    harness.gets[3].success({
+        _meta: {
+            home_assistant: "online"
+        }
+    });
+
+    assert.equal(harness.connectionLabel.innerHTML, "Online");
+    assert.equal(harness.networkBanner.innerHTML, "");
 
 });
 

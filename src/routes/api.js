@@ -369,7 +369,10 @@ router.get(
         res.json({
 
             widgets:
-                dashboardConfig.getPublicWidgets()
+                dashboardConfig.getPublicWidgets(),
+
+            refresh_interval_ms:
+                dashboardConfig.getRefreshIntervalMs()
 
         });
 
