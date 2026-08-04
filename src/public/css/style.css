@@ -83,7 +83,7 @@ textarea {
     max-width: 1180px;
 
     margin: 0 auto;
-    padding: 24px;
+    padding: 18px;
 
 }
 
@@ -105,14 +105,14 @@ textarea {
 
     width: 100%;
 
-    margin: 0 0 24px 0;
+    margin: 0 0 12px 0;
 
 }
 
 .brand {
 
     min-width: 0;
-    padding-right: 18px;
+    padding-right: 12px;
 
 }
 
@@ -122,11 +122,13 @@ textarea {
 
     color: inherit;
 
-    font-size: 30px;
-    font-weight: 700;
-    line-height: 1.15;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
 
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
+
+    white-space: nowrap;
 
 }
 
@@ -164,8 +166,14 @@ textarea {
 
 .wall-clock {
 
-    min-width: 108px;
-    margin-right: 14px;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: baseline;
+    align-items: baseline;
+
+    min-width: 0;
+    margin-right: 12px;
 
     text-align: right;
 
@@ -182,8 +190,8 @@ textarea {
 
     color: inherit;
 
-    font-size: 28px;
-    font-weight: 650;
+    font-size: 18px;
+    font-weight: 600;
     line-height: 1;
 
     letter-spacing: -0.025em;
@@ -192,12 +200,12 @@ textarea {
 
 .wall-clock-date {
 
-    margin-top: 5px;
+    margin: 0 0 0 7px;
 
     color: #667085;
 
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 400;
     line-height: 1.2;
 
     white-space: nowrap;
@@ -212,19 +220,18 @@ textarea {
     -webkit-align-items: center;
     align-items: center;
 
-    min-height: 34px;
+    min-height: 20px;
 
-    margin-right: 12px;
-    padding: 0 12px;
+    margin-right: 10px;
+    padding: 0;
 
-    border: 1px solid #dce3ec;
-    border-radius: 12px;
+    border: 0;
 
-    background: #ffffff;
+    background: transparent;
     color: #526071;
 
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 500;
 
     white-space: nowrap;
 
@@ -234,10 +241,10 @@ textarea {
 
     display: block;
 
-    width: 9px;
-    height: 9px;
+    width: 7px;
+    height: 7px;
 
-    margin-right: 7px;
+    margin-right: 5px;
 
     border-radius: 50%;
 
@@ -247,8 +254,7 @@ textarea {
 
 .connection-badge.is-online {
 
-    border-color: #b8dfc9;
-    color: #137044;
+    color: #47715b;
 
 }
 
@@ -260,8 +266,7 @@ textarea {
 
 .connection-badge.is-degraded {
 
-    border-color: #f0cf9f;
-    color: #9a570c;
+    color: #8a642e;
 
 }
 
@@ -273,8 +278,7 @@ textarea {
 
 .connection-badge.is-offline {
 
-    border-color: #efbdc3;
-    color: #bd3444;
+    color: #9b4d56;
 
 }
 
@@ -288,17 +292,17 @@ textarea {
 
     display: none;
 
-    margin: -8px 0 20px 0;
-    padding: 13px 16px;
+    margin: 0 0 12px 0;
+    padding: 9px 12px;
 
     border: 1px solid #efbdc3;
-    border-radius: 14px;
+    border-radius: 10px;
 
     background: #fff1f2;
     color: #a92d3c;
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
     line-height: 1.35;
 
     text-align: center;
@@ -339,19 +343,20 @@ textarea {
     -webkit-flex: 0 0 auto;
     flex: 0 0 auto;
 
-    min-width: 116px;
-    height: 46px;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
 
     margin: 0;
-    padding: 0 16px;
+    padding: 0;
 
-    border: 1px solid #dce2ea;
-    border-radius: 15px;
+    border: 0;
+    border-radius: 12px;
 
-    background: #ffffff;
-    color: #344054;
+    background: transparent;
+    color: #667085;
 
-    box-shadow: 0 4px 14px rgba(23, 32, 51, 0.08);
+    box-shadow: none;
 
     cursor: pointer;
 
@@ -384,10 +389,10 @@ textarea {
 
     display: block;
 
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 
-    margin-right: 8px;
+    margin-right: 0;
 
     fill: none;
     stroke: currentColor;
@@ -399,8 +404,7 @@ textarea {
 
 .theme-toggle-label {
 
-    font-size: 14px;
-    font-weight: 600;
+    display: none;
 
 }
 
@@ -771,30 +775,26 @@ body.theme-dark .wall-clock-date {
 
 body.theme-dark .connection-badge {
 
-    background: #1a2432;
-    border-color: #303d4e;
+    background: transparent;
     color: #aeb9c7;
 
 }
 
 body.theme-dark .connection-badge.is-online {
 
-    border-color: #275b43;
-    color: #63d796;
+    color: #80b998;
 
 }
 
 body.theme-dark .connection-badge.is-degraded {
 
-    border-color: #684b28;
-    color: #f0ad55;
+    color: #d2a66d;
 
 }
 
 body.theme-dark .connection-badge.is-offline {
 
-    border-color: #6a343b;
-    color: #ff7b84;
+    color: #dc9298;
 
 }
 
@@ -818,12 +818,12 @@ body.theme-dark .network-banner.is-degraded {
 
 body.theme-dark .theme-toggle {
 
-    background: #1a2432;
-    color: #e5ebf3;
+    background: transparent;
+    color: #aeb9c7;
 
-    border-color: #303d4e;
+    border-color: transparent;
 
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.32);
+    box-shadow: none;
 
 }
 
@@ -970,28 +970,28 @@ body.theme-dark .footer {
 
     .app {
 
-        padding: 16px;
+        padding: 12px;
 
     }
 
     .app-header {
 
-        -webkit-align-items: flex-start;
-        align-items: flex-start;
+        -webkit-align-items: center;
+        align-items: center;
 
-        margin-bottom: 18px;
+        margin-bottom: 10px;
 
     }
 
     .app-header h1 {
 
-        font-size: 25px;
+        font-size: 16px;
 
     }
 
     .brand {
 
-        padding-right: 10px;
+        padding-right: 6px;
 
     }
 
@@ -1003,61 +1003,60 @@ body.theme-dark .footer {
 
     .wall-header {
 
-        -webkit-align-items: flex-end;
-        align-items: flex-end;
+        -webkit-align-items: center;
+        align-items: center;
 
     }
 
     .wall-clock {
 
-        min-width: 82px;
-        margin-right: 9px;
+        min-width: 0;
+        margin-right: 8px;
 
     }
 
     .wall-clock-time {
 
-        font-size: 24px;
+        font-size: 16px;
 
     }
 
     .wall-clock-date {
 
-        max-width: 90px;
-        overflow: hidden;
-
-        font-size: 11px;
-
-        text-overflow: ellipsis;
+        display: none;
 
     }
 
     .connection-badge {
 
-        position: absolute;
-        top: 76px;
-        left: 16px;
-        right: 16px;
+        min-height: 20px;
 
-        -webkit-justify-content: center;
-        justify-content: center;
+        margin-right: 8px;
 
-        min-height: 32px;
+    }
 
-        margin: 0;
+    .connection-label {
+
+        display: none;
+
+    }
+
+    .connection-dot {
+
+        margin-right: 0;
 
     }
 
     .network-banner {
 
-        margin-top: 24px;
+        margin-bottom: 10px;
 
     }
 
     .theme-toggle {
 
-        width: 46px;
-        min-width: 46px;
+        width: 44px;
+        min-width: 44px;
 
         padding: 0;
 
@@ -1145,7 +1144,7 @@ body.theme-dark .footer {
 
     .app-header {
 
-        margin-bottom: 15px;
+        margin-bottom: 10px;
 
     }
 

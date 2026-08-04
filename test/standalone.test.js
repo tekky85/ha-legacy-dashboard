@@ -56,22 +56,28 @@ test("iOS-Standalone-Metadaten sind vollständig", function () {
         /name="apple-mobile-web-app-title" content="HA Dashboard"/
     );
 
-    assert.match(
+    assert.match(html, /<h1>HA Dashboard<\/h1>/);
+    assert.doesNotMatch(
         html,
-        /rel="manifest" href="manifest\.json\?v=13"/
+        /Lightweight dashboards for legacy devices/
     );
 
     assert.match(
         html,
-        /sizes="76x76"[\s\S]*app-icon-76\.png\?v=13/
+        /rel="manifest" href="manifest\.json\?v=14"/
     );
 
     assert.match(
         html,
-        /sizes="152x152"[\s\S]*app-icon-152\.png\?v=13/
+        /sizes="76x76"[\s\S]*app-icon-76\.png\?v=14/
     );
 
-    assert.doesNotMatch(html, /\?v=11/);
+    assert.match(
+        html,
+        /sizes="152x152"[\s\S]*app-icon-152\.png\?v=14/
+    );
+
+    assert.doesNotMatch(html, /\?v=13/);
 
 });
 

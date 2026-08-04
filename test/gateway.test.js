@@ -527,7 +527,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=13"
+                "/js/app.js?v=14"
             );
 
             assert.equal(applicationScript.status, 200);
