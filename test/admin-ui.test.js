@@ -47,7 +47,7 @@ function createHarness() {
                 status: 200,
                 text: async function () {
                     return JSON.stringify({
-                        schemaVersion: 1,
+                        schemaVersion: 2,
                         defaultDashboardId: "default",
                         dashboards: []
                     });
@@ -200,6 +200,13 @@ test("Dashboard-Entwürfe unterstützen CRUD, Standardwechsel und Duplikate", fu
         return widget.id;
     });
 
+    duplicate.widgets.forEach(function (widget, index) {
+        assert.equal(
+            widget.size,
+            freshConfiguration().dashboards[0].widgets[index].size
+        );
+    });
+
     assert.equal(new Set(duplicateIds).size, duplicateIds.length);
     duplicateIds.forEach(function (widgetId) {
         assert.equal(originalIds.indexOf(widgetId), -1);
@@ -278,7 +285,8 @@ test("Entity-Suche und Widget-Entwurf begrenzen sich auf bekannte Typen", functi
             icon: "temperature",
             unit: "°C",
             order: 70,
-            visible: true
+            visible: true,
+            size: "normal"
         }
     );
     const second = admin.Widgets.create(
@@ -290,12 +298,15 @@ test("Entity-Suche und Widget-Entwurf begrenzen sich auf bekannte Typen", functi
             icon: "sensor",
             unit: "°C",
             order: 80,
-            visible: false
+            visible: false,
+            size: "compact"
         }
     );
 
     assert.notEqual(first.id, second.id);
     assert.equal(first.type, "sensor");
+    assert.equal(first.size, "normal");
+    assert.equal(second.size, "compact");
     assert.equal(dashboard.widgets.length, initialLength + 2);
 
     admin.Widgets.update(dashboard.id, first.id, {
@@ -304,12 +315,26 @@ test("Entity-Suche und Widget-Entwurf begrenzen sich auf bekannte Typen", functi
         icon: "sensor",
         unit: "K",
         order: first.order,
-        visible: false
+        visible: false,
+        size: "wide"
     });
     assert.equal(first.title, "Neue Temperatur");
     assert.equal(first.entity, "sensor.office_temperature");
     assert.equal(first.type, "sensor");
     assert.equal(first.visible, false);
+    assert.equal(first.size, "wide");
+
+    assert.throws(function () {
+        admin.Widgets.update(dashboard.id, first.id, {
+            title: "Ungültig",
+            subtitle: "Büro",
+            icon: "sensor",
+            unit: "K",
+            order: first.order,
+            visible: true,
+            size: "300px"
+        });
+    }, /gültige Kachelgröße/);
 
     admin.Widgets.setVisibility(dashboard.id, first.id, true);
     assert.equal(first.visible, true);
@@ -322,6 +347,12 @@ test("Entity-Suche und Widget-Entwurf begrenzen sich auf bekannte Typen", functi
             return widget.id === first.id;
         }),
         false
+    );
+
+    admin.State.discard();
+    assert.equal(
+        admin.State.getDraft().dashboards[0].widgets[0].size,
+        "normal"
     );
 });
 

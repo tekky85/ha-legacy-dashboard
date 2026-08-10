@@ -2,52 +2,25 @@
 
 Stand der Prüfung: 10. August 2026
 
-Dieser Bericht beschreibt den implementierten und im LXC ausgerollten Stand
-nach Sprint 15. Er enthält keine Werte aus `.env`, keine
-Home-Assistant-Zugangsdaten und keine Tokens.
+Dieser Bericht beschreibt den tatsächlichen Implementierungsstand nach Sprint
+16. Er enthält keine Werte aus `.env`, keine Home-Assistant-Zugangsdaten und
+keine Tokens.
 
-## 1. Aktueller Branch und Ausgangscommit
+## 1. Branch und Ausgangscommit
 
 - Branch: `main`
-- Ausgangscommit: `47a5a56 docs: define sprint 15 admin configuration ui`
-- Sprint-15-Commit: `332d0a5 feat: add graphical admin configuration ui`
+- Ausgangscommit: `3b05a93 docs: define sprint 16 configurable tile sizes`
 - Upstream: `origin/main`
-- `HEAD`, `origin/main` und `origin/HEAD` waren vor der Umsetzung synchron.
-- Sprint 15 wurde committed, gepusht und im Produktions-LXC ausgerollt.
+- Sprint 15 war vollständig implementiert, committed, gepusht und im LXC
+  ausgerollt.
 
-## 2. Status des Arbeitsbaums
+## 2. Arbeitsbaum
 
-Der Arbeitsbaum war zu Beginn sauber und ist nach dem Deployment wieder sauber.
-Laufzeitkonfiguration, `.env`, Tokens und Browser-Testdaten sind nicht Teil des
-Repositories.
+Der Arbeitsbaum war zu Beginn von Sprint 16 sauber. Laufzeitkonfigurationen
+unter `data/`, `.env`, Tokens und lokale Browser-Testdaten bleiben durch Git
+ausgeschlossen.
 
-## 3. Implementierte Funktionen
-
-### Bestehende Anwendung
-
-- Express-Gateway und Home-Assistant-REST-Anbindung
-- iOS-9-/ES5-kompatibles Wall-Display ohne Frontendframework
-- Sensor-, Binary-, Light- und Climate-Widgets
-- optimistische, explizit allowlisted Climate- und Light-Steuerung
-- persistente Multi-Dashboard-Konfiguration mit atomarem Backup
-- geschützte Admin API und sanitisiertes Entity-Inventar
-
-### Sprint 15
-
-- separate moderne Admin-Oberfläche unter `/admin`
-- Login mit separatem Bearer-Token und optionalem `sessionStorage`
-- Logout und Tokenbereinigung bei HTTP 401/403
-- Dashboardliste mit Standardmarkierung, Widgetanzahl und Preview-Link
-- Dashboard erstellen, umbenennen, duplizieren und löschen
-- Standard-Dashboard und Refresh-Intervall bearbeiten
-- lokaler Gesamtkonfigurationsentwurf mit Speichern und Verwerfen
-- Warnung beim Verlassen mit ungespeicherten Änderungen
-- Entity-Browser mit Suche und Domainfilter
-- Widget hinzufügen, bearbeiten, ein-/ausblenden, verschieben und entfernen
-- Widgetreihenfolge über Auf-/Ab-Schaltflächen statt Drag-and-drop
-- verständliche Behandlung definierter API-Fehler
-
-## 4. Implementierte Sprints
+## 3. Implementierte Funktionen und Sprints
 
 | Sprint | Thema | Stand |
 |---|---|---|
@@ -58,34 +31,29 @@ Repositories.
 | 11–12 | Wall-Display und Release-Baseline | umgesetzt |
 | 13 | Multi-Dashboard Foundation | umgesetzt |
 | 14 | Persistenz und Admin-API-Grundlage | umgesetzt |
-| 15 | Grafische Admin-Konfiguration | umgesetzt und ausgerollt |
+| 15 | Grafische Admin-Konfiguration | umgesetzt |
+| 16 | Konfigurierbare Kachelgrößen | umgesetzt |
 
-## 5. Entity-Auswahl und Schreibgrenzen
+Zusätzlich zu den bestehenden Sensor-, Binary-, Light- und Climate-Widgets
+unterstützt jedes Widget nun ein festes, validiertes Größen-Preset. Die
+Oberfläche bleibt ein responsiver Flexbox-Fluss; Sprint 16 führt weder
+Drag-and-drop noch freie Positionen oder Maße ein.
 
-Die Admin-Oberfläche lädt ausschließlich das sanitierte Inventar aus
-`GET /api/admin/entities`. Automatisch zuordenbar sind:
+## 4. Sprint-15-Verifikation
 
-| HA-Domain | Widgettyp |
-|---|---|
-| `sensor` | `sensor` |
-| `binary_sensor` | `binary` |
-| `light` | `light` |
-| `climate` | `climate` |
+Vor den Änderungen wurden die persistente Multi-Dashboard-Konfiguration,
+stabile Dashboard- und Widget-IDs, Admin API, `/admin`, Entity-Inventar,
+Widgetbearbeitung, Gesamtkonfigurationsentwurf, Speichern und Verwerfen sowie
+die getrennten HA-Schreib-Allowlisten im tatsächlichen Code bestätigt. Der
+Sprint-15-Referenztest bestand mit 62 von 62 Tests.
 
-Andere Domains werden nicht als Widget angeboten. Sichtbarkeit und
-Entity-Auswahl steuern nur Anzeige und HA-Lesezugriff. Schreibrechte bleiben
-unverändert separat in `src/routes/api.js`:
+## 5. Konfigurationsschema und Migration
 
-- Climate: ausschließlich `climate.esszimmer_thermostate`
-- Light: ausschließlich `light.esszimmer_lampen`
-
-## 6. Konfigurationsschema
-
-Schema Version 1 bleibt unverändert:
+Das persistente Schema ist Version 2:
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "defaultDashboardId": "default",
   "dashboards": [
     {
@@ -97,13 +65,14 @@ Schema Version 1 bleibt unverändert:
           "id": "default-bathroom-temperature",
           "entity": "sensor.example",
           "type": "sensor",
-          "title": "Titel",
-          "subtitle": "Untertitel",
+          "title": "Badezimmer",
+          "subtitle": "Temperatur",
           "icon": "temperature",
           "iconClass": "temperature",
           "unit": "",
           "order": 10,
-          "visible": true
+          "visible": true,
+          "size": "normal"
         }
       ]
     }
@@ -111,155 +80,126 @@ Schema Version 1 bleibt unverändert:
 }
 ```
 
-Das Backend bleibt finale Validierungsinstanz. Neue und duplizierte Widgets
-erhalten bereits im UI-Entwurf global eindeutige IDs; das Backend prüft sie
-erneut vor der Speicherung.
+Zulässig sind ausschließlich `compact`, `normal`, `wide`, `tall` und `large`.
+Schema-1-Dateien werden beim Laden vollständig validiert und anschließend
+atomar zu Schema 2 migriert. Fehlendes `size` wird zu `normal`; Dashboard-IDs,
+Widget-IDs, Entity-IDs, Reihenfolge, Sichtbarkeit, Texte und Icons bleiben
+unverändert. Die erste Migrationssicherung enthält die letzte gültige
+Schema-1-Konfiguration.
 
-## 7. Persistenz und Entwurfsmodell
+Nach späteren Schema-2-Schreibvorgängen kann die rollierende `.bak`-Datei
+ebenfalls Schema 2 enthalten. Ein späteres Downgrade auf Sprint 15 benötigt
+dann eine separat aufbewahrte Schema-1-Sicherung oder eine manuelle
+Rückkonvertierung; eine automatische Downgrade-Migration ist bewusst nicht
+enthalten.
 
-- Persistenz weiterhin standardmäßig in `data/dashboards.json`
-- vollständige Validierung vor Speicherung
-- atomare Primärdatei und eine gültige Vorgängerversion als `.bak`
-- UI lädt eine vollständige Konfiguration als lokalen Entwurf
-- Eingaben persistieren nicht bei jedem Tastendruck
-- `PUT /api/admin/config` speichert den Entwurf explizit als Ganzes
-- Fehler erhalten Entwurf und letzte gültige Serverkonfiguration
-- „Verwerfen“ stellt die zuletzt geladene oder gespeicherte Konfiguration her
+## 6. Persistenz und Backendvalidierung
 
-Eine Konfliktversion oder ETag für mehrere parallele Admin-Browser existiert
-noch nicht.
+- Standardpfad `data/dashboards.json`, überschreibbar mit
+  `DASHBOARD_CONFIG_PATH`
+- vollständige Validierung vor jedem Schreibvorgang
+- temporäre Datei und atomare Umbenennung
+- eine gültige Vorgängerversion als `dashboards.json.bak`
+- kontrollierter HTTP-400-Code `invalid_widget_size`
+- ungültige Größen verändern weder aktive noch persistierte Konfiguration
+- Public API liefert nur die validierten Presets aus
+- Renderer normalisiert fehlende oder unbekannte Werte zusätzlich zu `normal`
 
-## 8. Multi-Dashboard-Unterstützung
+## 7. Admin-Oberfläche
 
-Alle Sprint-13-/14-Routen bleiben bestehen. Die Admin UI kann Profile
-erstellen, umbenennen, duplizieren, löschen und als Standard auswählen.
-Technische IDs bleiben nach Erstellung read-only. Das Duplizieren vergibt für
-jedes kopierte Widget eine neue globale ID.
+Die Widgetbearbeitung unter `/admin` besitzt ein festes Select-Feld
+„Kachelgröße“ mit den fünf Presets. Die Widgetliste zeigt den deutschen
+Größennamen. Neue Widgets beginnen mit `normal`; Größen bleiben beim
+Ausblenden, Verwerfen, Speichern, Reload und Duplizieren erhalten. Es gibt
+keine freie Texteingabe für Maße oder CSS.
 
-Die Root-URL zeigt weiterhin das konfigurierte Standard-Dashboard; explizite
-URLs bleiben `/d/:dashboardId`.
+## 8. Wall-Display und responsive Größen
 
-## 9. Admin API und Authentifizierung
+Der ES5-Renderer ordnet bekannte Werte ausschließlich den Klassen
+`card-size-compact`, `card-size-normal`, `card-size-wide`,
+`card-size-tall` und `card-size-large` zu.
 
-Die Admin API bleibt ohne `ADMIN_API_ENABLED=true` deaktiviert. Bei Aktivierung
-ist ein vom `HA_TOKEN` verschiedener `ADMIN_TOKEN` erforderlich.
+| Breite | compact / normal / tall | wide / large |
+|---|---|---|
+| unter 600 px | volle Breite | volle Breite |
+| 600–899 px | etwa halbe Breite | volle Breite |
+| ab 900 px | etwa ein Drittel | etwa zwei Drittel |
 
-Die UI sendet ihn ausschließlich als:
+`compact` reduziert Mindesthöhe und Innenabstände, `tall` erhöht die
+Mindesthöhe und `large` kombiniert breite Darstellung mit zusätzlicher
+Mindesthöhe. Inhalte dürfen Karten vergrößern; feste Höhen werden nicht
+erzwungen. Climate-Tasten bleiben 46 × 46 px, der Theme-Schalter 44 × 44 px
+und der Light-Schalter mindestens 44 px hoch.
 
-```text
-Authorization: Bearer <ADMIN_TOKEN>
-```
+Die Reihenfolge entsteht weiterhin nur aus `order`; `order + size` bestimmen
+den Flexbox-Fluss. Zeilenumbrüche sind responsiv und nicht pixelgenau.
 
-und ausschließlich an `/api/admin/*`. Er erscheint nicht in URLs, HTML,
-öffentlichen Dashboard-Anfragen oder Logs. Die optionale Tab-Speicherung nutzt
-`sessionStorage`, niemals `localStorage`. Logout sowie HTTP 401/403 löschen den
-Token.
+## 9. Entity-Auswahl und Sicherheitsgrenzen
 
-Die Sprint-14-CRUD-Routen und das Rate-Limit für Schreiboperationen bleiben
-unverändert.
+Das Admin-Frontend verwendet nur das sanitierte Inventar aus
+`GET /api/admin/entities`. Dashboard-Sichtbarkeit und Kachelgröße steuern
+ausschließlich Anzeige und HA-Lesezugriff. Die getrennten Schreib-Allowlisten
+in `src/routes/api.js` bleiben unverändert:
 
-## 10. Admin-Oberfläche
+- Climate: `climate.esszimmer_thermostate`
+- Light: `light.esszimmer_lampen`
 
-Die Oberfläche liegt getrennt unter `src/admin/` und wird mit `no-store`
-ausgeliefert. Sie verwendet lokale HTML-, CSS- und JavaScript-Dateien ohne CDN
-oder Framework. Dynamische HA- und Konfigurationswerte werden über DOM-APIs und
-`textContent`, nicht über unbereinigtes `innerHTML`, ausgegeben.
+Der Admin-Token bleibt getrennt vom HA-Token. Die Admin API bleibt
+standardmäßig deaktiviert, Bearer-geschützt und für Schreibzugriffe
+rate-limitiert. Kein Token gelangt in das Wall-Display oder eine öffentliche
+Dashboardantwort.
 
-Das moderne Admin-JavaScript ist auf Authentifizierung, API, Zustand,
-Dashboards, Widgets, Entities und UI-Orchestrierung aufgeteilt. Das
-Wall-Display importiert keinen Admin-Code.
-
-## 11. Relevante Dateien
+## 10. Relevante Dateien
 
 | Bereich | Dateien |
 |---|---|
-| Admin-Auslieferung | `src/server.js`, `src/admin/index.html` |
-| Admin-Design | `src/admin/css/admin.css` |
-| Auth und API | `src/admin/js/auth.js`, `src/admin/js/api.js` |
-| lokaler Entwurf | `src/admin/js/state.js` |
-| Dashboardlogik | `src/admin/js/dashboards.js` |
-| Widgetlogik | `src/admin/js/widgets.js` |
-| Entity-Suche | `src/admin/js/entities.js` |
-| UI-Orchestrierung | `src/admin/js/app.js` |
-| Tests | `test/admin-ui.test.js`, `test/admin-api.test.js`, `test/gateway.test.js` |
-| Dokumentation | `README.md`, `CHANGELOG.md`, `docs/SPRINT_ROADMAP.md`, `docs/sprints/SPRINT-15.md` |
+| Schema und Migration | `src/config/dashboard.js`, `src/services/dashboard-config-store.js` |
+| Admin API | `src/routes/admin.js` |
+| Admin UI | `src/admin/index.html`, `src/admin/js/app.js`, `src/admin/js/widgets.js` |
+| Legacy-Mapping | `src/public/js/core/widget.js`, `src/public/js/widgets/*.js` |
+| Responsive Layout | `src/public/css/style.css` |
+| Cache | `src/public/index.html`, `src/public/manifest.json` |
+| Tests | `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js`, `test/tile-size.test.js` |
 
-## 12. Tests und Ergebnisse
+## 11. Tests und manuelle Prüfung
 
-Baseline Sprint 14:
+Alle automatisierten Integrationsprüfungen verwenden ausschließlich lokale
+Mock-HA-Dienste auf `127.0.0.1`, temporäre Konfigurationspfade und
+Fake-Credentials. Geprüft werden unter anderem Schema-1-Migration, alle fünf
+Presets, fehlerhafte Werte, atomare Persistenz, Backup, Admin API und UI,
+Public API, sichere CSS-Klassenzuordnung sowie unveränderte Schreibgrenzen.
 
-```text
-tests 58
-pass 58
-fail 0
-```
+In einem lokalen Browserlauf wurden Speichern, Reload, Verwerfen und alle fünf
+Größen geprüft. Bei 768 × 1024 und 1024 × 768 px gab es in Light und Dark Mode
+keinen horizontalen Überlauf, keine Konsolenfehler und keine verkleinerten
+Touchziele. Eine echte automatisierte Safari-iOS-9-Ausführung steht weiterhin
+nicht zur Verfügung.
 
-Sprint-15-Stand:
+Der vollständige Sprint-16-Testlauf bestand mit 69 von 69 Tests; alle 17
+geänderten JavaScript-Dateien bestanden `node --check`.
 
-```text
-tests 62
-pass 62
-fail 0
-cancelled 0
-skipped 0
-```
+## 12. Bekannte Einschränkungen und technische Schulden
 
-Neue Prüfungen decken Session-Token und Logout, reine Admin-API-Ziele,
-Dashboard-CRUD, Slugfehler, Duplikat-IDs, Standardwechsel, Entity-Suche,
-Domainfilter, bekannte Typen, Widget-CRUD, Sichtbarkeit, Pfeilreihenfolge,
-Secret-Grenzen, `/admin`-Auslieferung und unveränderte ES5-Syntax ab.
+- Flexbox garantiert keine exakte Rasterposition.
+- Keine getrennten Größen für Portrait und Landscape.
+- Keine Konflikterkennung für parallele Admin-Entwürfe.
+- In-Memory-Rate-Limit ist nicht prozessübergreifend.
+- Keine automatisierte echte Safari-/iOS-9-Ausführung.
+- Keine freie Breite, Höhe, X-/Y-Position, Drag-and-drop oder Layout-Handles.
+- Das Admin-Frontend besitzt keine vollständige Live-Vorschau.
 
-Alle Integrationsprüfungen verwenden ausschließlich lokale Mock-Dienste auf
-`127.0.0.1`, temporäre Konfigurationspfade und Fake-Credentials.
+Im automatisierten Testlauf ist kein funktionaler Sprint-16-Defekt bekannt.
 
-## 13. Manuelle Browserprüfung und bekannte Defekte
+## 13. Roadmap-Abgleich und Voraussetzung für Sprint 17
 
-Im aktuellen Codex-Browser wurden Login, falscher Token, Logout, Session-
-Restore, Dashboard-Erstellung/-Duplizierung, Entity-Suche und -Filter,
-Widgetanlage/-bearbeitung/-sichtbarkeit/-reihenfolge, Speichern, Reload,
-Verwerfen, Desktop-/Tabletdarstellung sowie `/` und `/d/default` erfolgreich
-geprüft. Es gab keine Konsolenfehler.
+Sprint 16 entspricht der Spezifikation: feste Presets, Schema-Migration,
+Backendvalidierung, Admin-Auswahl, sichere öffentliche Ausgabe und
+iOS-9-kompatibler Flexbox-Renderer sind umgesetzt. Nicht-Ziele wie CSS Grid,
+freie Werte, WYSIWYG, zusätzliche HA-Domänen und automatische
+Schreibberechtigungen wurden nicht eingeführt.
 
-Safari 18.6 ist auf dem Mac vorhanden, verweigert WebDriver jedoch, solange
-„Entfernte Automation erlauben“ in Safari nicht aktiviert ist. Die native
-Safari-Sichtprüfung ist daher noch manuell nachzuholen. Ein separater Chrome-,
-Chromium- oder Edge-Browser ist auf dem Mac nicht installiert.
-
-Im automatisierten Testlauf ist kein funktionaler Defekt offen.
-
-## 14. Technische Schulden
-
-- keine Konflikterkennung für parallele Admin-Entwürfe
-- Bearer-Token liegt während der Sitzung bewusst im Browserkontext; CSP und
-  ausschließlich lokale Assets begrenzen die Angriffsfläche
-- In-Memory-Rate-Limit ist nicht prozessübergreifend
-- keine automatisierte echte Safari-/iOS-9-Ausführung
-- keine freie Kachelposition oder -größe
-- keine visuelle Icon-Vorschau, nur eine auf bekannte Namen begrenzte Auswahl
-
-## 15. Abweichungen zwischen Roadmap und Code
-
-Die Roadmap ist bis Sprint 15 aktualisiert. Sprint 15 verwendet für gebündelte
-Entwurfsänderungen bevorzugt die vorhandene Gesamtconfig-Route statt für jede
-lokale Einzelaktion sofort eine CRUD-Route aufzurufen. Dadurch wird nicht bei
-jedem Tastendruck geschrieben; Backendvalidierung, atomare Persistenz und
-Rate-Limit bleiben dieselben.
-
-Es wurden bewusst weder Drag-and-drop noch freie Positionierung, Tile-Größen,
-Layoutprofile, neue HA-Schreibdomänen, HACS oder App-Packaging implementiert.
-
-## 16. Grundlage für Sprint 16
-
-Die Grundlage für einen späteren Layout-Sprint besteht aus:
-
-- stabilen Dashboard- und Widget-IDs
-- persistenter, versionierter Gesamtconfig
-- getrenntem modernen Admin-Frontend
-- lokalem Entwurfs- und Speichermodell
-- normalisierter Widgetreihenfolge
-- weiterhin klarer Trennung von Sichtbarkeit und Schreibberechtigung
-
-Vor paralleler Mehrbenutzerbearbeitung sollte Sprint 16 eine
-Konfigurationsrevision beziehungsweise ETag-Konflikterkennung ergänzen. Freie
-Positionierung oder Größen benötigen außerdem eine neue Schema-Version und
-dürfen nicht stillschweigend in Schema 1 aufgenommen werden.
+Sprint 17 kann auf stabilen Widget-IDs, `order`, `size`, Schema 2, atomarer
+Persistenz und dem lokalen Admin-Entwurf aufbauen. Für ein Drag-and-drop-Raster
+muss es ein eigenes validiertes Positionsmodell, eine klare Migration und eine
+iOS-9-taugliche Darstellung geben; das aktuelle Größenfeld darf dabei nicht in
+freie CSS-Werte umgedeutet werden.

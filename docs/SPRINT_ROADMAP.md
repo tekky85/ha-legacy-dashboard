@@ -39,6 +39,7 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 13 | Multi-Dashboard Foundation | abgeschlossen |
 | 14 | Persistenz und Admin-API-Grundlage | abgeschlossen |
 | 15 | Grafische Admin-Konfiguration | abgeschlossen |
+| 16 | Konfigurierbare Kachelgrößen | abgeschlossen |
 
 ---
 
@@ -505,6 +506,27 @@ Projektlizenz bleibt eine bewusste Entscheidung des Projektinhabers.
 
 ---
 
+# Sprint 16 – Konfigurierbare Kachelgrößen
+
+## Umgesetzt
+
+- Schema-Version 2 mit validiertem Widgetfeld `size`
+- automatische Migration von Schema 1 mit `size: normal` ohne Änderung
+  bestehender IDs, Entities, Reihenfolge oder Sichtbarkeit
+- feste Presets `compact`, `normal`, `wide`, `tall` und `large`
+- Kachelgrößen-Auswahl und Größenanzeige in der Admin-Oberfläche
+- Größenübernahme bei Dashboardduplikaten und Standard `normal` für neue
+  Widgets
+- kontrollierter API-Fehler `invalid_widget_size` ohne Teilpersistenz
+- sichere, allowlist-basierte CSS-Klassen im ES5-Wall-Display
+- responsiver Flexbox-Fluss für schmale, mittlere und große Displays
+- unveränderte Climate-/Light-Touchziele und Schreib-Allowlisten
+- Legacy-Asset-Cache-Version 18
+- keine freie Positionierung, keine frei definierbaren Maße und kein
+  Drag-and-drop
+
+---
+
 # Priorisierte Reihenfolge
 
 1. Sprint 4 vollständig verifizieren und abschließen
@@ -519,6 +541,7 @@ Projektlizenz bleibt eine bewusste Entscheidung des Projektinhabers.
 10. Sprint 13 Multi-Dashboard-Grundlage
 11. Sprint 14 Persistenz und Admin-API-Grundlage
 12. Sprint 15 grafische Admin-Konfiguration
+13. Sprint 16 konfigurierbare Kachelgrößen
 
 ---
 

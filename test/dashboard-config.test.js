@@ -53,6 +53,7 @@ test("Backend-Konfiguration liefert sichtbare Widgets in Reihenfolge", function 
         assert.equal(typeof widget.title, "string");
         assert.equal(typeof widget.icon, "string");
         assert.equal(typeof widget.unit, "string");
+        assert.equal(widget.size, "normal");
         assert.equal(
             Object.prototype.hasOwnProperty.call(
                 widget,

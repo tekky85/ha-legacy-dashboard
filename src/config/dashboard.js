@@ -11,7 +11,8 @@ const DashboardConfigStore =
     require("../services/dashboard-config-store");
 
 
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
+const LEGACY_SCHEMA_VERSION = 1;
 
 const DASHBOARD_ID_PATTERN =
     /^[a-z0-9][a-z0-9-]{0,62}$/;
@@ -28,6 +29,16 @@ const SUPPORTED_WIDGET_TYPES = [
     "light",
     "climate"
 ];
+
+const SUPPORTED_WIDGET_SIZES = [
+    "compact",
+    "normal",
+    "wide",
+    "tall",
+    "large"
+];
+
+const DEFAULT_WIDGET_SIZE = "normal";
 
 const DEFAULT_REFRESH_INTERVAL_MS = 5000;
 const MINIMUM_REFRESH_INTERVAL_MS = 3000;
@@ -53,7 +64,8 @@ const DEFAULT_CONFIGURATION = {
                     iconClass: "temperature",
                     unit: "",
                     order: 10,
-                    visible: true
+                    visible: true,
+                    size: DEFAULT_WIDGET_SIZE
                 },
                 {
                     id: "default-bathroom-humidity",
@@ -65,7 +77,8 @@ const DEFAULT_CONFIGURATION = {
                     iconClass: "humidity",
                     unit: "",
                     order: 20,
-                    visible: true
+                    visible: true,
+                    size: DEFAULT_WIDGET_SIZE
                 },
                 {
                     id: "default-kitchen-window-right",
@@ -77,7 +90,8 @@ const DEFAULT_CONFIGURATION = {
                     iconClass: "window",
                     unit: "",
                     order: 30,
-                    visible: true
+                    visible: true,
+                    size: DEFAULT_WIDGET_SIZE
                 },
                 {
                     id: "default-kitchen-window-center",
@@ -89,7 +103,8 @@ const DEFAULT_CONFIGURATION = {
                     iconClass: "window",
                     unit: "",
                     order: 35,
-                    visible: false
+                    visible: false,
+                    size: DEFAULT_WIDGET_SIZE
                 },
                 {
                     id: "default-dining-light",
@@ -101,7 +116,8 @@ const DEFAULT_CONFIGURATION = {
                     iconClass: "light",
                     unit: "",
                     order: 40,
-                    visible: true
+                    visible: true,
+                    size: DEFAULT_WIDGET_SIZE
                 },
                 {
                     id: "default-dining-climate",
@@ -113,7 +129,8 @@ const DEFAULT_CONFIGURATION = {
                     iconClass: "heating",
                     unit: "°C",
                     order: 50,
-                    visible: true
+                    visible: true,
+                    size: DEFAULT_WIDGET_SIZE
                 }
             ]
         },
@@ -132,7 +149,8 @@ const DEFAULT_CONFIGURATION = {
                     iconClass: "light",
                     unit: "",
                     order: 40,
-                    visible: true
+                    visible: true,
+                    size: DEFAULT_WIDGET_SIZE
                 },
                 {
                     id: "dining-room-climate",
@@ -144,7 +162,8 @@ const DEFAULT_CONFIGURATION = {
                     iconClass: "heating",
                     unit: "°C",
                     order: 50,
-                    visible: true
+                    visible: true,
+                    size: DEFAULT_WIDGET_SIZE
                 }
             ]
         }
@@ -168,7 +187,7 @@ function validateText(value, fieldName) {
 }
 
 
-function validateConfiguration(candidate) {
+function validateConfigurationVersion(candidate, schemaVersion) {
 
     const dashboards =
         candidate && candidate.dashboards;
@@ -179,7 +198,7 @@ function validateConfiguration(candidate) {
 
     if (
         !candidate ||
-        candidate.schemaVersion !== SCHEMA_VERSION
+        candidate.schemaVersion !== schemaVersion
     ) {
         throw new Error("Schema-Version wird nicht unterstützt");
     }
@@ -305,6 +324,24 @@ function validateConfiguration(candidate) {
                 );
             }
 
+            if (
+                schemaVersion >= SCHEMA_VERSION &&
+                (
+                    typeof widget.size !== "string" ||
+                    SUPPORTED_WIDGET_SIZES.indexOf(
+                        widget.size
+                    ) === -1
+                )
+            ) {
+                const error = new Error(
+                    "Widget-Größe ist ungültig: " +
+                    widget.id
+                );
+
+                error.code = "invalid_widget_size";
+                throw error;
+            }
+
         });
 
     });
@@ -323,6 +360,16 @@ function validateConfiguration(candidate) {
 }
 
 
+function validateConfiguration(candidate) {
+
+    return validateConfigurationVersion(
+        candidate,
+        SCHEMA_VERSION
+    );
+
+}
+
+
 function cloneWidget(widget) {
 
     return {
@@ -335,7 +382,43 @@ function cloneWidget(widget) {
         iconClass: widget.iconClass,
         unit: widget.unit,
         order: widget.order,
-        visible: widget.visible
+        visible: widget.visible,
+        size:
+            typeof widget.size === "string"
+                ? widget.size
+                : DEFAULT_WIDGET_SIZE
+    };
+
+}
+
+
+function migrateConfiguration(candidate) {
+
+    if (
+        !candidate ||
+        candidate.schemaVersion !== LEGACY_SCHEMA_VERSION
+    ) {
+        return {
+            configuration: candidate,
+            migrated: false
+        };
+    }
+
+
+    validateConfigurationVersion(
+        candidate,
+        LEGACY_SCHEMA_VERSION
+    );
+
+    const migrated =
+        cloneConfiguration(candidate);
+
+    migrated.schemaVersion = SCHEMA_VERSION;
+
+
+    return {
+        configuration: migrated,
+        migrated: true
     };
 
 }
@@ -397,7 +480,8 @@ function initialize(options) {
             defaultConfiguration:
                 DEFAULT_CONFIGURATION,
             validate: validateConfiguration,
-            clone: cloneConfiguration
+            clone: cloneConfiguration,
+            migrate: migrateConfiguration
         });
 
     const result =
@@ -647,6 +731,9 @@ module.exports = {
     ENTITY_ID_PATTERN: ENTITY_ID_PATTERN,
     SUPPORTED_WIDGET_TYPES:
         SUPPORTED_WIDGET_TYPES.slice(0),
+    SUPPORTED_WIDGET_SIZES:
+        SUPPORTED_WIDGET_SIZES.slice(0),
+    DEFAULT_WIDGET_SIZE: DEFAULT_WIDGET_SIZE,
     DEFAULT_CONFIGURATION:
         cloneConfiguration(DEFAULT_CONFIGURATION),
     initialize: initialize,
@@ -662,5 +749,6 @@ module.exports = {
     getVisibleEntityIds: getVisibleEntityIds,
     getRefreshIntervalMs: getRefreshIntervalMs,
     validateConfiguration: validateConfiguration,
-    cloneConfiguration: cloneConfiguration
+    cloneConfiguration: cloneConfiguration,
+    migrateConfiguration: migrateConfiguration
 };

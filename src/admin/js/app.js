@@ -210,6 +210,11 @@
         meta.appendChild(createElement(
             "span",
             "",
+            "Größe: " + admin.Widgets.sizeLabel(widget.size)
+        ));
+        meta.appendChild(createElement(
+            "span",
+            "",
             widget.visible ? "Sichtbar" : "Ausgeblendet"
         ));
         content.appendChild(title);
@@ -433,6 +438,7 @@
         elements.widgetIconInput.value = widget.icon;
         elements.widgetUnitInput.value = widget.unit;
         elements.widgetOrderInput.value = String(widget.order);
+        elements.widgetSizeInput.value = widget.size || "normal";
         elements.widgetVisibleInput.checked = widget.visible;
         elements.widgetFormError.textContent = "";
         openDialog(elements.widgetDialog);
@@ -740,7 +746,8 @@
             icon: suggestion.icon,
             unit: suggestion.unit,
             order: maxOrder + 10,
-            visible: true
+            visible: true,
+            size: "normal"
         }, "create", entity);
     }
 
@@ -751,6 +758,7 @@
             icon: elements.widgetIconInput.value,
             unit: elements.widgetUnitInput.value,
             order: elements.widgetOrderInput.value,
+            size: elements.widgetSizeInput.value,
             visible: elements.widgetVisibleInput.checked
         };
     }
@@ -798,7 +806,8 @@
             "widgetDialog", "widgetForm", "widgetDialogMode", "widgetIdInput",
             "widgetDialogTitle", "widgetEntityValue", "widgetTypeValue",
             "widgetTitleInput", "widgetSubtitleInput", "widgetIconInput",
-            "widgetUnitInput", "widgetOrderInput", "widgetVisibleInput",
+            "widgetUnitInput", "widgetOrderInput", "widgetSizeInput",
+            "widgetVisibleInput",
             "widgetFormError"
         ].forEach(function (id) {
             elements[id] = byId(id);

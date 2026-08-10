@@ -98,7 +98,9 @@ LightWidget.prototype.render =
 
         return "" +
 
-            '<section class="card card-light">' +
+            '<section class="card card-light ' +
+                this.getSizeClass() +
+            '">' +
 
 
                 '<div class="card-header">' +

@@ -9,6 +9,12 @@ function DashboardConfigStore(options) {
     this.defaultConfiguration = options.defaultConfiguration;
     this.validate = options.validate;
     this.clone = options.clone;
+    this.migrate = options.migrate || function (configuration) {
+        return {
+            configuration: configuration,
+            migrated: false
+        };
+    };
 
 }
 
@@ -31,12 +37,24 @@ DashboardConfigStore.prototype.readConfiguration = function (filePath) {
     const content =
         fs.readFileSync(filePath, "utf8");
 
-    const configuration =
+    const parsed =
         JSON.parse(content);
+
+    const migration =
+        this.migrate(parsed);
+
+    const configuration =
+        migration.configuration;
 
     this.validate(configuration);
 
-    return this.clone(configuration);
+    return {
+        configuration:
+            this.clone(configuration),
+        migrated:
+            migration.migrated === true,
+        sourceConfiguration: parsed
+    };
 
 };
 
@@ -164,12 +182,20 @@ DashboardConfigStore.prototype.load = function () {
     if (fs.existsSync(this.configPath)) {
 
         try {
+            const primary =
+                this.readConfiguration(
+                    this.configPath
+                );
+
             return {
                 configuration:
-                    this.readConfiguration(
-                        this.configPath
-                    ),
-                migrated: false,
+                    primary.migrated
+                        ? this.save(
+                            primary.configuration,
+                            primary.sourceConfiguration
+                        )
+                        : primary.configuration,
+                migrated: primary.migrated,
                 recovered: false
             };
         } catch (primaryError) {
@@ -178,21 +204,21 @@ DashboardConfigStore.prototype.load = function () {
                 throw primaryError;
             }
 
-            const backupConfiguration =
+            const backup =
                 this.readConfiguration(
                     this.backupPath
                 );
 
             this.writePrimaryOnly(
-                backupConfiguration
+                backup.configuration
             );
 
             return {
                 configuration:
                     this.clone(
-                        backupConfiguration
+                        backup.configuration
                     ),
-                migrated: false,
+                migrated: backup.migrated,
                 recovered: true
             };
 
@@ -203,21 +229,21 @@ DashboardConfigStore.prototype.load = function () {
 
     if (fs.existsSync(this.backupPath)) {
 
-        const backupConfiguration =
+        const backup =
             this.readConfiguration(
                 this.backupPath
             );
 
         this.writePrimaryOnly(
-            backupConfiguration
+            backup.configuration
         );
 
         return {
             configuration:
                 this.clone(
-                    backupConfiguration
+                    backup.configuration
                 ),
-            migrated: false,
+            migrated: backup.migrated,
             recovered: true
         };
 
@@ -246,7 +272,10 @@ DashboardConfigStore.prototype.load = function () {
 };
 
 
-DashboardConfigStore.prototype.save = function (configuration) {
+DashboardConfigStore.prototype.save = function (
+    configuration,
+    backupConfiguration
+) {
 
     this.validate(configuration);
 
@@ -273,16 +302,18 @@ DashboardConfigStore.prototype.save = function (configuration) {
 
         if (fs.existsSync(this.configPath)) {
 
-            const currentConfiguration =
-                this.readConfiguration(
-                    this.configPath
-                );
+            const previous =
+                typeof backupConfiguration !== "undefined"
+                    ? backupConfiguration
+                    : this.readConfiguration(
+                        this.configPath
+                    ).configuration;
 
             backupTemporaryPath =
                 this.writeTemporaryFile(
                     this.backupPath,
                     JSON.stringify(
-                        currentConfiguration,
+                        previous,
                         null,
                         2
                     ) + "\n"

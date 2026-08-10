@@ -432,7 +432,9 @@ ClimateWidget.prototype.render =
 
         return "" +
 
-            '<section class="card card-climate">' +
+            '<section class="card card-climate ' +
+                this.getSizeClass() +
+            '">' +
 
 
                 '<div class="card-header">' +

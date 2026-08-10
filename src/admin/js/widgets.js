@@ -10,6 +10,30 @@
         "heating"
     ];
 
+    const SIZES = [
+        "compact",
+        "normal",
+        "wide",
+        "tall",
+        "large"
+    ];
+
+    const SIZE_LABELS = {
+        compact: "Kompakt",
+        normal: "Normal",
+        wide: "Breit",
+        tall: "Hoch",
+        large: "Groß"
+    };
+
+    function validateSize(size) {
+        if (SIZES.indexOf(size) === -1) {
+            throw new Error("Bitte eine gültige Kachelgröße auswählen.");
+        }
+
+        return size;
+    }
+
     function findDashboard(dashboardId) {
         const draft = admin.State.getDraft();
         const dashboard = draft && draft.dashboards.find(function (item) {
@@ -131,7 +155,8 @@
                 Number.isFinite(Number(fields.order))
                     ? Number(fields.order)
                     : maxOrder + 10,
-            visible: Boolean(fields.visible)
+            visible: Boolean(fields.visible),
+            size: validateSize(fields.size || "normal")
         };
 
         dashboard.widgets.push(widget);
@@ -145,6 +170,7 @@
         const widget = findWidget(dashboard, widgetId);
         const title = String(fields.title || "").trim();
         const order = Number(fields.order);
+        const size = validateSize(fields.size);
 
         if (!title) {
             throw new Error("Bitte einen Widget-Titel eingeben.");
@@ -163,6 +189,7 @@
         widget.unit = String(fields.unit || "");
         widget.order = order;
         widget.visible = Boolean(fields.visible);
+        widget.size = size;
 
         normalizeOrders(dashboard);
         admin.State.markDirty();
@@ -218,6 +245,10 @@
 
     admin.Widgets = {
         ICONS: ICONS.slice(),
+        SIZES: SIZES.slice(),
+        sizeLabel: function (size) {
+            return SIZE_LABELS[size] || SIZE_LABELS.normal;
+        },
         suggestionForEntity: suggestionForEntity,
         normalizeOrders: normalizeOrders,
         create: create,

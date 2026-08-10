@@ -21,6 +21,28 @@ function Widget(config) {
     this.iconClass =
         config.iconClass || "";
 
+    this.size =
+        normalizeCardSize(
+            config.size
+        );
+
+}
+
+
+function normalizeCardSize(value) {
+
+    if (
+        value === "compact" ||
+        value === "normal" ||
+        value === "wide" ||
+        value === "tall" ||
+        value === "large"
+    ) {
+        return value;
+    }
+
+    return "normal";
+
 }
 
 
@@ -33,6 +55,13 @@ Widget.prototype.getIcon = function () {
     return LegacyIcons.get(
         this.icon
     );
+
+};
+
+
+Widget.prototype.getSizeClass = function () {
+
+    return "card-size-" + this.size;
 
 };
 

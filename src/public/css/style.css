@@ -2047,3 +2047,121 @@ body.theme-dark .climate-control:active {
     }
 
 }
+
+
+/* =========================================================
+   CONFIGURABLE CARD SIZE PRESETS
+   ========================================================= */
+
+/*
+ * Nur feste Klassen aus der validierten Dashboard-Konfiguration.
+ * Flexbox und die vorhandenen 20px Außenabstände bleiben erhalten.
+ */
+
+.grid {
+
+    -webkit-align-items: flex-start;
+    align-items: flex-start;
+
+}
+
+.card.card-size-compact {
+
+    min-height: 156px;
+    padding: 18px;
+
+}
+
+.card.card-size-compact .card-header {
+
+    min-height: 44px;
+    margin-bottom: 10px;
+
+}
+
+.card.card-size-compact .icon {
+
+    width: 44px;
+    height: 44px;
+
+}
+
+.card.card-size-compact .value,
+.card.card-size-compact .status {
+
+    margin-bottom: 10px;
+
+}
+
+.card.card-size-tall,
+.card.card-size-large {
+
+    min-height: 292px;
+
+}
+
+@media screen and (min-width: 600px) {
+
+    .card.card-size-compact,
+    .card.card-size-normal,
+    .card.card-size-tall {
+
+        width: calc(50% - 20px);
+
+    }
+
+    .card.card-size-wide,
+    .card.card-size-large {
+
+        width: calc(100% - 20px);
+
+    }
+
+}
+
+@media screen and (min-width: 900px) {
+
+    .card.card-size-compact,
+    .card.card-size-normal,
+    .card.card-size-tall {
+
+        width: calc(33.3333% - 20px);
+
+    }
+
+    .card.card-size-wide,
+    .card.card-size-large {
+
+        width: calc(66.6666% - 20px);
+
+    }
+
+}
+
+@media screen and (max-width: 599px) {
+
+    .card.card-size-compact,
+    .card.card-size-normal,
+    .card.card-size-wide,
+    .card.card-size-tall,
+    .card.card-size-large {
+
+        width: calc(100% - 20px);
+
+    }
+
+    .card.card-size-compact {
+
+        min-height: 148px;
+        padding: 16px;
+
+    }
+
+    .card.card-size-tall,
+    .card.card-size-large {
+
+        min-height: 270px;
+
+    }
+
+}

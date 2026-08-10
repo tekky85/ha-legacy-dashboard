@@ -204,7 +204,9 @@ function persistConfiguration(res, candidate) {
         );
     } catch (error) {
         res.status(400).json({
-            error: "configuration_invalid",
+            error:
+                error.code ||
+                "configuration_invalid",
             message: error.message
         });
 
@@ -462,10 +464,20 @@ router.post(
             });
         }
 
+        const widget = Object.assign(
+            {},
+            req.body || {}
+        );
+
+        if (typeof widget.size === "undefined") {
+            widget.size =
+                dashboardConfig.DEFAULT_WIDGET_SIZE;
+        }
+
         candidate
             .dashboards[dashboardIndex]
             .widgets
-            .push(req.body);
+            .push(widget);
 
         const persisted =
             persistConfiguration(res, candidate);
@@ -478,7 +490,7 @@ router.post(
                         .getDashboardById(
                             req.params.dashboardId
                         ),
-                    req.body && req.body.id
+                    widget.id
                 );
 
             res.status(201).json(
@@ -582,7 +594,11 @@ router.put(
             visible:
                 typeof body.visible !== "undefined"
                     ? body.visible
-                    : current.visible
+                    : current.visible,
+            size:
+                typeof body.size !== "undefined"
+                    ? body.size
+                    : current.size
         };
 
         const persisted =

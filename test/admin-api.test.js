@@ -457,6 +457,108 @@ test(
 
 
         await t.test(
+            "alle Kachelgrößen werden über die Admin-API validiert",
+            async function () {
+
+                const gateway = await startGateway(
+                    "sizes",
+                    "true",
+                    FAKE_ADMIN_TOKEN,
+                    null
+                );
+
+                const auth = {
+                    Authorization:
+                        "Bearer " +
+                        FAKE_ADMIN_TOKEN
+                };
+
+                const widget = {
+                    id: "default-size-test",
+                    entity: "sensor.office_temperature",
+                    type: "sensor",
+                    title: "Büro",
+                    subtitle: "Temperatur",
+                    icon: "temperature",
+                    iconClass: "temperature",
+                    unit: "°C",
+                    order: 70,
+                    visible: true,
+                    size: "normal"
+                };
+
+                const created = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/widgets",
+                    widget,
+                    auth
+                );
+
+                assert.equal(created.status, 201);
+                assert.equal(created.json.size, "normal");
+
+                for (const size of [
+                    "compact",
+                    "wide",
+                    "tall",
+                    "large"
+                ]) {
+                    const updated = await request(
+                        gateway.port,
+                        "PUT",
+                        "/api/admin/dashboards/default/widgets/" +
+                            widget.id,
+                        {
+                            size: size
+                        },
+                        auth
+                    );
+
+                    assert.equal(updated.status, 200);
+                    assert.equal(updated.json.size, size);
+                }
+
+                const invalid = await request(
+                    gateway.port,
+                    "PUT",
+                    "/api/admin/dashboards/default/widgets/" +
+                        widget.id,
+                    {
+                        size: "2fr"
+                    },
+                    auth
+                );
+
+                assert.equal(invalid.status, 400);
+                assert.equal(
+                    invalid.json.error,
+                    "invalid_widget_size"
+                );
+
+                const configuration = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/admin/config",
+                    undefined,
+                    auth
+                );
+
+                const persistedWidget =
+                    configuration.json.dashboards[0]
+                        .widgets.find(function (entry) {
+                            return entry.id === widget.id;
+                        });
+
+                assert.equal(persistedWidget.size, "large");
+
+                await stopChild(gateway.child);
+
+            }
+        );
+
+
+        await t.test(
             "Bearer-Authentifizierung, CRUD und Inventar",
             async function () {
 
@@ -508,7 +610,7 @@ test(
                 assert.equal(initialConfig.status, 200);
                 assert.equal(
                     initialConfig.json.schemaVersion,
-                    1
+                    2
                 );
                 assert.equal(
                     initialConfig.json.defaultDashboardId,
@@ -592,6 +694,7 @@ test(
                     createdWidget.json.id,
                     "office-temperature"
                 );
+                assert.equal(createdWidget.json.size, "normal");
 
                 const updatedWidget = await request(
                     gateway.port,
@@ -599,7 +702,8 @@ test(
                     "/api/admin/dashboards/office/widgets/office-temperature",
                     {
                         title: "Bürotemperatur",
-                        visible: false
+                        visible: false,
+                        size: "compact"
                     },
                     auth
                 );
@@ -613,12 +717,13 @@ test(
                     updatedWidget.json.visible,
                     false
                 );
+                assert.equal(updatedWidget.json.size, "compact");
 
                 const invalidConfig =
                     initialConfig.json;
 
-                invalidConfig.defaultDashboardId =
-                    "nicht-vorhanden";
+                invalidConfig.dashboards[0].widgets[0].size =
+                    "300px";
 
                 const invalidWrite = await request(
                     gateway.port,
@@ -631,7 +736,7 @@ test(
                 assert.equal(invalidWrite.status, 400);
                 assert.equal(
                     invalidWrite.json.error,
-                    "configuration_invalid"
+                    "invalid_widget_size"
                 );
 
                 const afterInvalidWrite = await request(
@@ -663,7 +768,8 @@ test(
                     iconClass: "heating",
                     unit: "°C",
                     order: 20,
-                    visible: true
+                    visible: true,
+                    size: "wide"
                 };
 
                 const lightWidget = {
@@ -676,7 +782,8 @@ test(
                     iconClass: "light",
                     unit: "",
                     order: 30,
-                    visible: true
+                    visible: true,
+                    size: "large"
                 };
 
                 assert.equal(
@@ -720,6 +827,12 @@ test(
                         "climate.not_allowed",
                         "light.not_allowed"
                     ]
+                );
+                assert.deepEqual(
+                    publicOffice.json.widgets.map(function (widget) {
+                        return widget.size;
+                    }),
+                    ["wide", "large"]
                 );
 
                 const deniedClimate = await request(

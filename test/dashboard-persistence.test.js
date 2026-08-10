@@ -74,7 +74,7 @@ test("fehlende Persistenz wird aus Sprint 13 migriert", function (t) {
         fs.readFileSync(configPath, "utf8")
     );
 
-    assert.equal(persisted.schemaVersion, 1);
+    assert.equal(persisted.schemaVersion, 2);
     assert.equal(
         persisted.defaultDashboardId,
         "default"
@@ -91,6 +91,7 @@ test("fehlende Persistenz wird aus Sprint 13 migriert", function (t) {
     persisted.dashboards.forEach(function (dashboard) {
         dashboard.widgets.forEach(function (widget) {
             assert.equal(typeof widget.id, "string");
+            assert.equal(widget.size, "normal");
             assert.equal(
                 widgetIds.indexOf(widget.id),
                 -1
@@ -103,6 +104,128 @@ test("fehlende Persistenz wird aus Sprint 13 migriert", function (t) {
         fs.statSync(configPath).mode & 0o777,
         0o600
     );
+
+});
+
+
+test("Schema 1 wird ohne fachliche Änderungen auf Schema 2 migriert", function (t) {
+
+    const configPath =
+        createTemporaryConfigPath(t);
+
+    const legacy =
+        dashboardConfig.cloneConfiguration(
+            dashboardConfig.DEFAULT_CONFIGURATION
+        );
+
+    legacy.schemaVersion = 1;
+    legacy.dashboards.forEach(function (dashboard) {
+        dashboard.widgets.forEach(function (widget) {
+            delete widget.size;
+        });
+    });
+
+    const identities = legacy.dashboards.map(function (dashboard) {
+        return {
+            id: dashboard.id,
+            widgets: dashboard.widgets.map(function (widget) {
+                return {
+                    id: widget.id,
+                    entity: widget.entity,
+                    order: widget.order,
+                    visible: widget.visible
+                };
+            })
+        };
+    });
+
+    writeConfiguration(configPath, legacy);
+
+    const result = dashboardConfig.initialize({
+        configPath: configPath
+    });
+
+    const persisted = JSON.parse(
+        fs.readFileSync(configPath, "utf8")
+    );
+
+    assert.equal(result.migrated, true);
+    assert.equal(result.recovered, false);
+    assert.equal(persisted.schemaVersion, 2);
+    assert.deepEqual(
+        persisted.dashboards.map(function (dashboard) {
+            return {
+                id: dashboard.id,
+                widgets: dashboard.widgets.map(function (widget) {
+                    return {
+                        id: widget.id,
+                        entity: widget.entity,
+                        order: widget.order,
+                        visible: widget.visible
+                    };
+                })
+            };
+        }),
+        identities
+    );
+    persisted.dashboards.forEach(function (dashboard) {
+        dashboard.widgets.forEach(function (widget) {
+            assert.equal(widget.size, "normal");
+        });
+    });
+    assert.equal(fs.existsSync(configPath + ".bak"), true);
+    const backup = JSON.parse(
+        fs.readFileSync(configPath + ".bak", "utf8")
+    );
+    assert.equal(backup.schemaVersion, 1);
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(
+            backup.dashboards[0].widgets[0],
+            "size"
+        ),
+        false
+    );
+
+});
+
+
+test("nur bekannte Kachelgrößen werden akzeptiert", function () {
+
+    [
+        "compact",
+        "normal",
+        "wide",
+        "tall",
+        "large"
+    ].forEach(function (size) {
+        const candidate =
+            dashboardConfig.cloneConfiguration(
+                dashboardConfig.DEFAULT_CONFIGURATION
+            );
+
+        candidate.dashboards[0].widgets[0].size = size;
+        assert.equal(
+            dashboardConfig.validateConfiguration(candidate),
+            true
+        );
+    });
+
+    ["", "huge", "300px", "javascript:alert(1)"].forEach(function (size) {
+        const candidate =
+            dashboardConfig.cloneConfiguration(
+                dashboardConfig.DEFAULT_CONFIGURATION
+            );
+
+        candidate.dashboards[0].widgets[0].size = size;
+        assert.throws(
+            function () {
+                dashboardConfig.validateConfiguration(candidate);
+            },
+            function (error) {
+                return error.code === "invalid_widget_size";
+            }
+        );
+    });
 
 });
 
