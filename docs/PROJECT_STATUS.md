@@ -2,24 +2,24 @@
 
 Stand der Prüfung: 10. August 2026
 
-Dieser Bericht beschreibt den ungecommitteten Review-Stand nach Umsetzung von
-Sprint 15. Er enthält keine Werte aus `.env`, keine Home-Assistant-Zugangsdaten
-und keine Tokens.
+Dieser Bericht beschreibt den implementierten und im LXC ausgerollten Stand
+nach Sprint 15. Er enthält keine Werte aus `.env`, keine
+Home-Assistant-Zugangsdaten und keine Tokens.
 
 ## 1. Aktueller Branch und Ausgangscommit
 
 - Branch: `main`
 - Ausgangscommit: `47a5a56 docs: define sprint 15 admin configuration ui`
-- Upstream zu Beginn: `origin/main`
+- Sprint-15-Commit: `332d0a5 feat: add graphical admin configuration ui`
+- Upstream: `origin/main`
 - `HEAD`, `origin/main` und `origin/HEAD` waren vor der Umsetzung synchron.
-- Die Sprint-15-Änderungen sind bewusst noch nicht committed oder gepusht.
+- Sprint 15 wurde committed, gepusht und im Produktions-LXC ausgerollt.
 
 ## 2. Status des Arbeitsbaums
 
-Der Arbeitsbaum war zu Beginn sauber. Im aktuellen Review-Stand sind nur die
-Sprint-15-Implementierung, ihre Tests und Dokumentation verändert oder neu.
+Der Arbeitsbaum war zu Beginn sauber und ist nach dem Deployment wieder sauber.
 Laufzeitkonfiguration, `.env`, Tokens und Browser-Testdaten sind nicht Teil des
-Repository-Diffs.
+Repositories.
 
 ## 3. Implementierte Funktionen
 
@@ -58,7 +58,7 @@ Repository-Diffs.
 | 11–12 | Wall-Display und Release-Baseline | umgesetzt |
 | 13 | Multi-Dashboard Foundation | umgesetzt |
 | 14 | Persistenz und Admin-API-Grundlage | umgesetzt |
-| 15 | Grafische Admin-Konfiguration | umgesetzt, Review ausstehend |
+| 15 | Grafische Admin-Konfiguration | umgesetzt und ausgerollt |
 
 ## 5. Entity-Auswahl und Schreibgrenzen
 
@@ -194,7 +194,7 @@ pass 58
 fail 0
 ```
 
-Sprint-15-Review-Stand:
+Sprint-15-Stand:
 
 ```text
 tests 62
