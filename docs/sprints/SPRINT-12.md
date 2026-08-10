@@ -1,521 +1,503 @@
-bplist00�_WebMainResource�	
-_WebResourceMIMEType_WebResourceTextEncodingName^WebResourceURL_WebResourceFrameName_WebResourceDataYtext/htmlUutf-8_file:///index.htmlPON�<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2299.77">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
-</head>
-<body>
-<p class="p1"># Sprint 12 – UI Polish + Release Baseline</p>
-<p class="p2"><br></p>
-<p class="p1">## Status</p>
-<p class="p2"><br></p>
-<p class="p1">Planned</p>
-<p class="p2"><br></p>
-<p class="p1">## Basis</p>
-<p class="p2"><br></p>
-<p class="p1">Dieser Sprint basiert auf dem tatsächlich geprüften Repository-Stand aus</p>
-<p class="p1">`docs/PROJECT_STATUS.md`.</p>
-<p class="p2"><br></p>
-<p class="p1">Bekannter Ausgangsstand:</p>
-<p class="p2"><br></p>
-<p class="p1">- Branch: `main`</p>
-<p class="p1">- Commit: `da4ebb2`</p>
-<p class="p1">- Commit-Betreff: `style: reduce wall display header`</p>
-<p class="p1">- Teststand: `39 passed`, `0 failed`</p>
-<p class="p1">- Cache-Version im Frontend: `v=14`</p>
-<p class="p2"><br></p>
-<p class="p1">Codex muss den aktuellen Stand vor Beginn erneut prüfen.</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Ziel</p>
-<p class="p2"><br></p>
-<p class="p1">Sprint 12 bereinigt den aktuellen Einzel-Dashboard-Stand visuell und technisch,</p>
-<p class="p1">bevor Multi-Dashboard, Admin-Oberfläche und frei konfigurierbare Layouts</p>
-<p class="p1">eingeführt werden.</p>
-<p class="p2"><br></p>
-<p class="p1">Der Sprint besteht aus zwei klar begrenzten Bereichen:</p>
-<p class="p2"><br></p>
-<p class="p1">1. UI Polish</p>
-<p class="p1">2. Release-/Wartbarkeits-Baseline</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Nicht-Ziele</p>
-<p class="p2"><br></p>
-<p class="p1">Nicht Bestandteil dieses Sprints:</p>
-<p class="p2"><br></p>
-<p class="p1">- keine Multi-Dashboard-Unterstützung</p>
-<p class="p1">- keine Admin- oder Konfigurationsoberfläche</p>
-<p class="p1">- keine persistente Dashboardkonfiguration</p>
-<p class="p1">- kein Drag-and-drop</p>
-<p class="p1">- keine frei skalierbaren Kacheln</p>
-<p class="p1">- keine Rasterkoordinaten</p>
-<p class="p1">- keine neuen Home-Assistant-Domänen</p>
-<p class="p1">- keine HACS-Integration</p>
-<p class="p1">- keine Home-Assistant-App</p>
-<p class="p1">- keine große Refaktorierung von `app.js`</p>
-<p class="p1">- keine große Refaktorierung von `api.js`</p>
-<p class="p1">- keine Änderung der Sicherheitsarchitektur</p>
-<p class="p1">- keine Änderung der bestehenden Schreib-Allowlisten</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Teil A – UI Polish</p>
-<p class="p2"><br></p>
-<p class="p1">## A1. Thermostat-Schaltflächen zentrieren</p>
-<p class="p2"><br></p>
-<p class="p1">Aktuelles Problem:</p>
-<p class="p2"><br></p>
-<p class="p1">Das Minus- und Pluszeichen der Climate-Steuerung sind innerhalb der Buttons</p>
-<p class="p1">nicht sauber horizontal und vertikal zentriert.</p>
-<p class="p2"><br></p>
-<p class="p1">### Anforderungen</p>
-<p class="p2"><br></p>
-<p class="p1">- Minuszeichen horizontal und vertikal zentriert</p>
-<p class="p1">- Pluszeichen horizontal und vertikal zentriert</p>
-<p class="p1">- Touch-Ziel mindestens 44 × 44 Pixel</p>
-<p class="p1">- kein unnötiger Browser-Button-Padding</p>
-<p class="p1">- keine Verschiebung durch ungeeignetes `line-height`</p>
-<p class="p1">- bestehender Disabled-/Busy-Zustand bleibt erhalten</p>
-<p class="p1">- Light-/Dark-Mode bleibt erhalten</p>
-<p class="p1">- Safari iOS 9 muss unterstützt bleiben</p>
-<p class="p2"><br></p>
-<p class="p1">Erlaubte CSS-Techniken:</p>
-<p class="p2"><br></p>
-<p class="p1">```css</p>
-<p class="p1">display: -webkit-flex;</p>
-<p class="p1">display: flex;</p>
-<p class="p1">-webkit-align-items: center;</p>
-<p class="p1">align-items: center;</p>
-<p class="p1">-webkit-justify-content: center;</p>
-<p class="p1">justify-content: center;</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">Nicht verwenden:</p>
-<p class="p2"><br></p>
-<p class="p1">- CSS Grid</p>
-<p class="p1">- Flexbox `gap`</p>
-<p class="p1">- moderne Selektoren ohne Safari-9-Unterstützung</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1">## A2. Climate-Kachel kompakter gestalten</p>
-<p class="p2"><br></p>
-<p class="p1">### Ziel</p>
-<p class="p2"><br></p>
-<p class="p1">Die Climate-Kachel soll deutlich platzsparender werden, ohne Lesbarkeit und</p>
-<p class="p1">Touch-Bedienbarkeit zu verschlechtern.</p>
-<p class="p2"><br></p>
-<p class="p1">Bevorzugte visuelle Richtung:</p>
-<p class="p2"><br></p>
-<p class="p1">```text</p>
-<p class="p1">Heizung Esszimmer<span class="Apple-converted-space">              </span>Heizen</p>
-<p class="p2"><br></p>
-<p class="p1">21,8 °C<span class="Apple-converted-space">                  </span>−<span class="Apple-converted-space">  </span>22,5 °C<span class="Apple-converted-space">  </span>+</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">### Anforderungen</p>
-<p class="p2"><br></p>
-<p class="p1">- Isttemperatur klar hervorgehoben</p>
-<p class="p1">- Solltemperatur direkt erkennbar</p>
-<p class="p1">- Minus und Plus unmittelbar am Zielwert</p>
-<p class="p1">- HVAC-Status kompakt</p>
-<p class="p1">- keine redundanten Leerflächen</p>
-<p class="p1">- keine unnötig große Mindesthöhe</p>
-<p class="p1">- mindestens 44-Pixel-Touchziele</p>
-<p class="p1">- bestehende Climate-Logik unverändert</p>
-<p class="p1">- optimistische Aktualisierung unverändert</p>
-<p class="p1">- Refreshschutz unverändert</p>
-<p class="p1">- Fehler- und Erfolgsmeldungen weiterhin funktionsfähig</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1">## A3. Allgemeine Kachelgrößen prüfen</p>
-<p class="p2"><br></p>
-<p class="p1">Codex soll vorhandene Mindesthöhen, Padding- und Margin-Werte prüfen und nur</p>
-<p class="p1">dort reduzieren, wo Lesbarkeit und Bedienbarkeit erhalten bleiben.</p>
-<p class="p2"><br></p>
-<p class="p1">Insbesondere prüfen:</p>
-<p class="p2"><br></p>
-<p class="p1">- `.card`</p>
-<p class="p1">- Sensor-Karten</p>
-<p class="p1">- Binary-Karten</p>
-<p class="p1">- Light-Karten</p>
-<p class="p1">- Climate-Karten</p>
-<p class="p1">- kleine Displays</p>
-<p class="p1">- Landscape-Regeln</p>
-<p class="p1">- Breakpoints bei 600 Pixeln</p>
-<p class="p1">- Breakpoints bei 900 Pixeln</p>
-<p class="p2"><br></p>
-<p class="p1">Dieser Sprint führt noch keine individuelle Kachelgröße ein.</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1">## A4. iOS-9-Kompatibilität erhalten</p>
-<p class="p2"><br></p>
-<p class="p1">Frontend weiterhin ES5-kompatibel.</p>
-<p class="p2"><br></p>
-<p class="p1">Nicht verwenden:</p>
-<p class="p2"><br></p>
-<p class="p1">- `let`</p>
-<p class="p1">- `const`</p>
-<p class="p1">- arrow functions</p>
-<p class="p1">- template literals</p>
-<p class="p1">- `fetch`</p>
-<p class="p1">- `Promise`</p>
-<p class="p1">- `async`</p>
-<p class="p1">- `await`</p>
-<p class="p1">- optional chaining</p>
-<p class="p1">- nullish coalescing</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Teil B – Release-/Wartbarkeits-Baseline</p>
-<p class="p2"><br></p>
-<p class="p1">## B1. Versionsnummer vereinheitlichen</p>
-<p class="p2"><br></p>
-<p class="p1">Aktuell laut Statusbericht:</p>
-<p class="p2"><br></p>
-<p class="p1">- `package.json`: `1.0.0`</p>
-<p class="p1">- `/api/status`: `0.1.0`</p>
-<p class="p1">- Footer: `v0.1`</p>
-<p class="p2"><br></p>
-<p class="p1">### Ziel</p>
-<p class="p2"><br></p>
-<p class="p1">Eine einzige verbindliche Projektversion verwenden.</p>
-<p class="p2"><br></p>
-<p class="p1">Bevorzugt:</p>
-<p class="p2"><br></p>
-<p class="p1">```text</p>
-<p class="p1">1.0.0</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">sofern die bestehende Releasepolitik nicht dagegen spricht.</p>
-<p class="p2"><br></p>
-<p class="p1">Folgende Stellen müssen konsistent sein:</p>
-<p class="p2"><br></p>
-<p class="p1">- `package.json`</p>
-<p class="p1">- `/api/status`</p>
-<p class="p1">- sichtbarer Footer</p>
-<p class="p1">- README</p>
-<p class="p1">- Changelog, falls erstellt</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1">## B2. Lizenzinkonsistenz bereinigen</p>
-<p class="p2"><br></p>
-<p class="p1">Aktuell:</p>
-<p class="p2"><br></p>
-<p class="p1">- `package.json` nennt `ISC`</p>
-<p class="p1">- README sagt, dass noch keine Lizenz gewählt wurde</p>
-<p class="p1">- `LICENSE` fehlt</p>
-<p class="p2"><br></p>
-<p class="p1">Codex darf keine Lizenzentscheidung selbst treffen.</p>
-<p class="p2"><br></p>
-<p class="p1">Falls keine explizite Entscheidung des Projektinhabers vorliegt:</p>
-<p class="p2"><br></p>
-<p class="p1">- keine neue Lizenz erfinden</p>
-<p class="p1">- Inkonsistenz dokumentieren</p>
-<p class="p1">- Punkt als Blocker ausweisen</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1">## B3. Ungenutzte `ws`-Abhängigkeit prüfen</p>
-<p class="p2"><br></p>
-<p class="p1">Prüfen, ob `ws` tatsächlich nirgendwo verwendet wird.</p>
-<p class="p2"><br></p>
-<p class="p1">Wenn eindeutig ungenutzt:</p>
-<p class="p2"><br></p>
-<p class="p1">```bash</p>
-<p class="p1">npm uninstall ws</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">Danach:</p>
-<p class="p2"><br></p>
-<p class="p1">- `package.json` prüfen</p>
-<p class="p1">- `package-lock.json` prüfen</p>
-<p class="p1">- `npm test`</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1">## B4. Tote Hilfsfunktion prüfen</p>
-<p class="p2"><br></p>
-<p class="p1">Der Statusbericht nennt:</p>
-<p class="p2"><br></p>
-<p class="p1">```text</p>
-<p class="p1">setClimateControlsBusy()</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">als definiert, aber nicht aufgerufen.</p>
-<p class="p2"><br></p>
-<p class="p1">Wenn eindeutig tot:</p>
-<p class="p2"><br></p>
-<p class="p1">- entfernen</p>
-<p class="p1">- zugehörigen ungenutzten Code bereinigen</p>
-<p class="p2"><br></p>
-<p class="p1">Wenn funktional relevant:</p>
-<p class="p2"><br></p>
-<p class="p1">- nicht in diesem Sprint neu verdrahten</p>
-<p class="p1">- als separaten Befund dokumentieren</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1">## B5. Rate-Limit-Test isolieren</p>
-<p class="p2"><br></p>
-<p class="p1">Der Rate-Limit-Test darf nicht von Schreibaufrufen vorheriger Untertests</p>
-<p class="p1">abhängen.</p>
-<p class="p2"><br></p>
-<p class="p1">### Anforderungen</p>
-<p class="p2"><br></p>
-<p class="p1">- definierter Ausgangszustand</p>
-<p class="p1">- keine Testreihenfolge-Abhängigkeit</p>
-<p class="p1">- isoliert ausführbar</p>
-<p class="p1">- nur lokaler Mock</p>
-<p class="p1">- keine echten HA-Zugangsdaten</p>
-<p class="p1">- kein Kontakt zum produktiven Home Assistant</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1">## B6. Node-Version dokumentieren</p>
-<p class="p2"><br></p>
-<p class="p1">CI verwendet aktuell Node 22.</p>
-<p class="p2"><br></p>
-<p class="p1">Wenn dies auch der produktiven Runtime entspricht, in `package.json`</p>
-<p class="p1">dokumentieren:</p>
-<p class="p2"><br></p>
-<p class="p1">```json</p>
-<p class="p1">{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>"engines": {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>"node": "&gt;=22"</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">}</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">Nur ergänzen, wenn dies mit Produktiv-LXC und CI übereinstimmt.</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1">## B7. Changelog-Baseline</p>
-<p class="p2"><br></p>
-<p class="p1">Falls `CHANGELOG.md` noch nicht existiert, einen kompakten Changelog erstellen.</p>
-<p class="p2"><br></p>
-<p class="p1">Mindestens enthalten:</p>
-<p class="p2"><br></p>
-<p class="p1">- Initial Gateway</p>
-<p class="p1">- Legacy Dashboard</p>
-<p class="p1">- Theme</p>
-<p class="p1">- Widgets</p>
-<p class="p1">- Climate</p>
-<p class="p1">- Standalone</p>
-<p class="p1">- Light</p>
-<p class="p1">- Security/Robustness</p>
-<p class="p1">- Tests</p>
-<p class="p1">- Deployment</p>
-<p class="p1">- Wall Display</p>
-<p class="p1">- Sprint 12 UI Polish</p>
-<p class="p2"><br></p>
-<p class="p1">Keine erfundenen Datumsangaben oder Release-Tags.</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Voraussichtlich betroffene Dateien</p>
-<p class="p2"><br></p>
-<p class="p1">```text</p>
-<p class="p1">src/public/css/style.css</p>
-<p class="p1">src/public/js/widgets/climate.js</p>
-<p class="p1">src/public/js/app.js</p>
-<p class="p1">src/public/index.html</p>
-<p class="p1">src/server.js</p>
-<p class="p1">package.json</p>
-<p class="p1">package-lock.json</p>
-<p class="p1">test/</p>
-<p class="p1">README.md</p>
-<p class="p1">CHANGELOG.md</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">Nur tatsächlich notwendige Dateien ändern.</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Tests</p>
-<p class="p2"><br></p>
-<p class="p1">Vor Abschluss:</p>
-<p class="p2"><br></p>
-<p class="p1">```bash</p>
-<p class="p1">npm ci</p>
-<p class="p1">npm test</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">Referenzstand:</p>
-<p class="p2"><br></p>
-<p class="p1">```text</p>
-<p class="p1">39 passed</p>
-<p class="p1">0 failed</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">Die Zahl darf steigen, aber nicht durch verlorene Abdeckung sinken.</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># JavaScript-Syntaxprüfung</p>
-<p class="p2"><br></p>
-<p class="p1">Für jede geänderte JavaScript-Datei:</p>
-<p class="p2"><br></p>
-<p class="p1">```bash</p>
-<p class="p1">node --check &lt;datei&gt;</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">Mindestens prüfen, falls verändert:</p>
-<p class="p2"><br></p>
-<p class="p1">```bash</p>
-<p class="p1">node --check src/server.js</p>
-<p class="p1">node --check src/public/js/app.js</p>
-<p class="p1">node --check src/public/js/widgets/climate.js</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Frontend-Cache</p>
-<p class="p2"><br></p>
-<p class="p1">Referenzstand:</p>
-<p class="p2"><br></p>
-<p class="p1">```text</p>
-<p class="p1">v=14</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">Wenn CSS oder Frontend-JavaScript geändert werden, Cache-Version in</p>
-<p class="p1">`src/public/index.html` konsistent erhöhen, z. B. auf:</p>
-<p class="p2"><br></p>
-<p class="p1">```text</p>
-<p class="p1">v=15</p>
-<p class="p1">```</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Manuelle visuelle Abnahme</p>
-<p class="p2"><br></p>
-<p class="p1">Auf dem iPad mini / iOS 9 prüfen:</p>
-<p class="p2"><br></p>
-<p class="p1">- Portrait</p>
-<p class="p1">- Landscape</p>
-<p class="p1">- Light Mode</p>
-<p class="p1">- Dark Mode</p>
-<p class="p1">- Climate Plus</p>
-<p class="p1">- Climate Minus</p>
-<p class="p1">- Zieltemperatur</p>
-<p class="p1">- Fehlermeldung</p>
-<p class="p1">- Erfolgsmeldung</p>
-<p class="p1">- automatische Aktualisierung</p>
-<p class="p1">- Header</p>
-<p class="p1">- Uhr</p>
-<p class="p1">- Verbindungsstatus</p>
-<p class="p2"><br></p>
-<p class="p1">Besonders prüfen:</p>
-<p class="p2"><br></p>
-<p class="p1">- Plus exakt mittig</p>
-<p class="p1">- Minus exakt mittig</p>
-<p class="p1">- Climate-Karte sichtbar kompakter</p>
-<p class="p1">- keine abgeschnittenen Texte</p>
-<p class="p1">- keine überlappenden Elemente</p>
-<p class="p1">- mindestens 44-Pixel-Touchziele</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Deployment</p>
-<p class="p2"><br></p>
-<p class="p1">Der bestehende Fast-Forward-, Test-, Restart- und Health-Check-Ablauf bleibt</p>
-<p class="p1">unverändert.</p>
-<p class="p2"><br></p>
-<p class="p1">Keine destruktiven Git-Kommandos verwenden.</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Definition of Done</p>
-<p class="p2"><br></p>
-<p class="p1">Sprint 12 ist abgeschlossen, wenn:</p>
-<p class="p2"><br></p>
-<p class="p1">- Plus und Minus optisch zentriert sind</p>
-<p class="p1">- Climate-Karte kompakter ist</p>
-<p class="p1">- allgemeine Kachelabstände sinnvoll reduziert wurden</p>
-<p class="p1">- iOS-9-Kompatibilität erhalten bleibt</p>
-<p class="p1">- Versionsnummern konsistent sind</p>
-<p class="p1">- `ws` geprüft und gegebenenfalls entfernt wurde</p>
-<p class="p1">- tote Climate-Hilfsfunktion geprüft wurde</p>
-<p class="p1">- Rate-Limit-Test isoliert ist</p>
-<p class="p1">- Node-Runtime dokumentiert ist, sofern eindeutig</p>
-<p class="p1">- bestehende Tests vollständig grün sind</p>
-<p class="p1">- Cache-Version bei Frontendänderungen erhöht wurde</p>
-<p class="p1">- keine Multi-Dashboard-Funktion eingeführt wurde</p>
-<p class="p1">- keine Admin-Oberfläche eingeführt wurde</p>
-<p class="p1">- keine Secrets oder `.env`-Inhalte committed wurden</p>
-<p class="p1">- `docs/PROJECT_STATUS.md` nach Abschluss aktualisiert wurde</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Erwartetes Codex-Ergebnis</p>
-<p class="p2"><br></p>
-<p class="p1">Codex soll berichten:</p>
-<p class="p2"><br></p>
-<p class="p1">1. geänderte Dateien</p>
-<p class="p1">2. UI-Änderungen</p>
-<p class="p1">3. Wartbarkeitsbereinigungen</p>
-<p class="p1">4. bewusst nicht geänderte Punkte</p>
-<p class="p1">5. Ergebnis von `npm test`</p>
-<p class="p1">6. Ergebnis der `node --check`-Prüfungen</p>
-<p class="p1">7. neue Cache-Version</p>
-<p class="p1">8. Commit-Vorschlag</p>
-<p class="p1">9. Deploymentbefehle</p>
-<p class="p1">10. verbleibende Blocker für Sprint 13</p>
-<p class="p2"><br></p>
-<p class="p1">---</p>
-<p class="p2"><br></p>
-<p class="p1"># Codex-Prompt für Sprint 12</p>
-<p class="p2"><br></p>
-<p class="p1">```text</p>
-<p class="p1">Read:</p>
-<p class="p2"><br></p>
-<p class="p1">- AGENTS.md</p>
-<p class="p1">- README.md</p>
-<p class="p1">- docs/CODEX_HANDOFF.md</p>
-<p class="p1">- docs/SPRINT_ROADMAP.md</p>
-<p class="p1">- docs/PROJECT_STATUS.md</p>
-<p class="p1">- docs/sprints/SPRINT-12.md</p>
-<p class="p2"><br></p>
-<p class="p1">Then inspect the current repository state.</p>
-<p class="p2"><br></p>
-<p class="p1">Implement Sprint 12 exactly as specified in docs/sprints/SPRINT-12.md.</p>
-<p class="p2"><br></p>
-<p class="p1">Do not implement multi-dashboard support, an admin UI, persistent dashboard</p>
-<p class="p1">configuration, drag-and-drop or free tile sizing in this sprint.</p>
-<p class="p2"><br></p>
-<p class="p1">Keep the legacy dashboard compatible with Safari on iOS 9 and ECMAScript 5.</p>
-<p class="p2"><br></p>
-<p class="p1">Preserve all existing Home Assistant security boundaries and write</p>
-<p class="p1">allowlists.</p>
-<p class="p2"><br></p>
-<p class="p1">Run all required syntax checks and the full test suite.</p>
-<p class="p2"><br></p>
-<p class="p1">Use only local mock services for integration tests. Do not contact the real</p>
-<p class="p1">Home Assistant instance and do not use production credentials.</p>
-<p class="p2"><br></p>
-<p class="p1">At the end:</p>
-<p class="p2"><br></p>
-<p class="p1">- summarize every changed file,</p>
-<p class="p1">- report test results,</p>
-<p class="p1">- report the frontend cache version,</p>
-<p class="p1">- identify any blocked decisions,</p>
-<p class="p1">- update docs/PROJECT_STATUS.md,</p>
-<p class="p1">- do not commit or push unless explicitly instructed.</p>
-<p class="p1">```</p>
-</body>
-</html>
-    ( > \ k � � � � � �                           O_
+# Sprint 12 – UI Polish + Release Baseline
+
+## Status
+
+Planned
+
+## Basis
+
+Dieser Sprint basiert auf dem tatsächlich geprüften Repository-Stand aus
+`docs/PROJECT_STATUS.md`.
+
+Bekannter Ausgangsstand:
+
+- Branch: `main`
+- Commit: `da4ebb2`
+- Commit-Betreff: `style: reduce wall display header`
+- Teststand: `39 passed`, `0 failed`
+- Cache-Version im Frontend: `v=14`
+
+Codex muss den aktuellen Stand vor Beginn erneut prüfen.
+
+---
+
+# Ziel
+
+Sprint 12 bereinigt den aktuellen Einzel-Dashboard-Stand visuell und technisch,
+bevor Multi-Dashboard, Admin-Oberfläche und frei konfigurierbare Layouts
+eingeführt werden.
+
+Der Sprint besteht aus zwei klar begrenzten Bereichen:
+
+1. UI Polish
+2. Release-/Wartbarkeits-Baseline
+
+---
+
+# Nicht-Ziele
+
+Nicht Bestandteil dieses Sprints:
+
+- keine Multi-Dashboard-Unterstützung
+- keine Admin- oder Konfigurationsoberfläche
+- keine persistente Dashboardkonfiguration
+- kein Drag-and-drop
+- keine frei skalierbaren Kacheln
+- keine Rasterkoordinaten
+- keine neuen Home-Assistant-Domänen
+- keine HACS-Integration
+- keine Home-Assistant-App
+- keine große Refaktorierung von `app.js`
+- keine große Refaktorierung von `api.js`
+- keine Änderung der Sicherheitsarchitektur
+- keine Änderung der bestehenden Schreib-Allowlisten
+
+---
+
+# Teil A – UI Polish
+
+## A1. Thermostat-Schaltflächen zentrieren
+
+Aktuelles Problem:
+
+Das Minus- und Pluszeichen der Climate-Steuerung sind innerhalb der Buttons
+nicht sauber horizontal und vertikal zentriert.
+
+### Anforderungen
+
+- Minuszeichen horizontal und vertikal zentriert
+- Pluszeichen horizontal und vertikal zentriert
+- Touch-Ziel mindestens 44 × 44 Pixel
+- kein unnötiger Browser-Button-Padding
+- keine Verschiebung durch ungeeignetes `line-height`
+- bestehender Disabled-/Busy-Zustand bleibt erhalten
+- Light-/Dark-Mode bleibt erhalten
+- Safari iOS 9 muss unterstützt bleiben
+
+Erlaubte CSS-Techniken:
+
+```css
+display: -webkit-flex;
+display: flex;
+-webkit-align-items: center;
+align-items: center;
+-webkit-justify-content: center;
+justify-content: center;
+```
+
+Nicht verwenden:
+
+- CSS Grid
+- Flexbox `gap`
+- moderne Selektoren ohne Safari-9-Unterstützung
+
+---
+
+## A2. Climate-Kachel kompakter gestalten
+
+### Ziel
+
+Die Climate-Kachel soll deutlich platzsparender werden, ohne Lesbarkeit und
+Touch-Bedienbarkeit zu verschlechtern.
+
+Bevorzugte visuelle Richtung:
+
+```text
+Heizung Esszimmer              Heizen
+
+21,8 °C                  −  22,5 °C  +
+```
+
+### Anforderungen
+
+- Isttemperatur klar hervorgehoben
+- Solltemperatur direkt erkennbar
+- Minus und Plus unmittelbar am Zielwert
+- HVAC-Status kompakt
+- keine redundanten Leerflächen
+- keine unnötig große Mindesthöhe
+- mindestens 44-Pixel-Touchziele
+- bestehende Climate-Logik unverändert
+- optimistische Aktualisierung unverändert
+- Refreshschutz unverändert
+- Fehler- und Erfolgsmeldungen weiterhin funktionsfähig
+
+---
+
+## A3. Allgemeine Kachelgrößen prüfen
+
+Codex soll vorhandene Mindesthöhen, Padding- und Margin-Werte prüfen und nur
+dort reduzieren, wo Lesbarkeit und Bedienbarkeit erhalten bleiben.
+
+Insbesondere prüfen:
+
+- `.card`
+- Sensor-Karten
+- Binary-Karten
+- Light-Karten
+- Climate-Karten
+- kleine Displays
+- Landscape-Regeln
+- Breakpoints bei 600 Pixeln
+- Breakpoints bei 900 Pixeln
+
+Dieser Sprint führt noch keine individuelle Kachelgröße ein.
+
+---
+
+## A4. iOS-9-Kompatibilität erhalten
+
+Frontend weiterhin ES5-kompatibel.
+
+Nicht verwenden:
+
+- `let`
+- `const`
+- arrow functions
+- template literals
+- `fetch`
+- `Promise`
+- `async`
+- `await`
+- optional chaining
+- nullish coalescing
+
+---
+
+# Teil B – Release-/Wartbarkeits-Baseline
+
+## B1. Versionsnummer vereinheitlichen
+
+Aktuell laut Statusbericht:
+
+- `package.json`: `1.0.0`
+- `/api/status`: `0.1.0`
+- Footer: `v0.1`
+
+### Ziel
+
+Eine einzige verbindliche Projektversion verwenden.
+
+Bevorzugt:
+
+```text
+1.0.0
+```
+
+sofern die bestehende Releasepolitik nicht dagegen spricht.
+
+Folgende Stellen müssen konsistent sein:
+
+- `package.json`
+- `/api/status`
+- sichtbarer Footer
+- README
+- Changelog, falls erstellt
+
+---
+
+## B2. Lizenzinkonsistenz bereinigen
+
+Aktuell:
+
+- `package.json` nennt `ISC`
+- README sagt, dass noch keine Lizenz gewählt wurde
+- `LICENSE` fehlt
+
+Codex darf keine Lizenzentscheidung selbst treffen.
+
+Falls keine explizite Entscheidung des Projektinhabers vorliegt:
+
+- keine neue Lizenz erfinden
+- Inkonsistenz dokumentieren
+- Punkt als Blocker ausweisen
+
+---
+
+## B3. Ungenutzte `ws`-Abhängigkeit prüfen
+
+Prüfen, ob `ws` tatsächlich nirgendwo verwendet wird.
+
+Wenn eindeutig ungenutzt:
+
+```bash
+npm uninstall ws
+```
+
+Danach:
+
+- `package.json` prüfen
+- `package-lock.json` prüfen
+- `npm test`
+
+---
+
+## B4. Tote Hilfsfunktion prüfen
+
+Der Statusbericht nennt:
+
+```text
+setClimateControlsBusy()
+```
+
+als definiert, aber nicht aufgerufen.
+
+Wenn eindeutig tot:
+
+- entfernen
+- zugehörigen ungenutzten Code bereinigen
+
+Wenn funktional relevant:
+
+- nicht in diesem Sprint neu verdrahten
+- als separaten Befund dokumentieren
+
+---
+
+## B5. Rate-Limit-Test isolieren
+
+Der Rate-Limit-Test darf nicht von Schreibaufrufen vorheriger Untertests
+abhängen.
+
+### Anforderungen
+
+- definierter Ausgangszustand
+- keine Testreihenfolge-Abhängigkeit
+- isoliert ausführbar
+- nur lokaler Mock
+- keine echten HA-Zugangsdaten
+- kein Kontakt zum produktiven Home Assistant
+
+---
+
+## B6. Node-Version dokumentieren
+
+CI verwendet aktuell Node 22.
+
+Wenn dies auch der produktiven Runtime entspricht, in `package.json`
+dokumentieren:
+
+```json
+{
+  "engines": {
+    "node": ">=22"
+  }
+}
+```
+
+Nur ergänzen, wenn dies mit Produktiv-LXC und CI übereinstimmt.
+
+---
+
+## B7. Changelog-Baseline
+
+Falls `CHANGELOG.md` noch nicht existiert, einen kompakten Changelog erstellen.
+
+Mindestens enthalten:
+
+- Initial Gateway
+- Legacy Dashboard
+- Theme
+- Widgets
+- Climate
+- Standalone
+- Light
+- Security/Robustness
+- Tests
+- Deployment
+- Wall Display
+- Sprint 12 UI Polish
+
+Keine erfundenen Datumsangaben oder Release-Tags.
+
+---
+
+# Voraussichtlich betroffene Dateien
+
+```text
+src/public/css/style.css
+src/public/js/widgets/climate.js
+src/public/js/app.js
+src/public/index.html
+src/server.js
+package.json
+package-lock.json
+test/
+README.md
+CHANGELOG.md
+```
+
+Nur tatsächlich notwendige Dateien ändern.
+
+---
+
+# Tests
+
+Vor Abschluss:
+
+```bash
+npm ci
+npm test
+```
+
+Referenzstand:
+
+```text
+39 passed
+0 failed
+```
+
+Die Zahl darf steigen, aber nicht durch verlorene Abdeckung sinken.
+
+---
+
+# JavaScript-Syntaxprüfung
+
+Für jede geänderte JavaScript-Datei:
+
+```bash
+node --check <datei>
+```
+
+Mindestens prüfen, falls verändert:
+
+```bash
+node --check src/server.js
+node --check src/public/js/app.js
+node --check src/public/js/widgets/climate.js
+```
+
+---
+
+# Frontend-Cache
+
+Referenzstand:
+
+```text
+v=14
+```
+
+Wenn CSS oder Frontend-JavaScript geändert werden, Cache-Version in
+`src/public/index.html` konsistent erhöhen, z. B. auf:
+
+```text
+v=15
+```
+
+---
+
+# Manuelle visuelle Abnahme
+
+Auf dem iPad mini / iOS 9 prüfen:
+
+- Portrait
+- Landscape
+- Light Mode
+- Dark Mode
+- Climate Plus
+- Climate Minus
+- Zieltemperatur
+- Fehlermeldung
+- Erfolgsmeldung
+- automatische Aktualisierung
+- Header
+- Uhr
+- Verbindungsstatus
+
+Besonders prüfen:
+
+- Plus exakt mittig
+- Minus exakt mittig
+- Climate-Karte sichtbar kompakter
+- keine abgeschnittenen Texte
+- keine überlappenden Elemente
+- mindestens 44-Pixel-Touchziele
+
+---
+
+# Deployment
+
+Der bestehende Fast-Forward-, Test-, Restart- und Health-Check-Ablauf bleibt
+unverändert.
+
+Keine destruktiven Git-Kommandos verwenden.
+
+---
+
+# Definition of Done
+
+Sprint 12 ist abgeschlossen, wenn:
+
+- Plus und Minus optisch zentriert sind
+- Climate-Karte kompakter ist
+- allgemeine Kachelabstände sinnvoll reduziert wurden
+- iOS-9-Kompatibilität erhalten bleibt
+- Versionsnummern konsistent sind
+- `ws` geprüft und gegebenenfalls entfernt wurde
+- tote Climate-Hilfsfunktion geprüft wurde
+- Rate-Limit-Test isoliert ist
+- Node-Runtime dokumentiert ist, sofern eindeutig
+- bestehende Tests vollständig grün sind
+- Cache-Version bei Frontendänderungen erhöht wurde
+- keine Multi-Dashboard-Funktion eingeführt wurde
+- keine Admin-Oberfläche eingeführt wurde
+- keine Secrets oder `.env`-Inhalte committed wurden
+- `docs/PROJECT_STATUS.md` nach Abschluss aktualisiert wurde
+
+---
+
+# Erwartetes Codex-Ergebnis
+
+Codex soll berichten:
+
+1. geänderte Dateien
+2. UI-Änderungen
+3. Wartbarkeitsbereinigungen
+4. bewusst nicht geänderte Punkte
+5. Ergebnis von `npm test`
+6. Ergebnis der `node --check`-Prüfungen
+7. neue Cache-Version
+8. Commit-Vorschlag
+9. Deploymentbefehle
+10. verbleibende Blocker für Sprint 13
+
+---
+
+# Codex-Prompt für Sprint 12
+
+```text
+Read:
+
+- AGENTS.md
+- README.md
+- docs/CODEX_HANDOFF.md
+- docs/SPRINT_ROADMAP.md
+- docs/PROJECT_STATUS.md
+- docs/sprints/SPRINT-12.md
+
+Then inspect the current repository state.
+
+Implement Sprint 12 exactly as specified in docs/sprints/SPRINT-12.md.
+
+Do not implement multi-dashboard support, an admin UI, persistent dashboard
+configuration, drag-and-drop or free tile sizing in this sprint.
+
+Keep the legacy dashboard compatible with Safari on iOS 9 and ECMAScript 5.
+
+Preserve all existing Home Assistant security boundaries and write
+allowlists.
+
+Run all required syntax checks and the full test suite.
+
+Use only local mock services for integration tests. Do not contact the real
+Home Assistant instance and do not use production credentials.
+
+At the end:
+
+- summarize every changed file,
+- report test results,
+- report the frontend cache version,
+- identify any blocked decisions,
+- update docs/PROJECT_STATUS.md,
+- do not commit or push unless explicitly instructed.
+```

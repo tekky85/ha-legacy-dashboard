@@ -9,6 +9,11 @@ Assistant frontend.
 The initial target device is an Apple iPad mini first generation running
 iOS 9.3.5.
 
+Current project version: `1.0.0`.
+
+The implemented changes are summarized in
+[`CHANGELOG.md`](CHANGELOG.md).
+
 ## Why?
 
 Modern Home Assistant dashboards depend on browser capabilities that are not
@@ -369,4 +374,6 @@ docs/CODEX_HANDOFF.md
 
 ## License
 
-No license has been selected yet.
+No license has been selected yet. The package is marked as private to prevent
+accidental publication to npm; this does not grant a software license. A
+license remains an explicit project-owner decision before a public release.

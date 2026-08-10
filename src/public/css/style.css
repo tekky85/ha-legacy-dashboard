@@ -463,10 +463,10 @@ textarea {
     justify-content: space-between;
 
     width: calc(100% - 20px);
-    min-height: 220px;
+    min-height: 204px;
 
     margin: 10px;
-    padding: 26px;
+    padding: 22px;
 
     overflow: hidden;
 
@@ -514,7 +514,7 @@ textarea {
 
     min-height: 54px;
 
-    margin: 0 0 22px 0;
+    margin: 0 0 18px 0;
 
 }
 
@@ -615,7 +615,7 @@ textarea {
 
 .value {
 
-    margin: auto 0 24px 0;
+    margin: auto 0 20px 0;
 
     color: inherit;
 
@@ -680,7 +680,7 @@ textarea {
 
 .status {
 
-    margin: auto 0 24px 0;
+    margin: auto 0 20px 0;
 
     color: inherit;
 
@@ -1076,8 +1076,8 @@ body.theme-dark .footer {
 
     .card {
 
-        min-height: 195px;
-        padding: 22px;
+        min-height: 184px;
+        padding: 18px;
 
         border-radius: 20px;
 
@@ -1085,7 +1085,7 @@ body.theme-dark .footer {
 
     .card-header {
 
-        margin-bottom: 17px;
+        margin-bottom: 15px;
 
     }
 
@@ -1100,7 +1100,7 @@ body.theme-dark .footer {
 
     .value {
 
-        margin-bottom: 20px;
+        margin-bottom: 16px;
 
         font-size: 53px;
 
@@ -1114,7 +1114,7 @@ body.theme-dark .footer {
 
     .status {
 
-        margin-bottom: 20px;
+        margin-bottom: 16px;
 
         font-size: 34px;
 
@@ -1150,15 +1150,15 @@ body.theme-dark .footer {
 
     .card {
 
-        min-height: 195px;
-        padding: 22px;
+        min-height: 180px;
+        padding: 18px;
 
     }
 
     .card-header {
 
         min-height: 48px;
-        margin-bottom: 15px;
+        margin-bottom: 13px;
 
     }
 
@@ -1173,7 +1173,7 @@ body.theme-dark .footer {
 
     .value {
 
-        margin-bottom: 18px;
+        margin-bottom: 16px;
 
         font-size: 54px;
 
@@ -1181,7 +1181,7 @@ body.theme-dark .footer {
 
     .status {
 
-        margin-bottom: 18px;
+        margin-bottom: 16px;
 
         font-size: 34px;
 
@@ -1229,7 +1229,7 @@ body.theme-dark .status-neutral {
 
 .card-light {
 
-    min-height: 250px;
+    min-height: 220px;
 
 }
 
@@ -1293,7 +1293,7 @@ body.theme-dark .status-neutral {
     width: 100%;
     min-height: 62px;
 
-    margin: auto 0 24px 0;
+    margin: auto 0 18px 0;
     padding: 10px 16px;
 
     border: 1px solid #dce3ec;
@@ -1486,7 +1486,7 @@ body.theme-dark .light-control.is-on .light-control-track {
 
 .card-climate {
 
-    min-height: 290px;
+    min-height: 210px;
 
 }
 
@@ -1497,6 +1497,71 @@ body.theme-dark .light-control.is-on .light-control-track {
 
     justify-content:
         space-between;
+
+    min-height: 46px;
+    margin-bottom: 12px;
+
+}
+
+.climate-heading {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    min-width: 0;
+
+}
+
+.card-climate .icon {
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    width: 46px;
+    height: 46px;
+
+    margin-right: 12px;
+
+    border-radius: 14px;
+
+}
+
+.card-climate .icon svg {
+
+    width: 25px;
+    height: 25px;
+
+}
+
+.climate-heading-copy {
+
+    min-width: 0;
+
+}
+
+.climate-heading-copy .title,
+.climate-heading-copy .subtitle {
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+}
+
+.climate-heading-copy .title {
+
+    font-size: 18px;
+
+}
+
+.climate-heading-copy .subtitle {
+
+    margin-top: 2px;
+    font-size: 12px;
 
 }
 
@@ -1583,13 +1648,31 @@ body.theme-dark .light-control.is-on .light-control-track {
 }
 
 
-/* Current temperature */
+/* Temperature values */
+
+.climate-values {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+
+    min-width: 0;
+
+}
 
 .climate-current {
 
     position: relative;
 
-    margin: 2px 0 24px 0;
+    -webkit-flex: 0 1 auto;
+    flex: 0 1 auto;
+
+    margin: 0 14px 0 0;
 
 }
 
@@ -1597,7 +1680,7 @@ body.theme-dark .light-control.is-on .light-control-track {
 
     color: inherit;
 
-    font-size: 54px;
+    font-size: 48px;
     font-weight: 300;
     line-height: 1;
 
@@ -1620,7 +1703,7 @@ body.theme-dark .light-control.is-on .light-control-track {
 
     display: block;
 
-    margin-top: 5px;
+    margin-top: 3px;
 
     color: #667085;
 
@@ -1646,8 +1729,11 @@ body.theme-dark .light-control.is-on .light-control-track {
     justify-content:
         space-between;
 
-    margin: 0 0 24px 0;
-    padding: 10px;
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    margin: 0;
+    padding: 6px;
 
     border: 1px solid #e1e7ef;
     border-radius: 18px;
@@ -1667,8 +1753,8 @@ body.theme-dark .light-control.is-on .light-control-track {
     -webkit-justify-content: center;
     justify-content: center;
 
-    width: 54px;
-    height: 54px;
+    width: 46px;
+    height: 46px;
 
     margin: 0;
     padding: 0;
@@ -1683,9 +1769,7 @@ body.theme-dark .light-control.is-on .light-control-track {
         0 3px 10px
         rgba(23, 32, 51, 0.08);
 
-    font-size: 31px;
-    font-weight: 400;
-    line-height: 1;
+    line-height: normal;
 
     cursor: pointer;
 
@@ -1700,6 +1784,20 @@ body.theme-dark .light-control.is-on .light-control-track {
         color 0.15s ease,
         border-color 0.15s ease,
         -webkit-transform 0.1s ease;
+
+}
+
+.climate-control-icon {
+
+    display: block;
+
+    width: 24px;
+    height: 24px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
 
 }
 
@@ -1735,9 +1833,9 @@ body.theme-dark .light-control.is-on .light-control-track {
 
     display: block;
 
-    min-width: 92px;
+    min-width: 78px;
 
-    padding: 0 10px;
+    padding: 0 4px;
 
     text-align: center;
 
@@ -1766,7 +1864,7 @@ body.theme-dark .light-control.is-on .light-control-track {
 
     color: inherit;
 
-    font-size: 28px;
+    font-size: 25px;
     font-weight: 600;
     line-height: 1.2;
 
@@ -1897,24 +1995,46 @@ body.theme-dark .climate-control:active {
 
 }
 
-@media screen and (max-width: 599px) {
+@media screen and (max-width: 739px) {
 
     .card-climate {
 
-        min-height: 270px;
+        min-height: 238px;
 
     }
 
+    .climate-values {
+
+        display: block;
+
+    }
+
+    .climate-current {
+
+        margin: 0 0 12px 0;
+
+    }
+
+    .climate-target-row {
+
+        width: 100%;
+
+    }
+
+}
+
+@media screen and (max-width: 599px) {
+
     .climate-current-value {
 
-        font-size: 48px;
+        font-size: 46px;
 
     }
 
     .climate-control {
 
-        width: 50px;
-        height: 50px;
+        width: 46px;
+        height: 46px;
 
         border-radius: 15px;
 

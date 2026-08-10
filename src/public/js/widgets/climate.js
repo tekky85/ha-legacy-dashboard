@@ -438,15 +438,45 @@ ClimateWidget.prototype.render =
                 '<div class="card-header">' +
 
 
-                    '<div class="icon ' +
+                    '<div class="climate-heading">' +
 
-                        Legacy.html.escape(
-                            iconClass
-                        ) +
 
-                    '">' +
+                        '<div class="icon ' +
 
-                        this.getIcon() +
+                            Legacy.html.escape(
+                                iconClass
+                            ) +
+
+                        '">' +
+
+                            this.getIcon() +
+
+                        '</div>' +
+
+
+                        '<div class="climate-heading-copy">' +
+
+
+                            '<div class="title">' +
+
+                                Legacy.html.escape(
+                                    this.title
+                                ) +
+
+                            '</div>' +
+
+
+                            '<div class="subtitle">' +
+
+                                Legacy.html.escape(
+                                    this.subtitle
+                                ) +
+
+                            '</div>' +
+
+
+                        '</div>' +
+
 
                     '</div>' +
 
@@ -471,38 +501,41 @@ ClimateWidget.prototype.render =
                 '</div>' +
 
 
-                '<div class="climate-current">' +
+                '<div class="climate-values">' +
 
 
-                    '<span class="climate-current-value">' +
-
-                        Legacy.html.escape(
-                            currentText
-                        ) +
-
-                    '</span>' +
+                    '<div class="climate-current">' +
 
 
-                    '<span class="climate-current-unit">' +
+                        '<span class="climate-current-value">' +
 
-                        Legacy.html.escape(
-                            this.unit
-                        ) +
+                            Legacy.html.escape(
+                                currentText
+                            ) +
 
-                    '</span>' +
-
-
-                    '<span class="climate-current-label">' +
-
-                        "Aktuell" +
-
-                    '</span>' +
+                        '</span>' +
 
 
-                '</div>' +
+                        '<span class="climate-current-unit">' +
+
+                            Legacy.html.escape(
+                                this.unit
+                            ) +
+
+                        '</span>' +
 
 
-                '<div class="climate-target-row">' +
+                        '<span class="climate-current-label">' +
+
+                            "Aktuell" +
+
+                        '</span>' +
+
+
+                    '</div>' +
+
+
+                    '<div class="climate-target-row">' +
 
 
                     '<button ' +
@@ -567,7 +600,13 @@ ClimateWidget.prototype.render =
 
                     '>' +
 
-                        '&#8722;' +
+                        '<svg ' +
+                            'class="climate-control-icon" ' +
+                            'viewBox="0 0 24 24" ' +
+                            'aria-hidden="true"' +
+                        '>' +
+                            '<line x1="5" y1="12" x2="19" y2="12"></line>' +
+                        '</svg>' +
 
                     '</button>' +
 
@@ -664,28 +703,20 @@ ClimateWidget.prototype.render =
 
                     '>' +
 
-                        "+" +
+                        '<svg ' +
+                            'class="climate-control-icon" ' +
+                            'viewBox="0 0 24 24" ' +
+                            'aria-hidden="true"' +
+                        '>' +
+                            '<line x1="5" y1="12" x2="19" y2="12"></line>' +
+                            '<line x1="12" y1="5" x2="12" y2="19"></line>' +
+                        '</svg>' +
 
                     '</button>' +
 
 
-                '</div>' +
+                    '</div>' +
 
-
-                '<div class="title">' +
-
-                    Legacy.html.escape(
-                        this.title
-                    ) +
-
-                '</div>' +
-
-
-                '<div class="subtitle">' +
-
-                    Legacy.html.escape(
-                        this.subtitle
-                    ) +
 
                 '</div>' +
 

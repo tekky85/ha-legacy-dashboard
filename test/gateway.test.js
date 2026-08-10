@@ -398,29 +398,71 @@ test(
             "server.js"
         );
 
-        const gateway = childProcess.spawn(
-            process.execPath,
-            [serverPath],
-            {
-                cwd: temporaryDirectory,
-                env: Object.assign({}, process.env, {
-                    HA_TOKEN: TEST_TOKEN,
-                    HA_URL:
-                        "http://127.0.0.1:" +
-                        mockPort,
-                    NODE_ENV: "test",
-                    PORT: String(gatewayPort)
-                }),
-                stdio: ["ignore", "pipe", "pipe"]
-            }
-        );
-
+        let gateway = null;
         let gatewayErrorOutput = "";
         let gatewayOutput = "";
 
-        gateway.stderr.on("data", function (chunk) {
-            gatewayErrorOutput += chunk.toString();
-        });
+
+        function startGateway() {
+
+            gatewayErrorOutput = "";
+            gatewayOutput = "";
+
+            gateway = childProcess.spawn(
+                process.execPath,
+                [serverPath],
+                {
+                    cwd: temporaryDirectory,
+                    env: Object.assign({}, process.env, {
+                        HA_TOKEN: TEST_TOKEN,
+                        HA_URL:
+                            "http://127.0.0.1:" +
+                            mockPort,
+                        NODE_ENV: "test",
+                        PORT: String(gatewayPort)
+                    }),
+                    stdio: ["ignore", "pipe", "pipe"]
+                }
+            );
+
+            gateway.stderr.on("data", function (chunk) {
+                gatewayErrorOutput += chunk.toString();
+            });
+
+            return new Promise(function (resolve, reject) {
+
+                const startTimer = setTimeout(function () {
+                    reject(new Error(
+                        "Gateway-Start fehlgeschlagen: " +
+                        gatewayErrorOutput
+                    ));
+                }, 5000);
+
+                gateway.stdout.on("data", function (chunk) {
+                    gatewayOutput += chunk.toString();
+                    if (
+                        gatewayOutput.indexOf(
+                            "server_started"
+                        ) !== -1
+                    ) {
+                        clearTimeout(startTimer);
+                        resolve();
+                    }
+                });
+
+                gateway.once("exit", function (code) {
+                    clearTimeout(startTimer);
+                    reject(new Error(
+                        "Gateway wurde mit " +
+                        code +
+                        " beendet: " +
+                        gatewayErrorOutput
+                    ));
+                });
+
+            });
+
+        }
 
         t.after(async function () {
             await stopChild(gateway);
@@ -439,34 +481,7 @@ test(
             );
         });
 
-        await new Promise(function (resolve, reject) {
-
-            const startTimer = setTimeout(function () {
-                reject(new Error(
-                    "Gateway-Start fehlgeschlagen: " +
-                    gatewayErrorOutput
-                ));
-            }, 5000);
-
-            gateway.stdout.on("data", function (chunk) {
-                gatewayOutput += chunk.toString();
-                if (gatewayOutput.indexOf("server_started") !== -1) {
-                    clearTimeout(startTimer);
-                    resolve();
-                }
-            });
-
-            gateway.once("exit", function (code) {
-                clearTimeout(startTimer);
-                reject(new Error(
-                    "Gateway wurde mit " +
-                    code +
-                    " beendet: " +
-                    gatewayErrorOutput
-                ));
-            });
-
-        });
+        await startGateway();
         assert.equal(
             fs.existsSync(
                 path.join(
@@ -527,7 +542,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=14"
+                "/js/app.js?v=16"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -550,6 +565,7 @@ test(
 
             assert.equal(status.status, 200);
             assert.equal(status.json.status, "online");
+            assert.equal(status.json.version, "1.0.0");
             assert.equal(
                 status.json.home_assistant.status,
                 "online"
@@ -911,12 +927,15 @@ test(
 
         await t.test("Rate-Limit für Lichtbefehle", async function () {
 
+            await stopChild(gateway);
+            await startGateway();
+
             resetMock();
 
             const responses = [];
             let index;
 
-            for (index = 0; index < 8; index += 1) {
+            for (index = 0; index < 11; index += 1) {
                 responses.push(
                     await request(
                         gatewayPort,
@@ -942,7 +961,7 @@ test(
                         .headers["retry-after"]
                 ) >= 1
             );
-            assert.equal(mock.lightServiceCalls.length, 7);
+            assert.equal(mock.lightServiceCalls.length, 10);
 
         });
 

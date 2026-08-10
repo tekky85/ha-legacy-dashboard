@@ -14,6 +14,9 @@ const logger =
 const writeRateLimit =
     require("../services/write-rate-limit");
 
+const projectPackage =
+    require("../../package.json");
+
 
 const DASHBOARD_ENTITIES =
     dashboardConfig.getVisibleEntityIds();
@@ -346,7 +349,7 @@ router.get(
                     ? "online"
                     : "degraded",
             service: "ha-dashboard-gateway",
-            version: "0.1.0",
+            version: projectPackage.version,
             timestamp: new Date().toISOString(),
             home_assistant: homeAssistant
         });
