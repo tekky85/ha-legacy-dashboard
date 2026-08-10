@@ -43,6 +43,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_PATH = path.join(__dirname, "public");
+const ADMIN_PATH = path.join(__dirname, "admin");
 
 
 function setStaticHeaders(res, filePath) {
@@ -120,6 +121,18 @@ function setApiHeaders(req, res, next) {
 }
 
 
+function setAdminHeaders(res) {
+
+    res.setHeader(
+        "Cache-Control",
+        "no-cache, no-store, must-revalidate"
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
+}
+
+
 app.disable("x-powered-by");
 app.use(setSecurityHeaders);
 app.use(express.json({
@@ -155,6 +168,23 @@ app.get("/d/:dashboardId", function (req, res) {
     return res.sendFile(indexPath);
 
 });
+app.get(["/admin", "/admin/"], function (req, res) {
+
+    const indexPath =
+        path.join(ADMIN_PATH, "index.html");
+
+    setAdminHeaders(res);
+
+    return res.sendFile(indexPath);
+
+});
+app.use("/admin", express.static(
+    ADMIN_PATH,
+    {
+        index: false,
+        setHeaders: setAdminHeaders
+    }
+));
 app.use(express.static(
     PUBLIC_PATH,
     {

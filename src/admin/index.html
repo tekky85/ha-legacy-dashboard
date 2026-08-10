@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>HA Legacy Dashboard – Administration</title>
+    <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+    <a class="skip-link" href="#adminMain">Zum Inhalt springen</a>
+
+    <main id="adminMain">
+        <section id="loginView" class="login-view" aria-labelledby="loginTitle">
+            <form id="loginForm" class="login-card">
+                <p class="eyebrow">HA Legacy Dashboard</p>
+                <h1 id="loginTitle">Administration</h1>
+                <p class="muted">
+                    Melden Sie sich mit dem separaten Admin-Token des Gateways an.
+                </p>
+
+                <label for="adminToken">Admin-Token</label>
+                <input
+                    id="adminToken"
+                    name="adminToken"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <label class="checkbox-row" for="rememberToken">
+                    <input id="rememberToken" type="checkbox" checked>
+                    <span>Für diesen Tab merken</span>
+                </label>
+
+                <button id="loginButton" class="button primary" type="submit">
+                    Anmelden
+                </button>
+                <p id="loginError" class="form-error" role="alert"></p>
+            </form>
+        </section>
+
+        <section id="adminView" class="admin-view" hidden>
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">HA Legacy Dashboard</p>
+                    <h1>Administration</h1>
+                </div>
+                <div class="topbar-actions">
+                    <span id="connectionStatus" class="status-pill" role="status">
+                        Backend verbunden
+                    </span>
+                    <button id="logoutButton" class="button secondary" type="button">
+                        Abmelden
+                    </button>
+                </div>
+            </header>
+
+            <div id="globalNotice" class="notice" role="status" aria-live="polite" hidden></div>
+
+            <div class="workspace">
+                <aside class="sidebar" aria-labelledby="dashboardListTitle">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">Konfiguration</p>
+                            <h2 id="dashboardListTitle">Dashboards</h2>
+                        </div>
+                        <button id="newDashboardButton" class="button primary compact" type="button">
+                            + Neu
+                        </button>
+                    </div>
+                    <nav id="dashboardList" class="dashboard-list" aria-label="Dashboards"></nav>
+                </aside>
+
+                <section id="dashboardEditor" class="editor" aria-labelledby="editorTitle">
+                    <div class="editor-empty">
+                        <h2 id="editorTitle">Dashboard auswählen</h2>
+                        <p class="muted">Wählen Sie links ein Dashboard zur Bearbeitung.</p>
+                    </div>
+                </section>
+            </div>
+
+            <div id="saveBar" class="save-bar" hidden>
+                <p>Es gibt nicht gespeicherte Änderungen.</p>
+                <div class="button-row">
+                    <button id="discardButton" class="button secondary" type="button">
+                        Verwerfen
+                    </button>
+                    <button id="saveButton" class="button primary" type="button">
+                        Änderungen speichern
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <dialog id="dashboardDialog" aria-labelledby="dashboardDialogTitle">
+        <form id="dashboardForm" class="dialog-form">
+            <div class="dialog-heading">
+                <div>
+                    <p class="eyebrow">Dashboard</p>
+                    <h2 id="dashboardDialogTitle">Dashboard erstellen</h2>
+                </div>
+                <button class="icon-button" type="button" data-close-dialog="dashboardDialog" aria-label="Dialog schließen">×</button>
+            </div>
+
+            <input id="dashboardDialogMode" type="hidden" value="create">
+            <input id="dashboardSourceId" type="hidden">
+
+            <label for="dashboardTitleInput">Titel</label>
+            <input id="dashboardTitleInput" type="text" maxlength="120" required>
+
+            <label for="dashboardIdInput">Technische ID</label>
+            <input
+                id="dashboardIdInput"
+                type="text"
+                maxlength="63"
+                pattern="[a-z0-9][a-z0-9-]{0,62}"
+                aria-describedby="dashboardIdHelp"
+                required
+            >
+            <small id="dashboardIdHelp">Kleinbuchstaben, Zahlen und Bindestriche.</small>
+
+            <p id="dashboardFormError" class="form-error" role="alert"></p>
+            <div class="button-row end">
+                <button class="button secondary" type="button" data-close-dialog="dashboardDialog">Abbrechen</button>
+                <button class="button primary" type="submit">Übernehmen</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="entityDialog" class="wide-dialog" aria-labelledby="entityDialogTitle">
+        <div class="dialog-form">
+            <div class="dialog-heading">
+                <div>
+                    <p class="eyebrow">Widget hinzufügen</p>
+                    <h2 id="entityDialogTitle">Home-Assistant-Entity auswählen</h2>
+                </div>
+                <button class="icon-button" type="button" data-close-dialog="entityDialog" aria-label="Dialog schließen">×</button>
+            </div>
+
+            <div class="entity-tools">
+                <div>
+                    <label for="entitySearch">Entity suchen</label>
+                    <input id="entitySearch" type="search" placeholder="Name, ID, Domain oder Device Class">
+                </div>
+                <div>
+                    <label for="entityDomainFilter">Domain</label>
+                    <select id="entityDomainFilter">
+                        <option value="">Alle unterstützten</option>
+                        <option value="sensor">Sensor</option>
+                        <option value="binary_sensor">Binary Sensor</option>
+                        <option value="light">Light</option>
+                        <option value="climate">Climate</option>
+                    </select>
+                </div>
+            </div>
+
+            <p id="entityStatus" class="muted" role="status"></p>
+            <div id="entityList" class="entity-list"></div>
+        </div>
+    </dialog>
+
+    <dialog id="widgetDialog" aria-labelledby="widgetDialogTitle">
+        <form id="widgetForm" class="dialog-form">
+            <div class="dialog-heading">
+                <div>
+                    <p class="eyebrow">Widget</p>
+                    <h2 id="widgetDialogTitle">Widget bearbeiten</h2>
+                </div>
+                <button class="icon-button" type="button" data-close-dialog="widgetDialog" aria-label="Dialog schließen">×</button>
+            </div>
+
+            <input id="widgetDialogMode" type="hidden" value="edit">
+            <input id="widgetIdInput" type="hidden">
+
+            <div class="readonly-grid">
+                <div>
+                    <span class="field-label">Entity</span>
+                    <code id="widgetEntityValue"></code>
+                </div>
+                <div>
+                    <span class="field-label">Widget-Typ</span>
+                    <span id="widgetTypeValue"></span>
+                </div>
+            </div>
+
+            <label for="widgetTitleInput">Titel</label>
+            <input id="widgetTitleInput" type="text" maxlength="120" required>
+
+            <label for="widgetSubtitleInput">Untertitel</label>
+            <input id="widgetSubtitleInput" type="text" maxlength="120">
+
+            <div class="form-grid">
+                <div>
+                    <label for="widgetIconInput">Icon</label>
+                    <select id="widgetIconInput"></select>
+                </div>
+                <div>
+                    <label for="widgetUnitInput">Einheit</label>
+                    <input id="widgetUnitInput" type="text" maxlength="24">
+                </div>
+                <div>
+                    <label for="widgetOrderInput">Reihenfolge</label>
+                    <input id="widgetOrderInput" type="number" step="1" required>
+                </div>
+            </div>
+
+            <label class="checkbox-row" for="widgetVisibleInput">
+                <input id="widgetVisibleInput" type="checkbox">
+                <span>Im Wall-Display sichtbar</span>
+            </label>
+
+            <p id="widgetFormError" class="form-error" role="alert"></p>
+            <div class="button-row end">
+                <button class="button secondary" type="button" data-close-dialog="widgetDialog">Abbrechen</button>
+                <button class="button primary" type="submit">Übernehmen</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="/admin/js/auth.js" defer></script>
+    <script src="/admin/js/api.js" defer></script>
+    <script src="/admin/js/state.js" defer></script>
+    <script src="/admin/js/dashboards.js" defer></script>
+    <script src="/admin/js/widgets.js" defer></script>
+    <script src="/admin/js/entities.js" defer></script>
+    <script src="/admin/js/app.js" defer></script>
+</body>
+</html>

@@ -54,7 +54,7 @@ browser.
 - responsive optimistic light on/off control
 - multiple persistent server-side dashboard profiles
 - stable dashboard URLs with a backward-compatible default dashboard
-- protected, opt-in Admin API without a graphical Admin UI
+- protected, opt-in Admin API with a graphical configuration UI
 - Home Assistant reachability status
 - stale-data indicator with last successful refresh
 - wall-display clock and German date
@@ -249,8 +249,9 @@ GET /api/dashboards/:dashboardId/state
 Unknown dashboard IDs return HTTP 404 and are never redirected to the default
 dashboard.
 
-The optional Admin API is documented below. It is disabled by default and is
-not used by the legacy dashboard frontend.
+The optional Admin API and its separate graphical UI are documented below.
+They are disabled by default and are not used by the legacy dashboard
+frontend.
 
 Set climate target temperature:
 
@@ -342,8 +343,8 @@ the separate allowlists in `src/routes/api.js`.
 
 ## Admin API
 
-There is no graphical Admin UI in Sprint 14. The backend API is disabled by
-default. To enable it, set both values in the server-only `.env`:
+The backend API is disabled by default. To enable the API and use the graphical
+configuration UI, set both values in the server-only `.env`:
 
 ```ini
 ADMIN_API_ENABLED=true
@@ -379,6 +380,40 @@ are not returned.
 Enabling the API still does not grant Home Assistant write permissions.
 Climate and Light remain controlled exclusively by their hard-coded backend
 allowlists.
+
+## Admin configuration UI
+
+Open the administration in a modern browser:
+
+```text
+http://gateway-address:3000/admin
+```
+
+The login form sends the separate Admin token only in the `Authorization`
+header to `/api/admin/*`. When “For this tab” is selected, the token is kept in
+`sessionStorage`; it is never placed in a URL, HTML file, public dashboard
+request, or persistent `localStorage`. Logout and HTTP 401/403 responses remove
+the session token.
+
+The UI supports:
+
+- creating, renaming, duplicating, deleting, and selecting the default
+  dashboard
+- editing the refresh interval
+- browsing and filtering the sanitized Home Assistant entity inventory
+- adding supported Sensor, Binary Sensor, Light, and Climate widgets
+- editing widget title, subtitle, icon, unit, visibility, and order
+- reordering widgets with up/down buttons
+- explicit save and discard for one local configuration draft
+- warning before leaving with unsaved changes
+
+Dashboard and widget IDs remain backend-validated. Entity selection controls
+display only; it does not modify the Climate or Light write allowlists. Sprint
+15 intentionally has no drag-and-drop, free positioning, or tile sizing.
+
+The Admin UI is technically separate under `src/admin/` and may use modern
+browser JavaScript. The wall display under `src/public/` remains ES5 and Safari
+iOS 9 compatible.
 
 ## Security model
 
@@ -419,6 +454,11 @@ ha-legacy-dashboard/
 ├── docs/
 │   └── CODEX_HANDOFF.md
 └── src/
+    ├── admin/
+    │   ├── index.html
+    │   ├── css/
+    │   │   └── admin.css
+    │   └── js/
     ├── config/
     │   └── dashboard.js
     ├── server.js

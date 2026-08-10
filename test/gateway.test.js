@@ -564,6 +564,42 @@ test(
                 "public, max-age=31536000, immutable"
             );
 
+            const adminPage = await request(
+                gatewayPort,
+                "GET",
+                "/admin"
+            );
+
+            assert.equal(adminPage.status, 200);
+            assert.equal(
+                adminPage.headers["cache-control"],
+                "no-cache, no-store, must-revalidate"
+            );
+            assert.match(
+                adminPage.text,
+                /HA Legacy Dashboard – Administration/
+            );
+            assert.match(
+                adminPage.text,
+                /src="\/admin\/js\/app\.js"/
+            );
+            assert.doesNotMatch(
+                adminPage.text,
+                /HA_TOKEN|ADMIN_TOKEN=/
+            );
+
+            const adminScript = await request(
+                gatewayPort,
+                "GET",
+                "/admin/js/app.js"
+            );
+
+            assert.equal(adminScript.status, 200);
+            assert.equal(
+                adminScript.headers["cache-control"],
+                "no-cache, no-store, must-revalidate"
+            );
+
         });
 
         await t.test("Dashboard-URLs liefern nur konfigurierte Dashboards", async function () {

@@ -38,6 +38,7 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 12 | Release und Dokumentation | abgeschlossen |
 | 13 | Multi-Dashboard Foundation | abgeschlossen |
 | 14 | Persistenz und Admin-API-Grundlage | abgeschlossen |
+| 15 | Grafische Admin-Konfiguration | abgeschlossen |
 
 ---
 
@@ -483,6 +484,27 @@ Projektlizenz bleibt eine bewusste Entscheidung des Projektinhabers.
 
 ---
 
+# Sprint 15 – Grafische Admin-Konfiguration
+
+## Umgesetzt
+
+- getrennte moderne Oberfläche unter `/admin`
+- session-scoped Bearer-Anmeldung mit Logout und automatischer Bereinigung bei
+  HTTP 401/403
+- lokaler Gesamtkonfigurationsentwurf mit explizitem Speichern und Verwerfen
+- Dashboard erstellen, umbenennen, duplizieren und löschen
+- Standard-Dashboard und Refresh-Intervall bearbeiten
+- global eindeutige Widget-IDs beim Duplizieren und Hinzufügen
+- sanitisiertes Entity-Inventar mit Suche und Domainfilter
+- ausschließlich bekannte Widgettypen und vorhandene Icon-Namen
+- Widgettitel, Untertitel, Icon, Einheit, Sichtbarkeit und Reihenfolge
+- Auf-/Ab-Steuerung ohne Drag-and-drop
+- verständliche API-Fehler und Warnung bei ungespeicherten Änderungen
+- lokale Admin-Assets ohne CDN oder Framework
+- unverändertes ES5-/iOS-9-Wall-Display und unveränderte HA-Schreib-Allowlisten
+
+---
+
 # Priorisierte Reihenfolge
 
 1. Sprint 4 vollständig verifizieren und abschließen
@@ -496,6 +518,7 @@ Projektlizenz bleibt eine bewusste Entscheidung des Projektinhabers.
 9. Sprint 12 Release und Dokumentation
 10. Sprint 13 Multi-Dashboard-Grundlage
 11. Sprint 14 Persistenz und Admin-API-Grundlage
+12. Sprint 15 grafische Admin-Konfiguration
 
 ---
 

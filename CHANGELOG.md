@@ -36,3 +36,7 @@ release tags have been assigned.
 - Sprint 14 Persistent Configuration: added schema-versioned atomic JSON
   persistence with stable widget IDs and one valid backup, plus an opt-in
   Bearer-protected Admin API and sanitized Home Assistant entity inventory.
+- Sprint 15 Admin Configuration UI: added the separate modern `/admin`
+  interface with session-scoped Bearer authentication, dashboard and widget
+  draft editing, sanitized entity search, and explicit save/discard without
+  changing Home Assistant write allowlists.
