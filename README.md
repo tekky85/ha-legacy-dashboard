@@ -52,7 +52,8 @@ browser.
 - binary sensor card
 - allowlisted Esszimmer light card
 - responsive optimistic light on/off control
-- server-side dashboard widget configuration
+- multiple static server-side dashboard profiles
+- stable dashboard URLs with a backward-compatible default dashboard
 - Home Assistant reachability status
 - stale-data indicator with last successful refresh
 - wall-display clock and German date
@@ -141,6 +142,13 @@ Open:
 http://gateway-address:3000/
 ```
 
+The root URL loads the default dashboard. Named dashboards use stable paths:
+
+```text
+http://gateway-address:3000/d/default
+http://gateway-address:3000/d/esszimmer
+```
+
 ## iPad home-screen installation
 
 On the iPad, open the dashboard URL in Safari and select:
@@ -222,6 +230,18 @@ Dashboard widget configuration:
 GET /api/dashboard/config
 ```
 
+The two endpoints above are compatibility routes and always refer to the
+default dashboard. Multi-dashboard clients can use:
+
+```text
+GET /api/dashboards
+GET /api/dashboards/:dashboardId/config
+GET /api/dashboards/:dashboardId/state
+```
+
+Unknown dashboard IDs return HTTP 404 and are never redirected to the default
+dashboard.
+
 Set climate target temperature:
 
 ```text
@@ -256,13 +276,20 @@ Writable entities must be explicitly allowlisted in the backend.
 
 ## Dashboard configuration
 
-Visible widgets are defined in:
+Dashboards and their visible widgets are defined statically in:
 
 ```text
 src/config/dashboard.js
 ```
 
-Each entry defines:
+The configuration declares one `defaultDashboardId` and a list of dashboard
+profiles. Every profile has a stable lowercase ID, a display title, a refresh
+interval, and its own widget list. The current profiles are:
+
+- `default` – the complete existing dashboard and the target of `/`
+- `esszimmer` – the existing Esszimmer light and climate widgets
+
+Each widget entry defines:
 
 - `entity`
 - `type`
@@ -278,6 +305,14 @@ The optional backend environment value `DASHBOARD_REFRESH_INTERVAL_MS`
 controls the automatic browser refresh between 3000 and 300000 milliseconds.
 Invalid values fall back to 5000 milliseconds. The browser receives only this
 sanitized interval and the public widget configuration.
+
+Dashboard visibility controls only which entities are displayed and read.
+It never grants write access. Climate and light writes remain protected by
+separate explicit backend allowlists.
+
+There is deliberately no admin UI and no runtime persistence for dashboard
+configuration yet. Changes are versioned source-code changes to
+`src/config/dashboard.js`.
 
 Set `visible` to `false` to remove a widget from both the browser
 configuration and the dashboard state query. Supported frontend widget types

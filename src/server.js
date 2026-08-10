@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const apiRoutes = require("./routes/api");
+const dashboardConfig = require("./config/dashboard");
 const logger = require("./services/logger");
 const app = express();
 
@@ -97,6 +98,27 @@ app.use("/api", function (req, res) {
     res.status(404).json({
         error: "API-Endpunkt nicht gefunden"
     });
+
+});
+app.get("/d/:dashboardId", function (req, res) {
+
+    if (
+        !dashboardConfig.getDashboardById(
+            req.params.dashboardId
+        )
+    ) {
+        return res.status(404)
+            .type("text/plain")
+            .send("Dashboard nicht gefunden");
+    }
+
+
+    const indexPath =
+        path.join(PUBLIC_PATH, "index.html");
+
+    setStaticHeaders(res, indexPath);
+
+    return res.sendFile(indexPath);
 
 });
 app.use(express.static(

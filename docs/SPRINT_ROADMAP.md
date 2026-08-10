@@ -35,7 +35,8 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 9 | Lokale Mock- und Integrationstests | abgeschlossen |
 | 10 | Deployment und Betrieb | abgeschlossen |
 | 11 | Wall-Display-Betrieb | abgeschlossen |
-| 12 | Release und Dokumentation | vorgeschlagen |
+| 12 | Release und Dokumentation | abgeschlossen |
+| 13 | Multi-Dashboard Foundation | abgeschlossen |
 
 ---
 
@@ -418,7 +419,7 @@ Echte Kiosk- und Bildschirmsteuerung bleibt durch iOS 9 begrenzt.
 
 # Sprint 12 – Release, Dokumentation und Wartbarkeit
 
-## Vorgeschlagen
+## Umgesetzt
 
 - Versionierung
 - `CHANGELOG.md`
@@ -429,7 +430,32 @@ Echte Kiosk- und Bildschirmsteuerung bleibt durch iOS 9 begrenzt.
 - Testdokumentation
 - Entity-Beispiele
 - bekannte Einschränkungen
-- Lizenzentscheidung
+- dokumentierter Hinweis auf die noch offene Lizenzentscheidung
+
+Die Release-Baseline `1.0.0`, der Changelog, die Wartungsdokumentation, die
+isolierten Rate-Limit-Tests und das kompaktere UI sind umgesetzt. Eine
+Projektlizenz bleibt eine bewusste Entscheidung des Projektinhabers.
+
+---
+
+# Sprint 13 – Multi-Dashboard Foundation
+
+## Umgesetzt
+
+- statische, versionierte Dashboardprofile in `src/config/dashboard.js`
+- eindeutiges Standard-Dashboard `default`
+- zweites Dashboard `esszimmer` mit vorhandenen Light- und Climate-Entities
+- stabile Browserpfade `/d/default` und `/d/esszimmer`
+- öffentliche Dashboardliste `GET /api/dashboards`
+- dashboard-spezifische Konfiguration und Zustände
+- kontrollierte 404-Antworten für unbekannte Dashboard-IDs
+- Legacy-Routen `/api/dashboard/config` und `/api/dashboard` zeigen weiterhin
+  das Standard-Dashboard
+- dashboard-spezifische, deduplizierte HA-Leselisten
+- dynamischer Dashboardtitel im bestehenden ES5-Frontend
+- unveränderte, getrennte Schreib-Allowlisten für Climate und Light
+- keine Admin-UI, keine Laufzeitpersistenz und keine Layoutbearbeitung
+- automatisierte Konfigurations-, Frontend-, Routing- und Integrationstests
 
 ---
 
@@ -444,6 +470,7 @@ Echte Kiosk- und Bildschirmsteuerung bleibt durch iOS 9 begrenzt.
 7. Sprint 7 Konfigurationssteuerung
 8. Sprint 11 Wall-Display-Funktionen
 9. Sprint 12 Release und Dokumentation
+10. Sprint 13 Multi-Dashboard-Grundlage
 
 ---
 

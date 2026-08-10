@@ -56,7 +56,10 @@ test("iOS-Standalone-Metadaten sind vollständig", function () {
         /name="apple-mobile-web-app-title" content="HA Dashboard"/
     );
 
-    assert.match(html, /<h1>HA Dashboard<\/h1>/);
+    assert.match(
+        html,
+        /<h1 id="dashboardTitle">HA Dashboard<\/h1>/
+    );
     assert.doesNotMatch(
         html,
         /Lightweight dashboards for legacy devices/
@@ -64,20 +67,20 @@ test("iOS-Standalone-Metadaten sind vollständig", function () {
 
     assert.match(
         html,
-        /rel="manifest" href="manifest\.json\?v=16"/
+        /rel="manifest" href="\/manifest\.json\?v=17"/
     );
 
     assert.match(
         html,
-        /sizes="76x76"[\s\S]*app-icon-76\.png\?v=16/
+        /sizes="76x76"[\s\S]*\/icons\/app-icon-76\.png\?v=17/
     );
 
     assert.match(
         html,
-        /sizes="152x152"[\s\S]*app-icon-152\.png\?v=16/
+        /sizes="152x152"[\s\S]*\/icons\/app-icon-152\.png\?v=17/
     );
 
-    assert.doesNotMatch(html, /\?v=15/);
+    assert.doesNotMatch(html, /\?v=16/);
 
 });
 
@@ -102,6 +105,10 @@ test("Manifest beschreibt eine Standalone-Web-App", function () {
         }),
         ["192x192", "512x512"]
     );
+
+    manifest.icons.forEach(function (icon) {
+        assert.match(icon.src, /\?v=17$/);
+    });
 
 });
 

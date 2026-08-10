@@ -126,6 +126,130 @@ test("Refresh-Intervall wird serverseitig begrenzt", function () {
 });
 
 
+test("statische Multi-Dashboard-Konfiguration ist eindeutig und gekapselt", function () {
+
+    const dashboardConfig = require(
+        path.join(
+            __dirname,
+            "..",
+            "src",
+            "config",
+            "dashboard.js"
+        )
+    );
+
+    const dashboards =
+        dashboardConfig.getPublicDashboards();
+
+    const defaultDashboard =
+        dashboardConfig.getDefaultDashboard();
+
+    const roomConfiguration =
+        dashboardConfig.getPublicDashboardConfig(
+            "esszimmer"
+        );
+
+
+    assert.deepEqual(dashboards, [
+        {
+            id: "default",
+            title: "Übersicht"
+        },
+        {
+            id: "esszimmer",
+            title: "Esszimmer"
+        }
+    ]);
+
+    assert.equal(defaultDashboard.id, "default");
+    assert.equal(roomConfiguration.id, "esszimmer");
+    assert.deepEqual(
+        roomConfiguration.widgets.map(function (widget) {
+            return widget.entity;
+        }),
+        [
+            "light.esszimmer_lampen",
+            "climate.esszimmer_thermostate"
+        ]
+    );
+
+    roomConfiguration.widgets[0].title = "Verändert";
+
+    assert.equal(
+        dashboardConfig
+            .getPublicDashboardConfig("esszimmer")
+            .widgets[0]
+            .title,
+        "Esszimmer"
+    );
+
+    assert.equal(
+        dashboardConfig.getDashboardById("unbekannt"),
+        null
+    );
+    assert.equal(
+        dashboardConfig.getPublicDashboardConfig("unbekannt"),
+        null
+    );
+
+});
+
+
+test("ungültige Dashboard-IDs und Duplikate werden abgelehnt", function () {
+
+    const dashboardConfig = require(
+        path.join(
+            __dirname,
+            "..",
+            "src",
+            "config",
+            "dashboard.js"
+        )
+    );
+
+    const widget = {
+        entity: "sensor.test",
+        type: "sensor",
+        title: "Test",
+        order: 10,
+        visible: true
+    };
+
+
+    assert.throws(function () {
+        dashboardConfig.validateConfiguration({
+            defaultDashboardId: "Wohnzimmer",
+            dashboards: [
+                {
+                    id: "Wohnzimmer",
+                    title: "Wohnzimmer",
+                    widgets: [widget]
+                }
+            ]
+        });
+    }, /Dashboard-ID ist ungültig/);
+
+    assert.throws(function () {
+        dashboardConfig.validateConfiguration({
+            defaultDashboardId: "gleich",
+            dashboards: [
+                {
+                    id: "gleich",
+                    title: "Eins",
+                    widgets: [widget]
+                },
+                {
+                    id: "gleich",
+                    title: "Zwei",
+                    widgets: [widget]
+                }
+            ]
+        });
+    }, /nicht eindeutig/);
+
+});
+
+
 test("Frontend erzeugt nur bekannte sichtbare Widget-Typen", function () {
 
     const container = {

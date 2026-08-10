@@ -5,7 +5,7 @@ const test = require("node:test");
 const vm = require("node:vm");
 
 
-function createHarness() {
+function createHarness(pathname) {
 
     let now = 1000;
     let timerId = 0;
@@ -41,6 +41,10 @@ function createHarness() {
     const networkBanner = {
         className: "network-banner",
         innerHTML: ""
+    };
+
+    const dashboardTitle = {
+        innerHTML: "HA Dashboard"
     };
 
     const display = {
@@ -146,6 +150,7 @@ function createHarness() {
 
     const document = {
         body: body,
+        title: "HA Legacy Dashboard",
         getElementById: function (id) {
             if (id === "updated") {
                 return status;
@@ -167,6 +172,9 @@ function createHarness() {
             }
             if (id === "networkBanner") {
                 return networkBanner;
+            }
+            if (id === "dashboardTitle") {
+                return dashboardTitle;
             }
             return null;
         },
@@ -287,6 +295,9 @@ function createHarness() {
         Math: Math,
         window: {
             event: null,
+            location: {
+                pathname: pathname || "/"
+            },
             setInterval: function (callback, delay) {
                 callback.delay = delay;
                 callback.cleared = false;
@@ -324,6 +335,8 @@ function createHarness() {
         connectionBadge: connectionBadge,
         connectionLabel: connectionLabel,
         networkBanner: networkBanner,
+        dashboardTitle: dashboardTitle,
+        document: document,
         configurations: configurations,
         display: display,
         gets: gets,
@@ -339,6 +352,8 @@ function createHarness() {
         status: status,
         completeConfiguration: function () {
             gets[0].success({
+                id: "default",
+                title: "Übersicht",
                 refresh_interval_ms: 5000,
                 widgets: [
                     {
@@ -394,6 +409,43 @@ test("Dashboard-Konfiguration wird vor Zuständen geladen", function () {
     assert.equal(harness.configurations.length, 1);
     assert.equal(harness.gets.length, 2);
     assert.equal(harness.gets[1].url, "/api/dashboard");
+
+});
+
+
+test("Dashboard-ID aus der URL steuert Konfiguration und Zustand", function () {
+
+    const harness = createHarness("/d/esszimmer");
+
+    assert.equal(
+        harness.gets[0].url,
+        "/api/dashboards/esszimmer/config"
+    );
+
+    harness.gets[0].success({
+        id: "esszimmer",
+        title: "Esszimmer",
+        refresh_interval_ms: 5000,
+        widgets: [
+            {
+                entity: "light.esszimmer_lampen",
+                type: "light"
+            }
+        ]
+    });
+
+    assert.equal(
+        harness.dashboardTitle.innerHTML,
+        "Esszimmer"
+    );
+    assert.equal(
+        harness.document.title,
+        "Esszimmer – HA Dashboard"
+    );
+    assert.equal(
+        harness.gets[1].url,
+        "/api/dashboards/esszimmer/state"
+    );
 
 });
 

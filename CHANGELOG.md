@@ -29,3 +29,7 @@ release tags have been assigned.
 - Sprint 12 UI Polish: centered the thermostat controls, compacted the climate
   card, and reduced general card whitespace while retaining 44-pixel touch
   targets and Safari iOS 9 compatibility.
+- Sprint 13 Multi-Dashboard Foundation: added static named dashboard profiles,
+  stable `/d/:dashboardId` URLs, dashboard-specific read APIs, a public
+  dashboard list, and backward-compatible default-dashboard routes without
+  changing write allowlists.

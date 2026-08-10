@@ -18,10 +18,6 @@ const projectPackage =
     require("../../package.json");
 
 
-const DASHBOARD_ENTITIES =
-    dashboardConfig.getVisibleEntityIds();
-
-
 /*
  * Nur diese Climate-Entitäten dürfen über
  * das Gateway gesteuert werden.
@@ -100,11 +96,14 @@ function allowWrite(res, key) {
 }
 
 
-function addDashboardMeta(entities) {
+function addDashboardMeta(
+    entities,
+    dashboardEntities
+) {
 
     const failedEntities =
 
-        DASHBOARD_ENTITIES.filter(
+        dashboardEntities.filter(
 
             function (entityId) {
 
@@ -124,7 +123,7 @@ function addDashboardMeta(entities) {
 
     if (
         failedEntities.length ===
-        DASHBOARD_ENTITIES.length
+        dashboardEntities.length
     ) {
 
         status = "offline";
@@ -144,6 +143,51 @@ function addDashboardMeta(entities) {
 
 
     return entities;
+
+}
+
+
+async function sendDashboardState(
+    res,
+    dashboardId
+) {
+
+    const dashboardEntities =
+        dashboardConfig.getVisibleEntityIds(
+            dashboardId
+        );
+
+
+    try {
+
+        const entities =
+            await ha.getEntities(
+                dashboardEntities
+            );
+
+        return res.json(
+            addDashboardMeta(
+                entities,
+                dashboardEntities
+            )
+        );
+
+    } catch (error) {
+
+        logger.error(
+            "dashboard_load_failed",
+            {
+                dashboard_id: dashboardId,
+                error: error.message
+            }
+        );
+
+        return res.status(502).json({
+            error:
+                "Home Assistant ist nicht erreichbar"
+        });
+
+    }
 
 }
 
@@ -365,19 +409,62 @@ router.get(
 
 router.get(
 
-    "/dashboard/config",
+    "/dashboards",
 
     function (req, res) {
 
         res.json({
-
-            widgets:
-                dashboardConfig.getPublicWidgets(),
-
-            refresh_interval_ms:
-                dashboardConfig.getRefreshIntervalMs()
-
+            default_dashboard:
+                dashboardConfig
+                    .getDefaultDashboard()
+                    .id,
+            dashboards:
+                dashboardConfig
+                    .getPublicDashboards()
         });
+
+    }
+
+);
+
+
+router.get(
+
+    "/dashboards/:dashboardId/config",
+
+    function (req, res) {
+
+        const configuration =
+            dashboardConfig
+                .getPublicDashboardConfig(
+                    req.params.dashboardId
+                );
+
+
+        if (!configuration) {
+            return res.status(404).json({
+                error: "dashboard_not_found"
+            });
+        }
+
+
+        return res.json(configuration);
+
+    }
+
+);
+
+
+router.get(
+
+    "/dashboard/config",
+
+    function (req, res) {
+
+        res.json(
+            dashboardConfig
+                .getPublicDashboardConfig()
+        );
 
     }
 
@@ -390,40 +477,46 @@ router.get(
 
 router.get(
 
+    "/dashboards/:dashboardId/state",
+
+    async function (req, res) {
+
+        const dashboardId =
+            req.params.dashboardId;
+
+
+        if (
+            !dashboardConfig
+                .getDashboardById(dashboardId)
+        ) {
+            return res.status(404).json({
+                error: "dashboard_not_found"
+            });
+        }
+
+
+        return sendDashboardState(
+            res,
+            dashboardId
+        );
+
+    }
+
+);
+
+
+router.get(
+
     "/dashboard",
 
     async function (req, res) {
 
-        try {
-
-            const entities =
-                await ha.getEntities(
-
-                    DASHBOARD_ENTITIES
-
-                );
-
-            res.json(
-                addDashboardMeta(entities)
-            );
-
-        } catch (error) {
-
-            logger.error(
-                "dashboard_load_failed",
-                {
-                    error: error.message
-                }
-            );
-
-            res.status(502).json({
-
-                error:
-                    "Home Assistant ist nicht erreichbar"
-
-            });
-
-        }
+        return sendDashboardState(
+            res,
+            dashboardConfig
+                .getDefaultDashboard()
+                .id
+        );
 
     }
 

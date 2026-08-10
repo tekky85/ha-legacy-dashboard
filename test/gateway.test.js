@@ -179,6 +179,7 @@ test(
             serviceCalls: [],
             serviceError: false,
             serviceIssued: false,
+            stateRequests: [],
             targetTemperature: 20
         };
 
@@ -194,6 +195,7 @@ test(
             mock.serviceCalls = [];
             mock.serviceError = false;
             mock.serviceIssued = false;
+            mock.stateRequests = [];
             mock.targetTemperature = 20;
         }
 
@@ -320,6 +322,8 @@ test(
                             "/api/states/".length
                         )
                     );
+
+                    mock.stateRequests.push(entityId);
 
                     if (entityId === mock.hangEntity) {
                         return;
@@ -525,6 +529,10 @@ test(
                 index.text,
                 /apple-mobile-web-app-capable/
             );
+            assert.match(
+                index.text,
+                /src="\/js\/app\.js\?v=17"/
+            );
 
             const manifest = await request(
                 gatewayPort,
@@ -542,13 +550,140 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=16"
+                "/js/app.js?v=17"
             );
 
             assert.equal(applicationScript.status, 200);
             assert.equal(
                 applicationScript.headers["cache-control"],
                 "public, max-age=31536000, immutable"
+            );
+
+        });
+
+        await t.test("Dashboard-URLs liefern nur konfigurierte Dashboards", async function () {
+
+            const defaultPage = await request(
+                gatewayPort,
+                "GET",
+                "/d/default"
+            );
+
+            const roomPage = await request(
+                gatewayPort,
+                "GET",
+                "/d/esszimmer"
+            );
+
+            const unknownPage = await request(
+                gatewayPort,
+                "GET",
+                "/d/unbekannt"
+            );
+
+
+            assert.equal(defaultPage.status, 200);
+            assert.equal(roomPage.status, 200);
+            assert.match(roomPage.text, /id="dashboardTitle"/);
+            assert.equal(unknownPage.status, 404);
+            assert.doesNotMatch(
+                unknownPage.text,
+                /id="dashboardTitle"/
+            );
+
+        });
+
+        await t.test("Multi-Dashboard-APIs begrenzen Konfiguration und Zustände", async function () {
+
+            resetMock();
+
+            const list = await request(
+                gatewayPort,
+                "GET",
+                "/api/dashboards"
+            );
+
+            assert.equal(list.status, 200);
+            assert.equal(
+                list.json.default_dashboard,
+                "default"
+            );
+            assert.deepEqual(list.json.dashboards, [
+                {
+                    id: "default",
+                    title: "Übersicht"
+                },
+                {
+                    id: "esszimmer",
+                    title: "Esszimmer"
+                }
+            ]);
+
+            const roomConfig = await request(
+                gatewayPort,
+                "GET",
+                "/api/dashboards/esszimmer/config"
+            );
+
+            assert.equal(roomConfig.status, 200);
+            assert.equal(roomConfig.json.id, "esszimmer");
+            assert.equal(roomConfig.json.title, "Esszimmer");
+            assert.deepEqual(
+                roomConfig.json.widgets.map(function (widget) {
+                    return widget.entity;
+                }),
+                [LIGHT_ENTITY, CLIMATE_ENTITY]
+            );
+
+            mock.stateRequests = [];
+
+            const roomState = await request(
+                gatewayPort,
+                "GET",
+                "/api/dashboards/esszimmer/state"
+            );
+
+            assert.equal(roomState.status, 200);
+            assert.deepEqual(
+                mock.stateRequests.slice(0).sort(),
+                [CLIMATE_ENTITY, LIGHT_ENTITY].sort()
+            );
+            assert.equal(
+                new Set(mock.stateRequests).size,
+                mock.stateRequests.length
+            );
+            assert.ok(roomState.json[LIGHT_ENTITY]);
+            assert.ok(roomState.json[CLIMATE_ENTITY]);
+            assert.equal(roomState.json[TEMPERATURE_ENTITY], undefined);
+
+            const unknownConfig = await request(
+                gatewayPort,
+                "GET",
+                "/api/dashboards/unbekannt/config"
+            );
+
+            const unknownState = await request(
+                gatewayPort,
+                "GET",
+                "/api/dashboards/unbekannt/state"
+            );
+
+            assert.equal(unknownConfig.status, 404);
+            assert.deepEqual(unknownConfig.json, {
+                error: "dashboard_not_found"
+            });
+            assert.equal(unknownState.status, 404);
+            assert.deepEqual(unknownState.json, {
+                error: "dashboard_not_found"
+            });
+
+            assert.equal(
+                JSON.stringify(list.json).indexOf(TEST_TOKEN),
+                -1
+            );
+            assert.equal(
+                JSON.stringify(roomConfig.json).indexOf(TEST_TOKEN),
+                -1
             );
 
         });

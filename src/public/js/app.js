@@ -47,6 +47,47 @@ var lastSuccessfulRefreshText =
     "";
 
 
+function getDashboardIdFromPath(pathname) {
+
+    var match =
+        /^\/d\/([a-z0-9][a-z0-9-]{0,62})\/?$/.exec(
+            pathname || ""
+        );
+
+    return match
+        ? match[1]
+        : null;
+
+}
+
+
+var dashboardId =
+    getDashboardIdFromPath(
+        window.location &&
+        window.location.pathname
+    );
+
+var dashboardConfigurationUrl =
+
+    dashboardId
+
+        ? "/api/dashboards/" +
+            encodeURIComponent(dashboardId) +
+            "/config"
+
+        : "/api/dashboard/config";
+
+var dashboardStateUrl =
+
+    dashboardId
+
+        ? "/api/dashboards/" +
+            encodeURIComponent(dashboardId) +
+            "/state"
+
+        : "/api/dashboard";
+
+
 /* =========================================================
    HELPERS
    ========================================================= */
@@ -1725,7 +1766,7 @@ function loadDashboardConfiguration() {
 
     Legacy.http.get(
 
-        "/api/dashboard/config",
+        dashboardConfigurationUrl,
 
         function (data) {
 
@@ -1740,9 +1781,40 @@ function loadDashboardConfiguration() {
 
                 );
 
+            var dashboardTitle =
+
+                data &&
+                typeof data.title === "string" &&
+                data.title
+
+                    ? data.title
+
+                    : "HA Dashboard";
+
+            var dashboardTitleElement =
+
+                Legacy.dom.byId(
+                    "dashboardTitle"
+                );
+
 
             dashboardConfigurationLoading =
                 false;
+
+
+            if (dashboardTitleElement) {
+
+                dashboardTitleElement.innerHTML =
+                    Legacy.html.escape(
+                        dashboardTitle
+                    );
+
+            }
+
+
+            document.title =
+                dashboardTitle +
+                " – HA Dashboard";
 
 
             if (
@@ -1905,7 +1977,7 @@ function loadDashboard() {
 
     Legacy.http.get(
 
-        "/api/dashboard",
+        dashboardStateUrl,
 
         function (data) {
 
