@@ -422,6 +422,11 @@ test(
                         HA_URL:
                             "http://127.0.0.1:" +
                             mockPort,
+                        DASHBOARD_CONFIG_PATH:
+                            path.join(
+                                temporaryDirectory,
+                                "dashboards.json"
+                            ),
                         NODE_ENV: "test",
                         PORT: String(gatewayPort)
                     }),

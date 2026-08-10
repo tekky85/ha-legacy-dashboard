@@ -52,8 +52,9 @@ browser.
 - binary sensor card
 - allowlisted Esszimmer light card
 - responsive optimistic light on/off control
-- multiple static server-side dashboard profiles
+- multiple persistent server-side dashboard profiles
 - stable dashboard URLs with a backward-compatible default dashboard
+- protected, opt-in Admin API without a graphical Admin UI
 - Home Assistant reachability status
 - stale-data indicator with last successful refresh
 - wall-display clock and German date
@@ -126,6 +127,12 @@ HA_URL=http://home-assistant-address:8123
 HA_TOKEN=your-long-lived-access-token
 # Optional: 3000 to 300000 milliseconds, default 5000
 DASHBOARD_REFRESH_INTERVAL_MS=5000
+# Optional: defaults to data/dashboards.json
+DASHBOARD_CONFIG_PATH=/home/dashboard/ha-legacy-dashboard/data/dashboards.json
+# Admin API remains disabled unless explicitly enabled
+ADMIN_API_ENABLED=false
+# Required only when ADMIN_API_ENABLED=true; never reuse HA_TOKEN
+# ADMIN_TOKEN=use-a-separate-random-secret
 ```
 
 Never commit `.env`.
@@ -242,6 +249,9 @@ GET /api/dashboards/:dashboardId/state
 Unknown dashboard IDs return HTTP 404 and are never redirected to the default
 dashboard.
 
+The optional Admin API is documented below. It is disabled by default and is
+not used by the legacy dashboard frontend.
+
 Set climate target temperature:
 
 ```text
@@ -276,21 +286,27 @@ Writable entities must be explicitly allowlisted in the backend.
 
 ## Dashboard configuration
 
-Dashboards and their visible widgets are defined statically in:
+The active configuration is stored by default in:
 
 ```text
-src/config/dashboard.js
+data/dashboards.json
 ```
 
-The configuration declares one `defaultDashboardId` and a list of dashboard
-profiles. Every profile has a stable lowercase ID, a display title, a refresh
-interval, and its own widget list. The current profiles are:
+The path can be overridden with `DASHBOARD_CONFIG_PATH`. On the first start,
+the application validates and migrates the built-in Sprint 13 profiles from
+`src/config/dashboard.js`. Runtime files under `data/` are ignored by Git.
+
+The version 1 schema declares `schemaVersion`, one `defaultDashboardId`, and a
+list of dashboard profiles. Every profile has a stable lowercase ID, a display
+title, a refresh interval, and its own widget list. Every widget also has a
+stable globally unique `id`. The migrated profiles are:
 
 - `default` – the complete existing dashboard and the target of `/`
 - `esszimmer` – the existing Esszimmer light and climate widgets
 
 Each widget entry defines:
 
+- `id`
 - `entity`
 - `type`
 - `title`
@@ -310,9 +326,11 @@ Dashboard visibility controls only which entities are displayed and read.
 It never grants write access. Climate and light writes remain protected by
 separate explicit backend allowlists.
 
-There is deliberately no admin UI and no runtime persistence for dashboard
-configuration yet. Changes are versioned source-code changes to
-`src/config/dashboard.js`.
+Every complete configuration is validated before it can replace the active
+configuration. Writes use a temporary file in the same directory followed by
+an atomic rename. The previous valid version is retained as
+`dashboards.json.bak`. Invalid JSON, an unsupported schema, validation errors,
+or write failures do not replace the last valid configuration.
 
 Set `visible` to `false` to remove a widget from both the browser
 configuration and the dashboard state query. Supported frontend widget types
@@ -321,6 +339,46 @@ are explicitly limited to `sensor`, `binary`, `light`, and `climate`.
 This configuration controls display and read access only. Adding an entity
 here does not make it writable. Climate and light write permissions remain in
 the separate allowlists in `src/routes/api.js`.
+
+## Admin API
+
+There is no graphical Admin UI in Sprint 14. The backend API is disabled by
+default. To enable it, set both values in the server-only `.env`:
+
+```ini
+ADMIN_API_ENABLED=true
+ADMIN_TOKEN=use-a-separate-random-secret
+```
+
+`ADMIN_TOKEN` must be distinct from `HA_TOKEN`. Every Admin request requires:
+
+```text
+Authorization: Bearer <ADMIN_TOKEN>
+```
+
+Available routes:
+
+```text
+GET    /api/admin/config
+PUT    /api/admin/config
+GET    /api/admin/dashboards
+POST   /api/admin/dashboards
+PUT    /api/admin/dashboards/:id
+DELETE /api/admin/dashboards/:id
+POST   /api/admin/dashboards/:id/widgets
+PUT    /api/admin/dashboards/:id/widgets/:widgetId
+DELETE /api/admin/dashboards/:id/widgets/:widgetId
+GET    /api/admin/entities
+```
+
+Admin writes are rate-limited. The entity inventory contains only entity ID,
+domain, friendly name, device class, and unit of measurement. Tokens, raw
+states, arbitrary attributes, internal paths, services, and write allowlists
+are not returned.
+
+Enabling the API still does not grant Home Assistant write permissions.
+Climate and Light remain controlled exclusively by their hard-coded backend
+allowlists.
 
 ## Security model
 
@@ -332,6 +390,8 @@ the separate allowlists in `src/routes/api.js`.
 - `.env` is excluded from Git.
 - JSON request bodies are limited to 16 KB.
 - Allowed HA writes are limited to 10 calls per entity in 10 seconds.
+- Admin writes are Bearer-authenticated and rate-limited when explicitly
+  enabled.
 - API responses are not cached.
 - CSP, frame, referrer, and MIME-sniffing protection headers are sent.
 
@@ -352,6 +412,8 @@ authorization headers, and Home Assistant tokens are never logged.
 ha-legacy-dashboard/
 ├── AGENTS.md
 ├── README.md
+├── data/
+│   └── dashboards.json (runtime, ignored by Git)
 ├── deploy/
 │   └── systemd/
 ├── docs/
@@ -361,7 +423,11 @@ ha-legacy-dashboard/
     │   └── dashboard.js
     ├── server.js
     ├── routes/
+    │   ├── admin.js
+    │   └── api.js
     ├── services/
+    │   ├── dashboard-config-store.js
+    │   └── homeassistant.js
     └── public/
 ```
 

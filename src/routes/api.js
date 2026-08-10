@@ -2,6 +2,9 @@ const express = require("express");
 
 const router = express.Router();
 
+const adminRoutes =
+    require("./admin");
+
 const ha =
     require("../services/homeassistant");
 
@@ -40,6 +43,9 @@ const ALLOWED_LIGHT_ENTITIES = [
     "light.esszimmer_lampen"
 
 ];
+
+
+router.use("/admin", adminRoutes);
 
 
 function allowWrite(res, key) {

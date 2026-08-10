@@ -1,12 +1,26 @@
 /*
- * Static dashboard configuration.
+ * Versioned dashboard configuration.
  *
- * Dashboards control only display and read access. Writable entities remain
- * separately allowlisted in src/routes/api.js.
+ * Dashboard visibility controls display and read access only. Writable
+ * entities remain separately allowlisted in src/routes/api.js.
  */
+
+const path = require("path");
+
+const DashboardConfigStore =
+    require("../services/dashboard-config-store");
+
+
+const SCHEMA_VERSION = 1;
 
 const DASHBOARD_ID_PATTERN =
     /^[a-z0-9][a-z0-9-]{0,62}$/;
+
+const WIDGET_ID_PATTERN =
+    /^[a-z0-9][a-z0-9-]{0,62}$/;
+
+const ENTITY_ID_PATTERN =
+    /^[a-z0-9_]+\.[a-z0-9_]+$/;
 
 const SUPPORTED_WIDGET_TYPES = [
     "sensor",
@@ -20,80 +34,8 @@ const MINIMUM_REFRESH_INTERVAL_MS = 3000;
 const MAXIMUM_REFRESH_INTERVAL_MS = 300000;
 
 
-const TEMPERATURE_WIDGET = {
-    entity: "sensor.badezimmer_smart_indoor_module_temperatur",
-    type: "sensor",
-    title: "Badezimmer",
-    subtitle: "Temperatur",
-    icon: "temperature",
-    iconClass: "temperature",
-    unit: "",
-    order: 10,
-    visible: true
-};
-
-const HUMIDITY_WIDGET = {
-    entity: "sensor.badezimmer_smart_indoor_module_luftfeuchtigkeit",
-    type: "sensor",
-    title: "Badezimmer",
-    subtitle: "Luftfeuchtigkeit",
-    icon: "humidity",
-    iconClass: "humidity",
-    unit: "",
-    order: 20,
-    visible: true
-};
-
-const RIGHT_WINDOW_WIDGET = {
-    entity: "binary_sensor.kuche_fenster_rechts",
-    type: "binary",
-    title: "Küche",
-    subtitle: "Fenster rechts",
-    icon: "window",
-    iconClass: "window",
-    unit: "",
-    order: 30,
-    visible: true
-};
-
-const MIDDLE_WINDOW_WIDGET = {
-    entity: "binary_sensor.kuche_fenster_mitte",
-    type: "binary",
-    title: "Küche",
-    subtitle: "Fenster Mitte",
-    icon: "window",
-    iconClass: "window",
-    unit: "",
-    order: 35,
-    visible: false
-};
-
-const LIGHT_WIDGET = {
-    entity: "light.esszimmer_lampen",
-    type: "light",
-    title: "Esszimmer",
-    subtitle: "Licht",
-    icon: "light",
-    iconClass: "light",
-    unit: "",
-    order: 40,
-    visible: true
-};
-
-const CLIMATE_WIDGET = {
-    entity: "climate.esszimmer_thermostate",
-    type: "climate",
-    title: "Esszimmer",
-    subtitle: "Thermostate",
-    icon: "heating",
-    iconClass: "heating",
-    unit: "°C",
-    order: 50,
-    visible: true
-};
-
-
-const CONFIGURATION = {
+const DEFAULT_CONFIGURATION = {
+    schemaVersion: SCHEMA_VERSION,
     defaultDashboardId: "default",
     dashboards: [
         {
@@ -101,12 +43,78 @@ const CONFIGURATION = {
             title: "Übersicht",
             refreshIntervalMs: DEFAULT_REFRESH_INTERVAL_MS,
             widgets: [
-                TEMPERATURE_WIDGET,
-                HUMIDITY_WIDGET,
-                RIGHT_WINDOW_WIDGET,
-                MIDDLE_WINDOW_WIDGET,
-                LIGHT_WIDGET,
-                CLIMATE_WIDGET
+                {
+                    id: "default-bathroom-temperature",
+                    entity: "sensor.badezimmer_smart_indoor_module_temperatur",
+                    type: "sensor",
+                    title: "Badezimmer",
+                    subtitle: "Temperatur",
+                    icon: "temperature",
+                    iconClass: "temperature",
+                    unit: "",
+                    order: 10,
+                    visible: true
+                },
+                {
+                    id: "default-bathroom-humidity",
+                    entity: "sensor.badezimmer_smart_indoor_module_luftfeuchtigkeit",
+                    type: "sensor",
+                    title: "Badezimmer",
+                    subtitle: "Luftfeuchtigkeit",
+                    icon: "humidity",
+                    iconClass: "humidity",
+                    unit: "",
+                    order: 20,
+                    visible: true
+                },
+                {
+                    id: "default-kitchen-window-right",
+                    entity: "binary_sensor.kuche_fenster_rechts",
+                    type: "binary",
+                    title: "Küche",
+                    subtitle: "Fenster rechts",
+                    icon: "window",
+                    iconClass: "window",
+                    unit: "",
+                    order: 30,
+                    visible: true
+                },
+                {
+                    id: "default-kitchen-window-center",
+                    entity: "binary_sensor.kuche_fenster_mitte",
+                    type: "binary",
+                    title: "Küche",
+                    subtitle: "Fenster Mitte",
+                    icon: "window",
+                    iconClass: "window",
+                    unit: "",
+                    order: 35,
+                    visible: false
+                },
+                {
+                    id: "default-dining-light",
+                    entity: "light.esszimmer_lampen",
+                    type: "light",
+                    title: "Esszimmer",
+                    subtitle: "Licht",
+                    icon: "light",
+                    iconClass: "light",
+                    unit: "",
+                    order: 40,
+                    visible: true
+                },
+                {
+                    id: "default-dining-climate",
+                    entity: "climate.esszimmer_thermostate",
+                    type: "climate",
+                    title: "Esszimmer",
+                    subtitle: "Thermostate",
+                    icon: "heating",
+                    iconClass: "heating",
+                    unit: "°C",
+                    order: 50,
+                    visible: true
+                }
             ]
         },
         {
@@ -114,24 +122,67 @@ const CONFIGURATION = {
             title: "Esszimmer",
             refreshIntervalMs: DEFAULT_REFRESH_INTERVAL_MS,
             widgets: [
-                LIGHT_WIDGET,
-                CLIMATE_WIDGET
+                {
+                    id: "dining-room-light",
+                    entity: "light.esszimmer_lampen",
+                    type: "light",
+                    title: "Esszimmer",
+                    subtitle: "Licht",
+                    icon: "light",
+                    iconClass: "light",
+                    unit: "",
+                    order: 40,
+                    visible: true
+                },
+                {
+                    id: "dining-room-climate",
+                    entity: "climate.esszimmer_thermostate",
+                    type: "climate",
+                    title: "Esszimmer",
+                    subtitle: "Thermostate",
+                    icon: "heating",
+                    iconClass: "heating",
+                    unit: "°C",
+                    order: 50,
+                    visible: true
+                }
             ]
         }
     ]
 };
 
 
-function validateConfiguration(configuration) {
+let configuration = null;
+let configurationStore = null;
+
+
+function validateText(value, fieldName) {
+
+    if (
+        typeof value !== "string" ||
+        value.trim() === ""
+    ) {
+        throw new Error(fieldName + " fehlt");
+    }
+
+}
+
+
+function validateConfiguration(candidate) {
 
     const dashboards =
-        configuration && configuration.dashboards;
-
-    const defaultDashboardId =
-        configuration && configuration.defaultDashboardId;
+        candidate && candidate.dashboards;
 
     const dashboardIds = Object.create(null);
+    const widgetIds = Object.create(null);
 
+
+    if (
+        !candidate ||
+        candidate.schemaVersion !== SCHEMA_VERSION
+    ) {
+        throw new Error("Schema-Version wird nicht unterstützt");
+    }
 
     if (!Array.isArray(dashboards) || dashboards.length === 0) {
         throw new Error("Mindestens ein Dashboard ist erforderlich");
@@ -157,13 +208,19 @@ function validateConfiguration(configuration) {
 
         dashboardIds[dashboard.id] = true;
 
+        validateText(
+            dashboard.title,
+            "Dashboard-Titel"
+        );
 
         if (
-            typeof dashboard.title !== "string" ||
-            dashboard.title.trim() === ""
+            typeof dashboard.refreshIntervalMs !== "number" ||
+            !Number.isFinite(dashboard.refreshIntervalMs) ||
+            dashboard.refreshIntervalMs < MINIMUM_REFRESH_INTERVAL_MS ||
+            dashboard.refreshIntervalMs > MAXIMUM_REFRESH_INTERVAL_MS
         ) {
             throw new Error(
-                "Dashboard-Titel fehlt: " +
+                "Dashboard-Refresh-Intervall ist ungültig: " +
                 dashboard.id
             );
         }
@@ -180,12 +237,28 @@ function validateConfiguration(configuration) {
 
             if (
                 !widget ||
+                typeof widget.id !== "string" ||
+                !WIDGET_ID_PATTERN.test(widget.id)
+            ) {
+                throw new Error("Widget-ID ist ungültig");
+            }
+
+            if (widgetIds[widget.id]) {
+                throw new Error(
+                    "Widget-ID ist nicht eindeutig: " +
+                    widget.id
+                );
+            }
+
+            widgetIds[widget.id] = true;
+
+            if (
                 typeof widget.entity !== "string" ||
-                widget.entity.trim() === ""
+                !ENTITY_ID_PATTERN.test(widget.entity)
             ) {
                 throw new Error(
-                    "Widget-Entity fehlt: " +
-                    dashboard.id
+                    "Widget-Entity ist ungültig: " +
+                    widget.id
                 );
             }
 
@@ -195,24 +268,40 @@ function validateConfiguration(configuration) {
             ) {
                 throw new Error(
                     "Widget-Typ ist ungültig: " +
-                    dashboard.id
+                    widget.id
                 );
             }
 
-            if (!Number.isFinite(Number(widget.order))) {
-                throw new Error(
-                    "Widget-Reihenfolge ist ungültig: " +
-                    dashboard.id
-                );
-            }
+            validateText(widget.title, "Widget-Titel");
+
+            [
+                "subtitle",
+                "icon",
+                "iconClass",
+                "unit"
+            ].forEach(function (fieldName) {
+                if (typeof widget[fieldName] !== "string") {
+                    throw new Error(
+                        "Widget-Feld ist ungültig: " +
+                        fieldName
+                    );
+                }
+            });
 
             if (
-                typeof widget.visible !== "undefined" &&
-                typeof widget.visible !== "boolean"
+                typeof widget.order !== "number" ||
+                !Number.isFinite(widget.order)
             ) {
                 throw new Error(
+                    "Widget-Reihenfolge ist ungültig: " +
+                    widget.id
+                );
+            }
+
+            if (typeof widget.visible !== "boolean") {
+                throw new Error(
                     "Widget-Sichtbarkeit ist ungültig: " +
-                    dashboard.id
+                    widget.id
                 );
             }
 
@@ -222,8 +311,8 @@ function validateConfiguration(configuration) {
 
 
     if (
-        typeof defaultDashboardId !== "string" ||
-        !dashboardIds[defaultDashboardId]
+        typeof candidate.defaultDashboardId !== "string" ||
+        !dashboardIds[candidate.defaultDashboardId]
     ) {
         throw new Error("Standard-Dashboard ist ungültig");
     }
@@ -237,6 +326,7 @@ function validateConfiguration(configuration) {
 function cloneWidget(widget) {
 
     return {
+        id: widget.id,
         entity: widget.entity,
         type: widget.type,
         title: widget.title,
@@ -245,40 +335,8 @@ function cloneWidget(widget) {
         iconClass: widget.iconClass,
         unit: widget.unit,
         order: widget.order,
-        visible: widget.visible !== false
+        visible: widget.visible
     };
-
-}
-
-
-function findDashboard(dashboardId) {
-
-    let index;
-
-
-    for (index = 0; index < CONFIGURATION.dashboards.length; index++) {
-
-        if (CONFIGURATION.dashboards[index].id === dashboardId) {
-            return CONFIGURATION.dashboards[index];
-        }
-
-    }
-
-
-    return null;
-
-}
-
-
-function resolveDashboard(dashboardId) {
-
-    if (typeof dashboardId === "undefined") {
-        return findDashboard(
-            CONFIGURATION.defaultDashboardId
-        );
-    }
-
-    return findDashboard(dashboardId);
 
 }
 
@@ -299,23 +357,161 @@ function cloneDashboard(dashboard) {
 }
 
 
+function cloneConfiguration(candidate) {
+
+    return {
+        schemaVersion: candidate.schemaVersion,
+        defaultDashboardId: candidate.defaultDashboardId,
+        dashboards: candidate.dashboards.map(cloneDashboard)
+    };
+
+}
+
+
+function getDefaultConfigPath() {
+
+    return path.join(
+        __dirname,
+        "..",
+        "..",
+        "data",
+        "dashboards.json"
+    );
+
+}
+
+
+function initialize(options) {
+
+    const configPath = path.resolve(
+        options && options.configPath
+            ? options.configPath
+            : process.env.DASHBOARD_CONFIG_PATH ||
+                getDefaultConfigPath()
+    );
+
+
+    configurationStore =
+        new DashboardConfigStore({
+            configPath: configPath,
+            defaultConfiguration:
+                DEFAULT_CONFIGURATION,
+            validate: validateConfiguration,
+            clone: cloneConfiguration
+        });
+
+    const result =
+        configurationStore.load();
+
+    configuration =
+        cloneConfiguration(
+            result.configuration
+        );
+
+    return {
+        migrated: result.migrated,
+        recovered: result.recovered
+    };
+
+}
+
+
+function ensureConfiguration() {
+
+    if (!configuration) {
+        configuration =
+            cloneConfiguration(
+                DEFAULT_CONFIGURATION
+            );
+    }
+
+    return configuration;
+
+}
+
+
+function replaceConfiguration(candidate) {
+
+    validateConfiguration(candidate);
+
+    if (!configurationStore) {
+        throw new Error(
+            "Dashboard-Persistenz ist nicht initialisiert"
+        );
+    }
+
+    const persisted =
+        configurationStore.save(candidate);
+
+    configuration =
+        cloneConfiguration(persisted);
+
+    return getConfiguration();
+
+}
+
+
+function getConfiguration() {
+
+    return cloneConfiguration(
+        ensureConfiguration()
+    );
+
+}
+
+
+function findDashboard(dashboardId) {
+
+    const dashboards =
+        ensureConfiguration().dashboards;
+
+    let index;
+
+
+    for (index = 0; index < dashboards.length; index++) {
+        if (dashboards[index].id === dashboardId) {
+            return dashboards[index];
+        }
+    }
+
+    return null;
+
+}
+
+
+function resolveDashboard(dashboardId) {
+
+    if (typeof dashboardId === "undefined") {
+        return findDashboard(
+            ensureConfiguration()
+                .defaultDashboardId
+        );
+    }
+
+    return findDashboard(dashboardId);
+
+}
+
+
 function getDashboards() {
 
-    return CONFIGURATION.dashboards.map(cloneDashboard);
+    return ensureConfiguration()
+        .dashboards
+        .map(cloneDashboard);
 
 }
 
 
 function getPublicDashboards() {
 
-    return CONFIGURATION.dashboards.map(function (dashboard) {
-
-        return {
-            id: dashboard.id,
-            title: dashboard.title
-        };
-
-    });
+    return ensureConfiguration()
+        .dashboards
+        .map(function (dashboard) {
+            return {
+                id: dashboard.id,
+                title: dashboard.title
+            };
+        });
 
 }
 
@@ -324,7 +520,8 @@ function getDefaultDashboard() {
 
     return cloneDashboard(
         findDashboard(
-            CONFIGURATION.defaultDashboardId
+            ensureConfiguration()
+                .defaultDashboardId
         )
     );
 
@@ -350,17 +547,13 @@ function getVisibleWidgets(dashboardId) {
         return [];
     }
 
-
     return dashboard.widgets
-
         .filter(function (widget) {
-            return widget.visible !== false;
+            return widget.visible;
         })
-
         .map(cloneWidget)
-
         .sort(function (first, second) {
-            return Number(first.order) - Number(second.order);
+            return first.order - second.order;
         });
 
 }
@@ -372,15 +565,11 @@ function getVisibleEntityIds(dashboardId) {
 
 
     getVisibleWidgets(dashboardId)
-
         .forEach(function (widget) {
-
             if (entityIds.indexOf(widget.entity) === -1) {
                 entityIds.push(widget.entity);
             }
-
         });
-
 
     return entityIds;
 
@@ -392,10 +581,9 @@ function getRefreshIntervalMs(dashboardId) {
     const dashboard =
         resolveDashboard(dashboardId);
 
-    const configured =
-        Number(
-            process.env.DASHBOARD_REFRESH_INTERVAL_MS
-        );
+    const configured = Number(
+        process.env.DASHBOARD_REFRESH_INTERVAL_MS
+    );
 
 
     if (!dashboard) {
@@ -439,20 +627,31 @@ function getPublicDashboardConfig(dashboardId) {
 
 function getPublicWidgets(dashboardId) {
 
-    const configuration =
+    const publicConfiguration =
         getPublicDashboardConfig(dashboardId);
 
-    return configuration
-        ? configuration.widgets
+    return publicConfiguration
+        ? publicConfiguration.widgets
         : [];
 
 }
 
 
-validateConfiguration(CONFIGURATION);
+validateConfiguration(DEFAULT_CONFIGURATION);
 
 
 module.exports = {
+    SCHEMA_VERSION: SCHEMA_VERSION,
+    DASHBOARD_ID_PATTERN: DASHBOARD_ID_PATTERN,
+    WIDGET_ID_PATTERN: WIDGET_ID_PATTERN,
+    ENTITY_ID_PATTERN: ENTITY_ID_PATTERN,
+    SUPPORTED_WIDGET_TYPES:
+        SUPPORTED_WIDGET_TYPES.slice(0),
+    DEFAULT_CONFIGURATION:
+        cloneConfiguration(DEFAULT_CONFIGURATION),
+    initialize: initialize,
+    replaceConfiguration: replaceConfiguration,
+    getConfiguration: getConfiguration,
     getDashboards: getDashboards,
     getPublicDashboards: getPublicDashboards,
     getDefaultDashboard: getDefaultDashboard,
@@ -462,5 +661,6 @@ module.exports = {
     getPublicWidgets: getPublicWidgets,
     getVisibleEntityIds: getVisibleEntityIds,
     getRefreshIntervalMs: getRefreshIntervalMs,
-    validateConfiguration: validateConfiguration
+    validateConfiguration: validateConfiguration,
+    cloneConfiguration: cloneConfiguration
 };

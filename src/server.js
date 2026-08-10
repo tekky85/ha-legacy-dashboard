@@ -2,9 +2,43 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
-const apiRoutes = require("./routes/api");
 const dashboardConfig = require("./config/dashboard");
 const logger = require("./services/logger");
+
+
+try {
+    const initialization =
+        dashboardConfig.initialize();
+
+    if (initialization.migrated) {
+        logger.info(
+            "dashboard_config_migrated",
+            {
+                schema_version:
+                    dashboardConfig.SCHEMA_VERSION
+            }
+        );
+    } else if (initialization.recovered) {
+        logger.warn(
+            "dashboard_config_recovered",
+            {
+                schema_version:
+                    dashboardConfig.SCHEMA_VERSION
+            }
+        );
+    }
+} catch (error) {
+    logger.error(
+        "dashboard_config_initialization_failed",
+        {
+            error_type: error.name
+        }
+    );
+    process.exit(1);
+}
+
+
+const apiRoutes = require("./routes/api");
 const app = express();
 
 const PORT = process.env.PORT || 3000;

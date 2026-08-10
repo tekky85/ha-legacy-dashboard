@@ -33,3 +33,6 @@ release tags have been assigned.
   stable `/d/:dashboardId` URLs, dashboard-specific read APIs, a public
   dashboard list, and backward-compatible default-dashboard routes without
   changing write allowlists.
+- Sprint 14 Persistent Configuration: added schema-versioned atomic JSON
+  persistence with stable widget IDs and one valid backup, plus an opt-in
+  Bearer-protected Admin API and sanitized Home Assistant entity inventory.

@@ -46,6 +46,13 @@ git merge --ff-only origin/main
 DEPLOYED_REVISION=$(git rev-parse HEAD)
 
 
+mkdir -p data
+chmod 700 data
+
+DASHBOARD_CONFIG_PATH="$PROJECT_DIR/data/dashboards.json" \
+    node -e 'require("./src/config/dashboard").initialize()'
+
+
 if ! git diff --quiet \
     "$PREVIOUS_REVISION" \
     "$DEPLOYED_REVISION" \

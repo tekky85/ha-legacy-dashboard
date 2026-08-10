@@ -207,44 +207,37 @@ test("ungültige Dashboard-IDs und Duplikate werden abgelehnt", function () {
         )
     );
 
-    const widget = {
-        entity: "sensor.test",
-        type: "sensor",
-        title: "Test",
-        order: 10,
-        visible: true
-    };
+    const invalidIdConfiguration =
+        dashboardConfig.cloneConfiguration(
+            dashboardConfig.DEFAULT_CONFIGURATION
+        );
+
+    invalidIdConfiguration
+        .dashboards[0]
+        .id = "Wohnzimmer";
+
+    invalidIdConfiguration.defaultDashboardId =
+        "Wohnzimmer";
 
 
     assert.throws(function () {
-        dashboardConfig.validateConfiguration({
-            defaultDashboardId: "Wohnzimmer",
-            dashboards: [
-                {
-                    id: "Wohnzimmer",
-                    title: "Wohnzimmer",
-                    widgets: [widget]
-                }
-            ]
-        });
+        dashboardConfig.validateConfiguration(
+            invalidIdConfiguration
+        );
     }, /Dashboard-ID ist ungültig/);
 
+    const duplicateConfiguration =
+        dashboardConfig.cloneConfiguration(
+            dashboardConfig.DEFAULT_CONFIGURATION
+        );
+
+    duplicateConfiguration.dashboards[1].id =
+        duplicateConfiguration.dashboards[0].id;
+
     assert.throws(function () {
-        dashboardConfig.validateConfiguration({
-            defaultDashboardId: "gleich",
-            dashboards: [
-                {
-                    id: "gleich",
-                    title: "Eins",
-                    widgets: [widget]
-                },
-                {
-                    id: "gleich",
-                    title: "Zwei",
-                    widgets: [widget]
-                }
-            ]
-        });
+        dashboardConfig.validateConfiguration(
+            duplicateConfiguration
+        );
     }, /nicht eindeutig/);
 
 });

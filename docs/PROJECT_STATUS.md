@@ -2,262 +2,265 @@
 
 Stand der Prüfung: 10. August 2026
 
-Dieser Bericht beschreibt den Arbeitsstand nach Umsetzung von Sprint 13. Er
+Dieser Bericht beschreibt den Arbeitsstand nach Umsetzung von Sprint 14. Er
 enthält keine Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine
 Tokens.
 
-## 1. Aktueller Branch und Commit
+## 1. Aktueller Branch und Ausgangscommit
 
 - Branch: `main`
-- Implementierungsbasis: `794d523`
-- Ausgangscommit: `docs: define sprint 13 multi-dashboard foundation`
-- Upstream: `origin/main`
-- Vor Sprint 13 waren lokales `HEAD` und `origin/main` synchron.
+- Ausgangscommit: `ac822d2 feat: add multi-dashboard foundation`
+- Upstream vor Beginn: `origin/main`
+- `HEAD`, `origin/main` und `origin/HEAD` waren vor Sprint 14 synchron.
 
 ## 2. Status des Arbeitsbaums
 
-Sprint 13 ist im Arbeitsbaum implementiert. Betroffen sind:
+Vor Sprint 14 waren bereits zwei Nutzerdokumente verändert:
 
-- Backend-Konfiguration und Routing
-- Frontend-Routing und Cache-Version
-- Konfigurations-, Frontend-, Gateway- und Standalone-Tests
-- README, Changelog, Roadmap und dieser Statusbericht
+- `docs/PROJECT_STATUS.md` enthielt einen älteren Pre-Sprint-12-Bericht.
+- `docs/sprints/SPRINT-14.md` lag als neue Sprintbeschreibung vor.
 
-Die vorgefundene lokale Änderung an dieser Datei beschrieb einen älteren
-Pre-Sprint-12-Stand. Sie wurde nicht blind übernommen, sondern mit dem
-tatsächlichen Sprint-12- und Sprint-13-Stand zusammengeführt.
+Beide Dateien wurden als Nutzerdaten behandelt. Die Sprintbeschreibung wurde
+erhalten und um ihren Status ergänzt. Der Projektstatus wurde mit dem
+tatsächlichen Sprint-13- und Sprint-14-Stand zusammengeführt.
 
 ## 3. Implementierte Funktionen
 
-### Backend und Sicherheit
+### Bestehende Anwendung
 
-- Express-Gateway zwischen Browser und Home Assistant
-- HA-Zugangsdaten ausschließlich im Backend
-- bereinigte Lese-APIs für statisch konfigurierte Dashboards
-- explizit getrennte Schreib-Allowlisten für Climate und Light
-- fest zugeordnete HA-Services
-- Validierung, Payload-Limit, Rate-Limit und Sicherheitsheader
-- strukturierte Logs mit Redaktion sensitiver Felder
-- kein generischer HA-Service-Endpunkt
-
-### Frontend
-
-- ES5-kompatibles JavaScript ohne Framework oder externe Abhängigkeiten
-- XHR-Kommunikation ausschließlich über `Legacy.http`
+- Express-Gateway und Home-Assistant-REST-Anbindung
+- iOS-9-/ES5-kompatibles Dashboard ohne Frontendframework
 - Sensor-, Binary-, Light- und Climate-Widgets
-- optimistische Climate- und Light-Bedienung
-- responsives Flexbox-Layout für Portrait und Landscape
-- Light-/Dark-Mode, Uhr, Datum und Verbindungsanzeige
-- iOS-9-Standalone-Metadaten und lokale Icons
-- mehrere Dashboard-URLs ohne clientseitiges Router-Framework
+- optimistische, explizit allowlisted Climate- und Light-Steuerung
+- zwei Dashboardprofile mit stabilen Direkt-URLs
+- Status-, Stale-Data-, Theme-, Uhr- und Standalone-Funktionen
 
-### Multi-Dashboard
+### Sprint 14
 
-- statische Dashboardprofile mit stabiler ID und Titel
-- Standard-Dashboard `default`
-- zweites Profil `esszimmer`
-- dashboard-spezifische öffentliche Konfiguration
-- dashboard-spezifische, deduplizierte Entity-Leselisten
-- kontrollierte 404-Antworten für unbekannte IDs
-- dynamischer Titel im sichtbaren Header und Dokumenttitel
-- bestehende Einzel-Dashboard-Routen bleiben kompatibel
+- Konfigurationsschema Version 1
+- stabile global eindeutige Widget-IDs
+- persistente JSON-Konfiguration
+- automatische Erst-Migration der Sprint-13-Profile
+- vollständige Validierung vor Speicherung
+- atomare Dateiersetzung und eine Vorgängerversion
+- Recovery aus gültigem Backup
+- geschützte, standardmäßig deaktivierte Admin-API
+- sanitisiertes HA-Entity-Inventar
+- Rate-Limit für Admin-Schreiboperationen
 
 ## 4. Implementierte Sprints
 
 | Sprint | Thema | Stand |
 |---|---|---|
 | 0–3 | Grundlage, Gateway, Legacy-UI und Widgets | umgesetzt |
-| 4 | Climate-Steuerung | umgesetzt und gegen veraltete States abgesichert |
+| 4 | Climate-Steuerung | umgesetzt |
 | 5 | iOS-9-Standalone-Web-App | umgesetzt |
-| 6 | Light-Steuerung | umgesetzt und explizit allowlisted |
-| 7 | Konfigurationsgetriebenes Dashboard | umgesetzt |
-| 8 | Robustheit und Sicherheit | umgesetzt |
-| 9 | Lokale Mock- und Integrationstests | umgesetzt |
-| 10 | Deployment und Betrieb | umgesetzt |
+| 6 | Light-Steuerung | umgesetzt |
+| 7–8 | Konfiguration, Robustheit und Sicherheit | umgesetzt |
+| 9–10 | Tests, Deployment und Betrieb | umgesetzt |
 | 11 | Wall-Display-Betrieb | umgesetzt |
 | 12 | UI-Polish und Release-Baseline 1.0.0 | umgesetzt |
 | 13 | Multi-Dashboard Foundation | umgesetzt |
+| 14 | Persistenz und Admin-API-Grundlage | umgesetzt |
 
-## 5. Aktueller Mechanismus zur Entity-Auswahl
+## 5. Entity-Auswahl und Schreibgrenzen
 
-Lesende Entity-Auswahl entsteht ausschließlich aus den sichtbaren Widgets des
-angeforderten Profils in `src/config/dashboard.js`. Die Entity-IDs werden
-vor der HA-Abfrage pro Dashboard dedupliziert.
+Die sichtbaren Widgets eines Dashboards bestimmen ausschließlich dessen
+deduplizierte HA-Leseliste.
 
-Das Standard-Dashboard liest:
+Schreibrechte bleiben separat in `src/routes/api.js` definiert:
 
-- `sensor.badezimmer_smart_indoor_module_temperatur`
-- `sensor.badezimmer_smart_indoor_module_luftfeuchtigkeit`
-- `binary_sensor.kuche_fenster_rechts`
-- `light.esszimmer_lampen`
-- `climate.esszimmer_thermostate`
+- Climate: ausschließlich `climate.esszimmer_thermostate`
+- Light: ausschließlich `light.esszimmer_lampen`
 
-`binary_sensor.kuche_fenster_mitte` bleibt konfiguriert, ist aber unsichtbar
-und wird deshalb nicht gelesen.
+Admin-API, persistierte Konfiguration und Entity-Inventar ändern diese
+Allowlisten nicht. Tests ergänzen nicht freigegebene Climate- und
+Light-Entities sichtbar zu einem Dashboard und bestätigen weiterhin HTTP 403
+auf den Schreibendpunkten.
 
-Das Dashboard `esszimmer` liest ausschließlich:
+## 6. Konfigurationsschema
 
-- `light.esszimmer_lampen`
-- `climate.esszimmer_thermostate`
+Das vollständige Schema verwendet:
 
-Schreibrechte werden nicht daraus abgeleitet. Climate und Light verwenden
-weiterhin die unveränderten, separaten Allowlists in `src/routes/api.js`.
+```json
+{
+  "schemaVersion": 1,
+  "defaultDashboardId": "default",
+  "dashboards": [
+    {
+      "id": "default",
+      "title": "Übersicht",
+      "refreshIntervalMs": 5000,
+      "widgets": [
+        {
+          "id": "default-bathroom-temperature",
+          "entity": "sensor.example",
+          "type": "sensor",
+          "title": "Titel",
+          "subtitle": "Untertitel",
+          "icon": "temperature",
+          "iconClass": "temperature",
+          "unit": "",
+          "order": 10,
+          "visible": true
+        }
+      ]
+    }
+  ]
+}
+```
 
-## 6. Aktueller Mechanismus der Dashboardkonfiguration
+Validiert werden Schema-Version, Standard-Dashboard, Dashboard- und Widget-IDs,
+globale Eindeutigkeit, bekannte Widgettypen, Entity-ID, Titel und
+Darstellungsfelder, numerische Reihenfolge, boolesche Sichtbarkeit sowie
+Refresh-Intervalle von 3000 bis 300000 Millisekunden.
 
-`src/config/dashboard.js` exportiert ein validiertes statisches Modell mit:
+## 7. Persistenz und Migration
 
-- `defaultDashboardId`
-- Dashboardliste mit `id`, `title`, `refreshIntervalMs` und `widgets`
-- Lookup-, Public-Config-, Sortier- und Entity-Listen-Helfern
-- Startvalidierung für IDs, Duplikate, Titel, Widgets, Typ, Reihenfolge,
-  Sichtbarkeit und Standard-Dashboard
+- Standardpfad: `data/dashboards.json`
+- optionaler Pfad: `DASHBOARD_CONFIG_PATH`
+- Erststart ohne Primärdatei und Backup: validierte Sprint-13-Profile werden
+  geschrieben.
+- Schreiben: temporäre Datei im selben Verzeichnis, `fsync`, atomarer Rename.
+- Vorherige gültige Primärdatei: `dashboards.json.bak`
+- Dateimodus: `0600`; Standardverzeichnis im Deployment: `0700`
+- ungültige Daten oder Schreibfehler ändern Primärdatei und Backup nicht.
+- beschädigte oder fehlende Primärdatei wird aus einem gültigen Backup
+  wiederhergestellt.
 
-Rückgabewerte werden geklont, damit Aufrufer die zentrale Konfiguration nicht
-versehentlich verändern.
+Die Laufzeitdateien sind in `.gitignore` ausgeschlossen.
 
-## 7. Aktuelle Multi-Dashboard-Unterstützung
+## 8. Multi-Dashboard-Unterstützung
 
-Verfügbar sind:
+Die Sprint-13-Profile bleiben erhalten:
 
-| ID | Titel | Browserpfad |
+| ID | Titel | Pfad |
 |---|---|---|
-| `default` | Übersicht | `/` und `/d/default` |
+| `default` | Übersicht | `/`, `/d/default` |
 | `esszimmer` | Esszimmer | `/d/esszimmer` |
 
-Es gibt noch keinen Dashboard-Selector. Direkte, stabile URLs sind die
-vorgesehene Auswahlmethode für Sprint 13.
+Legacy- und dashboard-spezifische Lese-APIs bleiben kompatibel. Persistierte
+Änderungen wirken ohne Frontendänderung auf diese APIs.
 
-## 8. Aktuelle Kachelpositionierung und Größenunterstützung
+## 9. Admin-API
 
-- Reihenfolge über numerisches `order`
-- Sichtbarkeit über `visible`
-- responsive Breite über bestehendes Flexbox-Layout
-- kompakte Climate-Karte und mindestens ungefähr 44 Pixel große Touchziele
-- keine freie Positionierung
-- keine persistierbaren Größen
-- kein CSS Grid, Drag-and-drop oder Layouteditor
+Die Admin-API ist ohne `ADMIN_API_ENABLED=true` deaktiviert. Bei Aktivierung
+ist ein separater `ADMIN_TOKEN` erforderlich. Er darf nicht dem `HA_TOKEN`
+entsprechen. Authentifizierung erfolgt ausschließlich über
+`Authorization: Bearer ...` mit Digest-basierter konstanter Vergleichslänge.
 
-Sprint 13 verändert das Layoutmodell nicht.
-
-## 9. Aktuelle Admin- oder Konfigurationsoberfläche
-
-Es gibt keine Admin- oder Konfigurationsoberfläche. Dashboardänderungen sind
-versionierte Quellcodeänderungen. Es existieren keine Browser-Endpunkte zum
-Speichern, Erstellen, Löschen oder Umsortieren von Dashboards.
-
-## 10. Aktuelles Deploymentmodell
-
-- Git-Repository auf Branch `main`
-- Produktionspfad `/home/dashboard/ha-legacy-dashboard`
-- Fast-Forward-Deployment über `deploy/deploy.sh`
-- systemd-Dienst `ha-legacy-dashboard.service`
-- enger sudoers-Eintrag nur für den Dienstneustart
-- Health-Check und recoverable Rollback
-- `.env` bleibt lokal im LXC und wird weder committed noch ausgeliefert
-
-## 11. Relevante Dateien je Bereich
-
-| Bereich | Dateien |
-|---|---|
-| Regeln und Status | `AGENTS.md`, `README.md`, `docs/CODEX_HANDOFF.md`, `docs/SPRINT_ROADMAP.md` |
-| Sprint 13 | `docs/sprints/SPRINT-13.md`, `src/config/dashboard.js` |
-| HTTP- und Browser-Routing | `src/server.js`, `src/routes/api.js`, `src/public/js/app.js` |
-| Frontendstruktur | `src/public/index.html`, `src/public/css/style.css` |
-| Widgets | `src/public/js/widgets/*.js`, `src/public/js/core/dashboard.js` |
-| HA-Integration | `src/services/homeassistant.js`, `src/routes/api.js` |
-| Persistenz | `src/public/js/core/theme.js` für Theme; keine Dashboardpersistenz |
-| Deployment | `deploy/deploy.sh`, `deploy/health-check.sh`, `deploy/rollback.sh` |
-| Tests | `test/*.test.js` |
-
-### Aktuelle URL-Routen
+Routen:
 
 | Methode | URL | Funktion |
 |---|---|---|
-| GET | `/` | Standard-Dashboard |
-| GET | `/d/:dashboardId` | konfiguriertes Dashboard oder 404 |
-| GET | `/api/status` | Gateway- und HA-Status |
-| GET | `/api/dashboards` | öffentliche Dashboardliste |
-| GET | `/api/dashboards/:dashboardId/config` | öffentliche Profilkonfiguration |
-| GET | `/api/dashboards/:dashboardId/state` | profilbegrenzte Zustände |
-| GET | `/api/dashboard/config` | Legacy-Konfiguration des Standards |
-| GET | `/api/dashboard` | Legacy-Zustände des Standards |
-| POST | `/api/climate/temperature` | allowlisted Climate-Schreibzugriff |
-| POST | `/api/light/state` | allowlisted Light-Schreibzugriff |
+| GET/PUT | `/api/admin/config` | Gesamtkonfiguration lesen/ersetzen |
+| GET/POST | `/api/admin/dashboards` | Dashboards lesen/anlegen |
+| PUT/DELETE | `/api/admin/dashboards/:id` | Dashboard ändern/löschen |
+| POST | `/api/admin/dashboards/:id/widgets` | Widget anlegen |
+| PUT/DELETE | `/api/admin/dashboards/:id/widgets/:widgetId` | Widget ändern/löschen |
+| GET | `/api/admin/entities` | sanitisiertes HA-Entity-Inventar |
 
-## 12. Vorhandene Tests und Ergebnis
+Admin-Schreiboperationen teilen ein eigenes Präfix im vorhandenen
+In-Memory-Rate-Limit. Es gibt keine grafische Admin-Oberfläche, Loginseite,
+Session oder Browserpersistenz für den Token.
 
-Ausgeführt:
+## 10. Entity-Inventar
 
-```bash
-node --check src/config/dashboard.js
-node --check src/routes/api.js
-node --check src/server.js
-node --check src/public/js/app.js
-npm test
-```
+`GET /api/admin/entities` ruft serverseitig `/api/states` ab und liefert je
+gültiger Entity ausschließlich:
 
-Ergebnis:
+- `entity_id`
+- `domain`
+- `friendly_name`
+- `device_class`
+- `unit_of_measurement`
+
+Rohzustände, beliebige Attribute, Standortdaten, Tokens und Services werden
+nicht weitergegeben.
+
+## 11. Relevante Dateien
+
+| Bereich | Dateien |
+|---|---|
+| Schema und Laufzeitmodell | `src/config/dashboard.js` |
+| atomare Persistenz | `src/services/dashboard-config-store.js` |
+| Admin-API | `src/routes/admin.js` |
+| öffentliche API und Allowlists | `src/routes/api.js` |
+| HA-Entity-Inventar | `src/services/homeassistant.js` |
+| Initialisierung | `src/server.js` |
+| Datenpfad und systemd | `.gitignore`, `data/.gitkeep`, `deploy/systemd/ha-legacy-dashboard.service` |
+| Deployment | `deploy/deploy.sh`, `docs/DEPLOYMENT.md` |
+| Tests | `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, bestehende `test/*.test.js` |
+
+## 12. Tests und Ergebnis
+
+Ausgangsstand Sprint 13:
 
 ```text
 tests 45
 pass 45
 fail 0
+```
+
+Stand nach Sprint 14:
+
+```text
+tests 58
+pass 58
+fail 0
 cancelled 0
 skipped 0
 ```
 
-Die Integrationstests verwenden ausschließlich einen lokalen Mock-Home-
-Assistant mit Testtoken. Sie prüfen unter anderem:
+Alle Integrationsprüfungen verwenden ausschließlich lokale Mock-Dienste auf
+`127.0.0.1`, temporäre Konfigurationspfade und Fake-Credentials.
 
-- beide Dashboardprofile und das Standard-Dashboard
-- öffentliche Liste ohne Secret
-- profilbezogene Konfiguration und Leseliste
-- deduplizierte State-Abfragen
-- Legacy-Endpunkte
-- Browserpfade und kontrollierte 404-Antworten
-- Frontend-Pfaderkennung und Dashboardtitel
-- unverändert erlaubte und verbotene Climate-/Light-Schreibzugriffe
-- bestehende Robustheits-, Sicherheits-, Standalone- und Deploymentfälle
+Abgedeckt sind insbesondere Migration, Laden, ungültiges JSON, Schema-Version,
+doppelte und ungültige IDs, atomare Speicherung, Backup, Recovery,
+Schreibfehler, deaktivierte Admin-API, fehlender/wiederverwendeter/ungültiger
+und gültiger Token, CRUD, Standard-Dashboard-Konsistenz, Entity-Sanitizing,
+Rate-Limit-Header, unveränderte Allowlists und sämtliche Sprint-13-Fälle.
 
 ## 13. Bekannte Defekte
 
 Im automatisierten Testlauf wurde kein funktionaler Defekt reproduziert.
-Manuell offen bleibt die Abnahme auf Safari iOS 9 im Portrait- und
-Landscape-Modus. Das Zielgerät soll insbesondere beide Dashboard-URLs,
-Light-/Climate-Bedienung und das Home-Screen-Verhalten prüfen.
+Safari iOS 9 bleibt eine manuelle Zielgeräteprüfung.
+
+Für die produktive Aktivierung der Admin-API muss die aktualisierte
+systemd-Unit einmalig als root installiert werden, damit ausschließlich das
+`data`-Verzeichnis trotz `ProtectHome=read-only` beschreibbar bleibt.
 
 ## 14. Technische Schulden
 
-- Dashboardprofile werden nur im Quellcode gepflegt.
-- Es gibt keinen Dashboard-Selector im Frontend.
-- Konfigurationsvalidierung läuft beim Prozessstart, aber es gibt noch kein
-  separates Schemaformat.
-- Layoutpositionen und Größen sind nicht frei konfigurierbar.
-- Das In-Memory-Rate-Limit ist absichtlich nicht prozessübergreifend.
-- Die produktive Node-Version ist nicht durch ein `engines`-Feld fixiert.
-- Eine Projektlizenz wurde noch nicht durch den Eigentümer festgelegt.
+- keine grafische Admin-Oberfläche
+- kein CSRF-Thema, solange ausschließlich Bearer-Header ohne Cookies verwendet
+  werden; eine spätere Browser-Session würde eine neue Sicherheitsprüfung
+  benötigen
+- In-Memory-Rate-Limit ist nicht prozessübergreifend
+- synchrone Dateizugriffe sind für die kleine Konfiguration bewusst gewählt
+- keine Konfliktversion beziehungsweise ETag für parallele Admin-Schreibende
+- keine automatisierte Safari-iOS-9-Ausführung
+- keine freie Kachelposition oder -größe
 
-## 15. Abweichungen zwischen Roadmap und tatsächlichem Code
+## 15. Abweichungen zwischen Roadmap und Code
 
-Die Roadmap wurde für Sprint 12 und 13 aktualisiert. Verbleibende historische
-Abweichungen:
+Die Roadmap wurde um Sprint 14 ergänzt. Historische Abschnitte zu Sprint 3 und
+Sprint 7 beschreiben weiterhin ihren damaligen Stand. Sprint 13 nannte bewusst
+statische Konfiguration; diese wurde in Sprint 14 durch die spezifizierte
+Persistenz ersetzt, während Datenmodell und öffentliche APIs erhalten blieben.
 
-- Die Sprint-3-Entityliste nennt den mittleren Fenstersensor, obwohl er aktuell
-  unsichtbar ist.
-- „Konfigurationsgetriebene Dashboards“ in Sprint 7 beschrieb ursprünglich nur
-  ein Profil; echte Multi-Dashboard-Unterstützung beginnt erst mit Sprint 13.
-- Die priorisierte Reihenfolge ist eine historische Umsetzungsfolge und keine
-  aktuelle Backlog-Priorisierung.
+## 16. Empfohlener Sprint 15
 
-## 16. Empfohlener nächster Sprint
+Empfohlen wird eine kleine grafische Admin-Oberfläche mit klarer
+Sicherheitsentscheidung:
 
-Empfohlen wird Sprint 14 als kleine, read-only Dashboard-Navigation:
+- moderne Admin-Oberfläche getrennt vom iOS-9-Dashboard
+- sichere Token-Eingabe nur im Arbeitsspeicher oder ein ausdrücklich
+  entworfenes Sessionmodell
+- Entity-Auswahl aus dem sanitisierten Inventar
+- Formularvalidierung und verständliche Konflikt-/Backup-Anzeige
+- keine automatische HA-Schreibberechtigung
+- keine freie Layoutpositionierung im selben Sprint
 
-- optionaler ES5-kompatibler Selector oder kompakte Linknavigation
-- Daten ausschließlich aus `GET /api/dashboards`
-- keine Schreibpersistenz und keine Ableitung von Berechtigungen
-- weiterhin stabile Direkt-URLs für iOS-Home-Screen-Verknüpfungen
-
-Vor neuen schreibbaren Widgets sollte weiterhin eine separate
-Sicherheitsentscheidung mit eigener Entity- und Service-Allowlist erfolgen.
+Vor der UI sollte entschieden werden, ob Bearer-Token-Eingabe oder eine
+serverseitige Session mit CSRF-Schutz das gewünschte Betriebsmodell ist.

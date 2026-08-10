@@ -67,6 +67,23 @@ test("Deployment-Skripte sind ausführbar und nicht destruktiv", function () {
         /git switch --detach/
     );
 
+    assert.match(
+        readProjectFile("deploy/deploy.sh"),
+        /chmod 700 data/
+    );
+
+    assert.match(
+        readProjectFile("deploy/deploy.sh"),
+        /DASHBOARD_CONFIG_PATH=/
+    );
+
+    assert.match(
+        readProjectFile(
+            "deploy/systemd/ha-legacy-dashboard.service"
+        ),
+        /ReadWritePaths=\/home\/dashboard\/ha-legacy-dashboard\/data/
+    );
+
 });
 
 

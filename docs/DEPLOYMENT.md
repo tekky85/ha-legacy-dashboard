@@ -18,6 +18,36 @@ Die Deployment-Skripte verändern weder `.env` noch die systemd-Unit. Sie
 akzeptieren keinen nicht-linearen Git-Verlauf und führen keinen Force-Push oder
 `git reset --hard` aus.
 
+## Schreibbarer Konfigurationspfad
+
+Sprint 14 speichert die Dashboardkonfiguration standardmäßig unter:
+
+```text
+/home/dashboard/ha-legacy-dashboard/data/dashboards.json
+```
+
+Die gehärtete systemd-Unit hält das übrige Home-Verzeichnis weiterhin
+read-only und erlaubt nur für dieses `data`-Verzeichnis Schreibzugriff. Nach
+dem ersten Deployment von Sprint 14 muss die aktualisierte Unit einmalig als
+root installiert werden:
+
+```bash
+sudo install -o root -g root -m 0644 \
+  deploy/systemd/ha-legacy-dashboard.service \
+  /etc/systemd/system/ha-legacy-dashboard.service
+
+sudo systemctl daemon-reload
+sudo systemctl restart ha-legacy-dashboard.service
+```
+
+`deploy/deploy.sh` legt den Standardpfad mit Modus `0700` an und migriert die
+Sprint-13-Konfiguration vor dem Neustart. Die JSON- und Backup-Dateien erhalten
+Modus `0600` und bleiben durch `.gitignore` vom Repository ausgeschlossen.
+
+Bei einem über `DASHBOARD_CONFIG_PATH` gesetzten Pfad muss eine entsprechende
+enge `ReadWritePaths=`-Freigabe per systemd-Override eingerichtet werden. Keine
+breitere Schreibfreigabe für das gesamte Projektverzeichnis verwenden.
+
 ## Einmalige Neustartfreigabe
 
 Für vollständig automatisierte Deployments darf `dashboard` ausschließlich
@@ -68,6 +98,10 @@ Das Skript:
 8. startet ausschließlich `ha-legacy-dashboard.service` neu,
 9. prüft Dienst, APIs, Dashboard-Metadaten und Sicherheitsheader,
 10. meldet die neue und die vorherige Revision.
+
+Die persistierte Dashboardkonfiguration und ihr Backup werden beim Git-
+Deployment weder gelöscht noch überschrieben. Ist noch keine Primärdatei
+vorhanden, wird einmalig die validierte Standardkonfiguration erzeugt.
 
 ## Einzelne Prüfungen
 

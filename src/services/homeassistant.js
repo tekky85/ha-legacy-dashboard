@@ -113,6 +113,18 @@ async function getEntities(entityIds) {
 }
 
 
+async function getAllEntities() {
+
+    const response =
+        await client.get("/api/states");
+
+    return Array.isArray(response.data)
+        ? response.data
+        : [];
+
+}
+
+
 async function callService(
     domain,
     service,
@@ -142,6 +154,8 @@ module.exports = {
     getEntity: getEntity,
 
     getEntities: getEntities,
+
+    getAllEntities: getAllEntities,
 
     callService: callService
 

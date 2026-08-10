@@ -37,6 +37,7 @@ Der Home-Assistant-Token verbleibt ausschließlich im Backend.
 | 11 | Wall-Display-Betrieb | abgeschlossen |
 | 12 | Release und Dokumentation | abgeschlossen |
 | 13 | Multi-Dashboard Foundation | abgeschlossen |
+| 14 | Persistenz und Admin-API-Grundlage | abgeschlossen |
 
 ---
 
@@ -459,6 +460,29 @@ Projektlizenz bleibt eine bewusste Entscheidung des Projektinhabers.
 
 ---
 
+# Sprint 14 – Persistenz und Admin-API-Grundlage
+
+## Umgesetzt
+
+- versioniertes Konfigurationsschema `schemaVersion: 1`
+- stabile, global eindeutige Widget-IDs
+- Standardpersistenz in `data/dashboards.json`
+- Pfadüberschreibung über `DASHBOARD_CONFIG_PATH`
+- automatische Migration der Sprint-13-Profile beim ersten Start
+- vollständige Validierung vor jeder Speicherung
+- atomare Ersetzung und eine gültige Vorgängerversion als `.bak`
+- Wiederherstellung aus gültigem Backup bei beschädigter Primärdatei
+- standardmäßig deaktivierte Admin-API
+- separater Bearer-Token, der nicht dem HA-Token entsprechen darf
+- CRUD-Routen für Gesamtkonfiguration, Dashboards und Widgets
+- sanitisiertes Entity-Inventar ohne Rohzustände oder beliebige Attribute
+- Rate-Limit für Admin-Schreiboperationen
+- unveränderte Climate- und Light-Schreib-Allowlisten
+- keine grafische Admin-Oberfläche, keine Layoutbearbeitung und keine
+  automatische Schreibberechtigung
+
+---
+
 # Priorisierte Reihenfolge
 
 1. Sprint 4 vollständig verifizieren und abschließen
@@ -471,6 +495,7 @@ Projektlizenz bleibt eine bewusste Entscheidung des Projektinhabers.
 8. Sprint 11 Wall-Display-Funktionen
 9. Sprint 12 Release und Dokumentation
 10. Sprint 13 Multi-Dashboard-Grundlage
+11. Sprint 14 Persistenz und Admin-API-Grundlage
 
 ---
 

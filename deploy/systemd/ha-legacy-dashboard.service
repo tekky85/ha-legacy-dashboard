@@ -30,6 +30,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=full
 ProtectHome=read-only
+ReadWritePaths=/home/dashboard/ha-legacy-dashboard/data
 UMask=0077
 
 [Install]
