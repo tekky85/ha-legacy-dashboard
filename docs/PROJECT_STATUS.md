@@ -10,15 +10,18 @@ keine Tokens.
 
 - Branch: `main`
 - Ausgangscommit: `3b05a93 docs: define sprint 16 configurable tile sizes`
+- Sprint-16-Commit: `9c44cd5 feat: add configurable tile size presets`
 - Upstream: `origin/main`
 - Sprint 15 war vollständig implementiert, committed, gepusht und im LXC
   ausgerollt.
+- Sprint 16 wurde committed, gepusht und im Produktions-LXC ausgerollt.
 
 ## 2. Arbeitsbaum
 
-Der Arbeitsbaum war zu Beginn von Sprint 16 sauber. Laufzeitkonfigurationen
-unter `data/`, `.env`, Tokens und lokale Browser-Testdaten bleiben durch Git
-ausgeschlossen.
+Der Arbeitsbaum war zu Beginn von Sprint 16 sauber und war nach dem ersten
+Produktions-Rollout sowohl lokal als auch im LXC wieder sauber.
+Laufzeitkonfigurationen unter `data/`, `.env`, Tokens und lokale
+Browser-Testdaten bleiben durch Git ausgeschlossen.
 
 ## 3. Implementierte Funktionen und Sprints
 
@@ -177,6 +180,12 @@ nicht zur Verfügung.
 
 Der vollständige Sprint-16-Testlauf bestand mit 69 von 69 Tests; alle 17
 geänderten JavaScript-Dateien bestanden `node --check`.
+
+Der LXC-Deployment-Check bestand dieselben 69 Tests, startete den systemd-Dienst
+erfolgreich neu und bestätigte Gateway sowie Home Assistant als online. Die
+Produktionskonfiguration enthält zwei Dashboards unter Schema 2; alle acht
+bisherigen Widgets wurden zu `normal` migriert. Die unmittelbar dabei erzeugte
+Sicherung blieb im Schema-1-Format erhalten.
 
 ## 12. Bekannte Einschränkungen und technische Schulden
 
