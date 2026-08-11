@@ -477,7 +477,8 @@ test("Admin-Dateien leaken keine Secrets und das Wall-Display bleibt ES5", funct
     assert.doesNotMatch(apiSource, /\/api\/dashboard(?:s)?/);
     assert.doesNotMatch(apiSource, /console\./);
     assert.match(appSource, /beforeunload/);
-    assert.match(appSource, /dragstart|draggable/);
+    assert.match(appSource, /pointerdown/);
+    assert.match(appSource, /setPointerCapture/);
 
     const legacyDirectory = path.join(
         PROJECT_PATH,

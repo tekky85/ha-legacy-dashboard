@@ -289,7 +289,6 @@
         const controls = createElement("div", "layout-controls");
         const resizeHandle = createElement("button", "layout-resize-handle", "↘");
 
-        tile.draggable = true;
         tile.dataset.layoutWidgetId = widget.id;
         tile.style.gridColumn = (item.x + 1) + " / span " + item.w;
         tile.style.gridRow = (item.y + 1) + " / span " + item.h;
@@ -845,7 +844,7 @@
         return event.target.closest("[data-layout-grid]");
     }
 
-    function layoutCandidate(grid, widgetId, clientX, clientY, item) {
+    function layoutCandidate(grid, clientX, clientY, item, offsetX, offsetY) {
         const cell = admin.Layout.cellFromPoint(
             grid,
             activeLayoutProfile,
@@ -854,8 +853,8 @@
         );
 
         return {
-            x: cell.x,
-            y: cell.y,
+            x: cell.x + (offsetX || 0),
+            y: cell.y + (offsetY || 0),
             w: item.w,
             h: item.h
         };
@@ -877,88 +876,6 @@
         const preview = grid && grid.querySelector(".layout-preview");
         if (preview) {
             preview.hidden = true;
-        }
-    }
-
-    function handleLayoutDragStart(event) {
-        const tile = event.target.closest("[data-layout-widget-id]");
-        const grid = layoutGridFromEvent(event);
-        const dashboard = admin.State.getSelectedDashboard();
-
-        if (!tile || !grid || event.target.closest("button")) {
-            event.preventDefault();
-            return;
-        }
-
-        const widgetId = tile.dataset.layoutWidgetId;
-        const item = dashboard.layouts[activeLayoutProfile].items[widgetId];
-        layoutDragState = {
-            widgetId: widgetId,
-            item: admin.State.clone(item)
-        };
-        tile.classList.add("is-dragging");
-        event.dataTransfer.effectAllowed = "move";
-        event.dataTransfer.setData("text/plain", widgetId);
-    }
-
-    function handleLayoutDragOver(event) {
-        const grid = layoutGridFromEvent(event);
-        const dashboard = admin.State.getSelectedDashboard();
-
-        if (!grid || !layoutDragState) {
-            return;
-        }
-
-        event.preventDefault();
-        const candidate = layoutCandidate(
-            grid,
-            layoutDragState.widgetId,
-            event.clientX,
-            event.clientY,
-            layoutDragState.item
-        );
-        const valid = admin.Layout.canPlace(
-            dashboard.id,
-            layoutDragState.widgetId,
-            activeLayoutProfile,
-            candidate
-        );
-        layoutDragState.candidate = candidate;
-        showLayoutPreview(grid, candidate, valid);
-        event.dataTransfer.dropEffect = valid ? "move" : "none";
-    }
-
-    function handleLayoutDrop(event) {
-        const grid = layoutGridFromEvent(event);
-        const dashboard = admin.State.getSelectedDashboard();
-
-        if (!grid || !layoutDragState || !layoutDragState.candidate) {
-            return;
-        }
-
-        event.preventDefault();
-        const changed = admin.Layout.place(
-            dashboard.id,
-            layoutDragState.widgetId,
-            activeLayoutProfile,
-            layoutDragState.candidate
-        );
-        layoutDragState = null;
-
-        if (changed) {
-            renderAll();
-        } else {
-            hideLayoutPreview(grid);
-            showNotice("Die Kachel kann dort nicht abgelegt werden.", true);
-        }
-    }
-
-    function handleLayoutDragEnd(event) {
-        hideLayoutPreview(layoutGridFromEvent(event));
-        layoutDragState = null;
-        const tile = event.target.closest("[data-layout-widget-id]");
-        if (tile) {
-            tile.classList.remove("is-dragging");
         }
     }
 
@@ -986,15 +903,21 @@
                 startY: event.clientY,
                 grid: grid
             };
-        } else if (event.pointerType !== "mouse") {
+        } else {
+            const grabCell = admin.Layout.cellFromPoint(
+                grid,
+                activeLayoutProfile,
+                event.clientX,
+                event.clientY
+            );
             layoutDragState = {
                 pointerId: event.pointerId,
                 widgetId: widgetId,
                 item: item,
-                grid: grid
+                grid: grid,
+                offsetX: item.x - grabCell.x,
+                offsetY: item.y - grabCell.y
             };
-        } else {
-            return;
         }
 
         event.preventDefault();
@@ -1023,10 +946,11 @@
             state = layoutDragState;
             candidate = layoutCandidate(
                 state.grid,
-                state.widgetId,
                 event.clientX,
                 event.clientY,
-                state.item
+                state.item,
+                state.offsetX,
+                state.offsetY
             );
         } else {
             return;
@@ -1221,10 +1145,6 @@
         elements.dashboardEditor.addEventListener("click", handleEditorClick);
         elements.dashboardEditor.addEventListener("input", handleEditorInput);
         elements.dashboardEditor.addEventListener("change", handleEditorChange);
-        elements.dashboardEditor.addEventListener("dragstart", handleLayoutDragStart);
-        elements.dashboardEditor.addEventListener("dragover", handleLayoutDragOver);
-        elements.dashboardEditor.addEventListener("drop", handleLayoutDrop);
-        elements.dashboardEditor.addEventListener("dragend", handleLayoutDragEnd);
         elements.dashboardEditor.addEventListener("pointerdown", handleLayoutPointerDown);
         elements.dashboardEditor.addEventListener("pointermove", handleLayoutPointerMove);
         elements.dashboardEditor.addEventListener("pointerup", finishLayoutPointer);
