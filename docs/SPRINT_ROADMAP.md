@@ -535,6 +535,10 @@ docs/sprints/SPRINT-16.md
 
 # Sprint 17 – Drag-and-Drop Grid Layout
 
+## Status
+
+Abgeschlossen
+
 ## Ziel
 
 Rasterbasierter Layouteditor.

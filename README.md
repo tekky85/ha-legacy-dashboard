@@ -54,6 +54,8 @@ browser.
 - responsive optimistic light on/off control
 - multiple persistent server-side dashboard profiles
 - five validated responsive tile-size presets per widget
+- separate persistent portrait and landscape grid layouts
+- graphical drag-and-drop and resize editor in the Admin UI
 - stable dashboard URLs with a backward-compatible default dashboard
 - protected, opt-in Admin API with a graphical configuration UI
 - Home Assistant reachability status
@@ -298,13 +300,15 @@ The path can be overridden with `DASHBOARD_CONFIG_PATH`. On the first start,
 the application validates and migrates the built-in Sprint 13 profiles from
 `src/config/dashboard.js`. Runtime files under `data/` are ignored by Git.
 
-The version 2 schema declares `schemaVersion`, one `defaultDashboardId`, and a
+The version 3 schema declares `schemaVersion`, one `defaultDashboardId`, and a
 list of dashboard profiles. Every profile has a stable lowercase ID, a display
 title, a refresh interval, and its own widget list. Every widget also has a
-stable globally unique `id` and one validated `size` preset. Existing version
-1 files are migrated automatically; all existing widgets receive
-`size: "normal"` without changing IDs, entities, order, visibility, titles, or
-icons. The migrated profiles are:
+stable globally unique `id` and one validated `size` preset. Each dashboard
+also has `portrait` and `landscape` layouts whose items reference those widget
+IDs and contain only integer `x`, `y`, `w`, and `h` values. Portrait uses three
+columns and landscape six columns. Existing version 1 and version 2 files are
+migrated automatically without changing dashboard IDs, widget IDs, entities,
+order, visibility, titles, or icons. The migrated profiles are:
 
 - `default` – the complete existing dashboard and the target of `/`
 - `esszimmer` – the existing Esszimmer light and climate widgets
@@ -331,13 +335,17 @@ Supported tile sizes are:
 - `tall` – normal width with additional minimum height
 - `large` – wide with additional minimum height
 
-The wall display uses Flexbox and fixed CSS classes for these presets. Below
-600 px all sizes use the full available width. From 600 px, `wide` and `large`
-use the full row while the other presets retain the normal column width. From
-900 px, normal-width tiles use roughly one third and wide tiles roughly two
-thirds of the row. These are responsive flow hints, not exact positions;
-content may increase a tile's height and Flexbox may wrap a tile to the next
-row. No free CSS values, coordinates, drag-and-drop, or CSS Grid are used.
+The presets remain the deterministic migration and fallback basis:
+`compact`/`normal` map to 1×1, `wide` to 2×1, `tall` to 1×2 and `large` to
+2×2. Explicit validated layout coordinates take precedence. Missing profiles
+are reconstructed left-to-right and then row-by-row without collisions.
+Invisible widgets keep their last position but do not block cells.
+
+The legacy wall display calculates absolute percentage positions and fixed
+row heights from the validated raster. It deliberately uses neither CSS Grid
+nor arbitrary CSS strings. On rotation it reapplies the matching profile
+without reloading dashboard data. The container height is derived from the
+lowest occupied row.
 
 The optional backend environment value `DASHBOARD_REFRESH_INTERVAL_MS`
 controls the automatic browser refresh between 3000 and 300000 milliseconds.
@@ -354,13 +362,11 @@ an atomic rename. The previous valid version is retained as
 `dashboards.json.bak`. Invalid JSON, an unsupported schema, validation errors,
 or write failures do not replace the last valid configuration.
 
-During the initial version 1 to version 2 migration, the backup retains the
-last valid version 1 file for a direct software rollback. After a later
-version 2 configuration write, the rolling backup can also contain version 2.
-Older Sprint-15 code cannot load schema version 2, so a later downgrade then
-requires restoring a retained version 1 backup or manually removing `size`
-and resetting `schemaVersion` to `1`. There is intentionally no automatic
-downgrade migration.
+During migration to version 3, the rolling backup retains the last valid
+version 1 or version 2 file. After a later version 3 write, the backup can also
+contain version 3. Older releases cannot load the newer schema, so a downgrade
+requires restoring a compatible retained backup or manually converting the
+configuration. There is intentionally no automatic downgrade migration.
 
 Set `visible` to `false` to remove a widget from both the browser
 configuration and the dashboard state query. Supported frontend widget types
@@ -433,14 +439,19 @@ The UI supports:
 - adding supported Sensor, Binary Sensor, Light, and Climate widgets
 - editing widget title, subtitle, icon, unit, visibility, order, and tile size
 - choosing `compact`, `normal`, `wide`, `tall`, or `large` from a fixed select
+- switching between three-column portrait and six-column landscape layouts
+- moving widgets by mouse drag or modern touch/pointer input with grid snapping
+- resizing widgets in whole cells with a handle
+- moving and resizing with visible, keyboard-focusable alternative buttons
 - reordering widgets with up/down buttons
 - explicit save and discard for one local configuration draft
 - warning before leaving with unsaved changes
 
-Dashboard and widget IDs and tile sizes remain backend-validated. Entity
-selection controls display only; it does not modify the Climate or Light write
-allowlists. Tile sizing intentionally has no drag-and-drop, exact positioning,
-free width or height, or separate portrait and landscape values.
+Dashboard IDs, widget IDs, tile sizes, layout profiles, integer coordinates,
+bounds, widget references, minimum sizes and collisions remain
+backend-validated. Entity selection and layout changes control display only;
+they do not modify the Climate or Light write allowlists. Free pixel values,
+overlaps and arbitrary CSS remain unsupported.
 
 The Admin UI is technically separate under `src/admin/` and may use modern
 browser JavaScript. The wall display under `src/public/` remains ES5 and Safari

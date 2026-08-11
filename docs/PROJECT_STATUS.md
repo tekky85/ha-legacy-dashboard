@@ -1,62 +1,51 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand der Prüfung: 10. August 2026
+Stand: 11. August 2026, nach Sprint 17
 
-Dieser Bericht beschreibt den tatsächlichen Implementierungsstand nach Sprint
-16. Er enthält keine Werte aus `.env`, keine Home-Assistant-Zugangsdaten und
-keine Tokens.
+Dieser Bericht beschreibt den tatsächlich geprüften und produktiv ausgerollten
+Stand. Er enthält keine Werte aus `.env`, keine Home-Assistant-Zugangsdaten
+und keine Admin-Tokens.
 
-## 1. Branch und Ausgangscommit
+## 1. Branch, Commits und Arbeitsbaum
 
 - Branch: `main`
-- Ausgangscommit: `3b05a93 docs: define sprint 16 configurable tile sizes`
-- Sprint-16-Commit: `9c44cd5 feat: add configurable tile size presets`
+- Sprint-17-Ausgangscommit: `a346a82`
+- Implementierung: `db49277 feat: add persistent drag and drop grid layouts`
+- finaler Drag-Fix: `81466fc fix: unify admin grid pointer dragging`
 - Upstream: `origin/main`
-- Sprint 15 war vollständig implementiert, committed, gepusht und im LXC
-  ausgerollt.
-- Sprint 16 wurde committed, gepusht und im Produktions-LXC ausgerollt.
+- Produktiver LXC-Stand: `81466fc`
 
-## 2. Arbeitsbaum
+Sprint 16 war vor Beginn vollständig vorhanden: Multi-Dashboard,
+Schema-Version 2, atomare Persistenz, stabile Widget-IDs, Admin API und UI
+sowie die fünf Größen-Presets wurden im tatsächlichen Code verifiziert. Der
+Ausgangsarbeitsbaum war sauber und der Referenzlauf bestand mit 69 Tests.
 
-Der Arbeitsbaum war zu Beginn von Sprint 16 sauber und war nach dem ersten
-Produktions-Rollout sowohl lokal als auch im LXC wieder sauber.
 Laufzeitkonfigurationen unter `data/`, `.env`, Tokens und lokale
-Browser-Testdaten bleiben durch Git ausgeschlossen.
+Browser-Testdaten sind nicht Bestandteil von Git.
 
-## 3. Implementierte Funktionen und Sprints
+## 2. Implementierte Sprints und Funktionen
 
 | Sprint | Thema | Stand |
 |---|---|---|
-| 0–3 | Grundlage, Gateway, Legacy-UI und Widgets | umgesetzt |
-| 4–6 | Climate, Standalone und Light | umgesetzt |
-| 7–8 | Konfiguration, Robustheit und Sicherheit | umgesetzt |
-| 9–10 | Tests, Deployment und Betrieb | umgesetzt |
-| 11–12 | Wall-Display und Release-Baseline | umgesetzt |
+| 0–12 | Gateway, Widgets, Sicherheit, Betrieb und Release-Baseline | umgesetzt |
 | 13 | Multi-Dashboard Foundation | umgesetzt |
 | 14 | Persistenz und Admin-API-Grundlage | umgesetzt |
 | 15 | Grafische Admin-Konfiguration | umgesetzt |
 | 16 | Konfigurierbare Kachelgrößen | umgesetzt |
+| 17 | Persistentes Drag-and-Drop-Rasterlayout | umgesetzt |
 
-Zusätzlich zu den bestehenden Sensor-, Binary-, Light- und Climate-Widgets
-unterstützt jedes Widget nun ein festes, validiertes Größen-Preset. Die
-Oberfläche bleibt ein responsiver Flexbox-Fluss; Sprint 16 führt weder
-Drag-and-drop noch freie Positionen oder Maße ein.
+Sensor-, Binary-, Light- und Climate-Widgets besitzen weiterhin stabile IDs,
+Reihenfolge, Sichtbarkeit und Größen-Presets. Sprint 17 ergänzt getrennte,
+persistente Raster für Portrait und Landscape.
 
-## 4. Sprint-15-Verifikation
+## 3. Finale Konfigurationsstruktur
 
-Vor den Änderungen wurden die persistente Multi-Dashboard-Konfiguration,
-stabile Dashboard- und Widget-IDs, Admin API, `/admin`, Entity-Inventar,
-Widgetbearbeitung, Gesamtkonfigurationsentwurf, Speichern und Verwerfen sowie
-die getrennten HA-Schreib-Allowlisten im tatsächlichen Code bestätigt. Der
-Sprint-15-Referenztest bestand mit 62 von 62 Tests.
-
-## 5. Konfigurationsschema und Migration
-
-Das persistente Schema ist Version 2:
+Das persistente Schema ist Version 3. Jede Layoutreferenz verwendet die
+stabile Widget-ID, niemals die Entity-ID:
 
 ```json
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "defaultDashboardId": "default",
   "dashboards": [
     {
@@ -77,138 +66,201 @@ Das persistente Schema ist Version 2:
           "visible": true,
           "size": "normal"
         }
-      ]
+      ],
+      "layouts": {
+        "portrait": {
+          "columns": 3,
+          "items": {
+            "default-bathroom-temperature": {"x": 0, "y": 0, "w": 1, "h": 1}
+          }
+        },
+        "landscape": {
+          "columns": 6,
+          "items": {
+            "default-bathroom-temperature": {"x": 0, "y": 0, "w": 1, "h": 1}
+          }
+        }
+      }
     }
   ]
 }
 ```
 
-Zulässig sind ausschließlich `compact`, `normal`, `wide`, `tall` und `large`.
-Schema-1-Dateien werden beim Laden vollständig validiert und anschließend
-atomar zu Schema 2 migriert. Fehlendes `size` wird zu `normal`; Dashboard-IDs,
-Widget-IDs, Entity-IDs, Reihenfolge, Sichtbarkeit, Texte und Icons bleiben
-unverändert. Die erste Migrationssicherung enthält die letzte gültige
-Schema-1-Konfiguration.
+Nur die bekannten Profile, festgelegten Spaltenzahlen und Integerwerte werden
+akzeptiert. Koordinaten und Maße sind keine CSS-Strings.
 
-Nach späteren Schema-2-Schreibvorgängen kann die rollierende `.bak`-Datei
-ebenfalls Schema 2 enthalten. Ein späteres Downgrade auf Sprint 15 benötigt
-dann eine separat aufbewahrte Schema-1-Sicherung oder eine manuelle
-Rückkonvertierung; eine automatische Downgrade-Migration ist bewusst nicht
-enthalten.
+## 4. Migration und Auto-Placement
 
-## 6. Persistenz und Backendvalidierung
+- Schema 1 wird zuerst um `size: normal` ergänzt und dann auf Schema 3
+  migriert.
+- Schema 2 wird direkt und atomar auf Schema 3 migriert.
+- Dashboard-IDs, Widget-IDs, Entities, Reihenfolge, Sichtbarkeit und Inhalte
+  bleiben erhalten.
+- `compact` und `normal` starten mit 1×1, `wide` mit 2×1, `tall` mit 1×2 und
+  `large` mit 2×2.
+- Platzierung erfolgt deterministisch von links nach rechts und dann in der
+  nächsten freien Zeile.
+- Belegte Bereiche werden übersprungen; unsichtbare Widgets blockieren keine
+  Zellen.
+- Beim erneuten Einblenden wird die alte Position genutzt, wenn sie frei ist,
+  andernfalls erfolgt Auto-Placement.
 
-- Standardpfad `data/dashboards.json`, überschreibbar mit
-  `DASHBOARD_CONFIG_PATH`
-- vollständige Validierung vor jedem Schreibvorgang
-- temporäre Datei und atomare Umbenennung
-- eine gültige Vorgängerversion als `dashboards.json.bak`
-- kontrollierter HTTP-400-Code `invalid_widget_size`
-- ungültige Größen verändern weder aktive noch persistierte Konfiguration
-- Public API liefert nur die validierten Presets aus
-- Renderer normalisiert fehlende oder unbekannte Werte zusätzlich zu `normal`
+Produktiv wurde Schema 2 erfolgreich auf Schema 3 migriert. Die rollierende
+Sicherung `dashboards.json.bak` enthält weiterhin die letzte gültige
+Schema-2-Konfiguration.
 
-## 7. Admin-Oberfläche
+## 5. Validierung, Kollisionen und Größen
 
-Die Widgetbearbeitung unter `/admin` besitzt ein festes Select-Feld
-„Kachelgröße“ mit den fünf Presets. Die Widgetliste zeigt den deutschen
-Größennamen. Neue Widgets beginnen mit `normal`; Größen bleiben beim
-Ausblenden, Verwerfen, Speichern, Reload und Duplizieren erhalten. Es gibt
-keine freie Texteingabe für Maße oder CSS.
+Backend und Admin-Entwurf prüfen:
 
-## 8. Wall-Display und responsive Größen
+- bekannte Profile `portrait` und `landscape`
+- exakt 3 beziehungsweise 6 Spalten
+- ganze Zahlen für `x`, `y`, `w` und `h`
+- `x/y >= 0`, `w/h >= 1`, Spalten- und Zeilengrenzen
+- maximal 100 Rasterzeilen und maximal 4 Zeilen Höhe je Kachel
+- bekannte Widgetreferenzen und vollständige Layoutitems
+- keine Kollisionen zwischen sichtbaren Widgets
+- Climate-Mindestbreite 2 im Landscape-Profil
 
-Der ES5-Renderer ordnet bekannte Werte ausschließlich den Klassen
-`card-size-compact`, `card-size-normal`, `card-size-wide`,
-`card-size-tall` und `card-size-large` zu.
+Ungültige Konfigurationen liefern kontrolliert HTTP 400 mit
+`invalid_layout` und ersetzen weder aktive noch persistierte Konfiguration.
 
-| Breite | compact / normal / tall | wide / large |
-|---|---|---|
-| unter 600 px | volle Breite | volle Breite |
-| 600–899 px | etwa halbe Breite | volle Breite |
-| ab 900 px | etwa ein Drittel | etwa zwei Drittel |
+## 6. Admin-Layouteditor
 
-`compact` reduziert Mindesthöhe und Innenabstände, `tall` erhöht die
-Mindesthöhe und `large` kombiniert breite Darstellung mit zusätzlicher
-Mindesthöhe. Inhalte dürfen Karten vergrößern; feste Höhen werden nicht
-erzwungen. Climate-Tasten bleiben 46 × 46 px, der Theme-Schalter 44 × 44 px
-und der Light-Schalter mindestens 44 px hoch.
+Unter `/admin` gibt es je Dashboard einen Rastereditor mit Portrait- und
+Landscape-Umschaltung. Unterstützt werden:
 
-Die Reihenfolge entsteht weiterhin nur aus `order`; `order + size` bestimmen
-den Flexbox-Fluss. Zeilenumbrüche sind responsiv und nicht pixelgenau.
+- Pointer-Dragging für Maus und moderne Touchgeräte
+- Erhaltung der Greifposition innerhalb mehrspaltiger Kacheln
+- Snapping auf ganze Rasterzellen
+- gültige und ungültige Zielvorschau
+- Resize-Griff in ganzen Rastereinheiten
+- Bounds-, Mindestgrößen- und Kollisionsschutz
+- sichtbare und fokussierbare Tasten für links, rechts, oben, unten, breiter,
+  schmaler, höher und niedriger
+- lokaler Entwurf mit Speichern, Verwerfen und `beforeunload`-Warnung
+- korrektes Layout-Remapping auf neue Widget-IDs beim Duplizieren
+- automatische Layoutpositionen für neue Widgets
 
-## 9. Entity-Auswahl und Sicherheitsgrenzen
+Die Admin UI darf moderne Browserfunktionen und CSS Grid verwenden; sie ist
+technisch vom Legacy-Wall-Display getrennt.
 
-Das Admin-Frontend verwendet nur das sanitierte Inventar aus
-`GET /api/admin/entities`. Dashboard-Sichtbarkeit und Kachelgröße steuern
-ausschließlich Anzeige und HA-Lesezugriff. Die getrennten Schreib-Allowlisten
-in `src/routes/api.js` bleiben unverändert:
+## 7. Legacy-Wall-Display
+
+`src/public/js/core/layout.js` ist reines ECMAScript 5. Es wählt das Profil
+über `window.innerWidth` und `window.innerHeight`, validiert die öffentliche
+Konfiguration nochmals defensiv und setzt ausschließlich berechnete
+Prozentwerte und Pixelhöhen.
+
+Der Dashboardcontainer ist `position: relative`, Kacheln sind absolut
+positioniert. Portrait nutzt eine Zeilenhöhe von 260 px, Landscape 240 px.
+Die Containerhöhe wird aus `max(y + h)` berechnet. Bei Rotation wird nur das
+Layout neu angewendet; Refresh- und Widgetzustand bleiben erhalten.
+
+Das Legacy-CSS enthält kein CSS Grid und keinen Flexbox-`gap`. Fehlt ein
+Profil oder ist es im Browser ungültig, wird ausschließlich aus den bekannten
+Größen-Presets ein sicheres Profil erzeugt; Koordinaten des anderen Profils
+werden nicht übernommen. Asset-Cache-Version ist 19.
+
+## 8. Sicherheitsgrenzen
+
+Layout und Sichtbarkeit steuern ausschließlich Anzeige und HA-Lesezugriff.
+Sie verändern keine Schreibberechtigung. Die Allowlist in
+`src/routes/api.js` blieb unverändert:
 
 - Climate: `climate.esszimmer_thermostate`
 - Light: `light.esszimmer_lampen`
 
-Der Admin-Token bleibt getrennt vom HA-Token. Die Admin API bleibt
-standardmäßig deaktiviert, Bearer-geschützt und für Schreibzugriffe
-rate-limitiert. Kein Token gelangt in das Wall-Display oder eine öffentliche
-Dashboardantwort.
+Der HA-Token bleibt ausschließlich im Backend. Admin API und Admin UI nutzen
+weiterhin einen separaten Bearer-Token, sind standardmäßig deaktiviert und
+rate-limitiert. Die öffentliche Layoutantwort enthält keine Tokens,
+Admin-Daten, beliebigen Attribute oder CSS-Werte.
+
+## 9. Persistenz und API
+
+- Standardpfad `data/dashboards.json`, überschreibbar mit
+  `DASHBOARD_CONFIG_PATH`
+- vollständige Validierung vor jedem Schreiben
+- temporäre Datei und atomare Ersetzung
+- eine letzte gültige Vorgängerversion als `.bak`
+- Admin CRUD erweitert das bestehende Konfigurationsmodell; keine parallele
+  Layout-API
+- öffentliche Dashboardkonfiguration liefert nur Layouts sichtbarer Widgets
 
 ## 10. Relevante Dateien
 
 | Bereich | Dateien |
 |---|---|
 | Schema und Migration | `src/config/dashboard.js`, `src/services/dashboard-config-store.js` |
+| Rastervalidierung und Auto-Placement | `src/services/layout.js` |
 | Admin API | `src/routes/admin.js` |
-| Admin UI | `src/admin/index.html`, `src/admin/js/app.js`, `src/admin/js/widgets.js` |
-| Legacy-Mapping | `src/public/js/core/widget.js`, `src/public/js/widgets/*.js` |
-| Responsive Layout | `src/public/css/style.css` |
-| Cache | `src/public/index.html`, `src/public/manifest.json` |
-| Tests | `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js`, `test/tile-size.test.js` |
+| Admin-Layoutmodell | `src/admin/js/layout.js` |
+| Admin-Interaktion | `src/admin/js/app.js`, `src/admin/js/dashboards.js`, `src/admin/js/widgets.js` |
+| Legacy-Raster | `src/public/js/core/layout.js`, `src/public/js/core/dashboard.js` |
+| Legacy-Widget-IDs | `src/public/js/core/widget.js`, `src/public/js/widgets/*.js` |
+| Legacy-Darstellung und Cache | `src/public/css/style.css`, `src/public/index.html`, `src/public/manifest.json` |
+| Tests | `test/layout.test.js`, `test/legacy-layout.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js`, `test/dashboard-persistence.test.js` |
 
-## 11. Tests und manuelle Prüfung
+## 11. Tests und manuelle Abnahme
 
-Alle automatisierten Integrationsprüfungen verwenden ausschließlich lokale
-Mock-HA-Dienste auf `127.0.0.1`, temporäre Konfigurationspfade und
-Fake-Credentials. Geprüft werden unter anderem Schema-1-Migration, alle fünf
-Presets, fehlerhafte Werte, atomare Persistenz, Backup, Admin API und UI,
-Public API, sichere CSS-Klassenzuordnung sowie unveränderte Schreibgrenzen.
+Der vollständige lokale und produktive Testlauf besteht mit 80 von 80 Tests.
+Alle Integrationstests verwenden nur localhost Mock-Home-Assistant-Dienste und
+Fake-Credentials. Alle geänderten JavaScriptdateien bestehen `node --check`.
 
-In einem lokalen Browserlauf wurden Speichern, Reload, Verwerfen und alle fünf
-Größen geprüft. Bei 768 × 1024 und 1024 × 768 px gab es in Light und Dark Mode
-keinen horizontalen Überlauf, keine Konsolenfehler und keine verkleinerten
-Touchziele. Eine echte automatisierte Safari-iOS-9-Ausführung steht weiterhin
-nicht zur Verfügung.
+Manuell geprüft wurden:
 
-Der vollständige Sprint-16-Testlauf bestand mit 69 von 69 Tests; alle 17
-geänderten JavaScript-Dateien bestanden `node --check`.
+- Maus-Drag mit gültigem Snapping und abgewiesener Kollision
+- Pointer-Resize-Griff
+- alle acht sichtbaren Alternativtasten
+- Portrait-/Landscape-Umschaltung, Speichern, Reload und Verwerfen
+- Dashboardduplikat und zurückgesetzter Entwurf
+- Wall-Display bei 768×1024 und 1024×768
+- Rotation Portrait → Landscape → Portrait ohne Reload
+- keine Kollision und kein horizontaler Overflow
+- Climate-Tasten 46×46 px und Light-Taste innerhalb der Kachel
+- Header, Uhr, Status und keine Browser-Konsolenfehler
 
-Der LXC-Deployment-Check bestand dieselben 69 Tests, startete den systemd-Dienst
-erfolgreich neu und bestätigte Gateway sowie Home Assistant als online. Die
-Produktionskonfiguration enthält zwei Dashboards unter Schema 2; alle acht
-bisherigen Widgets wurden zu `normal` migriert. Die unmittelbar dabei erzeugte
-Sicherung blieb im Schema-1-Format erhalten.
+Eine automatisierte echte Safari-iOS-9-Laufzeit steht weiterhin nicht zur
+Verfügung; ES5- und CSS-Verbote werden statisch und im kompatiblen Renderer
+getestet.
 
-## 12. Bekannte Einschränkungen und technische Schulden
+## 12. Produktionsstand
 
-- Flexbox garantiert keine exakte Rasterposition.
-- Keine getrennten Größen für Portrait und Landscape.
-- Keine Konflikterkennung für parallele Admin-Entwürfe.
-- In-Memory-Rate-Limit ist nicht prozessübergreifend.
+Das Deployment-Skript führte Syntaxprüfungen und alle 80 Tests auf dem LXC
+aus, migrierte die vorhandenen zwei Dashboards auf Schema 3 und startete
+`ha-legacy-dashboard.service` erfolgreich neu. Dienst, Gateway, Home Assistant
+und Dashboard-Health-Check sind online.
+
+Produktiv bestätigt:
+
+- Commit `81466fc`
+- Primärkonfiguration Schema 3, Backup Schema 2
+- `default`: 6 Layoutitems
+- `esszimmer`: 2 Layoutitems
+- Portrait 3 / Landscape 6 Spalten
+- öffentliche Standardkonfiguration: 5 sichtbare Widgets, keine Tokenhinweise
+
+## 13. Bekannte Einschränkungen und technische Schulden
+
 - Keine automatisierte echte Safari-/iOS-9-Ausführung.
-- Keine freie Breite, Höhe, X-/Y-Position, Drag-and-drop oder Layout-Handles.
-- Das Admin-Frontend besitzt keine vollständige Live-Vorschau.
+- Feste Legacy-Zeilenhöhen statt inhaltsabhängiger Rasterzeilen.
+- Maximale Rastergröße ist bewusst statisch begrenzt.
+- Kein Revisionsfeld oder Konfliktschutz für parallele Admin-Entwürfe.
+- Admin-Rate-Limit ist nur pro Prozess gespeichert.
+- Keine freie Pixelpositionierung, Überlappung, Rotation einzelner Kacheln oder
+  Z-Index-Bearbeitung; dies sind bewusste Nicht-Ziele.
 
-Im automatisierten Testlauf ist kein funktionaler Sprint-16-Defekt bekannt.
+Im geprüften Sprint-17-Umfang ist kein funktionaler Defekt bekannt.
 
-## 13. Roadmap-Abgleich und Voraussetzung für Sprint 17
+## 14. Roadmap-Abgleich und nächster Sprint
 
-Sprint 16 entspricht der Spezifikation: feste Presets, Schema-Migration,
-Backendvalidierung, Admin-Auswahl, sichere öffentliche Ausgabe und
-iOS-9-kompatibler Flexbox-Renderer sind umgesetzt. Nicht-Ziele wie CSS Grid,
-freie Werte, WYSIWYG, zusätzliche HA-Domänen und automatische
-Schreibberechtigungen wurden nicht eingeführt.
+Sprint 17 entspricht der Spezifikation: Schema 3, Migration, zwei Profile,
+Auto-Placement, Kollisionen, Bounds, Drag, Resize, zugängliche Alternativen,
+Duplikat-Remapping, öffentlicher sicherer Layouttransport und ES5-Renderer
+ohne CSS Grid sind umgesetzt.
 
-Sprint 17 kann auf stabilen Widget-IDs, `order`, `size`, Schema 2, atomarer
-Persistenz und dem lokalen Admin-Entwurf aufbauen. Für ein Drag-and-drop-Raster
-muss es ein eigenes validiertes Positionsmodell, eine klare Migration und eine
-iOS-9-taugliche Darstellung geben; das aktuelle Größenfeld darf dabei nicht in
-freie CSS-Werte umgedeutet werden.
+Der empfohlene nächste Schritt gemäß aktualisierter Roadmap ist Sprint 18 –
+System Dashboard Foundation. Er sollte eine gemeinsame normalisierte,
+read-only System-Snapshot-Grundlage und feste Routen für spätere Summary- und
+Error-Dashboards schaffen, ohne die bestehenden Raster oder HA-Schreibgrenzen
+zu erweitern.

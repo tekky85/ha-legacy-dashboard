@@ -1,7 +1,7 @@
 # Sprint 17 – Drag-and-Drop Grid Layout
 
 ## Status
-Planned
+Completed
 
 ## Abhängigkeit
 Sprint 17 setzt Sprint 16 voraus. Codex muss zuerst prüfen, ob Multi-Dashboard, persistente Konfiguration, stabile Widget-IDs, Admin-UI und die Größen-Presets `compact`, `normal`, `wide`, `tall`, `large` tatsächlich vorhanden sind.
