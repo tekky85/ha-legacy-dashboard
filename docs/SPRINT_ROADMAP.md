@@ -1,68 +1,224 @@
 # HA Legacy Dashboard – Sprint Roadmap
 
-## Zweck
+## Dokumentstatus
 
-Diese Datei fasst die bisher umgesetzten, aktuell offenen und geplanten Sprints
-des Projekts zusammen. Sie ergänzt `AGENTS.md`, `README.md` und
-`docs/CODEX_HANDOFF.md`.
+Aktualisierte verbindliche Projekt-Roadmap.
 
-Codex muss vor Änderungen immer den tatsächlichen Repository-Stand prüfen.
+Diese Roadmap integriert:
 
-## Projektziel
+- den aktuellen Projektstand,
+- die bisherigen Sprints 0 bis 17,
+- die geplanten Admin-/Layout-Sprints,
+- die Brainstorming-Anforderungen zu festen dynamischen System-Dashboards,
+- die weiterhin verbindlichen Sicherheits- und Legacy-Kompatibilitätsregeln.
 
-Ein leichtgewichtiges Home-Assistant-Dashboard für ein Apple iPad mini der
-ersten Generation mit iOS 9.3.5 und Safari unter iOS 9.
+Sie ergänzt:
+
+- `AGENTS.md`
+- `README.md`
+- `docs/CODEX_HANDOFF.md`
+- `docs/PROJECT_STATUS.md`
+- die einzelnen Dateien unter `docs/sprints/`
+
+Codex muss vor jedem Sprint den tatsächlichen Repository-Stand prüfen.
+
+---
+
+# Verbindliche Grundsätze
+
+## Architektur
+
+`ha-legacy-dashboard` bleibt eine eigenständige externe Node.js-/Express-Anwendung.
+
+Es ist:
+
+- kein internes Home-Assistant-Dashboard,
+- kein Lovelace-Dashboard,
+- kein Custom Panel,
+- keine direkte Frontend-Erweiterung innerhalb von Home Assistant.
+
+Datenfluss:
 
 ```text
-Legacy-Browser -> HA Legacy Dashboard Gateway -> Home Assistant REST API
+Legacy Browser / iPad
+        |
+        | HTTP
+        v
+HA Legacy Dashboard Gateway
+Node.js + Express
+        |
+        | Home Assistant API
+        v
+Home Assistant
 ```
 
-Der Home-Assistant-Token verbleibt ausschließlich im Backend.
+## Sicherheit
 
-## Statusübersicht
+Verbindlich für alle Sprints:
+
+- Home-Assistant-Token ausschließlich im Backend
+- Browser kennt keinen HA-Token
+- keine generische Home-Assistant-Service-API
+- keine automatische Freigabe schreibender Entitäten
+- bestehende Write-Allowlists bleiben separate Sicherheitsgrenze
+- Dashboard-Sichtbarkeit erzeugt niemals Schreibrechte
+- Admin-Token getrennt vom HA-Token
+- keine Secrets in Logs
+- keine Secrets im Browser
+- keine Secrets im Repository
+- bestehende Rate Limits, Payload Limits und Security Header bleiben erhalten
+- neue Schreibaktionen nur über explizite, eng begrenzte Backend-Endpunkte
+
+Kurzform:
+
+```text
+Entity sichtbar
+     !=
+Entity schreibbar
+```
+
+## Legacy-Kompatibilität
+
+Das Wall-Display bleibt kompatibel mit:
+
+- Apple iPad mini 1
+- iOS 9.3.5
+- Safari unter iOS 9
+- ECMAScript 5
+
+Im Legacy-Frontend weiterhin nicht verwenden:
+
+- `let`
+- `const`
+- arrow functions
+- template literals
+- classes
+- `fetch`
+- `Promise`
+- `async`
+- `await`
+- optional chaining
+- nullish coalescing
+- CSS Grid
+- Flexbox `gap`
+
+Browserkommunikation weiterhin über:
+
+```text
+Legacy.http
+XMLHttpRequest
+```
+
+Die Admin-Oberfläche darf moderne Browsertechnologie verwenden, sofern das
+Legacy-Wall-Display davon technisch getrennt bleibt.
+
+---
+
+# Zwei Dashboard-Klassen
+
+Ab Sprint 18 unterscheidet das Projekt verbindlich zwischen zwei Arten von
+Dashboards.
+
+## 1. Benutzerdashboards
+
+Beispiele:
+
+```text
+/d/eingang
+/d/wohnen
+/d/esszimmer
+```
+
+Eigenschaften:
+
+- frei konfigurierbar
+- anlegbar
+- löschbar
+- umbenennbar
+- Widgets frei auswählbar
+- Kachelgrößen konfigurierbar
+- Rasterlayout konfigurierbar
+- im Admin-UI verwaltbar
+
+## 2. Feste System-Dashboards
+
+Feste Routen:
+
+```text
+/system/summary
+/system/errors
+```
+
+Eigenschaften:
+
+- immer vorhanden
+- nicht löschbar
+- feste technische Funktion
+- festes Layout
+- dynamischer Inhalt
+- nicht über das normale Rasterlayout frei editierbar
+- nur begrenzte Regeln und Filter konfigurierbar
+- dieselbe sichere Gateway-Architektur wie alle anderen Ansichten
+
+Bedeutung von „fest“:
+
+- fest innerhalb der externen Anwendung
+- nicht in Home Assistant registriert
+- nicht Teil von Lovelace
+- nicht Teil des normalen Dashboard-Editors
+
+---
+
+# Statusübersicht
 
 | Sprint | Thema | Status |
 |---|---|---|
-| 0 | Projektgrundlage und Repository | abgeschlossen |
-| 1 | Express-Gateway und HA-Anbindung | abgeschlossen |
-| 2 | Legacy-kompatibles Dashboard | abgeschlossen |
-| 3 | Modulare Widgets, Icons und Theme | abgeschlossen |
-| 4 | Climate-Widget und Solltemperatur | abgeschlossen |
-| 5 | Standalone-Web-App für iOS 9 | abgeschlossen |
-| 6 | Weitere steuerbare Entitäten | abgeschlossen |
-| 7 | Konfigurationsgetriebene Dashboards | abgeschlossen |
-| 8 | Robustheit und Sicherheit | abgeschlossen |
-| 9 | Lokale Mock- und Integrationstests | abgeschlossen |
-| 10 | Deployment und Betrieb | abgeschlossen |
-| 11 | Wall-Display-Betrieb | abgeschlossen |
-| 12 | Release und Dokumentation | abgeschlossen |
-| 13 | Multi-Dashboard Foundation | abgeschlossen |
-| 14 | Persistenz und Admin-API-Grundlage | abgeschlossen |
-| 15 | Grafische Admin-Konfiguration | abgeschlossen |
-| 16 | Konfigurierbare Kachelgrößen | abgeschlossen |
+| 0 | Projektgrundlage und Repository | umgesetzt |
+| 1 | Express-Gateway und HA-Anbindung | umgesetzt |
+| 2 | Legacy-kompatibles Dashboard | umgesetzt |
+| 3 | Modulare Widgets, Icons und Theme | umgesetzt |
+| 4 | Climate-Widget und Solltemperatur | umgesetzt |
+| 5 | Standalone-Web-App für iOS 9 | umgesetzt |
+| 6 | Weitere steuerbare Entitäten | teilweise umgesetzt, Light vorhanden |
+| 7 | Konfigurationsgetriebenes Einzel-Dashboard | umgesetzt |
+| 8 | Robustheit und Sicherheit | umgesetzt |
+| 9 | Lokale Mock- und Integrationstests | umgesetzt |
+| 10 | Deployment und Betrieb | umgesetzt |
+| 11 | Wall-Display-Betrieb | umgesetzt |
+| 12 | UI Polish + Release Baseline | geplant/umzusetzen gemäß Sprint-Datei |
+| 13 | Multi-Dashboard Foundation | geplant/umzusetzen gemäß Sprint-Datei |
+| 14 | Persistent Configuration + Admin API Foundation | geplant |
+| 15 | Admin Configuration UI | geplant |
+| 16 | Configurable Tile Sizes | geplant |
+| 17 | Drag-and-Drop Grid Layout | geplant |
+| 18 | System Dashboard Foundation | neu geplant |
+| 19 | Summary Dashboard MVP | neu geplant |
+| 20 | Error Dashboard MVP | neu geplant |
+| 21 | Registry & Diagnostic Enrichment | neu geplant |
+| 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
+| 23 | Automation Impact & Advanced Diagnostics | neu geplant |
+| 24 | Home Assistant App Packaging | verschoben |
+| 25 | Release & Distribution | geplant |
 
 ---
 
 # Sprint 0 – Projektgrundlage und Repository
 
-## Umgesetzt
+## Ziel
 
-- Git-Repository und GitHub-Repository eingerichtet
-- Branch auf `main` vereinheitlicht
-- getrennte Historien zusammengeführt
-- SSH-Zugriff vom LXC und Mac zu GitHub eingerichtet
-- Repository auf dem Mac geklont
-- `.gitignore` und Ausschluss von `.env`
-- `README.md`, `AGENTS.md` und `docs/CODEX_HANDOFF.md`
-- Codex-Arbeitsordner auf dem Mac vorbereitet
+Versioniertes, reproduzierbares Projekt mit GitHub-Workflow.
 
-## Relevante Commits
+## Kerninhalte
 
-```text
-2491f61 Initial project setup
-e7d2d48 merge: integrate initial GitHub repository
-aa44565 docs: add Codex instructions and project handoff
-```
+- Git-Repository
+- Branch `main`
+- GitHub-Anbindung
+- SSH vom LXC
+- SSH vom Mac
+- `.gitignore`
+- `.env` ausgeschlossen
+- Dokumentationsgrundlage
+- Codex-Arbeitsablauf
 
 ---
 
@@ -70,530 +226,1185 @@ aa44565 docs: add Codex instructions and project handoff
 
 ## Ziel
 
-Sicheres Backend zwischen Legacy-Browser und Home Assistant.
+Sicheres Backend zwischen Browser und Home Assistant.
 
-## Umgesetzt
+## Kerninhalte
 
-- Node.js und Express
-- `.env`-Konfiguration
-- axios-basierte HA-Kommunikation
-- `/api/status`
-- `/api/dashboard`
+- Node.js
+- Express
+- Axios
+- serverseitige HA-Zugangsdaten
+- Status-API
+- Dashboard-API
 - statische Frontend-Auslieferung
-- Token ausschließlich serverseitig
-
-## Dateien
-
-```text
-src/server.js
-src/routes/api.js
-src/services/homeassistant.js
-```
 
 ---
 
 # Sprint 2 – Legacy-kompatibles Dashboard
 
-## Umgesetzt
+## Ziel
 
-- responsive Kartenansicht
-- Flexbox statt CSS Grid
-- Portrait und Landscape
-- Light Mode und Dark Mode
-- manueller Theme-Schalter
-- Theme-Persistenz
-- automatischer Refresh
-- ES5-kompatibles Frontend
-- Wechsel von `fetch` zu `XMLHttpRequest`
+Responsive Oberfläche für Safari iOS 9.
 
-## Dateien
+## Kerninhalte
 
-```text
-src/public/index.html
-src/public/css/style.css
-src/public/js/app.js
-src/public/js/core/compat.js
-src/public/js/core/theme.js
-```
+- HTML/CSS/plain JS
+- ES5
+- XMLHttpRequest
+- Light/Dark Mode
+- Portrait/Landscape
+- Flexbox
+- Polling
 
 ---
 
 # Sprint 3 – Modulare Widgets, Icons und Dashboard-Struktur
 
-## Umgesetzt
+## Kerninhalte
 
-- Widget-Basiskonzept
-- Dashboard-Renderer
+- Widget-Basis
+- Sensor
+- Binary Sensor
 - Inline-SVG-Icons
-- Temperatur-Widget
-- Luftfeuchtigkeits-Widget
-- Binary-Sensor-Widget
-- Fensterstatus
-- zentrale Widget-Registrierung
-
-## Aktuelle Entitäten
-
-```text
-sensor.badezimmer_smart_indoor_module_temperatur
-sensor.badezimmer_smart_indoor_module_luftfeuchtigkeit
-binary_sensor.kuche_fenster_rechts
-binary_sensor.kuche_fenster_mitte
-```
+- zentrale Widgetregistrierung
 
 ---
 
 # Sprint 4 – Climate-Widget und Solltemperatursteuerung
 
-## Umgesetzt
+## Kerninhalte
 
 - Climate-Widget
-- Ist- und Solltemperatur
-- HVAC-Status beziehungsweise HVAC-Aktion
-- Plus-/Minus-Steuerung
-- `POST /api/climate/temperature`
-- Entity-Allowlist
-- Eingabevalidierung
-- HA-Service `climate.set_temperature`
-
-## Entity
-
-```text
-climate.esszimmer_thermostate
-```
-
-## Beobachtetes Problem
-
-Nach dem Drücken von Plus erschien:
-
-```text
-Setze Zieltemperatur auf 22.5 °C …
-```
-
-Die Erfolgsmeldung und der neue Zielwert wurden zunächst nicht sichtbar.
-
-## Vorgesehene Korrektur
-
-- Zielwert optimistisch aktualisieren
-- Refresh kurz blockieren
-- Erfolgsmeldung nicht sofort überschreiben
-- HA-State kurz nachprüfen
-- HTTP 200 bei Bestätigung
-- HTTP 202 bei noch ausstehender Bestätigung
-
-## Abschluss
-
-- Zielwert wird optimistisch aktualisiert
-- schnelle Plus-/Minus-Klicks werden zusammengefasst
-- Bedienelemente bleiben während der HA-Bestätigung aktiv
-- veraltete Refresh-Antworten werden verworfen
-- HTTP 200 und HTTP 202 werden korrekt verarbeitet
-- Funktion auf dem iPad unter iOS 9 abgenommen
-
-## Abnahmekriterien
-
-- Plus und Minus funktionieren
-- Zielwert ändert sich unmittelbar
-- Erfolgsmeldung bleibt sichtbar
-- Refresh überschreibt keinen neuen Wert
-- korrekter HA-Service-Aufruf
-- verständliche Fehleranzeige
-- kein Token im Browser
+- Solltemperatur
+- Plus/Minus
+- optimistische Aktualisierung
+- Refreshschutz
+- Bestätigungsprüfung
+- separate Write-Allowlist
 
 ---
 
 # Sprint 5 – Standalone-Web-App für iOS 9
 
-## Umgesetzt
+## Kerninhalte
 
-- Apple-Web-App-Meta-Tags
-- `apple-mobile-web-app-capable`
-- `apple-mobile-web-app-title`
-- Statusbalkenstil für den Standalone-Modus
-- lokale Apple-Touch-Icons in 76, 120, 152 und 180 Pixeln
-- Start über den Home-Bildschirm
-- Vollbildmodus ohne Safari-Adress- und Buttonleisten
-- Manifest und Icons in 192 und 512 Pixeln für moderne Browser
-- keine Service-Worker-Registrierung
-- HTML und Manifest werden nicht dauerhaft gecacht
-- versionierte statische Assets erhalten langfristige Cache-Header
-- automatisierte Tests für Metadaten, Manifest, Icons und Cache-Header
-
-## Einschränkung
-
-iOS 9 unterstützt keine Service Worker. Ziel ist daher eine klassische
-iOS-Standalone-Web-App, keine moderne Offline-PWA.
+- Apple-Web-App-Metatags
+- Touch Icons
+- Manifest
+- Home-Screen-Start
+- Asset-Versionierung
+- kein Service Worker
 
 ---
 
 # Sprint 6 – Weitere steuerbare Entitäten
 
-## Umgesetzt
+## Aktueller Stand
 
-- ES5-kompatibles `light`-Widget mit großem Touch-Schalter
-- explizit freigegebene Entity `light.esszimmer_lampen`
-- eigener Gateway-Endpunkt `POST /api/light/state`
-- ausschließlich fest zugeordnete Services `light.turn_on` und
-  `light.turn_off`
-- sofortige optimistische Anzeige ohne mehrsekündige Buttonsperre
-- schnelle Folgetaps werden auf den zuletzt gewünschten Zustand
-  zusammengeführt
-- Fehleranzeige und anschließender Zustands-Refresh
-- Light-/Dark-Mode und mindestens 44 Pixel große Touch-Ziele
-- Gateway- und Frontendtests für erlaubte und abgewiesene Befehle
+Light ist umgesetzt.
 
-## Bewusst nicht freigegeben
+## Weiterhin möglicher späterer Ausbau
 
-- beliebige `switch`-Entities
-- Garagentore oder andere `cover`-Entities
-- Pumpen, Server-Steckdosen und sonstige sensible Geräte
-- beliebige Home-Assistant-Domänen oder Services aus Browserdaten
+- Switch
+- Cover
+- weitere explizit erlaubte Domains
 
-`weather`, `media_player`, weitere `climate`- und `binary_sensor`-Widgets
-bleiben mögliche spätere Erweiterungen und erhalten ohne konkrete Auswahl
-keine zusätzlichen Dashboard-Kacheln.
-
-## Sicherheitsanforderung
-
-Jede schreibbare Entity muss im Backend explizit erlaubt werden. Es darf keine
-generische Browser-API für beliebige HA-Services geben.
+Nur in separaten, sicherheitsgeprüften Sprints.
 
 ---
 
-# Sprint 7 – Konfigurationsgetriebene Dashboards
+# Sprint 7 – Konfigurationsgetriebenes Dashboard
 
-## Umgesetzt
+## Kerninhalte
 
-- zentrale Konfiguration in `src/config/dashboard.js`
-- Entity-ID, Widget-Typ, Titel, Untertitel, Icon, Icon-Klasse, Einheit,
-  Reihenfolge und Sichtbarkeit je Eintrag
-- sichtbare Entity-Liste für `/api/dashboard` wird aus der Konfiguration
-  abgeleitet
-- eigener read-only Endpunkt `GET /api/dashboard/config`
-- Frontend lädt Konfiguration vor den Zustandsdaten
-- explizite Zuordnung der erlaubten Typen `sensor`, `binary`, `light` und
-  `climate`
-- unbekannte Widget-Typen werden ignoriert und nicht dynamisch ausgeführt
-- fehlgeschlagene Konfigurationsabfragen werden beim nächsten Intervall erneut
-  versucht
-- automatisierte Tests für Reihenfolge, Sichtbarkeit, Typ-Allowlist,
-  API-Ausgabe und Ladeabfolge
-
-## Sicherheitstrennung
-
-Die Dashboard-Konfiguration steuert ausschließlich Anzeige und lesende
-Entity-Abfragen. Sie enthält keine Services und gewährt keine Schreibrechte.
-Die Allowlisten für `climate` und `light` verbleiben separat in
-`src/routes/api.js`.
+- zentrale Dashboardkonfiguration
+- `visible`
+- `order`
+- öffentliche bereinigte Config-API
+- Anzeige und Schreibrecht getrennt
 
 ---
 
-# Sprint 8 – Robustheit, Fehlerbehandlung und Sicherheit
+# Sprint 8 – Robustheit und Sicherheit
 
-## Umgesetzt
+## Kerninhalte
 
-- zentrale Express-Fehlerbehandlung für ungültiges JSON und zu große Payloads
-- 10-Sekunden-Timeouts für Browser- und HA-Requests
-- definierte Statuscodes einschließlich 400, 403, 404, 413, 429, 502 und 503
-- strukturierte einzeilige JSON-Logs
-- zusätzliche Redaktion von Feldnamen wie Token, Authorization, Password und
-  Secret
-- `GET /api/status` mit getrenntem Gateway- und HA-Erreichbarkeitsstatus
-- `_meta` in Dashboard-Antworten mit HA-Status, Abrufzeit und ausgefallenen
-  sichtbaren Entities
-- letzte erfolgreiche Kacheln bleiben bei vollständigem HA-Ausfall sichtbar
-- Anzeige des letzten vollständigen erfolgreichen Refreshs
-- Kennzeichnung teilweiser Erreichbarkeit
-- Rate-Limit von 10 tatsächlichen HA-Schreibaufrufen je Entity und 10 Sekunden
-- JSON-Payload-Limit von 16 KB
-- `Cache-Control: no-store` für API-Antworten
-- Content-Security-Policy, `X-Frame-Options: DENY`, `Referrer-Policy:
-  no-referrer` und `X-Content-Type-Options: nosniff`
-- Express-Technologieheader deaktiviert
-- automatisierte Sicherheits-, Gateway- und Frontendtests
+- Timeouts
+- Fehlerbehandlung
+- Stale Data
+- Teilverfügbarkeit
+- Rate Limits
+- Payload Limits
+- Security Header
+- Log Redaction
 
 ---
 
 # Sprint 9 – Lokale Mock- und Integrationstests
 
-## Umgesetzt
+## Kerninhalte
 
-- integrierter Node-Test-Runner ohne zusätzliche Testabhängigkeiten
-- Frontend-Test mit Fake-DOM und kontrollierten Timern
-- echter Gateway-Prozess gegen lokalen Mock-Home-Assistant
-- Test-Gateway startet in einem leeren temporären Arbeitsverzeichnis
-- ausschließlich gefälschter HA-Token
-- Mock-Server bindet nur an `127.0.0.1`
-- automatische Bereinigung aller Testprozesse und temporären Dateien
-
-Ausführung:
-
-```bash
-npm test
-```
-
-## Verbindliche Regeln
-
-- nur `127.0.0.1` oder `localhost`
-- kein Kontakt zum realen Home Assistant
-- produktive `.env` nicht lesen
-- nur gefälschte Credentials
-- produktiven systemd-Service nicht verändern
-- temporäre Artefakte nicht committen
-- Mock-Server nach Tests beenden
-
-## Testfälle
-
-- Status- und Dashboard-Endpunkt
-- fehlende Entity
-- Timeout und HTTP-Fehler
-- ungültiges JSON
-- erlaubte und nicht erlaubte Climate-Entity
-- gültige und ungültige Temperatur
-- Minimum, Maximum und Step
-- HA-Fehler
-- verzögerte Bestätigung
-- HTTP 200 und HTTP 202
+- localhost-only Mock HA
+- keine Produktionscredentials
+- Gateway-Integration
+- Climate
+- Light
+- Security
+- Fehlerfälle
 
 ---
 
 # Sprint 10 – Deployment und Betrieb
 
-## Bisheriger Ablauf
+## Kerninhalte
 
-Mac:
-
-```bash
-git status
-git add .
-git commit -m "..."
-git push
-```
-
-LXC:
-
-```bash
-cd /home/dashboard/ha-legacy-dashboard
-git pull --ff-only
-```
-
-Backend-Änderungen:
-
-```bash
-systemctl restart ha-legacy-dashboard.service
-systemctl status ha-legacy-dashboard.service --no-pager -l
-```
-
-## Umgesetzt
-
-- ausführbare Deployment-Checkliste in `deploy/check.sh`
-- Syntaxprüfung aller JavaScript-Dateien vor einem Neustart
-- vollständige Mock- und Integrationstests vor einem Neustart
-- ausschließlich Fast-Forward von `origin/main`
-- optionales `npm ci --omit=dev` bei geänderter Lockdatei
-- read-only Health-Check für Dienst, APIs, Dashboard-Metadaten und Header
-- explizites Rollback auf Commit oder Tag mittels Detached HEAD
-- kein `git reset --hard`, kein Force-Push und kein Überschreiben von Branches
-- Dokumentation für Release-Tags
-- GitHub-CI für Pushes und Pull Requests ohne produktive Credentials
-- eng begrenzte optionale sudoers-Regel ausschließlich für den Neustart von
-  `ha-legacy-dashboard.service`
-- vollständige Betriebsanleitung in `docs/DEPLOYMENT.md`
+- systemd
+- Syntaxprüfung
+- Tests vor Deployment
+- Fast-Forward
+- Restart
+- Health Check
+- Rollback
+- GitHub Actions
 
 ---
 
 # Sprint 11 – Wall-Display-Betrieb
 
-## Umgesetzt
+## Kerninhalte
 
-- gut lesbare Uhr und deutsches Datum im Kopfbereich
-- sichtbarer Zustand für Gateway und Home Assistant
-- letzter erfolgreicher Refresh bleibt unter den Kacheln sichtbar
-- automatische Wiederverbindung durch Intervall und Online-Ereignis
-- serverseitig validiertes Refresh-Intervall über
-  `DASHBOARD_REFRESH_INTERVAL_MS` von 3000 bis 300000 Millisekunden
-- bestehende manuelle Tag-/Nacht-Darstellung mit sicherer Persistenz
-- Netzwerkfehler-Banner, das nach erfolgreicher Verbindung verschwindet
-- bestehende große Touch-Ziele bleiben erhalten
-- automatisierte Frontend- und Gateway-Tests für Status, Erholung und Intervall
-
-Echte Kiosk- und Bildschirmsteuerung bleibt durch iOS 9 begrenzt.
+- Uhr
+- Datum
+- Verbindungsstatus
+- Recovery
+- kompakter Header
+- Stale-Data-Anzeige
 
 ---
 
-# Sprint 12 – Release, Dokumentation und Wartbarkeit
+# Sprint 12 – UI Polish + Release Baseline
 
-## Umgesetzt
+## Ziel
 
-- Versionierung
-- `CHANGELOG.md`
-- Installationsanleitung
-- Upgrade- und Rollback-Anleitung
-- Troubleshooting
-- Sicherheitsdokumentation
-- Testdokumentation
-- Entity-Beispiele
-- bekannte Einschränkungen
-- dokumentierter Hinweis auf die noch offene Lizenzentscheidung
+Visuelle und technische Baseline bereinigen.
 
-Die Release-Baseline `1.0.0`, der Changelog, die Wartungsdokumentation, die
-isolierten Rate-Limit-Tests und das kompaktere UI sind umgesetzt. Eine
-Projektlizenz bleibt eine bewusste Entscheidung des Projektinhabers.
+## Kerninhalte
+
+- Climate Plus/Minus zentrieren
+- Climate-Karte kompakter
+- Kartenabstände optimieren
+- Versionsnummern vereinheitlichen
+- tote/ungenutzte Komponenten prüfen
+- Rate-Limit-Test isolieren
+- Node-Runtime dokumentieren
+- Changelog-Basis
+
+Details:
+
+```text
+docs/sprints/SPRINT-12.md
+```
 
 ---
 
 # Sprint 13 – Multi-Dashboard Foundation
 
-## Umgesetzt
+## Ziel
 
-- statische, versionierte Dashboardprofile in `src/config/dashboard.js`
-- eindeutiges Standard-Dashboard `default`
-- zweites Dashboard `esszimmer` mit vorhandenen Light- und Climate-Entities
-- stabile Browserpfade `/d/default` und `/d/esszimmer`
-- öffentliche Dashboardliste `GET /api/dashboards`
-- dashboard-spezifische Konfiguration und Zustände
-- kontrollierte 404-Antworten für unbekannte Dashboard-IDs
-- Legacy-Routen `/api/dashboard/config` und `/api/dashboard` zeigen weiterhin
-  das Standard-Dashboard
-- dashboard-spezifische, deduplizierte HA-Leselisten
-- dynamischer Dashboardtitel im bestehenden ES5-Frontend
-- unveränderte, getrennte Schreib-Allowlisten für Climate und Light
-- keine Admin-UI, keine Laufzeitpersistenz und keine Layoutbearbeitung
-- automatisierte Konfigurations-, Frontend-, Routing- und Integrationstests
+Mehrere statische serverseitige Dashboards einführen.
 
----
+## Kerninhalte
 
-# Sprint 14 – Persistenz und Admin-API-Grundlage
+- Dashboard-IDs / Slugs
+- Standard-Dashboard
+- `/d/:dashboardId`
+- Dashboardliste
+- dashboard-spezifische Config-API
+- dashboard-spezifische State-API
+- Legacy-Endpunkte bleiben kompatibel
 
-## Umgesetzt
+Details:
 
-- versioniertes Konfigurationsschema `schemaVersion: 1`
-- stabile, global eindeutige Widget-IDs
-- Standardpersistenz in `data/dashboards.json`
-- Pfadüberschreibung über `DASHBOARD_CONFIG_PATH`
-- automatische Migration der Sprint-13-Profile beim ersten Start
-- vollständige Validierung vor jeder Speicherung
-- atomare Ersetzung und eine gültige Vorgängerversion als `.bak`
-- Wiederherstellung aus gültigem Backup bei beschädigter Primärdatei
-- standardmäßig deaktivierte Admin-API
-- separater Bearer-Token, der nicht dem HA-Token entsprechen darf
-- CRUD-Routen für Gesamtkonfiguration, Dashboards und Widgets
-- sanitisiertes Entity-Inventar ohne Rohzustände oder beliebige Attribute
-- Rate-Limit für Admin-Schreiboperationen
-- unveränderte Climate- und Light-Schreib-Allowlisten
-- keine grafische Admin-Oberfläche, keine Layoutbearbeitung und keine
-  automatische Schreibberechtigung
+```text
+docs/sprints/SPRINT-13.md
+```
 
 ---
 
-# Sprint 15 – Grafische Admin-Konfiguration
+# Sprint 14 – Persistent Configuration + Admin API Foundation
 
-## Umgesetzt
+## Ziel
 
-- getrennte moderne Oberfläche unter `/admin`
-- session-scoped Bearer-Anmeldung mit Logout und automatischer Bereinigung bei
-  HTTP 401/403
-- lokaler Gesamtkonfigurationsentwurf mit explizitem Speichern und Verwerfen
-- Dashboard erstellen, umbenennen, duplizieren und löschen
-- Standard-Dashboard und Refresh-Intervall bearbeiten
-- global eindeutige Widget-IDs beim Duplizieren und Hinzufügen
-- sanitisiertes Entity-Inventar mit Suche und Domainfilter
-- ausschließlich bekannte Widgettypen und vorhandene Icon-Namen
-- Widgettitel, Untertitel, Icon, Einheit, Sichtbarkeit und Reihenfolge
-- Auf-/Ab-Steuerung ohne Drag-and-drop
-- verständliche API-Fehler und Warnung bei ungespeicherten Änderungen
-- lokale Admin-Assets ohne CDN oder Framework
-- unverändertes ES5-/iOS-9-Wall-Display und unveränderte HA-Schreib-Allowlisten
+Multi-Dashboard-Konfiguration persistent und zur Laufzeit editierbar machen.
 
----
+## Kerninhalte
 
-# Sprint 16 – Konfigurierbare Kachelgrößen
+- versioniertes Konfigurationsschema
+- stabile Widget-IDs
+- persistenter Config Store
+- atomisches Schreiben
+- Backup
+- Migration
+- Admin-API
+- Admin-Token
+- Admin-API standardmäßig deaktiviert
+- Entity-Inventar
 
-## Umgesetzt
+## Persistenz
 
-- Schema-Version 2 mit validiertem Widgetfeld `size`
-- automatische Migration von Schema 1 mit `size: normal` ohne Änderung
-  bestehender IDs, Entities, Reihenfolge oder Sichtbarkeit
-- feste Presets `compact`, `normal`, `wide`, `tall` und `large`
-- Kachelgrößen-Auswahl und Größenanzeige in der Admin-Oberfläche
-- Größenübernahme bei Dashboardduplikaten und Standard `normal` für neue
-  Widgets
-- kontrollierter API-Fehler `invalid_widget_size` ohne Teilpersistenz
-- sichere, allowlist-basierte CSS-Klassen im ES5-Wall-Display
-- responsiver Flexbox-Fluss für schmale, mittlere und große Displays
-- unveränderte Climate-/Light-Touchziele und Schreib-Allowlisten
-- Legacy-Asset-Cache-Version 18
-- keine freie Positionierung, keine frei definierbaren Maße und kein
-  Drag-and-drop
+Bevorzugt:
+
+```text
+data/dashboards.json
+```
+
+überschreibbar über:
+
+```text
+DASHBOARD_CONFIG_PATH
+```
+
+## Wichtig
+
+Admin-Konfiguration verändert keine Write-Allowlist.
 
 ---
 
-# Priorisierte Reihenfolge
+# Sprint 15 – Admin Configuration UI
 
-1. Sprint 4 vollständig verifizieren und abschließen
-2. Sprint 9 lokale Mock- und Integrationstests
-3. Sprint 5 iOS-Standalone-Web-App
-4. Sprint 8 Robustheit und Sicherheit
-5. Sprint 10 Deployment und Rollback
-6. Sprint 6 weitere Entitäten
-7. Sprint 7 Konfigurationssteuerung
-8. Sprint 11 Wall-Display-Funktionen
-9. Sprint 12 Release und Dokumentation
-10. Sprint 13 Multi-Dashboard-Grundlage
-11. Sprint 14 Persistenz und Admin-API-Grundlage
-12. Sprint 15 grafische Admin-Konfiguration
-13. Sprint 16 konfigurierbare Kachelgrößen
+## Ziel
+
+Grafische Verwaltungsoberfläche unter:
+
+```text
+/admin
+```
+
+## Kerninhalte
+
+- Admin-Login
+- Dashboards verwalten
+- Standard-Dashboard wählen
+- Entity-Browser
+- Widgets hinzufügen/ändern/löschen
+- Reihenfolge
+- Sichtbarkeit
+- Icon-Auswahl
+- Speichern/Verwerfen
+
+Details:
+
+```text
+docs/sprints/SPRINT-15.md
+```
 
 ---
 
-# Arbeitsregeln für Codex
+# Sprint 16 – Configurable Tile Sizes
 
-Vor jeder Änderung:
+## Ziel
+
+Sichere Größen-Presets pro Widget.
+
+## Presets
+
+```text
+compact
+normal
+wide
+tall
+large
+```
+
+## Kerninhalte
+
+- Schema-Erweiterung
+- Migration
+- Admin-Select
+- sichere CSS-Klassen
+- responsive Flexbox-Darstellung
+- weiterhin kein freies Raster
+
+Details:
+
+```text
+docs/sprints/SPRINT-16.md
+```
+
+---
+
+# Sprint 17 – Drag-and-Drop Grid Layout
+
+## Ziel
+
+Rasterbasierter Layouteditor.
+
+## Kerninhalte
+
+- stabile Widget-IDs als Layoutreferenz
+- `x`
+- `y`
+- `w`
+- `h`
+- Portraitlayout
+- Landscapelayout
+- Drag-and-drop
+- Resize
+- Kollisionserkennung
+- Bounds
+- deterministisches Auto-Placement
+- Tastaturalternative
+- Legacy-Renderer ohne CSS Grid
+
+Details:
+
+```text
+docs/sprints/SPRINT-17.md
+```
+
+---
+
+# Sprint 18 – System Dashboard Foundation
+
+## Ziel
+
+Gemeinsame technische Grundlage für feste dynamische System-Dashboards schaffen.
+
+Noch kein vollständiges Summary- oder Error-Dashboard.
+
+## Neue feste Routen
+
+```text
+/system/summary
+/system/errors
+```
+
+Diese Routen sind:
+
+- immer vorhanden
+- nicht löschbar
+- nicht Teil normaler Benutzerdashboards
+- nicht frei über das Raster editierbar
+
+## Backend-Zielarchitektur
+
+```text
+Home Assistant
+      |
+      v
+System State Collector
+      |
+      v
+Normalized System Snapshot
+      |
+      +-------------------+
+      |                   |
+      v                   v
+Summary Engine        Issue Engine
+      |                   |
+      v                   v
+/system/summary       /system/errors
+```
+
+## Gemeinsamer Snapshot
+
+Der Snapshot soll, soweit sicher und verfügbar, enthalten:
+
+- Entity States
+- Verfügbarkeit
+- Zeitstempel
+- Gateway-/HA-Verbindungsstatus
+- optionale Entity-/Device-/Area-Metadaten
+- später erweiterbare Diagnoseinformationen
+
+## API
+
+Konzeptionell:
+
+```text
+GET /api/system-dashboards/summary
+GET /api/system-dashboards/errors
+GET /api/system-dashboards/config
+```
+
+Die tatsächliche Route darf an die bestehende Architektur angepasst werden.
+
+## Anforderungen
+
+- keine doppelten unnötigen HA-Abfragen
+- Snapshot für beide System-Dashboards gemeinsam nutzbar
+- nur reduzierte Browser-Payloads
+- Teilfehler behandelbar
+- letzte erfolgreiche Daten speicherbar
+- HA-Ausfall != leerer Zustand
+- Gateway-Ausfall != HA-Ausfall
+- ES5-Frontend
+- keine Schreibaktionen
+
+## Neue Architekturmodule bevorzugt
+
+Beispielsweise:
+
+```text
+src/services/system-state.js
+src/services/entity-metadata.js
+src/services/summary/engine.js
+src/services/summary/rules.js
+src/services/issues/engine.js
+src/services/issues/severity.js
+```
+
+Keine weitere Konzentration der Logik in `app.js` oder `api.js`.
+
+---
+
+# Sprint 19 – Summary Dashboard MVP
+
+## Ziel
+
+Feste dynamische Übersicht:
+
+> Was ist im Haus gerade aktiv, offen, eingeschaltet oder läuft?
+
+## Route
+
+```text
+/system/summary
+```
+
+## MVP-Aktivitätsregeln
+
+### Light
+
+```text
+domain: light
+active: state == on
+```
+
+### Switch
+
+```text
+domain: switch
+active: state == on
+```
+
+nur wenn nicht als technisch/diagnostisch ausgeschlossen.
+
+### Binary Sensor
+
+Relevante Device Classes:
+
+```text
+window
+door
+opening
+garage_door
+```
+
+aktiv/relevant bei offenem Zustand.
+
+### Cover
+
+Relevant bei:
+
+```text
+open
+opening
+closing
+```
+
+und sinnvoller Positionsinformation.
+
+### Vacuum
+
+Relevant bei:
+
+```text
+cleaning
+returning
+paused
+```
+
+### Climate
+
+Nicht allein HVAC-Modus verwenden.
+
+Relevant bei tatsächlicher Aktion, z. B.:
+
+```text
+heating
+cooling
+drying
+fan
+```
+
+### Media Player
+
+MVP optional:
+
+```text
+playing
+```
+
+## Nicht automatisch anzeigen
+
+Numerische Messsensoren wie:
+
+```text
+sensor.temperature
+sensor.humidity
+```
+
+erscheinen nicht ohne explizite Aktivitätsregel.
+
+## Gruppierung
+
+Standard:
+
+```text
+nach Kategorie
+```
+
+Optional später:
+
+```text
+nach Raum
+```
+
+## Standardbereiche
+
+```text
+Offen
+Läuft gerade
+Eingeschaltet
+Klima aktiv
+Medien aktiv
+Weitere relevante Zustände
+```
+
+## UI
+
+Kompakte Aktivitätsliste statt großer normaler Dashboardkacheln.
+
+## Offline-Verhalten
+
+HA nicht erreichbar:
+
+```text
+nicht "keine Aktivitäten"
+```
+
+sondern:
+
+```text
+Daten nicht aktuell
+Letzte erfolgreiche Aktualisierung: ...
+```
+
+## Konfiguration
+
+Mindestens:
+
+- Entities ausschließen
+- technische/diagnostische Entities standardmäßig ausschließen
+- später erweiterbar für Einschlussregeln
+
+---
+
+# Sprint 20 – Error Dashboard MVP
+
+## Ziel
+
+Feste Diagnoseansicht:
+
+> Was funktioniert aktuell nicht oder ist gefährdet?
+
+## Route
+
+```text
+/system/errors
+```
+
+## MVP-Daten
+
+Mindestens:
+
+- `unavailable`
+- `unknown`
+- Gateway-/HA-Verbindungsstatus
+- sicherheitsrelevante Entities
+- Dauer des Problems
+- Entity-ID
+- Anzeigename
+- Domain
+- Bereich, sofern verfügbar
+- Schweregrad
+
+## Verbindliche Trennung
+
+```text
+unknown != unavailable
+```
+
+## Schweregrade
+
+```text
+critical
+error
+warning
+info
+```
+
+## Sicherheitsrelevante Entities
+
+Im Admin konfigurierbar.
+
+Bevorzugte Priorität:
+
+1. explizite Markierung in HA Legacy Dashboard
+2. Sicherheitsgruppe
+3. HA Label, falls verfügbar
+4. Bereich/Gerät
+5. Heuristik
+6. manuelle Nachbearbeitung
+
+## Leerer Zustand
+
+Nur wenn aktuelle Daten erfolgreich geladen wurden:
+
+```text
+Keine aktiven Störungen erkannt.
+```
+
+Bei HA-Ausfall niemals „alles OK“.
+
+---
+
+# Sprint 21 – Registry & Diagnostic Enrichment
+
+## Ziel
+
+System-Dashboards mit zusätzlichen strukturierten HA-Metadaten anreichern.
+
+## Zu prüfen
+
+- Entity Registry
+- Device Registry
+- Area Registry
+- Config Entries
+- Repairs / Issues
+- Matter-bezogene Daten
+- Integrationsstatus
+
+## Wichtig
+
+Dieser Sprint beginnt mit einer Capability-Prüfung gegen die tatsächlich
+unterstützte Home-Assistant-Version.
+
+Für jede Quelle klären:
+
+```text
+REST verfügbar?
+WebSocket erforderlich?
+offiziell/stabil?
+intern/undokumentiert?
+sicher nutzbar?
+```
+
+Nur belastbare Schnittstellen produktiv verwenden.
+
+## Matter
+
+Matter wird als spezialisierte Diagnosequelle behandelt, nicht als eigenes
+Parallelframework.
+
+Ziel:
+
+```text
+Matter-Komponente gestört
+X Geräte betroffen
+Y Entities betroffen
+```
+
+statt nur vieler einzelner Entity-Fehler.
+
+---
+
+# Sprint 22 – Rules, Grace Periods & Device Aggregation
+
+## Ziel
+
+Fehlalarme reduzieren und Summary-Einträge semantisch verbessern.
+
+## Fehler-Dashboard
+
+Einführen:
+
+- globale Karenzzeit
+- sicherheitskritische Karenzzeit
+- Entity-spezifische Karenzzeit
+- Ignorierliste
+- erwarteter Offlinezustand
+- Flapping-Erkennung
+- automatische Rücknahme nach Wiederherstellung
+
+Beispiel:
+
+```text
+normal: 120 Sekunden
+security critical: 15 Sekunden
+```
+
+## Summary-Dashboard
+
+Einführen:
+
+- Mindestdauer
+- Nachlaufzeit
+- Entprellung
+- explizite Include-/Exclude-Regeln
+- benutzerdefinierte Aktivitätsregeln
+- Leistungs-Schwellwerte
+
+Beispiel:
+
+```text
+Waschmaschine Leistung > 8 W
+Mindestdauer 30 s
+Nachlauf 60 s
+```
+
+## Geräteaggregation
+
+Mehrere Entities eines Geräts werden zu einem verständlichen Summary-Eintrag
+zusammengeführt.
+
+Beispiel:
+
+```text
+Waschmaschine läuft
+Baumwolle · noch ca. 24 Minuten
+```
+
+---
+
+# Sprint 23 – Automation Impact & Advanced Diagnostics
+
+## Ziel
+
+Potenzielle Auswirkungen von Fehlern auf Automationen analysieren.
+
+## Funktionen
+
+- Entity-Referenzen in Automationen finden
+- Trigger/Bedingung/Aktion unterscheiden, sofern zuverlässig
+- sicherheitsrelevante Automationen markieren
+- potenziell betroffene Alarmketten hervorheben
+
+## Wichtige Formulierung
+
+Keine falsche Sicherheit erzeugen.
+
+Nicht:
+
+```text
+Automation funktioniert nicht
+```
+
+sondern:
+
+```text
+Automation potenziell betroffen
+```
+
+## Einschränkungen
+
+Besonders berücksichtigen:
+
+- Templates
+- Blueprints
+- Gruppen
+- indirekte Referenzen
+- dynamische Entity-IDs
+
+## Spätere optionale Erweiterungen
+
+- Historie
+- Quittierung
+- Wartungsmodus
+- Benachrichtigungen
+- Zustandszusammenfassungen
+
+---
+
+# Sprint 24 – Home Assistant App Packaging
+
+## Ziel
+
+HA Legacy Dashboard zusätzlich als Home-Assistant-App betreibbar machen.
+
+Standalone-Betrieb bleibt erhalten.
+
+## Zielmodelle
+
+```text
+1. Standalone
+   LXC / VM / Docker / Node.js
+
+2. Home Assistant App
+   Home Assistant OS / Supervisor
+```
+
+## Kerninhalte
+
+- App-Repository-Struktur
+- Container-Image
+- persistente Daten unter `/data`
+- Gateway-Konfigurationspfade abstrahieren
+- Home-Assistant-API sicher über Supervisor-Kontext nutzen
+- Admin-Oberfläche integrieren
+- System-Dashboards integrieren
+- bestehende Legacy-Routen erhalten
+
+## Wichtig
+
+Keine Abhängigkeit davon, dass das Legacy-iPad die moderne HA-Oberfläche
+anzeigen kann.
+
+---
+
+# Sprint 25 – Release & Distribution
+
+## Ziel
+
+Nachvollziehbare veröffentlichbare Version.
+
+## Kerninhalte
+
+- konsistente Version
+- Release-Tags
+- `CHANGELOG.md`
+- Installationsanleitung
+- Upgrade
+- Rollback
+- Troubleshooting
+- Security-Dokumentation
+- Testdokumentation
+- Home-Assistant-App-Installationsanleitung
+- Standalone-Installationsanleitung
+- Screenshots
+- bekannte Einschränkungen
+- unterstützte HA-/Node-Versionen
+- Lizenzstatus final klären
+
+---
+
+# Gemeinsames Datenmodell der System-Dashboards
+
+## Summary
+
+Konzept:
+
+```text
+SummaryItem
+```
+
+Felder sinngemäß:
+
+```text
+id
+entityIds[]
+deviceId
+areaId
+category
+priority
+title
+description
+state
+startedAt
+updatedAt
+durationSeconds
+progress
+remainingSeconds
+icon
+metadata
+```
+
+## Error
+
+Konzept:
+
+```text
+DashboardIssue
+```
+
+Felder sinngemäß:
+
+```text
+id
+source
+severity
+status
+title
+description
+startedAt
+updatedAt
+integrationDomain
+configEntryId
+deviceId
+entityId
+areaId
+securityRelevant
+affectedAutomations[]
+metadata
+```
+
+Die endgültigen Modelle müssen an die tatsächliche JavaScript-/Node-Architektur
+angepasst werden.
+
+---
+
+# Gemeinsame System-Dashboard-Konfiguration
+
+System-Dashboards dürfen konfigurierbare Regeln besitzen, aber nicht wie normale
+Dashboards vollständig löschbar oder frei umbaubar sein.
+
+## Summary-Konfiguration
+
+Mögliche Einstellungen:
+
+- Gruppierung
+- Ignore Entities
+- Include Entities
+- ausgeschlossene Entity Categories
+- Mindestdauer
+- Nachlaufzeit
+- Schwellenwerte
+- benutzerdefinierte Regeln
+
+## Error-Konfiguration
+
+Mögliche Einstellungen:
+
+- Security Entities
+- Grace Period
+- Security Grace Period
+- Ignore Entities
+- erwartete Offlinegeräte
+- Severity Overrides
+- Matter-/Integrationsfilter
+
+## Persistenz
+
+Diese Einstellungen sollen in die bestehende versionierte Konfiguration oder
+einen klar getrennten Systembereich derselben Persistenzarchitektur integriert
+werden.
+
+Keine parallele unversionierte Konfigurationsdatei ohne Grund.
+
+---
+
+# Navigation
+
+Ab Sprint 18 soll die Anwendung konzeptionell folgende Ziele kennen:
+
+```text
+Benutzerdashboards:
+/d/:dashboardId
+
+System:
+/system/summary
+/system/errors
+
+Administration:
+/admin
+```
+
+Die Navigation selbst muss auf dem Legacy-Gerät kompakt bleiben.
+
+System-Dashboards sollen direkt per URL aufrufbar sein.
+
+---
+
+# Performance-Grundsätze
+
+Für System-Dashboards:
+
+- keine Einzelabfrage pro Listenzeile, wenn Sammelabfrage möglich
+- gemeinsame Datengrundlage für Summary und Error
+- serverseitig normalisieren
+- Browser-Payload reduzieren
+- Diagnoseattribute filtern
+- DOM-Anzahl begrenzen
+- lange Listen gruppieren, paginieren oder schrittweise darstellen
+- keine unnötigen Animationen
+- Polling bleibt zunächst Standard
+- Browser verbindet sich niemals direkt mit Home Assistant
+
+Serverseitiger WebSocket darf später separat bewertet werden, ist aber keine
+Voraussetzung.
+
+---
+
+# Fehler- und Offline-Semantik
+
+Verbindlich:
+
+```text
+keine Daten
+!=
+keine Probleme
+```
+
+und:
+
+```text
+keine Daten
+!=
+keine Aktivitäten
+```
+
+Bei HA-Ausfall:
+
+- letzte erfolgreiche Daten sichtbar halten
+- Stale-Status anzeigen
+- letzten erfolgreichen Zeitpunkt anzeigen
+- keine falsche grüne/ruhige Aussage
+
+---
+
+# Sicherheitsregeln für zukünftige Schnellaktionen
+
+System-Dashboards sind im MVP read-only.
+
+Spätere Aktionen wie:
+
+```text
+Licht ausschalten
+Cover schließen
+Vacuum pausieren
+Integration neu laden
+```
+
+dürfen nur eingeführt werden, wenn:
+
+- eigener Sprint
+- expliziter Backend-Endpunkt
+- explizite Entity-/Service-Allowlist
+- serverseitige Validierung
+- Rate Limit
+- kein generischer Service-Proxy
+- passende Bestätigung bei kritischen Aktionen
+
+System-Dashboard-Sichtbarkeit allein berechtigt niemals zu Aktionen.
+
+---
+
+# Codex-Arbeitsregeln
+
+Vor jedem Sprint:
 
 ```bash
 git status
-git log --oneline -10
+git log --oneline -15
 ```
 
-Weitere Regeln:
+Dann lesen:
 
-- relevante Dateien vor Änderungen vollständig lesen
-- pro Auftrag nur ein klar begrenztes Feature oder Problem
-- Frontend bleibt ES5- und iOS-9-kompatibel
-- `.env` niemals committen
-- Token niemals ins Frontend
-- schreibbare Entities explizit erlauben
-- jede geänderte JavaScript-Datei mit `node --check` prüfen
-- nach Frontend-Änderungen Cache-Versionen in `index.html` erhöhen
-- Backend-Änderungen erfordern einen Service-Neustart
+```text
+AGENTS.md
+README.md
+docs/CODEX_HANDOFF.md
+docs/SPRINT_ROADMAP.md
+docs/PROJECT_STATUS.md
+aktuelle Sprint-Datei
+```
+
+Nach jedem Sprint:
+
+- vollständige Tests
+- relevante `node --check`
+- `docs/PROJECT_STATUS.md` aktualisieren
+- Roadmapstatus aktualisieren
+- keine Secrets committen
+- nicht committen/pushen, wenn der Benutzer dies nicht freigegeben hat
 
 ---
 
-# Empfohlener Codex-Startprompt
+# Kommunikationsmodell Chat ↔ Codex
+
+Verbindliche Übergabedateien:
 
 ```text
-Read AGENTS.md, README.md, docs/CODEX_HANDOFF.md and
-docs/SPRINT_ROADMAP.md.
-
-Inspect the current Git status, recent commits and actual implementation.
-
-Do not assume that planned or previously proposed changes already exist.
-
-Identify the current sprint and compare its acceptance criteria with the
-actual code.
-
-Work on only one clearly bounded issue at a time.
-
-Preserve Safari iOS 9 and ECMAScript 5 frontend compatibility.
-Do not expose Home Assistant credentials to the frontend.
-
-You may use local-only mock HTTP servers for integration tests under these
-conditions:
-
-- bind only to 127.0.0.1 or localhost,
-- do not contact the real Home Assistant instance,
-- do not read or use the production .env,
-- use fake credentials only,
-- do not modify the production systemd service,
-- do not commit temporary secrets, logs or test artifacts,
-- stop all mock servers after testing.
+AGENTS.md
+docs/SPRINT_ROADMAP.md
+docs/PROJECT_STATUS.md
+docs/sprints/SPRINT-XX.md
 ```
+
+Ablauf:
+
+```text
+Planung in ChatGPT
+       |
+       v
+Sprint-Datei
+       |
+       v
+Codex implementiert
+       |
+       v
+PROJECT_STATUS.md
+       |
+       v
+nächste Planung
+```
+
+---
+
+# Priorisierte Reihenfolge ab Sprint 17
+
+```text
+18  System Dashboard Foundation
+19  Summary Dashboard MVP
+20  Error Dashboard MVP
+21  Registry & Diagnostic Enrichment
+22  Rules, Grace Periods & Device Aggregation
+23  Automation Impact & Advanced Diagnostics
+24  Home Assistant App Packaging
+25  Release & Distribution
+```
+
+---
+
+# Architekturentscheidung: System-Dashboards sind kein Lovelace-Ersatz
+
+Auch mit Summary und Error bleibt HA Legacy Dashboard bewusst begrenzt.
+
+Es wird nicht zu:
+
+- vollständigem Lovelace-Ersatz
+- generischem HA-Frontend
+- beliebigem Service-Terminal
+- universellem Admin-Frontend für Home Assistant
+
+Ziel bleibt:
+
+> Eine kleine, sichere, performante und iOS-9-kompatible externe Oberfläche
+> für ausgewählte Home-Assistant-Informationen und ausdrücklich freigegebene
+> Aktionen.
+
+---
+
+# Nächster Sprint
+
+Nach Abschluss von Sprint 17:
+
+```text
+Sprint 18 – System Dashboard Foundation
+```
+
+Dieser Sprint soll zunächst nur die gemeinsame technische Grundlage schaffen.
+
+Er soll noch nicht versuchen, die gesamte Brainstorming-Spezifikation in einem
+einzigen Schritt umzusetzen.
