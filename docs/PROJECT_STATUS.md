@@ -13,7 +13,7 @@ und keine Admin-Tokens.
 - Implementierung: `db49277 feat: add persistent drag and drop grid layouts`
 - finaler Drag-Fix: `81466fc fix: unify admin grid pointer dragging`
 - Upstream: `origin/main`
-- Produktiver LXC-Stand: `81466fc`
+- Produktiver Sprint-17-Implementierungsstand: `81466fc`
 
 Sprint 16 war vor Beginn vollständig vorhanden: Multi-Dashboard,
 Schema-Version 2, atomare Persistenz, stabile Widget-IDs, Admin API und UI
@@ -233,7 +233,8 @@ und Dashboard-Health-Check sind online.
 
 Produktiv bestätigt:
 
-- Commit `81466fc`
+- Sprint-17-Laufzeitcode `81466fc`; nachfolgende reine
+  Dokumentationscommits ändern den Dienstcode nicht
 - Primärkonfiguration Schema 3, Backup Schema 2
 - `default`: 6 Layoutitems
 - `esszimmer`: 2 Layoutitems
