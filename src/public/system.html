@@ -4,70 +4,30 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="HA Dashboard">
-
+<meta name="apple-mobile-web-app-title" content="HA System">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#2563eb">
 <meta name="format-detection" content="telephone=no">
 
-<title>
-HA Legacy Dashboard
-</title>
-
-<link rel="manifest" href="/manifest.json?v=20">
-
-<link
-    rel="apple-touch-icon"
-    sizes="76x76"
-    href="/icons/app-icon-76.png?v=20"
->
-
-<link
-    rel="apple-touch-icon"
-    sizes="120x120"
-    href="/icons/app-icon-120.png?v=20"
->
-
-<link
-    rel="apple-touch-icon"
-    sizes="152x152"
-    href="/icons/app-icon-152.png?v=20"
->
-
-<link
-    rel="apple-touch-icon"
-    sizes="180x180"
-    href="/icons/app-icon-180.png?v=20"
->
-
-<link
-    rel="icon"
-    type="image/png"
-    sizes="192x192"
-    href="/icons/app-icon-192.png?v=20"
->
+<title>HA Legacy Dashboard – System</title>
 
 <link rel="stylesheet" href="/css/style.css?v=20">
+<link rel="stylesheet" href="/css/system.css?v=20">
 
 </head>
 
-
 <body>
 
+<div class="app system-app">
 
-<div class="app">
-
-<header class="app-header">
+<header class="app-header system-header">
 
     <div class="brand">
-
-        <h1 id="dashboardTitle">HA Dashboard</h1>
-
+        <h1 id="systemTitle">System</h1>
     </div>
 
     <div class="wall-header">
@@ -134,6 +94,12 @@ HA Legacy Dashboard
 
 </header>
 
+<nav class="system-navigation" aria-label="System-Dashboards">
+    <a id="summaryNavigation" href="/system/summary">Summary</a>
+    <a id="errorsNavigation" href="/system/errors">Systemstatus</a>
+    <a href="/">Dashboard</a>
+</nav>
+
 <div
     id="networkBanner"
     class="network-banner"
@@ -141,31 +107,42 @@ HA Legacy Dashboard
     aria-live="polite"
 ></div>
 
-<main id="dashboard" class="grid"></main>
+<main class="system-content">
 
-<div id="updated" class="updated">
-    Wird geladen …
-</div>
+    <section class="system-card" aria-labelledby="systemCardTitle">
+        <p class="system-eyebrow">Read-only Systemansicht</p>
+        <h2 id="systemCardTitle">System</h2>
+        <p id="systemMessage" class="system-message">Daten werden geladen …</p>
 
-<footer class="footer">
-    HA Legacy Dashboard v1.0.0
-</footer>
+        <dl class="system-meta">
+            <div>
+                <dt>Home Assistant</dt>
+                <dd id="homeAssistantState">Wird geprüft …</dd>
+            </div>
+            <div>
+                <dt>Erfasste Entities</dt>
+                <dd id="entityCount">–</dd>
+            </div>
+            <div>
+                <dt>Letzte erfolgreiche Erfassung</dt>
+                <dd id="lastSuccessfulUpdate">Noch keine</dd>
+            </div>
+        </dl>
+    </section>
+
+</main>
+
+<div id="updated" class="updated">Wird geladen …</div>
+
+<footer class="footer">HA Legacy Dashboard v1.0.0</footer>
 
 </div>
 
 <script src="/js/core/compat.js?v=20"></script>
 <script src="/js/core/theme.js?v=20"></script>
-<script src="/js/core/icons.js?v=20"></script>
-<script src="/js/core/widget.js?v=20"></script>
-
-<script src="/js/widgets/sensor.js?v=20"></script>
-<script src="/js/widgets/binary.js?v=20"></script>
-<script src="/js/widgets/light.js?v=20"></script>
-<script src="/js/widgets/climate.js?v=20"></script>
-
-<script src="/js/core/layout.js?v=20"></script>
-<script src="/js/core/dashboard.js?v=20"></script>
-<script src="/js/app.js?v=20"></script>
+<script src="/js/system/common.js?v=20"></script>
+<script src="/js/system/summary.js?v=20"></script>
+<script src="/js/system/errors.js?v=20"></script>
 
 </body>
 

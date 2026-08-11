@@ -1,0 +1,208 @@
+/*
+ * Fixed system dashboard shells for Safari on iOS 9.
+ * No CSS Grid, custom-property dependency, or Flexbox gap.
+ */
+
+.system-app {
+    min-height: 100%;
+}
+
+.system-navigation {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin: 0 8px 14px;
+}
+
+.system-navigation a {
+    min-height: 44px;
+    margin: 0 6px 8px;
+    padding: 11px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 20px;
+    text-decoration: none;
+}
+
+.system-navigation a.is-active {
+    border-color: #2563eb;
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.system-content {
+    padding: 0 14px 12px;
+}
+
+.system-card {
+    max-width: 920px;
+    min-height: 300px;
+    margin: 0 auto;
+    padding: 28px;
+    border: 1px solid #dbe3ee;
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.system-eyebrow {
+    margin: 0 0 8px;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.system-card h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 32px;
+    line-height: 1.15;
+}
+
+.system-message {
+    margin: 18px 0 24px;
+    color: #475569;
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+.system-message.is-stale,
+.system-message.is-offline {
+    color: #9a3412;
+}
+
+.system-message.is-recovered {
+    color: #166534;
+}
+
+.network-banner.is-warning {
+    border-color: #f0cf9f;
+    background: #fff8eb;
+    color: #8d520f;
+}
+
+.network-banner.is-success {
+    border-color: #a7d7b8;
+    background: #eefbf2;
+    color: #166534;
+}
+
+.system-meta {
+    margin: 0 -6px;
+}
+
+.system-meta:after {
+    display: table;
+    clear: both;
+    content: "";
+}
+
+.system-meta div {
+    float: left;
+    width: 33.3333%;
+    min-height: 102px;
+    padding: 6px;
+}
+
+.system-meta dt,
+.system-meta dd {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.system-meta dt {
+    margin-bottom: 7px;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.system-meta dd {
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 750;
+    line-height: 1.35;
+}
+
+body.theme-dark .system-navigation a {
+    border-color: #334155;
+    background: #182232;
+    color: #dbe7f4;
+}
+
+body.theme-dark .system-navigation a.is-active {
+    border-color: #60a5fa;
+    background: #1e3a5f;
+    color: #bfdbfe;
+}
+
+body.theme-dark .system-card {
+    border-color: #293548;
+    background: #172131;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
+}
+
+body.theme-dark .system-card h2,
+body.theme-dark .system-meta dd {
+    color: #f1f5f9;
+}
+
+body.theme-dark .system-eyebrow,
+body.theme-dark .system-message,
+body.theme-dark .system-meta dt {
+    color: #aebdd0;
+}
+
+body.theme-dark .system-message.is-stale,
+body.theme-dark .system-message.is-offline {
+    color: #fdba74;
+}
+
+body.theme-dark .system-message.is-recovered {
+    color: #86efac;
+}
+
+body.theme-dark .network-banner.is-warning {
+    border-color: #684b28;
+    background: #39291b;
+    color: #f0b767;
+}
+
+body.theme-dark .network-banner.is-success {
+    border-color: #315b42;
+    background: #183124;
+    color: #86efac;
+}
+
+@media (max-width: 700px) {
+    .system-card {
+        padding: 22px;
+    }
+
+    .system-meta div {
+        float: none;
+        width: 100%;
+        min-height: 0;
+        margin-bottom: 18px;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 700px) {
+    .system-card {
+        min-height: 220px;
+        padding: 20px 24px;
+    }
+
+    .system-message {
+        margin: 12px 0 18px;
+    }
+}

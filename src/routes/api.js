@@ -5,6 +5,9 @@ const router = express.Router();
 const adminRoutes =
     require("./admin");
 
+const systemDashboardRoutes =
+    require("./system-dashboards");
+
 const ha =
     require("../services/homeassistant");
 
@@ -46,6 +49,10 @@ const ALLOWED_LIGHT_ENTITIES = [
 
 
 router.use("/admin", adminRoutes);
+router.use(
+    "/system-dashboards",
+    systemDashboardRoutes
+);
 
 
 function allowWrite(res, key) {

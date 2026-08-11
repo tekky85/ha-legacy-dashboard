@@ -44,12 +44,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const PUBLIC_PATH = path.join(__dirname, "public");
 const ADMIN_PATH = path.join(__dirname, "admin");
+const SYSTEM_PAGE_PATH = path.join(PUBLIC_PATH, "system.html");
 
 
 function setStaticHeaders(res, filePath) {
 
     if (
-        /index\.html$/.test(filePath) ||
+        /(?:index|system)\.html$/.test(filePath) ||
         /manifest\.json$/.test(filePath)
     ) {
 
@@ -166,6 +167,23 @@ app.get("/d/:dashboardId", function (req, res) {
     setStaticHeaders(res, indexPath);
 
     return res.sendFile(indexPath);
+
+});
+app.get(
+    ["/system/summary", "/system/errors"],
+    function (req, res) {
+
+        setStaticHeaders(res, SYSTEM_PAGE_PATH);
+
+        return res.sendFile(SYSTEM_PAGE_PATH);
+
+    }
+);
+app.get(/^\/system(?:\/.*)?$/, function (req, res) {
+
+    return res.status(404)
+        .type("text/plain")
+        .send("System-Dashboard nicht gefunden");
 
 });
 app.get(["/admin", "/admin/"], function (req, res) {

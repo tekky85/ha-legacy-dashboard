@@ -180,6 +180,22 @@ test(
             serviceError: false,
             serviceIssued: false,
             stateRequests: [],
+            systemStateError: false,
+            systemStateRequests: 0,
+            systemStates: [
+                {
+                    entity_id: "light.system_test",
+                    state: "on",
+                    attributes: {
+                        friendly_name: "System Test",
+                        device_class: "light",
+                        access_token: "raw-state-secret",
+                        entity_picture: "/api/camera_proxy/private"
+                    },
+                    last_changed: "2026-08-11T18:00:00Z",
+                    last_updated: "2026-08-11T18:00:01Z"
+                }
+            ],
             targetTemperature: 20
         };
 
@@ -196,6 +212,8 @@ test(
             mock.serviceError = false;
             mock.serviceIssued = false;
             mock.stateRequests = [];
+            mock.systemStateError = false;
+            mock.systemStateRequests = 0;
             mock.targetTemperature = 20;
         }
 
@@ -308,6 +326,26 @@ test(
                     }
 
                     res.end("[]");
+                    return;
+
+                }
+
+                if (
+                    req.method === "GET" &&
+                    req.url === "/api/states"
+                ) {
+
+                    mock.systemStateRequests += 1;
+
+                    if (mock.systemStateError) {
+                        res.statusCode = 503;
+                        res.end(JSON.stringify({
+                            message: "simulated unavailable"
+                        }));
+                        return;
+                    }
+
+                    res.end(JSON.stringify(mock.systemStates));
                     return;
 
                 }
@@ -536,7 +574,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=19"/
+                /src="\/js\/app\.js\?v=20"/
             );
 
             const manifest = await request(
@@ -555,7 +593,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=19"
+                "/js/app.js?v=20"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -631,6 +669,47 @@ test(
                 unknownPage.text,
                 /id="dashboardTitle"/
             );
+
+        });
+
+        await t.test("Feste System-Dashboard-Routen bleiben vom Benutzerraster getrennt", async function () {
+
+            const summaryPage = await request(
+                gatewayPort,
+                "GET",
+                "/system/summary"
+            );
+
+            const errorsPage = await request(
+                gatewayPort,
+                "GET",
+                "/system/errors"
+            );
+
+            const unknownPage = await request(
+                gatewayPort,
+                "GET",
+                "/system/does-not-exist"
+            );
+
+            const rootPage = await request(
+                gatewayPort,
+                "GET",
+                "/"
+            );
+
+            assert.equal(summaryPage.status, 200);
+            assert.equal(errorsPage.status, 200);
+            assert.equal(unknownPage.status, 404);
+            assert.equal(rootPage.status, 200);
+            assert.equal(
+                summaryPage.headers["cache-control"],
+                "no-cache, no-store, must-revalidate"
+            );
+            assert.match(summaryPage.text, /id="systemTitle"/);
+            assert.match(errorsPage.text, /id="systemTitle"/);
+            assert.doesNotMatch(unknownPage.text, /id="systemTitle"/);
+            assert.match(rootPage.text, /id="dashboardTitle"/);
 
         });
 
@@ -726,6 +805,73 @@ test(
                 JSON.stringify(roomConfig.json).indexOf(TEST_TOKEN),
                 -1
             );
+
+        });
+
+        await t.test("System-Dashboard-APIs teilen einen reduzierten Snapshot", async function () {
+
+            resetMock();
+
+            const summary = await request(
+                gatewayPort,
+                "GET",
+                "/api/system-dashboards/summary"
+            );
+
+            const errors = await request(
+                gatewayPort,
+                "GET",
+                "/api/system-dashboards/errors"
+            );
+
+            const status = await request(
+                gatewayPort,
+                "GET",
+                "/api/system-dashboards/status"
+            );
+
+            const unknown = await request(
+                gatewayPort,
+                "GET",
+                "/api/system-dashboards/unknown"
+            );
+
+            assert.equal(summary.status, 200);
+            assert.equal(errors.status, 200);
+            assert.equal(status.status, 200);
+            assert.equal(unknown.status, 404);
+            assert.deepEqual(unknown.json, {
+                error: "system_dashboard_not_found"
+            });
+            assert.deepEqual(summary.json.items, []);
+            assert.deepEqual(errors.json.issues, []);
+            assert.equal(summary.json.meta.entity_count, 1);
+            assert.equal(errors.json.meta.entity_count, 1);
+            assert.equal(status.json.cache_ttl_ms, 3000);
+            assert.equal(status.json.status, "online");
+            assert.equal(mock.systemStateRequests, 1);
+            assert.equal(summary.headers["cache-control"], "no-store");
+            assert.equal(errors.headers["cache-control"], "no-store");
+            assert.equal(status.headers["cache-control"], "no-store");
+
+            const combined = JSON.stringify({
+                summary: summary.json,
+                errors: errors.json,
+                status: status.json
+            });
+
+            assert.equal(combined.includes(TEST_TOKEN), false);
+            assert.equal(combined.includes("raw-state-secret"), false);
+            assert.equal(combined.includes("light.system_test"), false);
+            assert.equal(combined.includes("ALLOWED_LIGHT_ENTITIES"), false);
+            assert.equal(combined.includes("ALLOWED_CLIMATE_ENTITIES"), false);
+            assert.ok(
+                mock.authorizationHeaders.includes(
+                    "Bearer " + TEST_TOKEN
+                )
+            );
+            assert.equal(gatewayOutput.includes(TEST_TOKEN), false);
+            assert.equal(gatewayErrorOutput.includes(TEST_TOKEN), false);
 
         });
 
