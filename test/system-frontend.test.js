@@ -17,8 +17,14 @@ function createElement() {
     return {
         className: "",
         innerHTML: "",
+        hidden: false,
+        children: [],
         attributes: {},
         onclick: null,
+        appendChild: function (child) {
+            this.children.push(child);
+            return child;
+        },
         setAttribute: function (name, value) {
             this.attributes[name] = value;
         }
@@ -38,7 +44,8 @@ function createHarness(pathname, entryFile) {
         "errorsNavigation", "homeAssistantState", "lastSuccessfulUpdate",
         "networkBanner", "summaryNavigation", "systemCardTitle",
         "systemMessage", "systemTitle", "themeButton", "themeButtonLabel",
-        "updated", "wallClock", "wallDate"
+        "updated", "wallClock", "wallDate", "summaryOverview",
+        "summaryGroups", "summaryActiveCount"
     ].forEach(function (id) {
         elements[id] = createElement();
     });
@@ -49,6 +56,15 @@ function createHarness(pathname, entryFile) {
         document: {
             body: createElement(),
             title: "",
+            createElement: function () {
+                return createElement();
+            },
+            createElementNS: function () {
+                return createElement();
+            },
+            createTextNode: function (text) {
+                return {textContent: String(text)};
+            },
             getElementById: function (id) {
                 return elements[id] || null;
             }
@@ -150,17 +166,23 @@ test("Summary-Shell zeigt Online, Stale und Recovery", function () {
     );
 
     harness.requests[0].success({
+        activeCount: 0,
+        groups: [],
+        message: "Keine aktiven Zustände.",
         meta: meta(true, false, "2026-08-11T18:00:00.000Z")
     });
 
     assert.equal(
         harness.elements.systemMessage.innerHTML,
-        "Noch keine Summary-Regeln aktiviert."
+        "Keine aktiven Zustände."
     );
     assert.match(harness.elements.connectionBadge.className, /is-online/);
 
     harness.timers.shift()();
     harness.requests[1].success({
+        activeCount: 1,
+        groups: [],
+        message: "1 aktiver Zustand.",
         meta: meta(false, true, "2026-08-11T18:00:00.000Z")
     });
 
@@ -169,6 +191,9 @@ test("Summary-Shell zeigt Online, Stale und Recovery", function () {
 
     harness.timers.shift()();
     harness.requests[2].success({
+        activeCount: 0,
+        groups: [],
+        message: "Keine aktiven Zustände.",
         meta: meta(true, false, "2026-08-11T18:00:05.000Z")
     });
 
@@ -232,7 +257,7 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=22/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=23/);
     assert.match(source, /Legacy\.http\.get/);
     assert.doesNotMatch(source, /\bconst\b|\blet\b|=>|`/);
     assert.doesNotMatch(source, /\bfetch\b|\bPromise\b|\basync\b|\bawait\b/);

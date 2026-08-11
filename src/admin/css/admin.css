@@ -350,6 +350,59 @@ input[readonly] {
     font-size: 0.78rem;
 }
 
+.system-settings {
+    margin-top: 1.5rem;
+    padding-top: 1.35rem;
+    border-top: 1px solid var(--border);
+}
+
+.system-settings h3 {
+    margin: 0 0 0.7rem;
+    font-size: 1rem;
+}
+
+.system-dashboard-link {
+    display: inline-block;
+    margin-bottom: 0.45rem;
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.summary-ignore-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.45rem;
+}
+
+.summary-ignored-list {
+    margin-top: 0.75rem;
+}
+
+.summary-ignore-empty {
+    margin: 0;
+    font-size: 0.82rem;
+}
+
+.summary-ignored-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.45rem;
+    padding: 0.55rem;
+    border: 1px solid var(--border);
+    border-radius: 0.55rem;
+    background: var(--surface-subtle);
+}
+
+.summary-ignored-label {
+    min-width: 0;
+    color: #475467;
+    font-size: 0.76rem;
+    overflow-wrap: anywhere;
+}
+
 .default-badge {
     color: var(--primary-dark);
     font-weight: 750;

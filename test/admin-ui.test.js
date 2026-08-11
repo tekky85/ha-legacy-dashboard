@@ -47,8 +47,14 @@ function createHarness() {
                 status: 200,
                 text: async function () {
                     return JSON.stringify({
-                        schemaVersion: 4,
+                        schemaVersion: 5,
                         defaultDashboardId: "default",
+                        systemDashboards: {
+                            summary: {
+                                ignoredEntities: [],
+                                showMediaTitles: false
+                            }
+                        },
                         dashboards: []
                     });
                 }
@@ -75,7 +81,8 @@ function createHarness() {
         "js/layout.js",
         "js/dashboards.js",
         "js/widgets.js",
-        "js/entities.js"
+        "js/entities.js",
+        "js/system-dashboards.js"
     ].forEach(function (relativePath) {
         vm.runInContext(
             readAdminFile(relativePath),
@@ -549,6 +556,8 @@ test("Admin-Dateien leaken keine Secrets und das Wall-Display bleibt ES5", funct
     assert.match(html, /id="logoutButton"/);
     assert.match(html, /id="dashboardList"/);
     assert.match(html, /id="entitySearch"/);
+    assert.match(html, /id="summaryShowMediaTitles"/);
+    assert.match(html, /id="summaryIgnoredEntities"/);
     assert.doesNotMatch(html, /Bearer\s+[A-Za-z0-9_-]{8,}/);
     assert.doesNotMatch(html, /HA_TOKEN|ADMIN_TOKEN=/);
 
@@ -595,4 +604,35 @@ test("Admin-Dateien leaken keine Secrets und das Wall-Display bleibt ES5", funct
         ),
         /display:\s*grid|grid-template|grid-column|grid-row/
     );
+});
+
+
+test("Admin-Entwurf verwaltet Summary-Privatsphäre und Ignorierliste", function () {
+    const harness = createHarness();
+    const admin = harness.admin;
+
+    admin.State.setConfiguration(freshConfiguration());
+    admin.SystemDashboards.setShowMediaTitles(true);
+    assert.equal(
+        admin.State.getDraft().systemDashboards.summary.showMediaTitles,
+        true
+    );
+
+    assert.equal(
+        admin.SystemDashboards.addIgnoredEntity("switch.technik"),
+        true
+    );
+    assert.equal(
+        admin.SystemDashboards.addIgnoredEntity("switch.technik"),
+        false
+    );
+    assert.deepEqual(
+        admin.State.getDraft().systemDashboards.summary.ignoredEntities,
+        ["switch.technik"]
+    );
+    assert.equal(
+        admin.SystemDashboards.removeIgnoredEntity("switch.technik"),
+        true
+    );
+    assert.equal(admin.State.isDirty(), true);
 });

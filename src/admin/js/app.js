@@ -513,8 +513,72 @@
         layoutDragState = null;
         layoutResizeState = null;
         renderDashboardList();
+        renderSummarySettings();
         renderEditor();
         updateDirtyState();
+    }
+
+    function renderSummarySettings() {
+        const settings = admin.SystemDashboards.getSummarySettings();
+        const entities = admin.State.getEntities();
+        const ignored = settings.ignoredEntities;
+
+        elements.summaryShowMediaTitles.checked = settings.showMediaTitles;
+        elements.summaryIgnoreEntitySelect.textContent = "";
+
+        const placeholder = createElement("option", "", "Entity auswählen …");
+        placeholder.value = "";
+        elements.summaryIgnoreEntitySelect.appendChild(placeholder);
+
+        entities.forEach(function (entity) {
+            if (ignored.indexOf(entity.entity_id) !== -1) {
+                return;
+            }
+
+            const option = createElement(
+                "option",
+                "",
+                (entity.friendly_name || entity.entity_id) +
+                    " (" + entity.entity_id + ")"
+            );
+            option.value = entity.entity_id;
+            elements.summaryIgnoreEntitySelect.appendChild(option);
+        });
+
+        elements.summaryIgnoredEntities.textContent = "";
+
+        if (ignored.length === 0) {
+            elements.summaryIgnoredEntities.appendChild(createElement(
+                "p",
+                "muted summary-ignore-empty",
+                "Keine Entity wird ignoriert."
+            ));
+            return;
+        }
+
+        ignored.forEach(function (entityId) {
+            const entity = entities.find(function (item) {
+                return item.entity_id === entityId;
+            });
+            const row = createElement("div", "summary-ignored-item");
+            const label = createElement(
+                "span",
+                "summary-ignored-label",
+                entity && entity.friendly_name
+                    ? entity.friendly_name + " · " + entityId
+                    : entityId
+            );
+            const remove = createButton(
+                "Entfernen",
+                "summary-ignore-remove",
+                entityId,
+                "button secondary compact"
+            );
+
+            row.appendChild(label);
+            row.appendChild(remove);
+            elements.summaryIgnoredEntities.appendChild(row);
+        });
     }
 
     function openDashboardForm(mode) {
@@ -659,6 +723,7 @@
         showAdministration();
         renderAll();
         await loadEntities();
+        renderSummarySettings();
     }
 
     async function handleLogin(event) {
@@ -1118,7 +1183,9 @@
             "widgetTitleInput", "widgetSubtitleInput", "widgetIconInput",
             "widgetUnitInput", "widgetOrderInput", "widgetSizeInput",
             "widgetVisibleInput",
-            "widgetFormError"
+            "widgetFormError", "summaryShowMediaTitles",
+            "summaryIgnoreEntitySelect", "summaryIgnoreAdd",
+            "summaryIgnoredEntities"
         ].forEach(function (id) {
             elements[id] = byId(id);
         });
@@ -1163,6 +1230,33 @@
         elements.entitySearch.addEventListener("input", renderEntities);
         elements.entityDomainFilter.addEventListener("change", renderEntities);
         elements.entityList.addEventListener("click", handleEntitySelection);
+        elements.summaryShowMediaTitles.addEventListener("change", function () {
+            admin.SystemDashboards.setShowMediaTitles(
+                elements.summaryShowMediaTitles.checked
+            );
+            updateDirtyState();
+        });
+        elements.summaryIgnoreAdd.addEventListener("click", function () {
+            if (admin.SystemDashboards.addIgnoredEntity(
+                elements.summaryIgnoreEntitySelect.value
+            )) {
+                renderSummarySettings();
+                updateDirtyState();
+            }
+        });
+        elements.summaryIgnoredEntities.addEventListener("click", function (event) {
+            const button = event.target.closest(
+                "button[data-action='summary-ignore-remove']"
+            );
+
+            if (
+                button &&
+                admin.SystemDashboards.removeIgnoredEntity(button.dataset.id)
+            ) {
+                renderSummarySettings();
+                updateDirtyState();
+            }
+        });
         elements.widgetForm.addEventListener("submit", handleWidgetForm);
         elements.saveButton.addEventListener("click", saveConfiguration);
         elements.discardButton.addEventListener("click", function () {

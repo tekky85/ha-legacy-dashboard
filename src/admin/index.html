@@ -70,6 +70,31 @@
                         </button>
                     </div>
                     <nav id="dashboardList" class="dashboard-list" aria-label="Dashboards"></nav>
+
+                    <section class="system-settings" aria-labelledby="systemSettingsTitle">
+                        <p class="eyebrow">Fest integriert</p>
+                        <h3 id="systemSettingsTitle">System-Dashboards</h3>
+                        <a class="system-dashboard-link" href="/system/summary" target="_blank" rel="noopener">
+                            Summary öffnen
+                        </a>
+
+                        <label class="checkbox-row" for="summaryShowMediaTitles">
+                            <input id="summaryShowMediaTitles" type="checkbox">
+                            <span>Medientitel anzeigen</span>
+                        </label>
+                        <small>Standardmäßig bleiben abgespielte Titel verborgen.</small>
+
+                        <label for="summaryIgnoreEntitySelect">Entity in Summary ignorieren</label>
+                        <div class="summary-ignore-controls">
+                            <select id="summaryIgnoreEntitySelect">
+                                <option value="">Entity auswählen …</option>
+                            </select>
+                            <button id="summaryIgnoreAdd" class="button secondary compact" type="button">
+                                Ignorieren
+                            </button>
+                        </div>
+                        <div id="summaryIgnoredEntities" class="summary-ignored-list"></div>
+                    </section>
                 </aside>
 
                 <section id="dashboardEditor" class="editor" aria-labelledby="editorTitle">
@@ -236,6 +261,7 @@
     <script src="/admin/js/dashboards.js" defer></script>
     <script src="/admin/js/widgets.js" defer></script>
     <script src="/admin/js/entities.js" defer></script>
+    <script src="/admin/js/system-dashboards.js" defer></script>
     <script src="/admin/js/app.js" defer></script>
 </body>
 </html>

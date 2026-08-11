@@ -83,6 +83,162 @@
     color: #166534;
 }
 
+.summary-overview {
+    margin: 0 0 22px;
+}
+
+.summary-count {
+    display: inline-block;
+    min-width: 92px;
+    margin-bottom: 18px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: #eef2f7;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.summary-count strong {
+    margin-right: 4px;
+    color: #0f172a;
+    font-size: 20px;
+}
+
+.summary-group {
+    margin: 0 0 18px;
+}
+
+.summary-group-title {
+    margin: 0 0 8px;
+    color: #475569;
+    font-size: 15px;
+    line-height: 22px;
+}
+
+.summary-group-count {
+    display: inline-block;
+    min-width: 24px;
+    margin-left: 7px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #334155;
+    font-size: 12px;
+    text-align: center;
+    vertical-align: 1px;
+}
+
+.summary-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.summary-item {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    min-height: 58px;
+    margin: 0 0 7px;
+    padding: 9px 11px;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    background: #f8fafc;
+}
+
+.summary-icon {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-flex: 0 0 38px;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    margin-right: 11px;
+    border-radius: 11px;
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.summary-icon-security,
+.summary-icon-open {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.summary-icon-climate {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.summary-icon-media,
+.summary-icon-running,
+.summary-icon-cleaning {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.summary-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.summary-item-body {
+    min-width: 0;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
+.summary-item-heading {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    min-width: 0;
+}
+
+.summary-item-title {
+    min-width: 0;
+    padding-right: 10px;
+    color: #0f172a;
+    font-size: 16px;
+    line-height: 21px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.summary-item-duration {
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 21px;
+}
+
+.summary-item-description {
+    display: block;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 18px;
+    overflow-wrap: break-word;
+}
+
 .network-banner.is-warning {
     border-color: #f0cf9f;
     background: #fff8eb;
@@ -171,6 +327,28 @@ body.theme-dark .system-message.is-recovered {
     color: #86efac;
 }
 
+body.theme-dark .summary-count,
+body.theme-dark .summary-group-count {
+    background: #263448;
+    color: #b8c5d6;
+}
+
+body.theme-dark .summary-count strong,
+body.theme-dark .summary-item-title {
+    color: #f1f5f9;
+}
+
+body.theme-dark .summary-group-title,
+body.theme-dark .summary-item-duration,
+body.theme-dark .summary-item-description {
+    color: #aebdd0;
+}
+
+body.theme-dark .summary-item {
+    border-color: #334155;
+    background: #1d2939;
+}
+
 body.theme-dark .network-banner.is-warning {
     border-color: #684b28;
     background: #39291b;
@@ -193,6 +371,20 @@ body.theme-dark .network-banner.is-success {
         width: 100%;
         min-height: 0;
         margin-bottom: 18px;
+    }
+
+    .summary-item-heading {
+        display: block;
+    }
+
+    .summary-item-title,
+    .summary-item-duration {
+        display: block;
+    }
+
+    .summary-item-title {
+        padding-right: 0;
+        white-space: normal;
     }
 }
 

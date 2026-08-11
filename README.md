@@ -58,6 +58,8 @@ browser.
 - graphical drag-and-drop and resize editor in the Admin UI
 - stable dashboard URLs with a backward-compatible default dashboard
 - fixed read-only system dashboards for Summary and Systemstatus
+- read-only Summary activity rules grouped by category and priority
+- persistent Summary ignore list and privacy-safe media-title opt-in
 - shared normalized Home Assistant snapshot with short-lived server cache
 - explicit stale, offline, and recovery states for system dashboards
 - protected, opt-in Admin API with a graphical configuration UI
@@ -170,8 +172,9 @@ http://gateway-address:3000/system/summary
 http://gateway-address:3000/system/errors
 ```
 
-Sprint 18 provides the shared data and UI foundation only. Summary activity
-rules and issue classification follow in Sprint 19 and Sprint 20.
+The Summary dashboard now shows active, open, moving, cleaning, climate,
+media, powered, lock, and alarm states according to explicit server-side
+rules. Issue classification remains reserved for Sprint 20.
 
 ## iPad home-screen installation
 
@@ -276,9 +279,9 @@ GET /api/system-dashboards/errors
 
 All three endpoints use one normalized server-side Home Assistant state
 snapshot with a three-second in-memory cache. They return only reduced
-dashboard metadata and never raw Home Assistant state payloads. Summary and
-Error currently return empty placeholder collections by design; their full
-business logic is not part of Sprint 18.
+dashboard data and never raw Home Assistant state payloads. Summary returns
+explicitly recognized activities; Error remains a placeholder until Sprint
+20. Media titles are omitted by default.
 
 The optional Admin API and its separate graphical UI are documented below.
 They are disabled by default and are not used by the legacy dashboard
@@ -328,8 +331,9 @@ The path can be overridden with `DASHBOARD_CONFIG_PATH`. On the first start,
 the application validates and migrates the built-in Sprint 13 profiles from
 `src/config/dashboard.js`. Runtime files under `data/` are ignored by Git.
 
-The version 4 schema declares `schemaVersion`, one `defaultDashboardId`, and a
-list of dashboard profiles. Every profile has a stable lowercase ID, a display
+The version 5 schema declares `schemaVersion`, one `defaultDashboardId`,
+`systemDashboards`, and a list of dashboard profiles. Every profile has a
+stable lowercase ID, a display
 title, a refresh interval, and its own widget list. Every widget also has a
 stable globally unique `id` and one validated `size` preset. Each dashboard
 also has `portrait` and `landscape` layouts whose items reference those widget
@@ -337,8 +341,10 @@ IDs and contain only integer `x`, `y`, `w`, and `h` values. Portrait uses six
 columns and landscape twelve columns. Existing version 1 and version 2 files
 receive fresh deterministic layouts. Existing version 3 layouts are migrated
 exactly once with `x_new = x_old * 2` and `w_new = w_old * 2`; `y` and `h`
-remain unchanged. Dashboard IDs, widget IDs, entities, order, visibility,
-titles, and icons are preserved. The migrated profiles are:
+remain unchanged. Version 4 files retain their 6/12-column layouts and receive
+the default Summary settings exactly once. Dashboard IDs, widget IDs,
+entities, order, visibility, titles, and icons are preserved. The migrated
+profiles are:
 
 - `default` – the complete existing dashboard and the target of `/`
 - `esszimmer` – the existing Esszimmer light and climate widgets
@@ -408,6 +414,24 @@ version 1 or version 2 file. After a later version 3 write, the backup can also
 contain version 3. Older releases cannot load the newer schema, so a downgrade
 requires restoring a compatible retained backup or manually converting the
 configuration. There is intentionally no automatic downgrade migration.
+
+The schema 5 Summary settings are:
+
+```json
+{
+  "systemDashboards": {
+    "summary": {
+      "ignoredEntities": [],
+      "showMediaTitles": false
+    }
+  }
+}
+```
+
+`ignoredEntities` suppresses explicitly selected technical or unwanted
+entities only in Summary. `showMediaTitles` is an explicit privacy opt-in.
+Neither setting changes dashboard visibility or Home Assistant write
+authorization.
 
 Set `visible` to `false` to remove a widget from both the browser
 configuration and the dashboard state query. Supported frontend widget types
@@ -487,6 +511,9 @@ The UI supports:
 - reordering widgets with up/down buttons
 - explicit save and discard for one local configuration draft
 - warning before leaving with unsaved changes
+- opening the fixed Summary dashboard and configuring its ignore list from
+  the sanitized entity inventory
+- explicitly enabling media titles for Summary; disabled by default
 
 Dashboard IDs, widget IDs, tile sizes, layout profiles, integer coordinates,
 bounds, widget references, minimum sizes and collisions remain
@@ -530,6 +557,8 @@ Assistant becomes unavailable. Its reduced API metadata marks the data as
 Home Assistant reachability separate. Without any prior success, the system
 shell shows a clear offline state instead of an empty-success message. A later
 successful collection replaces the stale snapshot automatically.
+Recognized Summary activities remain visible while that snapshot is stale;
+an initial HA outage is shown as offline rather than as an empty house.
 
 ## Project structure
 

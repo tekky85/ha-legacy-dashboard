@@ -40,3 +40,13 @@ release tags have been assigned.
   interface with session-scoped Bearer authentication, dashboard and widget
   draft editing, sanitized entity search, and explicit save/discard without
   changing Home Assistant write allowlists.
+- Sprint 16–17.1 Layout: added validated tile presets, persistent responsive
+  grid layouts, modern Admin drag/resize editing, and adaptive legacy-card
+  content while retaining Safari iOS 9 compatibility.
+- Sprint 18 System Dashboard Foundation: added fixed read-only Summary and
+  Systemstatus routes backed by one normalized, cached Home Assistant
+  snapshot with stale/offline/recovery semantics.
+- Sprint 19 Summary Dashboard MVP: added explicit read-only activity rules,
+  deterministic priority/category grouping, compact legacy rendering,
+  persistent ignored entities, and privacy-safe media-title opt-in without
+  extending Home Assistant write permissions.

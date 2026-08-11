@@ -14,7 +14,8 @@ const Layout =
     require("../services/layout");
 
 
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
+const LAYOUT_SCHEMA_VERSION = 4;
 const GRID_SCHEMA_VERSION = 3;
 const SIZE_SCHEMA_VERSION = 2;
 const LEGACY_SCHEMA_VERSION = 1;
@@ -49,10 +50,18 @@ const DEFAULT_REFRESH_INTERVAL_MS = 5000;
 const MINIMUM_REFRESH_INTERVAL_MS = 3000;
 const MAXIMUM_REFRESH_INTERVAL_MS = 300000;
 
+const DEFAULT_SYSTEM_DASHBOARDS = {
+    summary: {
+        ignoredEntities: [],
+        showMediaTitles: false
+    }
+};
+
 
 const DEFAULT_CONFIGURATION = {
     schemaVersion: SCHEMA_VERSION,
     defaultDashboardId: "default",
+    systemDashboards: DEFAULT_SYSTEM_DASHBOARDS,
     dashboards: [
         {
             id: "default",
@@ -358,7 +367,7 @@ function validateConfigurationVersion(candidate, schemaVersion) {
 
         if (schemaVersion === GRID_SCHEMA_VERSION) {
             Layout.validateLegacyLayouts(dashboard);
-        } else if (schemaVersion >= SCHEMA_VERSION) {
+        } else if (schemaVersion >= LAYOUT_SCHEMA_VERSION) {
             Layout.validateLayouts(dashboard);
         }
 
@@ -372,8 +381,53 @@ function validateConfigurationVersion(candidate, schemaVersion) {
         throw new Error("Standard-Dashboard ist ungültig");
     }
 
+    if (schemaVersion >= SCHEMA_VERSION) {
+        validateSystemDashboards(candidate.systemDashboards);
+    }
+
 
     return true;
+
+}
+
+
+function validateSystemDashboards(systemDashboards) {
+
+    const summary =
+        systemDashboards && systemDashboards.summary;
+
+    const ignored =
+        summary && summary.ignoredEntities;
+
+    const seen = Object.create(null);
+
+
+    if (!summary || typeof summary !== "object") {
+        throw new Error("Summary-Konfiguration fehlt");
+    }
+
+    if (!Array.isArray(ignored)) {
+        throw new Error("Ignorierte Summary-Entities sind ungültig");
+    }
+
+    ignored.forEach(function (entityId) {
+        if (
+            typeof entityId !== "string" ||
+            !ENTITY_ID_PATTERN.test(entityId)
+        ) {
+            throw new Error("Ignorierte Summary-Entity ist ungültig");
+        }
+
+        if (seen[entityId]) {
+            throw new Error("Ignorierte Summary-Entity ist nicht eindeutig");
+        }
+
+        seen[entityId] = true;
+    });
+
+    if (typeof summary.showMediaTitles !== "boolean") {
+        throw new Error("Summary-Medientitel-Einstellung ist ungültig");
+    }
 
 }
 
@@ -417,7 +471,8 @@ function migrateConfiguration(candidate) {
         (
             candidate.schemaVersion !== LEGACY_SCHEMA_VERSION &&
             candidate.schemaVersion !== SIZE_SCHEMA_VERSION &&
-            candidate.schemaVersion !== GRID_SCHEMA_VERSION
+            candidate.schemaVersion !== GRID_SCHEMA_VERSION &&
+            candidate.schemaVersion !== LAYOUT_SCHEMA_VERSION
         )
     ) {
         return {
@@ -436,6 +491,8 @@ function migrateConfiguration(candidate) {
         cloneConfiguration(candidate);
 
     migrated.schemaVersion = SCHEMA_VERSION;
+    migrated.systemDashboards =
+        cloneSystemDashboards(DEFAULT_SYSTEM_DASHBOARDS);
 
     migrated.dashboards.forEach(function (dashboard) {
 
@@ -485,7 +542,27 @@ function cloneConfiguration(candidate) {
     return {
         schemaVersion: candidate.schemaVersion,
         defaultDashboardId: candidate.defaultDashboardId,
+        systemDashboards:
+            candidate.systemDashboards
+                ? cloneSystemDashboards(candidate.systemDashboards)
+                : undefined,
         dashboards: candidate.dashboards.map(cloneDashboard)
+    };
+
+}
+
+
+function cloneSystemDashboards(systemDashboards) {
+
+    const summary = systemDashboards.summary;
+
+    return {
+        summary: {
+            ignoredEntities:
+                summary.ignoredEntities.slice(0),
+            showMediaTitles:
+                summary.showMediaTitles
+        }
     };
 
 }
@@ -580,6 +657,15 @@ function getConfiguration() {
     return cloneConfiguration(
         ensureConfiguration()
     );
+
+}
+
+
+function getSummaryConfiguration() {
+
+    return cloneSystemDashboards(
+        ensureConfiguration().systemDashboards
+    ).summary;
 
 }
 
@@ -791,6 +877,7 @@ module.exports = {
     initialize: initialize,
     replaceConfiguration: replaceConfiguration,
     getConfiguration: getConfiguration,
+    getSummaryConfiguration: getSummaryConfiguration,
     getDashboards: getDashboards,
     getPublicDashboards: getPublicDashboards,
     getDefaultDashboard: getDefaultDashboard,

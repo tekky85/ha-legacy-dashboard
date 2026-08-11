@@ -193,7 +193,7 @@ Bedeutung von „fest“:
 | 17 | Drag-and-Drop Grid Layout | umgesetzt |
 | 18 | System Dashboard Foundation | umgesetzt |
 | 17.1 | Grid Refinement + Responsive Card Content (Korrektursprint nach 18) | umgesetzt |
-| 19 | Summary Dashboard MVP | neu geplant |
+| 19 | Summary Dashboard MVP | umgesetzt |
 | 20 | Error Dashboard MVP | neu geplant |
 | 21 | Registry & Diagnostic Enrichment | neu geplant |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
@@ -699,11 +699,23 @@ Umgesetzt nach Sprint 18 als gezielter Korrektursprint.
 
 # Sprint 19 – Summary Dashboard MVP
 
+## Status
+
+Abgeschlossen
+
 ## Ziel
 
 Feste dynamische Übersicht:
 
 > Was ist im Haus gerade aktiv, offen, eingeschaltet oder läuft?
+
+Umgesetzt sind explizite Regeln für Light, Switch, relevante Binary Sensoren,
+Cover, Vacuum, tatsächliche Climate-Aktionen, Media Player, Fan, Lock und
+Alarmanlage. Ergebnisse werden deterministisch nach Priorität und Kategorie
+gruppiert. Numerische Sensoren, Bewegung/Präsenz sowie unknown/unavailable
+bleiben außen vor. Die persistente Ignorierliste und das standardmäßig
+deaktivierte Medientitel-Opt-in werden über die bestehende geschützte Admin UI
+verwaltet. Collector, Cache und HA-Write-Allowlists bleiben unverändert.
 
 ## Route
 

@@ -15,8 +15,8 @@
 
 <title>HA Legacy Dashboard – System</title>
 
-<link rel="stylesheet" href="/css/style.css?v=22">
-<link rel="stylesheet" href="/css/system.css?v=22">
+<link rel="stylesheet" href="/css/style.css?v=23">
+<link rel="stylesheet" href="/css/system.css?v=23">
 
 </head>
 
@@ -114,6 +114,14 @@
         <h2 id="systemCardTitle">System</h2>
         <p id="systemMessage" class="system-message">Daten werden geladen …</p>
 
+        <div id="summaryOverview" class="summary-overview" hidden>
+            <div class="summary-count" aria-live="polite">
+                <strong id="summaryActiveCount">0</strong>
+                <span>aktiv</span>
+            </div>
+            <div id="summaryGroups" class="summary-groups"></div>
+        </div>
+
         <dl class="system-meta">
             <div>
                 <dt>Home Assistant</dt>
@@ -138,11 +146,11 @@
 
 </div>
 
-<script src="/js/core/compat.js?v=22"></script>
-<script src="/js/core/theme.js?v=22"></script>
-<script src="/js/system/common.js?v=22"></script>
-<script src="/js/system/summary.js?v=22"></script>
-<script src="/js/system/errors.js?v=22"></script>
+<script src="/js/core/compat.js?v=23"></script>
+<script src="/js/core/theme.js?v=23"></script>
+<script src="/js/system/common.js?v=23"></script>
+<script src="/js/system/summary.js?v=23"></script>
+<script src="/js/system/errors.js?v=23"></script>
 
 </body>
 

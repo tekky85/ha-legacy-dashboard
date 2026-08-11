@@ -290,7 +290,7 @@ test("Cache behält letzte erfolgreiche Daten, zeigt Offline und erholt sich", a
 });
 
 
-test("Summary- und Issue-Engines liefern reduzierte leere Foundation-Antworten", function () {
+test("Summary wertet aktive Zustände aus und Issue-Engine bleibt leer", function () {
 
     const snapshot = Snapshot.createSuccessful(
         [rawState("light.private", "on", {friendly_name: "Privat"})],
@@ -300,13 +300,15 @@ test("Summary- und Issue-Engines liefern reduzierte leere Foundation-Antworten",
     const summary = Summary.buildSummary(snapshot);
     const issues = Issues.buildIssues(snapshot);
 
-    assert.deepEqual(summary.items, []);
+    assert.equal(summary.items.length, 1);
+    assert.equal(summary.items[0].entityIds[0], "light.private");
+    assert.equal(summary.items[0].category, "powered");
     assert.deepEqual(issues.issues, []);
     assert.equal(summary.meta.entity_count, 1);
     assert.equal(issues.meta.entity_count, 1);
     assert.equal(summary.entities, undefined);
     assert.equal(issues.entities, undefined);
-    assert.equal(JSON.stringify(summary).includes("light.private"), false);
+    assert.equal(JSON.stringify(summary).includes("light.private"), true);
     assert.equal(JSON.stringify(issues).includes("light.private"), false);
 
 });

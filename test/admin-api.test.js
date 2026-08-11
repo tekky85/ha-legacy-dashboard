@@ -580,7 +580,7 @@ test(
                 );
 
                 assert.equal(initial.status, 200);
-                assert.equal(initial.json.schemaVersion, 4);
+                assert.equal(initial.json.schemaVersion, 5);
                 assert.equal(
                     initial.json.dashboards[0].layouts.portrait.columns,
                     6
@@ -723,7 +723,7 @@ test(
                 assert.equal(initialConfig.status, 200);
                 assert.equal(
                     initialConfig.json.schemaVersion,
-                    4
+                    5
                 );
                 assert.equal(
                     initialConfig.json.defaultDashboardId,

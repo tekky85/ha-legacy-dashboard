@@ -574,7 +574,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=22"/
+                /src="\/js\/app\.js\?v=23"/
             );
 
             const manifest = await request(
@@ -593,7 +593,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=22"
+                "/js/app.js?v=23"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -843,7 +843,12 @@ test(
             assert.deepEqual(unknown.json, {
                 error: "system_dashboard_not_found"
             });
-            assert.deepEqual(summary.json.items, []);
+            assert.equal(summary.json.items.length, 1);
+            assert.equal(
+                summary.json.items[0].entityIds[0],
+                "light.system_test"
+            );
+            assert.equal(summary.json.items[0].category, "powered");
             assert.deepEqual(errors.json.issues, []);
             assert.equal(summary.json.meta.entity_count, 1);
             assert.equal(errors.json.meta.entity_count, 1);
@@ -862,7 +867,7 @@ test(
 
             assert.equal(combined.includes(TEST_TOKEN), false);
             assert.equal(combined.includes("raw-state-secret"), false);
-            assert.equal(combined.includes("light.system_test"), false);
+            assert.equal(combined.includes("light.system_test"), true);
             assert.equal(combined.includes("ALLOWED_LIGHT_ENTITIES"), false);
             assert.equal(combined.includes("ALLOWED_CLIMATE_ENTITIES"), false);
             assert.ok(

@@ -182,6 +182,8 @@ var SystemDashboard = (function () {
 
         if (reachable && !stale) {
 
+            var recovered = connectionWasUnavailable;
+
             setConnection("online", "Home Assistant online");
             setText("homeAssistantState", "Online");
 
@@ -197,7 +199,9 @@ var SystemDashboard = (function () {
             }
 
             connectionWasUnavailable = false;
-            return;
+            return recovered
+                ? "recovered"
+                : "online";
 
         }
 
@@ -218,7 +222,7 @@ var SystemDashboard = (function () {
                     emptyMessage,
                 "stale"
             );
-            return;
+            return "stale";
         }
 
         setBanner(
@@ -229,6 +233,8 @@ var SystemDashboard = (function () {
             "Noch keine Systemdaten verfügbar.",
             "offline"
         );
+
+        return "offline";
 
     }
 
@@ -306,10 +312,15 @@ var SystemDashboard = (function () {
             Legacy.http.get(
                 settings.endpoint,
                 function (payload) {
-                    renderPayload(
+                    var connectionState = renderPayload(
                         payload,
                         settings.emptyMessage
                     );
+
+                    if (typeof settings.render === "function") {
+                        settings.render(payload, connectionState);
+                    }
+
                     scheduleRefresh(load);
                 },
                 function (details) {
@@ -327,6 +338,10 @@ var SystemDashboard = (function () {
 
 
     return {
+        byId: byId,
+        setText: setText,
+        setMessage: setMessage,
+        formatTimestamp: formatTimestamp,
         start: start
     };
 

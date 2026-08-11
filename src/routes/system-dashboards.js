@@ -1,5 +1,6 @@
 const express = require("express");
 
+const DashboardConfig = require("../config/dashboard");
 const Issues = require("../services/issues/engine");
 const Snapshot = require("../services/system/snapshot");
 const System = require("../services/system");
@@ -67,7 +68,12 @@ router.get("/summary", async function (req, res) {
 
     return loadSnapshot(
         res,
-        Summary.buildSummary
+        function (snapshot) {
+            return Summary.buildSummary(
+                snapshot,
+                DashboardConfig.getSummaryConfiguration()
+            );
+        }
     );
 
 });
