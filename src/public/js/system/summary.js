@@ -127,7 +127,9 @@
 
         var overview = SystemDashboard.byId("summaryOverview");
         var groupsElement = SystemDashboard.byId("summaryGroups");
-        var groups = payload && payload.groups instanceof Array
+        var groups = payload && Object.prototype.toString.call(
+            payload.groups
+        ) === "[object Array]"
             ? payload.groups
             : [];
 

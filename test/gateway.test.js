@@ -574,7 +574,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=24"/
+                /src="\/js\/app\.js\?v=25"/
             );
 
             const manifest = await request(
@@ -593,7 +593,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=24"
+                "/js/app.js?v=25"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -811,6 +811,32 @@ test(
         await t.test("System-Dashboard-APIs teilen einen reduzierten Snapshot", async function () {
 
             resetMock();
+            mock.systemStates = [
+                {
+                    entity_id: "light.system_test",
+                    state: "on",
+                    attributes: {friendly_name: "System Test"},
+                    last_changed: "2026-08-11T18:00:00Z",
+                    last_updated: "2026-08-11T18:00:01Z"
+                },
+                {
+                    entity_id: "sensor.system_unavailable",
+                    state: "unavailable",
+                    attributes: {
+                        friendly_name: "System unavailable",
+                        access_token: "must-not-survive"
+                    },
+                    last_changed: "2026-08-11T17:00:00Z",
+                    last_updated: "2026-08-11T17:00:01Z"
+                },
+                {
+                    entity_id: "sensor.system_unknown",
+                    state: "unknown",
+                    attributes: {friendly_name: "System unknown"},
+                    last_changed: "2026-08-11T17:30:00Z",
+                    last_updated: "2026-08-11T17:30:01Z"
+                }
+            ];
 
             const summary = await request(
                 gatewayPort,
@@ -849,9 +875,16 @@ test(
                 "light.system_test"
             );
             assert.equal(summary.json.items[0].category, "powered");
-            assert.deepEqual(errors.json.issues, []);
-            assert.equal(summary.json.meta.entity_count, 1);
-            assert.equal(errors.json.meta.entity_count, 1);
+            assert.equal(errors.json.issues.length, 2);
+            assert.equal(errors.json.issues[0].state, "unavailable");
+            assert.equal(errors.json.issues[0].severity, "warning");
+            assert.equal(errors.json.issues[1].state, "unknown");
+            assert.equal(errors.json.issues[1].severity, "info");
+            assert.equal(errors.json.summary.unavailable, 1);
+            assert.equal(errors.json.summary.unknown, 1);
+            assert.equal(errors.json.overallStatus, "warning");
+            assert.equal(summary.json.meta.entity_count, 3);
+            assert.equal(errors.json.meta.entity_count, 3);
             assert.equal(status.json.cache_ttl_ms, 3000);
             assert.equal(status.json.status, "online");
             assert.equal(mock.systemStateRequests, 1);
@@ -867,6 +900,7 @@ test(
 
             assert.equal(combined.includes(TEST_TOKEN), false);
             assert.equal(combined.includes("raw-state-secret"), false);
+            assert.equal(combined.includes("must-not-survive"), false);
             assert.equal(combined.includes("light.system_test"), true);
             assert.equal(combined.includes("ALLOWED_LIGHT_ENTITIES"), false);
             assert.equal(combined.includes("ALLOWED_CLIMATE_ENTITIES"), false);

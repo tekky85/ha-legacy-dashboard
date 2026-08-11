@@ -369,13 +369,15 @@ input[readonly] {
     font-weight: 700;
 }
 
-.summary-ignore-controls {
+.summary-ignore-controls,
+.system-entity-controls {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.45rem;
 }
 
-.summary-ignored-list {
+.summary-ignored-list,
+.system-entity-list {
     margin-top: 0.75rem;
 }
 
@@ -384,7 +386,8 @@ input[readonly] {
     font-size: 0.82rem;
 }
 
-.summary-ignored-item {
+.summary-ignored-item,
+.system-entity-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -396,11 +399,22 @@ input[readonly] {
     background: var(--surface-subtle);
 }
 
-.summary-ignored-label {
+.summary-ignored-label,
+.system-entity-label {
     min-width: 0;
     color: #475467;
     font-size: 0.76rem;
     overflow-wrap: anywhere;
+}
+
+.system-settings-subsection {
+    margin-top: 1.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--border);
+}
+
+.system-settings-subsection label {
+    margin-top: 0.85rem;
 }
 
 .default-badge {

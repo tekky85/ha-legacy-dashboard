@@ -83,7 +83,12 @@ router.get("/errors", async function (req, res) {
 
     return loadSnapshot(
         res,
-        Issues.buildIssues
+        function (snapshot) {
+            return Issues.buildIssues(
+                snapshot,
+                DashboardConfig.getErrorsConfiguration()
+            );
+        }
     );
 
 });

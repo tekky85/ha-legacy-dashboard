@@ -94,6 +94,35 @@
                             </button>
                         </div>
                         <div id="summaryIgnoredEntities" class="summary-ignored-list"></div>
+
+                        <div class="system-settings-subsection">
+                            <a class="system-dashboard-link" href="/system/errors" target="_blank" rel="noopener">
+                                Fehler öffnen
+                            </a>
+
+                            <label for="errorSecurityEntitySelect">Sicherheitsrelevante Entity</label>
+                            <div class="system-entity-controls">
+                                <select id="errorSecurityEntitySelect">
+                                    <option value="">Entity auswählen …</option>
+                                </select>
+                                <button id="errorSecurityAdd" class="button secondary compact" type="button">
+                                    Markieren
+                                </button>
+                            </div>
+                            <div id="errorSecurityEntities" class="system-entity-list"></div>
+
+                            <label for="errorIgnoreEntitySelect">Entity in Fehlern ignorieren</label>
+                            <div class="system-entity-controls">
+                                <select id="errorIgnoreEntitySelect">
+                                    <option value="">Entity auswählen …</option>
+                                </select>
+                                <button id="errorIgnoreAdd" class="button secondary compact" type="button">
+                                    Ignorieren
+                                </button>
+                            </div>
+                            <div id="errorIgnoredEntities" class="system-entity-list"></div>
+                            <small>Security-Markierungen erteilen keine Schreibrechte. Karenzzeiten folgen erst in Sprint 22.</small>
+                        </div>
                     </section>
                 </aside>
 

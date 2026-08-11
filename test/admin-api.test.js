@@ -580,7 +580,7 @@ test(
                 );
 
                 assert.equal(initial.status, 200);
-                assert.equal(initial.json.schemaVersion, 5);
+                assert.equal(initial.json.schemaVersion, 6);
                 assert.equal(
                     initial.json.dashboards[0].layouts.portrait.columns,
                     6
@@ -615,6 +615,63 @@ test(
                         .layouts.portrait.items[climate.id],
                     {x: 2, y: 3, w: 2, h: 2}
                 );
+
+                saved.json.systemDashboards.errors = {
+                    securityEntities: [
+                        "light.security_only",
+                        "climate.security_only"
+                    ],
+                    ignoredEntities: ["sensor.test_status"]
+                };
+
+                const settingsSaved = await request(
+                    gateway.port,
+                    "PUT",
+                    "/api/admin/config",
+                    saved.json,
+                    auth
+                );
+
+                assert.equal(settingsSaved.status, 200);
+                assert.deepEqual(
+                    settingsSaved.json.systemDashboards.errors,
+                    saved.json.systemDashboards.errors
+                );
+
+                const settingsReloaded = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/admin/config",
+                    undefined,
+                    auth
+                );
+
+                assert.deepEqual(
+                    settingsReloaded.json.systemDashboards.errors,
+                    saved.json.systemDashboards.errors
+                );
+
+                const forbiddenLight = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/light/state",
+                    {
+                        entity_id: "light.security_only",
+                        state: "on"
+                    }
+                );
+                const forbiddenClimate = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/climate/temperature",
+                    {
+                        entity_id: "climate.security_only",
+                        temperature: 21
+                    }
+                );
+
+                assert.equal(forbiddenLight.status, 403);
+                assert.equal(forbiddenClimate.status, 403);
 
                 const invalid = JSON.parse(JSON.stringify(saved.json));
                 const firstId = invalid.dashboards[0].widgets[0].id;
@@ -723,7 +780,7 @@ test(
                 assert.equal(initialConfig.status, 200);
                 assert.equal(
                     initialConfig.json.schemaVersion,
-                    5
+                    6
                 );
                 assert.equal(
                     initialConfig.json.defaultDashboardId,

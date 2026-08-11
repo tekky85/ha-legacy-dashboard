@@ -14,7 +14,8 @@ const Layout =
     require("../services/layout");
 
 
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
+const SUMMARY_SCHEMA_VERSION = 5;
 const LAYOUT_SCHEMA_VERSION = 4;
 const GRID_SCHEMA_VERSION = 3;
 const SIZE_SCHEMA_VERSION = 2;
@@ -54,6 +55,10 @@ const DEFAULT_SYSTEM_DASHBOARDS = {
     summary: {
         ignoredEntities: [],
         showMediaTitles: false
+    },
+    errors: {
+        securityEntities: [],
+        ignoredEntities: []
     }
 };
 
@@ -381,8 +386,11 @@ function validateConfigurationVersion(candidate, schemaVersion) {
         throw new Error("Standard-Dashboard ist ungültig");
     }
 
-    if (schemaVersion >= SCHEMA_VERSION) {
-        validateSystemDashboards(candidate.systemDashboards);
+    if (schemaVersion >= SUMMARY_SCHEMA_VERSION) {
+        validateSystemDashboards(
+            candidate.systemDashboards,
+            schemaVersion >= SCHEMA_VERSION
+        );
     }
 
 
@@ -391,7 +399,34 @@ function validateConfigurationVersion(candidate, schemaVersion) {
 }
 
 
-function validateSystemDashboards(systemDashboards) {
+function validateEntityList(list, fieldName) {
+
+    const seen = Object.create(null);
+
+
+    if (!Array.isArray(list)) {
+        throw new Error(fieldName + " sind ungültig");
+    }
+
+    list.forEach(function (entityId) {
+        if (
+            typeof entityId !== "string" ||
+            !ENTITY_ID_PATTERN.test(entityId)
+        ) {
+            throw new Error(fieldName + " enthalten eine ungültige Entity");
+        }
+
+        if (seen[entityId]) {
+            throw new Error(fieldName + " enthalten eine nicht eindeutige Entity");
+        }
+
+        seen[entityId] = true;
+    });
+
+}
+
+
+function validateSystemDashboards(systemDashboards, requireErrors) {
 
     const summary =
         systemDashboards && systemDashboards.summary;
@@ -399,34 +434,31 @@ function validateSystemDashboards(systemDashboards) {
     const ignored =
         summary && summary.ignoredEntities;
 
-    const seen = Object.create(null);
-
-
     if (!summary || typeof summary !== "object") {
         throw new Error("Summary-Konfiguration fehlt");
     }
 
-    if (!Array.isArray(ignored)) {
-        throw new Error("Ignorierte Summary-Entities sind ungültig");
-    }
-
-    ignored.forEach(function (entityId) {
-        if (
-            typeof entityId !== "string" ||
-            !ENTITY_ID_PATTERN.test(entityId)
-        ) {
-            throw new Error("Ignorierte Summary-Entity ist ungültig");
-        }
-
-        if (seen[entityId]) {
-            throw new Error("Ignorierte Summary-Entity ist nicht eindeutig");
-        }
-
-        seen[entityId] = true;
-    });
+    validateEntityList(ignored, "Ignorierte Summary-Entities");
 
     if (typeof summary.showMediaTitles !== "boolean") {
         throw new Error("Summary-Medientitel-Einstellung ist ungültig");
+    }
+
+    if (requireErrors) {
+        const errors = systemDashboards.errors;
+
+        if (!errors || typeof errors !== "object") {
+            throw new Error("Error-Konfiguration fehlt");
+        }
+
+        validateEntityList(
+            errors.securityEntities,
+            "Sicherheitsrelevante Error-Entities"
+        );
+        validateEntityList(
+            errors.ignoredEntities,
+            "Ignorierte Error-Entities"
+        );
     }
 
 }
@@ -472,7 +504,8 @@ function migrateConfiguration(candidate) {
             candidate.schemaVersion !== LEGACY_SCHEMA_VERSION &&
             candidate.schemaVersion !== SIZE_SCHEMA_VERSION &&
             candidate.schemaVersion !== GRID_SCHEMA_VERSION &&
-            candidate.schemaVersion !== LAYOUT_SCHEMA_VERSION
+            candidate.schemaVersion !== LAYOUT_SCHEMA_VERSION &&
+            candidate.schemaVersion !== SUMMARY_SCHEMA_VERSION
         )
     ) {
         return {
@@ -492,7 +525,9 @@ function migrateConfiguration(candidate) {
 
     migrated.schemaVersion = SCHEMA_VERSION;
     migrated.systemDashboards =
-        cloneSystemDashboards(DEFAULT_SYSTEM_DASHBOARDS);
+        candidate.schemaVersion >= SUMMARY_SCHEMA_VERSION
+            ? cloneSystemDashboards(candidate.systemDashboards)
+            : cloneSystemDashboards(DEFAULT_SYSTEM_DASHBOARDS);
 
     migrated.dashboards.forEach(function (dashboard) {
 
@@ -501,7 +536,7 @@ function migrateConfiguration(candidate) {
                 Layout.migrateLegacyLayouts(
                     dashboard.layouts
                 );
-        } else {
+        } else if (candidate.schemaVersion < LAYOUT_SCHEMA_VERSION) {
             dashboard.layouts =
                 Layout.createLayouts(dashboard.widgets);
         }
@@ -555,6 +590,8 @@ function cloneConfiguration(candidate) {
 function cloneSystemDashboards(systemDashboards) {
 
     const summary = systemDashboards.summary;
+    const errors = systemDashboards.errors ||
+        DEFAULT_SYSTEM_DASHBOARDS.errors;
 
     return {
         summary: {
@@ -562,6 +599,12 @@ function cloneSystemDashboards(systemDashboards) {
                 summary.ignoredEntities.slice(0),
             showMediaTitles:
                 summary.showMediaTitles
+        },
+        errors: {
+            securityEntities:
+                errors.securityEntities.slice(0),
+            ignoredEntities:
+                errors.ignoredEntities.slice(0)
         }
     };
 
@@ -666,6 +709,33 @@ function getSummaryConfiguration() {
     return cloneSystemDashboards(
         ensureConfiguration().systemDashboards
     ).summary;
+
+}
+
+
+function getErrorsConfiguration() {
+
+    const current = ensureConfiguration();
+    const settings = cloneSystemDashboards(
+        current.systemDashboards
+    ).errors;
+    const entityTitles = Object.create(null);
+
+
+    current.dashboards.forEach(function (dashboard) {
+        dashboard.widgets.forEach(function (widget) {
+            if (!entityTitles[widget.entity]) {
+                entityTitles[widget.entity] =
+                    widget.subtitle
+                        ? widget.title + " " + widget.subtitle
+                        : widget.title;
+            }
+        });
+    });
+
+    settings.entityTitles = entityTitles;
+
+    return settings;
 
 }
 
@@ -878,6 +948,7 @@ module.exports = {
     replaceConfiguration: replaceConfiguration,
     getConfiguration: getConfiguration,
     getSummaryConfiguration: getSummaryConfiguration,
+    getErrorsConfiguration: getErrorsConfiguration,
     getDashboards: getDashboards,
     getPublicDashboards: getPublicDashboards,
     getDefaultDashboard: getDefaultDashboard,

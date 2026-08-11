@@ -47,12 +47,16 @@ function createHarness() {
                 status: 200,
                 text: async function () {
                     return JSON.stringify({
-                        schemaVersion: 5,
+                        schemaVersion: 6,
                         defaultDashboardId: "default",
                         systemDashboards: {
                             summary: {
                                 ignoredEntities: [],
                                 showMediaTitles: false
+                            },
+                            errors: {
+                                securityEntities: [],
+                                ignoredEntities: []
                             }
                         },
                         dashboards: []
@@ -558,6 +562,10 @@ test("Admin-Dateien leaken keine Secrets und das Wall-Display bleibt ES5", funct
     assert.match(html, /id="entitySearch"/);
     assert.match(html, /id="summaryShowMediaTitles"/);
     assert.match(html, /id="summaryIgnoredEntities"/);
+    assert.match(html, /id="errorSecurityEntitySelect"/);
+    assert.match(html, /id="errorSecurityEntities"/);
+    assert.match(html, /id="errorIgnoreEntitySelect"/);
+    assert.match(html, /id="errorIgnoredEntities"/);
     assert.doesNotMatch(html, /Bearer\s+[A-Za-z0-9_-]{8,}/);
     assert.doesNotMatch(html, /HA_TOKEN|ADMIN_TOKEN=/);
 
@@ -632,6 +640,43 @@ test("Admin-Entwurf verwaltet Summary-Privatsphäre und Ignorierliste", function
     );
     assert.equal(
         admin.SystemDashboards.removeIgnoredEntity("switch.technik"),
+        true
+    );
+    assert.equal(admin.State.isDirty(), true);
+});
+
+
+test("Admin-Entwurf verwaltet Error-Security- und Ignorierlisten", function () {
+    const harness = createHarness();
+    const admin = harness.admin;
+
+    admin.State.setConfiguration(freshConfiguration());
+
+    assert.equal(
+        admin.SystemDashboards.addSecurityEntity("binary_sensor.rauch"),
+        true
+    );
+    assert.equal(
+        admin.SystemDashboards.addSecurityEntity("binary_sensor.rauch"),
+        false
+    );
+    assert.equal(
+        admin.SystemDashboards.addErrorIgnoredEntity("sensor.test"),
+        true
+    );
+    assert.deepEqual(
+        admin.State.getDraft().systemDashboards.errors,
+        {
+            securityEntities: ["binary_sensor.rauch"],
+            ignoredEntities: ["sensor.test"]
+        }
+    );
+    assert.equal(
+        admin.SystemDashboards.removeSecurityEntity("binary_sensor.rauch"),
+        true
+    );
+    assert.equal(
+        admin.SystemDashboards.removeErrorIgnoredEntity("sensor.test"),
         true
     );
     assert.equal(admin.State.isDirty(), true);

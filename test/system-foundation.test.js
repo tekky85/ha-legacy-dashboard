@@ -290,10 +290,13 @@ test("Cache behält letzte erfolgreiche Daten, zeigt Offline und erholt sich", a
 });
 
 
-test("Summary wertet aktive Zustände aus und Issue-Engine bleibt leer", function () {
+test("Summary und Issue-Engine werten denselben reduzierten Snapshot aus", function () {
 
     const snapshot = Snapshot.createSuccessful(
-        [rawState("light.private", "on", {friendly_name: "Privat"})],
+        [
+            rawState("light.private", "on", {friendly_name: "Privat"}),
+            rawState("sensor.problem", "unavailable", {friendly_name: "Problem"})
+        ],
         "2026-08-11T18:00:00.000Z"
     );
 
@@ -303,9 +306,10 @@ test("Summary wertet aktive Zustände aus und Issue-Engine bleibt leer", functio
     assert.equal(summary.items.length, 1);
     assert.equal(summary.items[0].entityIds[0], "light.private");
     assert.equal(summary.items[0].category, "powered");
-    assert.deepEqual(issues.issues, []);
-    assert.equal(summary.meta.entity_count, 1);
-    assert.equal(issues.meta.entity_count, 1);
+    assert.equal(issues.issues.length, 1);
+    assert.equal(issues.issues[0].entityId, "sensor.problem");
+    assert.equal(summary.meta.entity_count, 2);
+    assert.equal(issues.meta.entity_count, 2);
     assert.equal(summary.entities, undefined);
     assert.equal(issues.entities, undefined);
     assert.equal(JSON.stringify(summary).includes("light.private"), true);

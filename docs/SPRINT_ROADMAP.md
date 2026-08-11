@@ -195,7 +195,7 @@ Bedeutung von „fest“:
 | 17.1 | Grid Refinement + Responsive Card Content (Korrektursprint nach 18) | umgesetzt |
 | 19 | Summary Dashboard MVP | umgesetzt |
 | 17.2 | Card Identity, Proportional Geometry & Theme Persistence (Korrektursprint nach 19) | umgesetzt |
-| 20 | Error Dashboard MVP | neu geplant |
+| 20 | Error Dashboard MVP | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | neu geplant |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
 | 23 | Automation Impact & Advanced Diagnostics | neu geplant |
@@ -889,6 +889,23 @@ Umgesetzt nach Sprint 19.
 ---
 
 # Sprint 20 – Error Dashboard MVP
+
+## Status
+
+Umgesetzt am 11. August 2026.
+
+## Ergebnis
+
+- `/system/errors` klassifiziert `unavailable` und `unknown` getrennt aus dem
+  gemeinsamen Sprint-18-Snapshot.
+- Normal: `unavailable -> warning`, `unknown -> info`.
+- Explizit sicherheitsrelevant: `unavailable -> critical`, `unknown -> error`.
+- Security- und Ignore-Entities sind im geschützten Admin konfigurierbar und
+  werden mit Schema 6 atomar persistiert.
+- Stale beziehungsweise Offline ergeben niemals `OK`; letzte bekannte Issues
+  bleiben bei vorhandenem Snapshot sichtbar.
+- Keine Grace Period, Registry-Anreicherung, Historie oder Schreibaktion wurde
+  vorgezogen.
 
 ## Ziel
 

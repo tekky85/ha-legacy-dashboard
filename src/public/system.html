@@ -15,9 +15,9 @@
 
 <title>HA Legacy Dashboard – System</title>
 
-<script src="/js/core/theme.js?v=24"></script>
-<link rel="stylesheet" href="/css/style.css?v=24">
-<link rel="stylesheet" href="/css/system.css?v=24">
+<script src="/js/core/theme.js?v=25"></script>
+<link rel="stylesheet" href="/css/style.css?v=25">
+<link rel="stylesheet" href="/css/system.css?v=25">
 
 </head>
 
@@ -123,6 +123,25 @@
             <div id="summaryGroups" class="summary-groups"></div>
         </div>
 
+        <div id="errorsOverview" class="errors-overview" hidden>
+            <div id="errorOverall" class="error-overall is-unknown" role="status" aria-live="polite">
+                <span id="errorOverallSymbol" class="error-overall-symbol" aria-hidden="true">?</span>
+                <span>Gesamtstatus:</span>
+                <strong id="errorOverallLabel">Wird geprüft</strong>
+            </div>
+
+            <div class="error-stats" aria-label="Störungsübersicht">
+                <div><strong id="errorCriticalCount">0</strong><span>Kritisch</span></div>
+                <div><strong id="errorErrorCount">0</strong><span>Fehler</span></div>
+                <div><strong id="errorWarningCount">0</strong><span>Warnungen</span></div>
+                <div><strong id="errorInfoCount">0</strong><span>Info</span></div>
+                <div><strong id="errorUnavailableCount">0</strong><span>unavailable</span></div>
+                <div><strong id="errorUnknownCount">0</strong><span>unknown</span></div>
+            </div>
+
+            <div id="errorGroups" class="error-groups"></div>
+        </div>
+
         <dl class="system-meta">
             <div>
                 <dt>Home Assistant</dt>
@@ -147,10 +166,10 @@
 
 </div>
 
-<script src="/js/core/compat.js?v=24"></script>
-<script src="/js/system/common.js?v=24"></script>
-<script src="/js/system/summary.js?v=24"></script>
-<script src="/js/system/errors.js?v=24"></script>
+<script src="/js/core/compat.js?v=25"></script>
+<script src="/js/system/common.js?v=25"></script>
+<script src="/js/system/summary.js?v=25"></script>
+<script src="/js/system/errors.js?v=25"></script>
 
 </body>
 

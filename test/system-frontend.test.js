@@ -45,7 +45,11 @@ function createHarness(pathname, entryFile) {
         "networkBanner", "summaryNavigation", "systemCardTitle",
         "systemMessage", "systemTitle", "themeButton", "themeButtonLabel",
         "updated", "wallClock", "wallDate", "summaryOverview",
-        "summaryGroups", "summaryActiveCount"
+        "summaryGroups", "summaryActiveCount", "errorsOverview",
+        "errorOverall", "errorOverallSymbol", "errorOverallLabel",
+        "errorCriticalCount", "errorErrorCount", "errorWarningCount",
+        "errorInfoCount", "errorUnavailableCount", "errorUnknownCount",
+        "errorGroups"
     ].forEach(function (id) {
         elements[id] = createElement();
     });
@@ -216,6 +220,9 @@ test("Error-Shell zeigt Offlinezustand und Gatewayfehler", function () {
     );
 
     harness.requests[0].success({
+        overallStatus: "unknown",
+        summary: {},
+        groups: [],
         meta: meta(false, true, null)
     });
 
@@ -230,6 +237,121 @@ test("Error-Shell zeigt Offlinezustand und Gatewayfehler", function () {
     assert.match(harness.elements.networkBanner.innerHTML, /Netzwerkfehler/);
     assert.match(harness.elements.systemMessage.className, /is-offline/);
 
+    harness.timers.shift()();
+    harness.requests[2].success({
+        overallStatus: "ok",
+        message: "Keine aktiven Störungen erkannt.",
+        summary: {},
+        groups: [],
+        meta: meta(true, false, "2026-08-11T18:05:00.000Z")
+    });
+
+    assert.match(harness.elements.systemMessage.className, /is-recovered/);
+    assert.match(harness.elements.systemMessage.innerHTML, /wiederhergestellt/);
+
+    const staleHarness = createHarness(
+        "/system/errors",
+        "errors.js"
+    );
+
+    staleHarness.requests[0].success({
+        overallStatus: "stale",
+        summary: {warning: 1, unavailable: 1},
+        groups: [
+            {
+                severity: "warning",
+                title: "Warnungen",
+                issues: [
+                    {
+                        severity: "warning",
+                        title: "Letzte bekannte Störung",
+                        entityId: "sensor.saved",
+                        state: "unavailable",
+                        durationSeconds: 60
+                    }
+                ]
+            }
+        ],
+        meta: meta(false, true, "2026-08-11T18:00:00.000Z")
+    });
+
+    assert.match(staleHarness.elements.systemMessage.className, /is-stale/);
+    assert.match(staleHarness.elements.errorOverall.className, /is-stale/);
+    assert.equal(staleHarness.elements.errorGroups.children.length, 1);
+
+});
+
+
+test("Error-Shell zeigt Status, Severity-Gruppen, States und Recovery", function () {
+    const harness = createHarness(
+        "/system/errors",
+        "errors.js"
+    );
+
+    harness.requests[0].success({
+        overallStatus: "critical",
+        message: "2 aktive Störungen erkannt.",
+        summary: {
+            critical: 1,
+            error: 0,
+            warning: 0,
+            info: 1,
+            unavailable: 1,
+            unknown: 1
+        },
+        groups: [
+            {
+                severity: "critical",
+                title: "Kritisch",
+                issues: [
+                    {
+                        severity: "critical",
+                        title: "Ein sehr langer sicherheitsrelevanter Rauchmeldername nicht erreichbar",
+                        entityId: "binary_sensor.rauchmelder_flur",
+                        state: "unavailable",
+                        durationSeconds: 720,
+                        securityRelevant: true,
+                        description: "Die Entity ist derzeit nicht verfügbar."
+                    }
+                ]
+            },
+            {
+                severity: "info",
+                title: "Unbekannt",
+                issues: [
+                    {
+                        severity: "info",
+                        title: "Fenster: Zustand unbekannt",
+                        entityId: "binary_sensor.fenster",
+                        state: "unknown",
+                        durationSeconds: null,
+                        securityRelevant: false
+                    }
+                ]
+            }
+        ],
+        meta: meta(true, false, "2026-08-11T18:00:00.000Z")
+    });
+
+    assert.equal(harness.elements.errorsOverview.hidden, false);
+    assert.match(harness.elements.errorOverall.className, /is-critical/);
+    assert.equal(harness.elements.errorOverallLabel.innerHTML, "Kritisch");
+    assert.equal(harness.elements.errorCriticalCount.innerHTML, "1");
+    assert.equal(harness.elements.errorUnavailableCount.innerHTML, "1");
+    assert.equal(harness.elements.errorUnknownCount.innerHTML, "1");
+    assert.equal(harness.elements.errorGroups.children.length, 2);
+
+    harness.timers.shift()();
+    harness.requests[1].success({
+        overallStatus: "ok",
+        message: "Keine aktiven Störungen erkannt.",
+        summary: {},
+        groups: [],
+        meta: meta(true, false, "2026-08-11T18:00:05.000Z")
+    });
+
+    assert.match(harness.elements.errorOverall.className, /is-ok/);
+    assert.match(harness.elements.systemMessage.innerHTML, /Keine aktiven Störungen/);
 });
 
 
@@ -257,11 +379,15 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=24/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=25/);
+    assert.match(html, /id="errorOverallLabel"/);
+    assert.match(html, /id="errorUnavailableCount"/);
+    assert.match(html, /id="errorUnknownCount"/);
     assert.match(source, /Legacy\.http\.get/);
     assert.doesNotMatch(source, /\bconst\b|\blet\b|=>|`/);
     assert.doesNotMatch(source, /\bfetch\b|\bPromise\b|\basync\b|\bawait\b/);
     assert.doesNotMatch(source, /\?\.|\?\?/);
     assert.doesNotMatch(css, /display:\s*grid|grid-template|\bgap\s*:/);
+    assert.match(css, /word-break:\s*break-word/);
 
 });

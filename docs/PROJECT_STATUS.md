@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 11. August 2026, Sprint 17.2 nach Sprint 19 implementiert
+Stand: 11. August 2026, Sprint 20 implementiert
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -8,16 +8,16 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
-- Sprint-17.2-Ausgangscommit: `8bf0a41`
+- Sprint-20-Ausgangscommit: `62c823c`
 - Upstream vor Implementierung: `origin/main`
 - Sprint-19-Commit: `b4da718`
 - Sprint-18-Commit: `94ce1c0`
 - Sprint-17.1-Commit: `53ce672`
 
 Der Ausgangsarbeitsbaum war sauber und der vollständige Baseline-Testlauf
-bestand mit 108 von 108 Tests. Der tatsächliche Sprint-19-Code einschließlich
-Summary-Regeln, Schema 5, System-Snapshot, Admin-Einstellungen und
-Sicherheitsgrenzen wurde vor Sprint 17.2 geprüft.
+bestand mit 115 von 115 Tests. Die tatsächlichen Sprint-17.2-, Sprint-18- und
+Sprint-19-Implementierungen einschließlich Layout-/Theme-Korrekturen,
+System-Snapshot, Cache und Summary wurden vor Sprint 20 geprüft.
 
 ## 2. Implementierte Sprints und Funktionen
 
@@ -33,6 +33,7 @@ Sicherheitsgrenzen wurde vor Sprint 17.2 geprüft.
 | 17.1 | 6/12-Raster und responsive Karteninhalte | umgesetzt |
 | 19 | Summary Dashboard MVP | umgesetzt |
 | 17.2 | Kartenidentität, proportionale Geometrie und Theme-Persistenz | umgesetzt |
+| 20 | Error Dashboard MVP | umgesetzt |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -84,6 +85,33 @@ Titel, Zustand, Startzeit, Dauer, festes Icon, Beschreibung und die Domain.
 Medientitel fehlen standardmäßig vollständig und werden nur nach explizitem
 Admin-Opt-in ergänzt.
 
+## 4a. Error Dashboard MVP
+
+`/system/errors` beantwortet getrennt von Summary die Frage, welche Entities
+aktuell nicht funktionieren. Nur die States `unavailable` und `unknown`
+erzeugen im MVP Issues; beide bleiben in API und UI unterscheidbar.
+
+Die zentrale Severity-Regel lautet:
+
+```text
+normal unavailable  -> warning
+normal unknown      -> info
+security unavailable -> critical
+security unknown     -> error
+```
+
+Security-Relevanz entsteht ausschließlich durch die explizite persistente
+Admin-Konfiguration. Bekannte Device Classes wie `smoke`, `gas` oder
+`moisture` sind nur ein Hinweis und erhöhen die Severity nicht selbständig.
+Ignorierte Entities erscheinen nicht in der aktiven Fehlerliste.
+
+Issues enthalten ausschließlich normalisierte Anzeigefelder: ID, Quelle,
+Severity, aktiven Status, Titel, Kurzbeschreibung, Entity-ID, State,
+Security-Flag, Start-/Updatezeit, Dauer, Domain und soweit vorhanden Device
+Class. Titel folgen Widget-Konfiguration, Friendly Name und Entity-ID. Die
+Sortierung ist Critical, Error, Warning, Info, danach Security, Dauer, Titel
+und Entity-ID.
+
 ## 5. Collector, Cache und Ausfallsemantik
 
 Sprint 19 verwendet unverändert den gemeinsamen Sprint-18-Pfad:
@@ -103,7 +131,7 @@ Nach Recovery ersetzt ein frischer Snapshot die veralteten Daten.
 
 ## 6. Persistente Konfiguration
 
-Die Konfiguration verwendet Schema 5. Zusätzlich zu
+Die Konfiguration verwendet Schema 6. Zusätzlich zu
 `defaultDashboardId` und `dashboards` enthält sie:
 
 ```json
@@ -112,14 +140,19 @@ Die Konfiguration verwendet Schema 5. Zusätzlich zu
     "summary": {
       "ignoredEntities": [],
       "showMediaTitles": false
+    },
+    "errors": {
+      "securityEntities": [],
+      "ignoredEntities": []
     }
   }
 }
 ```
 
-Schema 1 bis 4 werden automatisch und atomar auf Schema 5 migriert. Bei Schema
-4 bleiben die 6/12-Spalten-Layouts unverändert; nur die sicheren
-Summary-Standardwerte werden ergänzt. Vollständige Validierung, atomarer
+Schema 1 bis 5 werden automatisch und atomar auf Schema 6 migriert. Bei Schema
+4 bleiben die 6/12-Spalten-Layouts unverändert. Bei Schema 5 bleiben Summary
+und Layouts unverändert und die leeren Error-Standardwerte werden ergänzt.
+Vollständige Validierung, atomarer
 Dateiersatz und genau ein `.bak` bleiben erhalten. Ungültige Entity-IDs,
 Duplikate oder ein nicht-boolesches Privacy-Flag werden abgelehnt, ohne die
 letzte gültige Datei zu ersetzen.
@@ -127,9 +160,10 @@ letzte gültige Datei zu ersetzen.
 ## 7. Admin UI
 
 Die moderne, Bearer-geschützte Admin UI besitzt einen eigenen Bereich
-„System-Dashboards“. Dort kann die feste Summary geöffnet, eine Entity aus dem
-bereits sanitisierten Admin-Inventar ignoriert und die Anzeige von
-Medientiteln ausdrücklich aktiviert werden. Die Änderungen laufen wie alle
+„System-Dashboards“. Dort können Summary und Fehler geöffnet, Entities aus dem
+bereits sanitisierten Admin-Inventar als sicherheitsrelevant markiert oder für
+Errors beziehungsweise Summary ignoriert und die Anzeige von Medientiteln
+ausdrücklich aktiviert werden. Die Änderungen laufen wie alle
 anderen Konfigurationsänderungen über Entwurf, Speichern, Schema-Validierung,
 Rate Limit und atomare Persistenz.
 
@@ -143,6 +177,12 @@ Kategoriegruppen mit festem Inline-SVG, Titel, Kurzbeschreibung und Dauer.
 Stale-, Offline- und Recovery-Hinweise bleiben sichtbar. Lange Namen werden
 ohne horizontales Überlaufen behandelt; Portrait und Landscape verwenden
 Flexbox und normale Blocklayouts.
+
+Errors zeigt Gesamtstatus, Counts für alle vier Severities und beide States
+sowie nur nichtleere Gruppen. Jede Zeile enthält sichtbaren Severity-Text und
+Symbol, Titel, Entity-ID, State und Dauer. OK erscheint ausschließlich bei
+einem frischen erfolgreichen Snapshot ohne Issues. Bei stale/offline bleiben
+letzte Issues sichtbar; ohne vorherigen Erfolg steht der Status auf unbekannt.
 
 Alle Compact Cards besitzen nun eine sichtbare, einzeilige `card-identity`.
 Die Fallback-Reihenfolge ist: expliziter Widgettitel, konfigurierter
@@ -175,18 +215,18 @@ werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion ist 24.
+Assetversion ist 25.
 
 ## 9. Sicherheitsgrenzen
 
-Sprint 19 ist vollständig read-only. Es wurden keine HA-Services, Schreib-
+Sprint 20 ist vollständig read-only. Es wurden keine HA-Services, Schreib-
 Endpoints oder automatischen Berechtigungen ergänzt. Die bestehenden
 Write-Allowlists in `src/routes/api.js` bleiben getrennt:
 
 - Climate: `climate.esszimmer_thermostate`
 - Light: `light.esszimmer_lampen`
 
-Summary-Erkennung, Ignorierliste, Dashboard-Sichtbarkeit und Admin-Inventar
+Summary-/Error-Erkennung, Security-/Ignorierlisten, Dashboard-Sichtbarkeit und Admin-Inventar
 erteilen keinerlei Schreibrecht. HA-Token und Admin-Token bleiben serverseitig
 und werden weder an Wall-Display noch Summary ausgeliefert oder geloggt.
 
@@ -194,16 +234,16 @@ und werden weder an Wall-Display noch Summary ausgeliefert oder geloggt.
 
 | Bereich | Dateien |
 |---|---|
-| Regeln und Engine | `src/services/summary/rules.js`, `src/services/summary/engine.js` |
+| Regeln und Engines | `src/services/summary/rules.js`, `src/services/summary/engine.js`, `src/services/issues/engine.js`, `src/services/issues/severity.js` |
 | Snapshot und Cache | `src/services/system/snapshot.js`, `src/services/system/cache.js`, `src/services/system/index.js` |
 | System-API | `src/routes/system-dashboards.js` |
 | Schema/Persistenz | `src/config/dashboard.js`, `src/services/dashboard-config-store.js` |
-| Legacy-Summary | `src/public/system.html`, `src/public/js/system/common.js`, `src/public/js/system/summary.js`, `src/public/css/system.css` |
+| Legacy-Systemansichten | `src/public/system.html`, `src/public/js/system/common.js`, `src/public/js/system/summary.js`, `src/public/js/system/errors.js`, `src/public/css/system.css` |
 | Sprint-17.2-Layout | `src/public/js/core/layout.js`, `src/public/js/core/widget.js`, `src/public/css/style.css` |
 | Sprint-17.2-Widgets | `src/public/js/widgets/sensor.js`, `src/public/js/widgets/binary.js`, `src/public/js/widgets/light.js`, `src/public/js/widgets/climate.js` |
 | Theme | `src/public/js/core/theme.js`, `src/public/index.html`, `src/public/system.html` |
 | Admin-Einstellungen | `src/admin/index.html`, `src/admin/js/system-dashboards.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
-| Tests | `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-ui.test.js` |
+| Tests | `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
 
 ## 11. Tests
 
@@ -211,12 +251,16 @@ Der vollständige Lauf verwendet ausschließlich localhost Mock-Home-Assistant-
 Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
 
 - alle positiven und negativen Sprint-19-Regeln
+- getrennte unavailable-/unknown-Klassifikation und alle vier Severities
+- Security-/Ignore-Konfiguration, Schema-5-auf-6-Migration und Reload
+- Statuslogik für OK, Warning, Error, Critical, stale, offline und Recovery
+- Dauer, deterministische Sortierung, fehlende Attribute und Datenreduktion
 - Climate nur nach `hvac_action`
 - ignorierte Entities und Medientitel-Privacy
 - deterministische Priorisierung, Gruppierung und Dauer
 - Stale-Datenerhalt, Offline und Recovery
 - gemeinsamer Cache ohne zusätzliche HA-Abfragen
-- Schema-4-auf-5-Migration und Einstellungsvalidierung
+- Schema-1-bis-5-auf-6-Migration und Einstellungsvalidierung
 - Admin-Entwurf und geschützte Persistenz
 - unveränderte Write-Allowlists
 - ES5- und CSS-Verbote der Legacy-Oberfläche
@@ -224,9 +268,9 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
 - proportionale, gutter-aware und gecachte Rastergeometrie
 - flächenabhängige Presentation Modes und Orientation Change
 - Dark-/Light-Persistenz, Reload und sichere Storage-Fehler
-- 1500 aktive Summary-Entities und 3000 normalisierte Entities
+- 1000-Entity-Issue-Lauf, 1500 aktive Summary-Entities und 3000 normalisierte Entities
 
-Der abschließende lokale Lauf besteht mit 115 von 115 Tests. Alle
+Der abschließende lokale Lauf besteht mit 127 von 127 Tests. Alle
 JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
 `git diff --check` ist sauber. Die Browser-Abnahme bei 768×1024 und 1024×768
 prüfte die kleinsten erlaubten Sensor-, Binary-, Light- und Climate-Karten.
@@ -240,9 +284,11 @@ Produktions-Rollout auf dem iPad.
 
 ## 12. Bekannte Einschränkungen und technischer Rest
 
-- `/system/errors` bleibt bis Sprint 20 der leere Issue-Platzhalter.
 - Registry-, Device-, Area-, Config-Entry- und Repairs-Anreicherung folgen
   frühestens in Sprint 21.
+- Grace Periods, erwartete Offlinezustände, Flapping und Aggregation folgen
+  Sprint 22; kurze Ausfälle erscheinen im MVP daher sofort.
+- Es gibt noch keine Issue-Historie oder Acknowledgements.
 - Switch-Ausschlüsse sind absichtlich explizit statt heuristisch; die
   Ersteinrichtung kann daher eine kurze Admin-Auswahl erfordern.
 - Der Snapshot-Cache ist pro Node-Prozess und geht beim Neustart verloren.
@@ -252,13 +298,12 @@ Produktions-Rollout auf dem iPad.
 
 ## 13. Roadmap-Abgleich und nächster Sprint
 
-Sprint 17.2 korrigiert ausschließlich die drei spezifizierten UX-Regressionen:
-Compact-Identität, proportionale Kartenhöhe und Theme-Persistenz. Sprint 19
-bleibt fachlich unverändert; ebenso Schema, Admin-Editor, Summary-/Error-
-Architektur, Drag/Resize und Write-Allowlists. Nicht vorgezogen wurden
-Error-Fachlogik, Registry-Anreicherung, weitere Schreibdomänen oder freie
-System-Dashboard-Layouts.
+Sprint 20 füllt ausschließlich die vorhandene Issue Engine und erweitert die
+versionierte System-Dashboard-Konfiguration. Summary-Regeln, Drag/Resize,
+Theme und Write-Allowlists bleiben unverändert. Nicht vorgezogen wurden
+Registry-/Repairs-Daten, Grace Periods, Historie, weitere Schreibdomänen oder
+freie System-Dashboard-Layouts.
 
-Empfohlener nächster Schritt ist Sprint 20 – Error Dashboard MVP. Er soll auf
-demselben Snapshot und Cache Issues klassifizieren, ohne die Summary-Regeln
-oder Sicherheitsgrenzen aufzuweichen.
+Empfohlener nächster Schritt ist Sprint 21 – Registry & Diagnostic Enrichment.
+Er beginnt mit einer Capability-Prüfung der tatsächlich eingesetzten Home-
+Assistant-Version und ergänzt nur stabile, sicher reduzierbare Diagnosequellen.

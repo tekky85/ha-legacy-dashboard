@@ -174,7 +174,9 @@ http://gateway-address:3000/system/errors
 
 The Summary dashboard now shows active, open, moving, cleaning, climate,
 media, powered, lock, and alarm states according to explicit server-side
-rules. Issue classification remains reserved for Sprint 20.
+rules. The Error dashboard separately shows `unavailable` and `unknown`
+entities, their duration and severity. It never treats stale or offline data
+as an all-clear.
 
 ## iPad home-screen installation
 
@@ -331,7 +333,7 @@ The path can be overridden with `DASHBOARD_CONFIG_PATH`. On the first start,
 the application validates and migrates the built-in Sprint 13 profiles from
 `src/config/dashboard.js`. Runtime files under `data/` are ignored by Git.
 
-The version 5 schema declares `schemaVersion`, one `defaultDashboardId`,
+The version 6 schema declares `schemaVersion`, one `defaultDashboardId`,
 `systemDashboards`, and a list of dashboard profiles. Every profile has a
 stable lowercase ID, a display
 title, a refresh interval, and its own widget list. Every widget also has a
@@ -342,7 +344,9 @@ columns and landscape twelve columns. Existing version 1 and version 2 files
 receive fresh deterministic layouts. Existing version 3 layouts are migrated
 exactly once with `x_new = x_old * 2` and `w_new = w_old * 2`; `y` and `h`
 remain unchanged. Version 4 files retain their 6/12-column layouts and receive
-the default Summary settings exactly once. Dashboard IDs, widget IDs,
+the default system-dashboard settings exactly once. Version 5 files retain
+their Summary settings and layouts while receiving empty Error settings.
+Dashboard IDs, widget IDs,
 entities, order, visibility, titles, and icons are preserved. The migrated
 profiles are:
 
@@ -433,7 +437,7 @@ contain version 3. Older releases cannot load the newer schema, so a downgrade
 requires restoring a compatible retained backup or manually converting the
 configuration. There is intentionally no automatic downgrade migration.
 
-The schema 5 Summary settings are:
+The schema 6 system-dashboard settings are:
 
 ```json
 {
@@ -441,6 +445,10 @@ The schema 5 Summary settings are:
     "summary": {
       "ignoredEntities": [],
       "showMediaTitles": false
+    },
+    "errors": {
+      "securityEntities": [],
+      "ignoredEntities": []
     }
   }
 }
@@ -450,6 +458,21 @@ The schema 5 Summary settings are:
 entities only in Summary. `showMediaTitles` is an explicit privacy opt-in.
 Neither setting changes dashboard visibility or Home Assistant write
 authorization.
+
+For Errors, `securityEntities` is the sole authoritative MVP marking for
+security relevance. `ignoredEntities` removes selected entities only from the
+Error list. A normal `unavailable` entity is `warning`; a normal `unknown`
+entity is `info`; an explicitly security-relevant `unavailable` entity is
+`critical`; and an explicitly security-relevant `unknown` entity is `error`.
+Known security device classes are exposed only as a hint and do not elevate
+severity automatically. Grace periods are not yet applied, so short outages
+can appear immediately until Sprint 22.
+
+Both fixed system dashboards use the same reduced, cached Home Assistant
+snapshot. When Home Assistant is offline, the last known issues remain visible
+as stale; without any prior successful snapshot, the UI reports that the error
+status is unavailable instead of showing OK. The browser receives normalized
+issue fields, never complete Home Assistant state objects.
 
 Set `visible` to `false` to remove a widget from both the browser
 configuration and the dashboard state query. Supported frontend widget types
@@ -532,6 +555,8 @@ The UI supports:
 - opening the fixed Summary dashboard and configuring its ignore list from
   the sanitized entity inventory
 - explicitly enabling media titles for Summary; disabled by default
+- opening the fixed Error dashboard and configuring Security and Ignore
+  entities from the same sanitized inventory
 
 Dashboard IDs, widget IDs, tile sizes, layout profiles, integer coordinates,
 bounds, widget references, minimum sizes and collisions remain
