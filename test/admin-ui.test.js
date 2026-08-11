@@ -47,7 +47,7 @@ function createHarness() {
                 status: 200,
                 text: async function () {
                     return JSON.stringify({
-                        schemaVersion: 2,
+                        schemaVersion: 3,
                         defaultDashboardId: "default",
                         dashboards: []
                     });
@@ -72,6 +72,7 @@ function createHarness() {
         "js/auth.js",
         "js/api.js",
         "js/state.js",
+        "js/layout.js",
         "js/dashboards.js",
         "js/widgets.js",
         "js/entities.js"
@@ -212,6 +213,25 @@ test("Dashboard-Entwürfe unterstützen CRUD, Standardwechsel und Duplikate", fu
         assert.equal(originalIds.indexOf(widgetId), -1);
     });
 
+    ["portrait", "landscape"].forEach(function (profileName) {
+        originalIds.forEach(function (originalId, index) {
+            assert.deepEqual(
+                JSON.parse(JSON.stringify(
+                    duplicate.layouts[profileName].items[duplicateIds[index]]
+                )),
+                freshConfiguration().dashboards[0]
+                    .layouts[profileName].items[originalId]
+            );
+            assert.equal(
+                Object.prototype.hasOwnProperty.call(
+                    duplicate.layouts[profileName].items,
+                    originalId
+                ),
+                false
+            );
+        });
+    });
+
     assert.throws(
         function () {
             admin.Dashboards.remove("default");
@@ -236,6 +256,87 @@ test("Dashboard-Entwürfe unterstützen CRUD, Standardwechsel und Duplikate", fu
     admin.State.discard();
     assert.equal(admin.State.isDirty(), false);
     assert.equal(admin.State.getDraft().defaultDashboardId, "default");
+});
+
+
+test("Layout-Entwurf verhindert Kollisionen und unterstützt Bewegung und Resize", function () {
+    const harness = createHarness();
+    const admin = harness.admin;
+    admin.State.setConfiguration(freshConfiguration());
+
+    const dashboard = admin.State.getSelectedDashboard();
+    const firstId = dashboard.widgets[0].id;
+    const secondId = dashboard.widgets[1].id;
+    const climateId = dashboard.widgets.find(function (widget) {
+        return widget.type === "climate";
+    }).id;
+
+    assert.equal(
+        admin.Layout.place(
+            dashboard.id,
+            firstId,
+            "portrait",
+            dashboard.layouts.portrait.items[secondId]
+        ),
+        false
+    );
+    assert.equal(
+        admin.Layout.place(
+            dashboard.id,
+            firstId,
+            "portrait",
+            {x: 3, y: 0, w: 1, h: 1}
+        ),
+        false
+    );
+    assert.equal(
+        admin.Layout.resize(
+            dashboard.id,
+            climateId,
+            "landscape",
+            -1,
+            0
+        ),
+        false
+    );
+
+    assert.equal(
+        admin.Layout.move(
+            dashboard.id,
+            climateId,
+            "portrait",
+            0,
+            1
+        ),
+        true
+    );
+    assert.equal(
+        admin.Layout.resize(
+            dashboard.id,
+            climateId,
+            "portrait",
+            0,
+            1
+        ),
+        true
+    );
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(
+            dashboard.layouts.portrait.items[climateId]
+        )),
+        {x: 1, y: 2, w: 1, h: 2}
+    );
+    assert.equal(admin.State.isDirty(), true);
+
+    admin.State.discard();
+    assert.equal(admin.State.isDirty(), false);
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(
+            admin.State.getSelectedDashboard()
+                .layouts.portrait.items[climateId]
+        )),
+        {x: 1, y: 1, w: 1, h: 1}
+    );
 });
 
 
@@ -376,7 +477,7 @@ test("Admin-Dateien leaken keine Secrets und das Wall-Display bleibt ES5", funct
     assert.doesNotMatch(apiSource, /\/api\/dashboard(?:s)?/);
     assert.doesNotMatch(apiSource, /console\./);
     assert.match(appSource, /beforeunload/);
-    assert.doesNotMatch(appSource, /dragstart|draggable|grid-column|tileWidth/);
+    assert.match(appSource, /dragstart|draggable/);
 
     const legacyDirectory = path.join(
         PROJECT_PATH,
@@ -405,4 +506,11 @@ test("Admin-Dateien leaken keine Secrets und das Wall-Display bleibt ES5", funct
 
     assert.doesNotMatch(legacySource, /\bconst\b|\blet\b|=>|`/);
     assert.doesNotMatch(legacySource, /\bfetch\b|\bPromise\b|\basync\b|\bawait\b/);
+    assert.doesNotMatch(
+        fs.readFileSync(
+            path.join(PROJECT_PATH, "src", "public", "css", "style.css"),
+            "utf8"
+        ),
+        /display:\s*grid|grid-template|grid-column|grid-row/
+    );
 });

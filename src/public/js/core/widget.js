@@ -6,6 +6,15 @@ function Widget(config) {
 
     config = config || {};
 
+    this.id =
+        typeof config.id === "string" &&
+        /^[a-z0-9][a-z0-9-]{0,62}$/.test(config.id)
+            ? config.id
+            : "";
+
+    this.type =
+        config.type || "";
+
     this.entity =
         config.entity || "";
 
@@ -62,6 +71,15 @@ Widget.prototype.getIcon = function () {
 Widget.prototype.getSizeClass = function () {
 
     return "card-size-" + this.size;
+
+};
+
+
+Widget.prototype.getLayoutAttribute = function () {
+
+    return this.id
+        ? ' data-widget-id="' + this.id + '"'
+        : "";
 
 };
 

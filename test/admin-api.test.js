@@ -559,6 +559,119 @@ test(
 
 
         await t.test(
+            "Rasterlayouts werden geschützt validiert und öffentlich bereinigt",
+            async function () {
+
+                const gateway = await startGateway(
+                    "layouts",
+                    "true",
+                    FAKE_ADMIN_TOKEN,
+                    null
+                );
+                const auth = {
+                    Authorization: "Bearer " + FAKE_ADMIN_TOKEN
+                };
+                const initial = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/admin/config",
+                    undefined,
+                    auth
+                );
+
+                assert.equal(initial.status, 200);
+                assert.equal(initial.json.schemaVersion, 3);
+                assert.equal(
+                    initial.json.dashboards[0].layouts.portrait.columns,
+                    3
+                );
+                assert.equal(
+                    initial.json.dashboards[0].layouts.landscape.columns,
+                    6
+                );
+
+                const dashboard = initial.json.dashboards[0];
+                const climate = dashboard.widgets.find(function (entry) {
+                    return entry.type === "climate";
+                });
+                dashboard.layouts.portrait.items[climate.id] = {
+                    x: 1,
+                    y: 3,
+                    w: 1,
+                    h: 2
+                };
+
+                const saved = await request(
+                    gateway.port,
+                    "PUT",
+                    "/api/admin/config",
+                    initial.json,
+                    auth
+                );
+
+                assert.equal(saved.status, 200);
+                assert.deepEqual(
+                    saved.json.dashboards[0]
+                        .layouts.portrait.items[climate.id],
+                    {x: 1, y: 3, w: 1, h: 2}
+                );
+
+                const invalid = JSON.parse(JSON.stringify(saved.json));
+                const firstId = invalid.dashboards[0].widgets[0].id;
+                const secondId = invalid.dashboards[0].widgets[1].id;
+                invalid.dashboards[0].layouts.portrait.items[secondId] =
+                    Object.assign(
+                        {},
+                        invalid.dashboards[0].layouts.portrait.items[firstId]
+                    );
+
+                const rejected = await request(
+                    gateway.port,
+                    "PUT",
+                    "/api/admin/config",
+                    invalid,
+                    auth
+                );
+
+                assert.equal(rejected.status, 400);
+                assert.equal(rejected.json.error, "invalid_layout");
+
+                const persisted = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/admin/config",
+                    undefined,
+                    auth
+                );
+                assert.deepEqual(
+                    persisted.json.dashboards[0]
+                        .layouts.portrait.items[climate.id],
+                    {x: 1, y: 3, w: 1, h: 2}
+                );
+
+                const publicConfig = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/dashboard/config"
+                );
+
+                assert.equal(publicConfig.status, 200);
+                assert.deepEqual(
+                    publicConfig.json.layouts.portrait.items[climate.id],
+                    {x: 1, y: 3, w: 1, h: 2}
+                );
+                assert.equal(
+                    JSON.stringify(publicConfig.json).indexOf(FAKE_ADMIN_TOKEN),
+                    -1
+                );
+
+                await stopChild(gateway.child);
+
+            }
+        );
+
+
+        await t.test(
             "Bearer-Authentifizierung, CRUD und Inventar",
             async function () {
 
@@ -610,7 +723,7 @@ test(
                 assert.equal(initialConfig.status, 200);
                 assert.equal(
                     initialConfig.json.schemaVersion,
-                    2
+                    3
                 );
                 assert.equal(
                     initialConfig.json.defaultDashboardId,

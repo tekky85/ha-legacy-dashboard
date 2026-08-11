@@ -1130,6 +1130,29 @@ body.theme-dark .footer {
 
 
 /* =========================================================
+   ABSOLUTE GRID LAYOUT (WITHOUT CSS GRID)
+   ========================================================= */
+
+.grid.grid-layout-active {
+
+    position: relative;
+
+    display: block;
+
+    width: auto;
+
+}
+
+.grid.grid-layout-active .card {
+
+    position: absolute;
+
+    margin: 10px;
+
+}
+
+
+/* =========================================================
    LANDSCAPE OPTIMIZATION
    ========================================================= */
 

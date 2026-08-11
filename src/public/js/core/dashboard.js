@@ -6,6 +6,8 @@ var Dashboard = {
 
     widgets: [],
 
+    layouts: null,
+
 
     addWidget: function (widget) {
 
@@ -58,7 +60,7 @@ var Dashboard = {
     },
 
 
-    configure: function (configs) {
+    configure: function (configs, layouts) {
 
         var orderedConfigs;
         var config;
@@ -67,6 +69,7 @@ var Dashboard = {
 
 
         this.widgets = [];
+        this.layouts = layouts || null;
 
 
         if (!configs || !configs.length) {
@@ -133,6 +136,14 @@ var Dashboard = {
 
             }
 
+        }
+
+
+        if (typeof LegacyLayout !== "undefined") {
+            LegacyLayout.configure(
+                this.layouts,
+                this.widgets
+            );
         }
 
 
@@ -203,6 +214,27 @@ var Dashboard = {
 
         container.innerHTML =
             html;
+
+
+        this.applyLayout();
+
+    },
+
+
+    applyLayout: function () {
+
+        var container =
+            document.getElementById(
+                "dashboard"
+            );
+
+
+        if (
+            container &&
+            typeof LegacyLayout !== "undefined"
+        ) {
+            LegacyLayout.apply(container);
+        }
 
     }
 

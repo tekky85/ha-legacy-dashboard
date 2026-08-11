@@ -72,7 +72,7 @@ BinaryWidget.prototype.render =
 
             '<section class="card ' +
                 this.getSizeClass() +
-            '">' +
+            '"' + this.getLayoutAttribute() + '>' +
 
                 '<div class="card-header">' +
 

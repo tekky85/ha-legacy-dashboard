@@ -408,6 +408,138 @@ input[readonly] {
     margin-bottom: 0;
 }
 
+.layout-section {
+    margin: 0 0 1.75rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.8rem;
+    background: var(--surface-subtle);
+}
+
+.layout-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+}
+
+.layout-heading p,
+.layout-help {
+    margin: 0.3rem 0 0;
+    font-size: 0.82rem;
+}
+
+.layout-profile-tabs {
+    display: flex;
+    gap: 0.45rem;
+}
+
+.layout-editor-grid {
+    --layout-columns: 3;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+    grid-auto-rows: 184px;
+    gap: 10px;
+    min-height: 194px;
+    padding: 10px;
+    overflow: auto;
+    border: 1px solid #b8c5d6;
+    border-radius: 0.7rem;
+    background-color: #edf2f8;
+    background-image:
+        linear-gradient(rgba(71, 84, 103, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(71, 84, 103, 0.1) 1px, transparent 1px);
+    background-size:
+        calc(100% / var(--layout-columns)) 194px,
+        calc(100% / var(--layout-columns)) 194px;
+}
+
+.layout-tile,
+.layout-preview {
+    min-width: 0;
+    border-radius: 0.6rem;
+}
+
+.layout-tile {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.7rem;
+    overflow: hidden;
+    border: 1px solid #84adff;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    cursor: grab;
+    touch-action: none;
+}
+
+.layout-tile.is-dragging {
+    opacity: 0.5;
+}
+
+.layout-tile-title {
+    overflow: hidden;
+    padding-right: 1.7rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.layout-tile-meta {
+    color: var(--muted);
+    font-size: 0.72rem;
+}
+
+.layout-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: auto;
+}
+
+.layout-control-button {
+    min-width: 1.75rem;
+    min-height: 1.75rem;
+    padding: 0.15rem 0.28rem;
+    border: 1px solid var(--border);
+    border-radius: 0.35rem;
+    background: #fff;
+    color: var(--text);
+    font-size: 0.72rem;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.layout-resize-handle {
+    position: absolute;
+    right: 0.25rem;
+    top: 0.25rem;
+    width: 1.7rem;
+    height: 1.7rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--primary-dark);
+    font-size: 1.1rem;
+    cursor: nwse-resize;
+    touch-action: none;
+}
+
+.layout-preview {
+    z-index: 1;
+    border: 2px dashed var(--primary);
+    background: rgba(37, 99, 235, 0.12);
+    pointer-events: none;
+}
+
+.layout-preview.is-invalid {
+    border-color: var(--danger);
+    background: rgba(180, 35, 24, 0.12);
+}
+
 .widget-section {
     margin-top: 1rem;
 }
@@ -642,6 +774,14 @@ dialog::backdrop {
 
     .widget-actions {
         justify-content: flex-start;
+    }
+
+    .layout-heading {
+        flex-direction: column;
+    }
+
+    .layout-editor-grid {
+        min-width: 620px;
     }
 
     .save-bar .button-row {

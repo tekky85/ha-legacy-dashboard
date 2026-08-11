@@ -4,6 +4,9 @@
     const elements = {};
     let pendingEntity = null;
     let entityLoadError = "";
+    let activeLayoutProfile = "portrait";
+    let layoutDragState = null;
+    let layoutResizeState = null;
 
     function byId(id) {
         return document.getElementById(id);
@@ -263,6 +266,122 @@
         container.appendChild(input);
     }
 
+    function layoutButton(label, action, widgetId, title) {
+        const button = createButton(
+            label,
+            action,
+            widgetId,
+            "layout-control-button"
+        );
+        button.setAttribute("aria-label", title);
+        return button;
+    }
+
+    function renderLayoutTile(dashboard, widget, profileName) {
+        const item = dashboard.layouts[profileName].items[widget.id];
+        const tile = createElement("article", "layout-tile");
+        const title = createElement("strong", "layout-tile-title", widget.title);
+        const meta = createElement(
+            "span",
+            "layout-tile-meta",
+            "x" + item.x + " · y" + item.y + " · " + item.w + "×" + item.h
+        );
+        const controls = createElement("div", "layout-controls");
+        const resizeHandle = createElement("button", "layout-resize-handle", "↘");
+
+        tile.draggable = true;
+        tile.dataset.layoutWidgetId = widget.id;
+        tile.style.gridColumn = (item.x + 1) + " / span " + item.w;
+        tile.style.gridRow = (item.y + 1) + " / span " + item.h;
+        tile.appendChild(title);
+        tile.appendChild(meta);
+
+        controls.appendChild(layoutButton("←", "layout-left", widget.id, widget.title + " nach links"));
+        controls.appendChild(layoutButton("→", "layout-right", widget.id, widget.title + " nach rechts"));
+        controls.appendChild(layoutButton("↑", "layout-up", widget.id, widget.title + " nach oben"));
+        controls.appendChild(layoutButton("↓", "layout-down", widget.id, widget.title + " nach unten"));
+        controls.appendChild(layoutButton("−B", "layout-narrower", widget.id, widget.title + " schmaler"));
+        controls.appendChild(layoutButton("+B", "layout-wider", widget.id, widget.title + " breiter"));
+        controls.appendChild(layoutButton("−H", "layout-shorter", widget.id, widget.title + " niedriger"));
+        controls.appendChild(layoutButton("+H", "layout-taller", widget.id, widget.title + " höher"));
+        tile.appendChild(controls);
+
+        resizeHandle.type = "button";
+        resizeHandle.draggable = false;
+        resizeHandle.dataset.layoutResize = widget.id;
+        resizeHandle.setAttribute("aria-label", widget.title + " am Raster vergrößern oder verkleinern");
+        tile.appendChild(resizeHandle);
+
+        return tile;
+    }
+
+    function renderLayoutEditor(dashboard) {
+        admin.Layout.ensureDashboard(dashboard);
+
+        const section = createElement("section", "layout-section");
+        const heading = createElement("div", "layout-heading");
+        const headingText = createElement("div");
+        const tabs = createElement("div", "layout-profile-tabs");
+        const grid = createElement("div", "layout-editor-grid");
+        const profileName = activeLayoutProfile;
+        const columns = admin.Layout.COLUMNS[profileName];
+        const rows = admin.Layout.rowCount(dashboard, profileName) + 1;
+        const preview = createElement("div", "layout-preview");
+
+        headingText.appendChild(createElement("h2", "", "Layout"));
+        headingText.appendChild(createElement(
+            "p",
+            "muted",
+            "Kacheln ziehen, am Raster einrasten oder über die Tasten anpassen."
+        ));
+
+        [
+            {id: "portrait", label: "Portrait"},
+            {id: "landscape", label: "Landscape"}
+        ].forEach(function (profile) {
+            const button = createButton(
+                profile.label,
+                "layout-profile",
+                profile.id,
+                profile.id === profileName
+                    ? "button primary compact"
+                    : "button secondary compact"
+            );
+            button.setAttribute("aria-pressed", profile.id === profileName ? "true" : "false");
+            tabs.appendChild(button);
+        });
+
+        heading.appendChild(headingText);
+        heading.appendChild(tabs);
+        section.appendChild(heading);
+
+        grid.dataset.layoutGrid = profileName;
+        grid.dataset.rowHeight = "194";
+        grid.style.setProperty("--layout-columns", String(columns));
+        grid.style.gridTemplateRows = "repeat(" + rows + ", 184px)";
+
+        sortedWidgets(dashboard).forEach(function (widget) {
+            if (widget.visible) {
+                grid.appendChild(
+                    renderLayoutTile(dashboard, widget, profileName)
+                );
+            }
+        });
+
+        preview.hidden = true;
+        preview.setAttribute("aria-hidden", "true");
+        grid.appendChild(preview);
+        section.appendChild(grid);
+        section.appendChild(createElement(
+            "p",
+            "layout-help muted",
+            profileName === "portrait"
+                ? "Portrait verwendet 3 Spalten."
+                : "Landscape verwendet 6 Spalten. Climate benötigt mindestens 2 Spalten."
+        ));
+        return section;
+    }
+
     function renderEditor() {
         const dashboard = admin.State.getSelectedDashboard();
         const draft = admin.State.getDraft();
@@ -353,6 +472,9 @@
         settings.appendChild(refreshField);
         settings.appendChild(defaultLabel);
         elements.dashboardEditor.appendChild(settings);
+        elements.dashboardEditor.appendChild(
+            renderLayoutEditor(dashboard)
+        );
 
         const widgetSection = createElement("section", "widget-section");
         const widgetHeading = createElement("div", "widget-heading");
@@ -389,6 +511,8 @@
     }
 
     function renderAll() {
+        layoutDragState = null;
+        layoutResizeState = null;
         renderDashboardList();
         renderEditor();
         updateDirtyState();
@@ -639,7 +763,36 @@
         hideNotice();
 
         try {
-            if (button.dataset.action === "dashboard-duplicate") {
+            if (button.dataset.action === "layout-profile") {
+                activeLayoutProfile = button.dataset.id;
+                renderEditor();
+            } else if (button.dataset.action.indexOf("layout-") === 0) {
+                let changed = false;
+
+                if (button.dataset.action === "layout-left") {
+                    changed = admin.Layout.move(dashboard.id, button.dataset.id, activeLayoutProfile, -1, 0);
+                } else if (button.dataset.action === "layout-right") {
+                    changed = admin.Layout.move(dashboard.id, button.dataset.id, activeLayoutProfile, 1, 0);
+                } else if (button.dataset.action === "layout-up") {
+                    changed = admin.Layout.move(dashboard.id, button.dataset.id, activeLayoutProfile, 0, -1);
+                } else if (button.dataset.action === "layout-down") {
+                    changed = admin.Layout.move(dashboard.id, button.dataset.id, activeLayoutProfile, 0, 1);
+                } else if (button.dataset.action === "layout-narrower") {
+                    changed = admin.Layout.resize(dashboard.id, button.dataset.id, activeLayoutProfile, -1, 0);
+                } else if (button.dataset.action === "layout-wider") {
+                    changed = admin.Layout.resize(dashboard.id, button.dataset.id, activeLayoutProfile, 1, 0);
+                } else if (button.dataset.action === "layout-shorter") {
+                    changed = admin.Layout.resize(dashboard.id, button.dataset.id, activeLayoutProfile, 0, -1);
+                } else if (button.dataset.action === "layout-taller") {
+                    changed = admin.Layout.resize(dashboard.id, button.dataset.id, activeLayoutProfile, 0, 1);
+                }
+
+                if (changed) {
+                    renderAll();
+                } else {
+                    showNotice("Diese Rasteränderung ist wegen Grenze, Mindestgröße oder Kollision nicht möglich.", true);
+                }
+            } else if (button.dataset.action === "dashboard-duplicate") {
                 openDashboardForm("duplicate");
             } else if (button.dataset.action === "dashboard-delete") {
                 if (window.confirm(
@@ -685,6 +838,239 @@
             }
         } catch (error) {
             showNotice(error.message, true);
+        }
+    }
+
+    function layoutGridFromEvent(event) {
+        return event.target.closest("[data-layout-grid]");
+    }
+
+    function layoutCandidate(grid, widgetId, clientX, clientY, item) {
+        const cell = admin.Layout.cellFromPoint(
+            grid,
+            activeLayoutProfile,
+            clientX,
+            clientY
+        );
+
+        return {
+            x: cell.x,
+            y: cell.y,
+            w: item.w,
+            h: item.h
+        };
+    }
+
+    function showLayoutPreview(grid, candidate, valid) {
+        const preview = grid.querySelector(".layout-preview");
+        const previewWidth = Math.max(1, candidate.w);
+        const previewHeight = Math.max(1, candidate.h);
+        preview.hidden = false;
+        preview.className = valid
+            ? "layout-preview is-valid"
+            : "layout-preview is-invalid";
+        preview.style.gridColumn = (candidate.x + 1) + " / span " + previewWidth;
+        preview.style.gridRow = (candidate.y + 1) + " / span " + previewHeight;
+    }
+
+    function hideLayoutPreview(grid) {
+        const preview = grid && grid.querySelector(".layout-preview");
+        if (preview) {
+            preview.hidden = true;
+        }
+    }
+
+    function handleLayoutDragStart(event) {
+        const tile = event.target.closest("[data-layout-widget-id]");
+        const grid = layoutGridFromEvent(event);
+        const dashboard = admin.State.getSelectedDashboard();
+
+        if (!tile || !grid || event.target.closest("button")) {
+            event.preventDefault();
+            return;
+        }
+
+        const widgetId = tile.dataset.layoutWidgetId;
+        const item = dashboard.layouts[activeLayoutProfile].items[widgetId];
+        layoutDragState = {
+            widgetId: widgetId,
+            item: admin.State.clone(item)
+        };
+        tile.classList.add("is-dragging");
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", widgetId);
+    }
+
+    function handleLayoutDragOver(event) {
+        const grid = layoutGridFromEvent(event);
+        const dashboard = admin.State.getSelectedDashboard();
+
+        if (!grid || !layoutDragState) {
+            return;
+        }
+
+        event.preventDefault();
+        const candidate = layoutCandidate(
+            grid,
+            layoutDragState.widgetId,
+            event.clientX,
+            event.clientY,
+            layoutDragState.item
+        );
+        const valid = admin.Layout.canPlace(
+            dashboard.id,
+            layoutDragState.widgetId,
+            activeLayoutProfile,
+            candidate
+        );
+        layoutDragState.candidate = candidate;
+        showLayoutPreview(grid, candidate, valid);
+        event.dataTransfer.dropEffect = valid ? "move" : "none";
+    }
+
+    function handleLayoutDrop(event) {
+        const grid = layoutGridFromEvent(event);
+        const dashboard = admin.State.getSelectedDashboard();
+
+        if (!grid || !layoutDragState || !layoutDragState.candidate) {
+            return;
+        }
+
+        event.preventDefault();
+        const changed = admin.Layout.place(
+            dashboard.id,
+            layoutDragState.widgetId,
+            activeLayoutProfile,
+            layoutDragState.candidate
+        );
+        layoutDragState = null;
+
+        if (changed) {
+            renderAll();
+        } else {
+            hideLayoutPreview(grid);
+            showNotice("Die Kachel kann dort nicht abgelegt werden.", true);
+        }
+    }
+
+    function handleLayoutDragEnd(event) {
+        hideLayoutPreview(layoutGridFromEvent(event));
+        layoutDragState = null;
+        const tile = event.target.closest("[data-layout-widget-id]");
+        if (tile) {
+            tile.classList.remove("is-dragging");
+        }
+    }
+
+    function handleLayoutPointerDown(event) {
+        const grid = layoutGridFromEvent(event);
+        const dashboard = admin.State.getSelectedDashboard();
+        const resizeHandle = event.target.closest("[data-layout-resize]");
+        const tile = event.target.closest("[data-layout-widget-id]");
+
+        if (!grid || !tile || event.target.closest(".layout-control-button")) {
+            return;
+        }
+
+        const widgetId = tile.dataset.layoutWidgetId;
+        const item = admin.State.clone(
+            dashboard.layouts[activeLayoutProfile].items[widgetId]
+        );
+
+        if (resizeHandle) {
+            layoutResizeState = {
+                pointerId: event.pointerId,
+                widgetId: widgetId,
+                item: item,
+                startX: event.clientX,
+                startY: event.clientY,
+                grid: grid
+            };
+        } else if (event.pointerType !== "mouse") {
+            layoutDragState = {
+                pointerId: event.pointerId,
+                widgetId: widgetId,
+                item: item,
+                grid: grid
+            };
+        } else {
+            return;
+        }
+
+        event.preventDefault();
+        if (typeof tile.setPointerCapture === "function") {
+            tile.setPointerCapture(event.pointerId);
+        }
+    }
+
+    function handleLayoutPointerMove(event) {
+        const dashboard = admin.State.getSelectedDashboard();
+        let state;
+        let candidate;
+
+        if (layoutResizeState && layoutResizeState.pointerId === event.pointerId) {
+            state = layoutResizeState;
+            const columns = admin.Layout.COLUMNS[activeLayoutProfile];
+            const columnWidth = state.grid.getBoundingClientRect().width / columns;
+            const rowHeight = Number(state.grid.dataset.rowHeight) || 194;
+            candidate = {
+                x: state.item.x,
+                y: state.item.y,
+                w: state.item.w + Math.round((event.clientX - state.startX) / columnWidth),
+                h: state.item.h + Math.round((event.clientY - state.startY) / rowHeight)
+            };
+        } else if (layoutDragState && layoutDragState.pointerId === event.pointerId) {
+            state = layoutDragState;
+            candidate = layoutCandidate(
+                state.grid,
+                state.widgetId,
+                event.clientX,
+                event.clientY,
+                state.item
+            );
+        } else {
+            return;
+        }
+
+        state.candidate = candidate;
+        showLayoutPreview(
+            state.grid,
+            candidate,
+            admin.Layout.canPlace(
+                dashboard.id,
+                state.widgetId,
+                activeLayoutProfile,
+                candidate
+            )
+        );
+    }
+
+    function finishLayoutPointer(event) {
+        const dashboard = admin.State.getSelectedDashboard();
+        const state = layoutResizeState && layoutResizeState.pointerId === event.pointerId
+            ? layoutResizeState
+            : layoutDragState && layoutDragState.pointerId === event.pointerId
+                ? layoutDragState
+                : null;
+
+        if (!state) {
+            return;
+        }
+
+        const changed = state.candidate && admin.Layout.place(
+            dashboard.id,
+            state.widgetId,
+            activeLayoutProfile,
+            state.candidate
+        );
+        hideLayoutPreview(state.grid);
+        layoutResizeState = null;
+        layoutDragState = null;
+
+        if (changed) {
+            renderAll();
+        } else if (state.candidate) {
+            showNotice("Die Rasteränderung ist dort nicht möglich.", true);
         }
     }
 
@@ -835,6 +1221,14 @@
         elements.dashboardEditor.addEventListener("click", handleEditorClick);
         elements.dashboardEditor.addEventListener("input", handleEditorInput);
         elements.dashboardEditor.addEventListener("change", handleEditorChange);
+        elements.dashboardEditor.addEventListener("dragstart", handleLayoutDragStart);
+        elements.dashboardEditor.addEventListener("dragover", handleLayoutDragOver);
+        elements.dashboardEditor.addEventListener("drop", handleLayoutDrop);
+        elements.dashboardEditor.addEventListener("dragend", handleLayoutDragEnd);
+        elements.dashboardEditor.addEventListener("pointerdown", handleLayoutPointerDown);
+        elements.dashboardEditor.addEventListener("pointermove", handleLayoutPointerMove);
+        elements.dashboardEditor.addEventListener("pointerup", finishLayoutPointer);
+        elements.dashboardEditor.addEventListener("pointercancel", finishLayoutPointer);
         elements.dashboardForm.addEventListener("submit", handleDashboardForm);
         elements.dashboardTitleInput.addEventListener("input", function () {
             if (elements.dashboardIdInput.dataset.automatic === "true") {

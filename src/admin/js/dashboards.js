@@ -87,7 +87,8 @@
             id: id,
             title: cleanTitle,
             refreshIntervalMs: 5000,
-            widgets: []
+            widgets: [],
+            layouts: admin.Layout.emptyLayouts()
         });
 
         admin.State.selectDashboard(id);
@@ -132,6 +133,7 @@
         const source = findDashboard(draft, sourceId);
         const cleanTitle = String(newTitle || "").trim();
         const usedWidgetIds = collectWidgetIds(draft);
+        const widgetIdMap = Object.create(null);
 
         validateIdentity(draft, newId, cleanTitle);
 
@@ -145,9 +147,17 @@
                     newId + "-" + widget.id,
                     usedWidgetIds
                 );
+                widgetIdMap[widget.id] = duplicateWidget.id;
                 return duplicateWidget;
-            })
+            }),
+            layouts: null
         };
+
+        duplicateDashboard.layouts =
+            admin.Layout.remapLayouts(
+                source,
+                widgetIdMap
+            );
 
         draft.dashboards.push(duplicateDashboard);
         admin.State.selectDashboard(newId);

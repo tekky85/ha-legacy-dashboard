@@ -1841,7 +1841,8 @@ function loadDashboardConfiguration() {
                 widgetCount =
 
                     Dashboard.configure(
-                        data.widgets
+                        data.widgets,
+                        data.layouts
                     );
 
             }
@@ -2224,3 +2225,32 @@ window.onoffline =
         );
 
     };
+
+
+var layoutResizeTimer = null;
+
+
+function applyDashboardLayoutAfterResize() {
+
+    if (layoutResizeTimer !== null) {
+        window.clearTimeout(layoutResizeTimer);
+    }
+
+    layoutResizeTimer = window.setTimeout(
+        function () {
+            layoutResizeTimer = null;
+            Dashboard.applyLayout();
+        },
+        120
+    );
+
+}
+
+
+if (window.addEventListener) {
+    window.addEventListener(
+        "resize",
+        applyDashboardLayoutAfterResize,
+        false
+    );
+}

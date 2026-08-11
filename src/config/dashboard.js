@@ -10,8 +10,12 @@ const path = require("path");
 const DashboardConfigStore =
     require("../services/dashboard-config-store");
 
+const Layout =
+    require("../services/layout");
 
-const SCHEMA_VERSION = 2;
+
+const SCHEMA_VERSION = 3;
+const SIZE_SCHEMA_VERSION = 2;
 const LEGACY_SCHEMA_VERSION = 1;
 
 const DASHBOARD_ID_PATTERN =
@@ -171,6 +175,12 @@ const DEFAULT_CONFIGURATION = {
 };
 
 
+DEFAULT_CONFIGURATION.dashboards.forEach(function (dashboard) {
+    dashboard.layouts =
+        Layout.createLayouts(dashboard.widgets);
+});
+
+
 let configuration = null;
 let configurationStore = null;
 
@@ -325,7 +335,7 @@ function validateConfigurationVersion(candidate, schemaVersion) {
             }
 
             if (
-                schemaVersion >= SCHEMA_VERSION &&
+                schemaVersion >= SIZE_SCHEMA_VERSION &&
                 (
                     typeof widget.size !== "string" ||
                     SUPPORTED_WIDGET_SIZES.indexOf(
@@ -343,6 +353,11 @@ function validateConfigurationVersion(candidate, schemaVersion) {
             }
 
         });
+
+
+        if (schemaVersion >= SCHEMA_VERSION) {
+            Layout.validateLayouts(dashboard);
+        }
 
     });
 
@@ -396,7 +411,10 @@ function migrateConfiguration(candidate) {
 
     if (
         !candidate ||
-        candidate.schemaVersion !== LEGACY_SCHEMA_VERSION
+        (
+            candidate.schemaVersion !== LEGACY_SCHEMA_VERSION &&
+            candidate.schemaVersion !== SIZE_SCHEMA_VERSION
+        )
     ) {
         return {
             configuration: candidate,
@@ -407,13 +425,18 @@ function migrateConfiguration(candidate) {
 
     validateConfigurationVersion(
         candidate,
-        LEGACY_SCHEMA_VERSION
+        candidate.schemaVersion
     );
 
     const migrated =
         cloneConfiguration(candidate);
 
     migrated.schemaVersion = SCHEMA_VERSION;
+
+    migrated.dashboards.forEach(function (dashboard) {
+        dashboard.layouts =
+            Layout.createLayouts(dashboard.widgets);
+    });
 
 
     return {
@@ -434,7 +457,11 @@ function cloneDashboard(dashboard) {
         id: dashboard.id,
         title: dashboard.title,
         refreshIntervalMs: dashboard.refreshIntervalMs,
-        widgets: dashboard.widgets.map(cloneWidget)
+        widgets: dashboard.widgets.map(cloneWidget),
+        layouts:
+            dashboard.layouts
+                ? Layout.cloneLayouts(dashboard.layouts)
+                : undefined
     };
 
 }
@@ -697,13 +724,21 @@ function getPublicDashboardConfig(dashboardId) {
         return null;
     }
 
+    const visibleWidgets =
+        getVisibleWidgets(dashboard.id);
+
+
     return {
         id: dashboard.id,
         title: dashboard.title,
         refresh_interval_ms:
             getRefreshIntervalMs(dashboard.id),
-        widgets:
-            getVisibleWidgets(dashboard.id)
+        widgets: visibleWidgets,
+        layouts:
+            Layout.publicLayouts(
+                dashboard,
+                visibleWidgets
+            )
     };
 
 }
@@ -734,6 +769,10 @@ module.exports = {
     SUPPORTED_WIDGET_SIZES:
         SUPPORTED_WIDGET_SIZES.slice(0),
     DEFAULT_WIDGET_SIZE: DEFAULT_WIDGET_SIZE,
+    LAYOUT_PROFILES:
+        Layout.PROFILES.slice(0),
+    LAYOUT_COLUMNS:
+        Object.assign({}, Layout.PROFILE_COLUMNS),
     DEFAULT_CONFIGURATION:
         cloneConfiguration(DEFAULT_CONFIGURATION),
     initialize: initialize,

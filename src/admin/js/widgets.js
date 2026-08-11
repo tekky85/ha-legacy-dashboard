@@ -160,6 +160,7 @@
         };
 
         dashboard.widgets.push(widget);
+        admin.Layout.addWidget(dashboard, widget);
         normalizeOrders(dashboard);
         admin.State.markDirty();
         return widget;
@@ -200,6 +201,10 @@
         const dashboard = findDashboard(dashboardId);
         const widget = findWidget(dashboard, widgetId);
         widget.visible = Boolean(visible);
+        admin.Layout.ensureVisiblePlacement(
+            dashboardId,
+            widgetId
+        );
         admin.State.markDirty();
     }
 
@@ -239,6 +244,7 @@
         }
 
         dashboard.widgets.splice(index, 1);
+        admin.Layout.removeWidget(dashboard, widgetId);
         normalizeOrders(dashboard);
         admin.State.markDirty();
     }

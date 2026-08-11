@@ -10,6 +10,9 @@ const ha =
 const logger =
     require("../services/logger");
 
+const Layout =
+    require("../services/layout");
+
 const writeRateLimit =
     require("../services/write-rate-limit");
 
@@ -311,7 +314,7 @@ router.post("/dashboards", function (req, res) {
         dashboardConfig.getConfiguration();
 
 
-    candidate.dashboards.push({
+    const dashboard = {
         id: body.id,
         title: body.title,
         refreshIntervalMs:
@@ -320,7 +323,16 @@ router.post("/dashboards", function (req, res) {
             Array.isArray(body.widgets)
                 ? body.widgets
                 : []
-    });
+    };
+
+    dashboard.layouts =
+        typeof body.layouts !== "undefined"
+            ? body.layouts
+            : Layout.createLayouts(
+                dashboard.widgets
+            );
+
+    candidate.dashboards.push(dashboard);
 
     const persisted =
         persistConfiguration(res, candidate);
@@ -383,7 +395,11 @@ router.put("/dashboards/:dashboardId", function (req, res) {
         widgets:
             typeof body.widgets !== "undefined"
                 ? body.widgets
-                : current.widgets
+                : current.widgets,
+        layouts:
+            typeof body.layouts !== "undefined"
+                ? body.layouts
+                : current.layouts
     };
 
     const persisted =
@@ -474,10 +490,11 @@ router.post(
                 dashboardConfig.DEFAULT_WIDGET_SIZE;
         }
 
-        candidate
-            .dashboards[dashboardIndex]
-            .widgets
-            .push(widget);
+        const dashboard =
+            candidate.dashboards[dashboardIndex];
+
+        dashboard.widgets.push(widget);
+        Layout.addWidget(dashboard, widget);
 
         const persisted =
             persistConfiguration(res, candidate);
@@ -601,6 +618,11 @@ router.put(
                     : current.size
         };
 
+        Layout.ensureVisibleWidgetPlacement(
+            dashboard,
+            dashboard.widgets[widgetIndex]
+        );
+
         const persisted =
             persistConfiguration(res, candidate);
 
@@ -658,6 +680,11 @@ router.delete(
         dashboard.widgets.splice(
             widgetIndex,
             1
+        );
+
+        Layout.removeWidget(
+            dashboard,
+            req.params.widgetId
         );
 
         const persisted =

@@ -74,7 +74,7 @@ test("fehlende Persistenz wird aus Sprint 13 migriert", function (t) {
         fs.readFileSync(configPath, "utf8")
     );
 
-    assert.equal(persisted.schemaVersion, 2);
+    assert.equal(persisted.schemaVersion, 3);
     assert.equal(
         persisted.defaultDashboardId,
         "default"
@@ -108,7 +108,7 @@ test("fehlende Persistenz wird aus Sprint 13 migriert", function (t) {
 });
 
 
-test("Schema 1 wird ohne fachliche Änderungen auf Schema 2 migriert", function (t) {
+test("Schema 1 wird ohne fachliche Änderungen auf Schema 3 migriert", function (t) {
 
     const configPath =
         createTemporaryConfigPath(t);
@@ -120,6 +120,7 @@ test("Schema 1 wird ohne fachliche Änderungen auf Schema 2 migriert", function 
 
     legacy.schemaVersion = 1;
     legacy.dashboards.forEach(function (dashboard) {
+        delete dashboard.layouts;
         dashboard.widgets.forEach(function (widget) {
             delete widget.size;
         });
@@ -151,7 +152,7 @@ test("Schema 1 wird ohne fachliche Änderungen auf Schema 2 migriert", function 
 
     assert.equal(result.migrated, true);
     assert.equal(result.recovered, false);
-    assert.equal(persisted.schemaVersion, 2);
+    assert.equal(persisted.schemaVersion, 3);
     assert.deepEqual(
         persisted.dashboards.map(function (dashboard) {
             return {
@@ -185,6 +186,71 @@ test("Schema 1 wird ohne fachliche Änderungen auf Schema 2 migriert", function 
         ),
         false
     );
+
+});
+
+
+test("Sprint-16-Schema 2 wird atomar auf Schema 3 migriert", function (t) {
+
+    const configPath = createTemporaryConfigPath(t);
+    const sprint16 = dashboardConfig.cloneConfiguration(
+        dashboardConfig.DEFAULT_CONFIGURATION
+    );
+
+    sprint16.schemaVersion = 2;
+    sprint16.dashboards[0].widgets[0].size = "compact";
+    sprint16.dashboards[0].widgets[1].size = "wide";
+    sprint16.dashboards.forEach(function (dashboard) {
+        delete dashboard.layouts;
+    });
+
+    const originalIds = sprint16.dashboards.map(function (dashboard) {
+        return {
+            dashboardId: dashboard.id,
+            widgetIds: dashboard.widgets.map(function (widget) {
+                return widget.id;
+            }),
+            orders: dashboard.widgets.map(function (widget) {
+                return widget.order;
+            })
+        };
+    });
+
+    writeConfiguration(configPath, sprint16);
+
+    const result = dashboardConfig.initialize({
+        configPath: configPath
+    });
+    const persisted = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    const backup = JSON.parse(fs.readFileSync(configPath + ".bak", "utf8"));
+
+    assert.equal(result.migrated, true);
+    assert.equal(persisted.schemaVersion, 3);
+    assert.equal(backup.schemaVersion, 2);
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(
+            backup.dashboards[0],
+            "layouts"
+        ),
+        false
+    );
+    assert.equal(persisted.dashboards[0].widgets[0].size, "compact");
+    assert.equal(persisted.dashboards[0].widgets[1].size, "wide");
+    assert.deepEqual(
+        persisted.dashboards.map(function (dashboard) {
+            return {
+                dashboardId: dashboard.id,
+                widgetIds: dashboard.widgets.map(function (widget) {
+                    return widget.id;
+                }),
+                orders: dashboard.widgets.map(function (widget) {
+                    return widget.order;
+                })
+            };
+        }),
+        originalIds
+    );
+    dashboardConfig.validateConfiguration(persisted);
 
 });
 
