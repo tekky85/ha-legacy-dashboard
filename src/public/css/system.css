@@ -311,6 +311,16 @@
     font-weight: 800;
 }
 
+.error-more {
+    margin: 12px 0 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #eef2f7;
+    color: #475569;
+    font-size: 13px;
+    line-height: 18px;
+}
+
 .summary-count {
     display: inline-block;
     min-width: 92px;
@@ -601,7 +611,8 @@ body.theme-dark .error-overall.is-critical {
 }
 
 body.theme-dark .error-stats div,
-body.theme-dark .error-group-count {
+body.theme-dark .error-group-count,
+body.theme-dark .error-more {
     background: #263448;
     color: #b8c5d6;
 }

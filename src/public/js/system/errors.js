@@ -16,6 +16,8 @@
         info: {label: "Info", symbol: "i"}
     };
 
+    var MAX_RENDERED_ISSUES = 200;
+
 
     function createElement(tagName, className, text) {
 
@@ -178,6 +180,7 @@
             ? payload.groups
             : [];
         var index;
+        var renderedIssues = 0;
 
 
         if (!overview || !groupsElement) {
@@ -197,7 +200,11 @@
 
         for (index = 0; index < groups.length; index++) {
 
-            if (!groups[index].issues || groups[index].issues.length === 0) {
+            if (
+                !groups[index].issues ||
+                groups[index].issues.length === 0 ||
+                renderedIssues >= MAX_RENDERED_ISSUES
+            ) {
                 continue;
             }
 
@@ -214,6 +221,10 @@
 
             var list = createElement("ul", "error-list");
             var issueIndex;
+            var issueLimit = Math.min(
+                groups[index].issues.length,
+                MAX_RENDERED_ISSUES - renderedIssues
+            );
 
 
             heading.appendChild(
@@ -228,17 +239,32 @@
 
             for (
                 issueIndex = 0;
-                issueIndex < groups[index].issues.length;
+                issueIndex < issueLimit;
                 issueIndex++
             ) {
                 list.appendChild(
                     createIssue(groups[index].issues[issueIndex])
                 );
+                renderedIssues += 1;
             }
 
             section.appendChild(list);
             groupsElement.appendChild(section);
 
+        }
+
+        if (
+            typeof summary.total === "number" &&
+            summary.total > renderedIssues
+        ) {
+            groupsElement.appendChild(
+                createElement(
+                    "p",
+                    "error-more",
+                    (summary.total - renderedIssues) +
+                        " weitere Störungen sind in den Gesamtzahlen enthalten."
+                )
+            );
         }
 
         if (

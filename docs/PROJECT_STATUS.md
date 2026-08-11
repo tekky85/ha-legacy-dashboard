@@ -183,6 +183,8 @@ sowie nur nichtleere Gruppen. Jede Zeile enthält sichtbaren Severity-Text und
 Symbol, Titel, Entity-ID, State und Dauer. OK erscheint ausschließlich bei
 einem frischen erfolgreichen Snapshot ohne Issues. Bei stale/offline bleiben
 letzte Issues sichtbar; ohne vorherigen Erfolg steht der Status auf unbekannt.
+Die API-Counts bleiben vollständig; das Legacy-Frontend begrenzt nur den DOM
+auf die 200 höchstpriorisierten Zeilen und weist auf weitere Issues hin.
 
 Alle Compact Cards besitzen nun eine sichtbare, einzeilige `card-identity`.
 Die Fallback-Reihenfolge ist: expliziter Widgettitel, konfigurierter

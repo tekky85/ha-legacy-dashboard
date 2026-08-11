@@ -352,6 +352,49 @@ test("Error-Shell zeigt Status, Severity-Gruppen, States und Recovery", function
 
     assert.match(harness.elements.errorOverall.className, /is-ok/);
     assert.match(harness.elements.systemMessage.innerHTML, /Keine aktiven Störungen/);
+
+    const largeHarness = createHarness(
+        "/system/errors",
+        "errors.js"
+    );
+    const manyIssues = [];
+
+    for (let index = 0; index < 205; index++) {
+        manyIssues.push({
+            severity: "warning",
+            title: "Störung " + index,
+            entityId: "sensor.issue_" + index,
+            state: "unavailable",
+            durationSeconds: index
+        });
+    }
+
+    largeHarness.requests[0].success({
+        overallStatus: "warning",
+        message: "205 aktive Störungen erkannt.",
+        summary: {
+            total: 205,
+            warning: 205,
+            unavailable: 205
+        },
+        groups: [
+            {
+                severity: "warning",
+                title: "Warnungen",
+                issues: manyIssues
+            }
+        ],
+        meta: meta(true, false, "2026-08-11T18:00:00.000Z")
+    });
+
+    assert.equal(
+        largeHarness.elements.errorGroups.children[0].children[1].children.length,
+        200
+    );
+    assert.equal(
+        largeHarness.elements.errorGroups.children[1].className,
+        "error-more"
+    );
 });
 
 
@@ -384,6 +427,7 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /id="errorUnavailableCount"/);
     assert.match(html, /id="errorUnknownCount"/);
     assert.match(source, /Legacy\.http\.get/);
+    assert.match(source, /MAX_RENDERED_ISSUES\s*=\s*200/);
     assert.doesNotMatch(source, /\bconst\b|\blet\b|=>|`/);
     assert.doesNotMatch(source, /\bfetch\b|\bPromise\b|\basync\b|\bawait\b/);
     assert.doesNotMatch(source, /\?\.|\?\?/);
