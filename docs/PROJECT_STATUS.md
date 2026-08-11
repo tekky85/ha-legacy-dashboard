@@ -217,7 +217,7 @@ werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion ist 25.
+Assetversion ist 26.
 
 ## 9. Sicherheitsgrenzen
 
