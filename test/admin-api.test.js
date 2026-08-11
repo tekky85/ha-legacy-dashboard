@@ -580,14 +580,14 @@ test(
                 );
 
                 assert.equal(initial.status, 200);
-                assert.equal(initial.json.schemaVersion, 3);
+                assert.equal(initial.json.schemaVersion, 4);
                 assert.equal(
                     initial.json.dashboards[0].layouts.portrait.columns,
-                    3
+                    6
                 );
                 assert.equal(
                     initial.json.dashboards[0].layouts.landscape.columns,
-                    6
+                    12
                 );
 
                 const dashboard = initial.json.dashboards[0];
@@ -595,9 +595,9 @@ test(
                     return entry.type === "climate";
                 });
                 dashboard.layouts.portrait.items[climate.id] = {
-                    x: 1,
+                    x: 2,
                     y: 3,
-                    w: 1,
+                    w: 2,
                     h: 2
                 };
 
@@ -613,7 +613,7 @@ test(
                 assert.deepEqual(
                     saved.json.dashboards[0]
                         .layouts.portrait.items[climate.id],
-                    {x: 1, y: 3, w: 1, h: 2}
+                    {x: 2, y: 3, w: 2, h: 2}
                 );
 
                 const invalid = JSON.parse(JSON.stringify(saved.json));
@@ -646,7 +646,7 @@ test(
                 assert.deepEqual(
                     persisted.json.dashboards[0]
                         .layouts.portrait.items[climate.id],
-                    {x: 1, y: 3, w: 1, h: 2}
+                    {x: 2, y: 3, w: 2, h: 2}
                 );
 
                 const publicConfig = await request(
@@ -658,7 +658,7 @@ test(
                 assert.equal(publicConfig.status, 200);
                 assert.deepEqual(
                     publicConfig.json.layouts.portrait.items[climate.id],
-                    {x: 1, y: 3, w: 1, h: 2}
+                    {x: 2, y: 3, w: 2, h: 2}
                 );
                 assert.equal(
                     JSON.stringify(publicConfig.json).indexOf(FAKE_ADMIN_TOKEN),
@@ -723,7 +723,7 @@ test(
                 assert.equal(initialConfig.status, 200);
                 assert.equal(
                     initialConfig.json.schemaVersion,
-                    3
+                    4
                 );
                 assert.equal(
                     initialConfig.json.defaultDashboardId,

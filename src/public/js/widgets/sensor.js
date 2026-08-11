@@ -76,7 +76,7 @@ SensorWidget.prototype.render =
 
         return "" +
 
-            '<section class="card ' +
+            '<section class="card card-sensor ' +
                 this.getSizeClass() +
             '"' + this.getLayoutAttribute() + '>' +
 

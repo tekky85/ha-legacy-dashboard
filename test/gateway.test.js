@@ -574,7 +574,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=20"/
+                /src="\/js\/app\.js\?v=22"/
             );
 
             const manifest = await request(
@@ -593,7 +593,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=20"
+                "/js/app.js?v=22"
             );
 
             assert.equal(applicationScript.status, 200);

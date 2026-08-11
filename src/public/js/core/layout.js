@@ -8,8 +8,8 @@
 var LegacyLayout = (function () {
 
     var PROFILE_COLUMNS = {
-        portrait: 3,
-        landscape: 6
+        portrait: 6,
+        landscape: 12
     };
 
     var MAX_ROWS = 100;
@@ -17,6 +17,9 @@ var LegacyLayout = (function () {
 
     var configuredLayouts = null;
     var configuredWidgets = [];
+    var configuredWidgetById = {};
+    var presentationCache = {};
+    var presentationComputationCount = 0;
 
 
     function isInteger(value) {
@@ -43,29 +46,32 @@ var LegacyLayout = (function () {
 
     function minimumWidth(widget, name) {
 
-        return (
-            widget &&
-            widget.type === "climate" &&
-            name === "landscape"
-        )
-            ? 2
-            : 1;
+        if (widget && widget.type === "climate") {
+            return name === "landscape"
+                ? 3
+                : 2;
+        }
+
+        return 2;
 
     }
 
 
     function preferredSize(widget, name) {
 
-        var width = 1;
+        var width = 3;
         var height = 1;
 
 
-        if (widget.size === "wide") {
+        if (widget.size === "compact") {
             width = 2;
+        } else if (widget.size === "wide") {
+            width = 6;
         } else if (widget.size === "tall") {
+            width = 3;
             height = 2;
         } else if (widget.size === "large") {
-            width = 2;
+            width = 6;
             height = 2;
         }
 
@@ -264,8 +270,87 @@ var LegacyLayout = (function () {
 
     function configure(layouts, widgets) {
 
+        var index;
+
+
         configuredLayouts = layouts || null;
         configuredWidgets = widgets || [];
+        configuredWidgetById = {};
+        presentationCache = {};
+        presentationComputationCount = 0;
+
+
+        for (index = 0; index < configuredWidgets.length; index++) {
+            configuredWidgetById[configuredWidgets[index].id] =
+                configuredWidgets[index];
+        }
+
+    }
+
+
+    function getPresentationMode(widget, width, height) {
+
+        presentationComputationCount++;
+
+
+        if (height >= 2 || width >= 6) {
+            return "expanded";
+        }
+
+        if (widget && widget.type === "climate") {
+            return width <= 4
+                ? "compact"
+                : "normal";
+        }
+
+        return width <= 2
+            ? "compact"
+            : "normal";
+
+    }
+
+
+    function resolvePresentationMode(name, widget, item) {
+
+        var key = name + ":" + widget.id;
+        var signature =
+            widget.type + ":" + item.w + ":" + item.h;
+        var cached = presentationCache[key];
+
+
+        if (cached && cached.signature === signature) {
+            return cached.mode;
+        }
+
+
+        cached = {
+            signature: signature,
+            mode: getPresentationMode(
+                widget,
+                item.w,
+                item.h
+            )
+        };
+
+        presentationCache[key] = cached;
+
+        return cached.mode;
+
+    }
+
+
+    function applyPresentationMode(card, mode) {
+
+        var className = card.className || "";
+
+
+        className = className.replace(
+            /\s*card-presentation-(compact|normal|expanded)/g,
+            ""
+        );
+
+        card.className =
+            className + " card-presentation-" + mode;
 
     }
 
@@ -281,6 +366,8 @@ var LegacyLayout = (function () {
         var card;
         var widgetId;
         var item;
+        var widget;
+        var presentationMode;
         var widthPercent;
 
 
@@ -320,10 +407,22 @@ var LegacyLayout = (function () {
             card = cards[index];
             widgetId = card.getAttribute("data-widget-id");
             item = profile.items[widgetId];
+            widget = configuredWidgetById[widgetId];
 
-            if (!item) {
+            if (!item || !widget) {
                 continue;
             }
+
+            presentationMode = resolvePresentationMode(
+                name,
+                widget,
+                item
+            );
+
+            applyPresentationMode(
+                card,
+                presentationMode
+            );
 
             widthPercent =
                 item.w / profile.columns * 100;
@@ -355,7 +454,11 @@ var LegacyLayout = (function () {
     return {
         configure: configure,
         apply: apply,
-        getProfileName: profileName
+        getProfileName: profileName,
+        getPresentationMode: getPresentationMode,
+        getPresentationComputationCount: function () {
+            return presentationComputationCount;
+        }
     };
 
 }());

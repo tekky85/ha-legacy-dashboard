@@ -328,15 +328,17 @@ The path can be overridden with `DASHBOARD_CONFIG_PATH`. On the first start,
 the application validates and migrates the built-in Sprint 13 profiles from
 `src/config/dashboard.js`. Runtime files under `data/` are ignored by Git.
 
-The version 3 schema declares `schemaVersion`, one `defaultDashboardId`, and a
+The version 4 schema declares `schemaVersion`, one `defaultDashboardId`, and a
 list of dashboard profiles. Every profile has a stable lowercase ID, a display
 title, a refresh interval, and its own widget list. Every widget also has a
 stable globally unique `id` and one validated `size` preset. Each dashboard
 also has `portrait` and `landscape` layouts whose items reference those widget
-IDs and contain only integer `x`, `y`, `w`, and `h` values. Portrait uses three
-columns and landscape six columns. Existing version 1 and version 2 files are
-migrated automatically without changing dashboard IDs, widget IDs, entities,
-order, visibility, titles, or icons. The migrated profiles are:
+IDs and contain only integer `x`, `y`, `w`, and `h` values. Portrait uses six
+columns and landscape twelve columns. Existing version 1 and version 2 files
+receive fresh deterministic layouts. Existing version 3 layouts are migrated
+exactly once with `x_new = x_old * 2` and `w_new = w_old * 2`; `y` and `h`
+remain unchanged. Dashboard IDs, widget IDs, entities, order, visibility,
+titles, and icons are preserved. The migrated profiles are:
 
 - `default` – the complete existing dashboard and the target of `/`
 - `esszimmer` – the existing Esszimmer light and climate widgets
@@ -363,17 +365,28 @@ Supported tile sizes are:
 - `tall` – normal width with additional minimum height
 - `large` – wide with additional minimum height
 
-The presets remain the deterministic migration and fallback basis:
-`compact`/`normal` map to 1×1, `wide` to 2×1, `tall` to 1×2 and `large` to
-2×2. Explicit validated layout coordinates take precedence. Missing profiles
+The presets remain the deterministic initial-placement and fallback basis:
+`compact` maps to 2×1, `normal` to 3×1, `wide` to 6×1, `tall` to 3×2 and
+`large` to 6×2. Explicit validated layout coordinates take precedence. Missing profiles
 are reconstructed left-to-right and then row-by-row without collisions.
 Invisible widgets keep their last position but do not block cells.
+
+The persistent `size` value is a placement preset. It is separate from the
+runtime-only presentation mode (`compact`, `normal`, or `expanded`) derived
+from widget type and the active layout item's `w`/`h`. Sensor, binary, and
+light widgets require at least 2×1 cells in both profiles. Climate requires at
+least 2×1 in portrait and 3×1 in landscape. Backend validation and the Admin
+editor both enforce these limits.
 
 The legacy wall display calculates absolute percentage positions and fixed
 row heights from the validated raster. It deliberately uses neither CSS Grid
 nor arbitrary CSS strings. On rotation it reapplies the matching profile
-without reloading dashboard data. The container height is derived from the
-lowest occupied row.
+and its presentation mode without reloading dashboard data. Unchanged state
+refreshes reuse the cached presentation decision. Compact cards rearrange
+their content instead of globally scaling it; Light and Climate controls keep
+approximately 44-pixel touch targets. The container height is derived from
+the lowest occupied row. These rules remain compatible with Safari on iOS 9
+and ECMAScript 5.
 
 The optional backend environment value `DASHBOARD_REFRESH_INTERVAL_MS`
 controls the automatic browser refresh between 3000 and 300000 milliseconds.

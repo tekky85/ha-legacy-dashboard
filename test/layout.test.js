@@ -37,7 +37,7 @@ function expectInvalid(configuration) {
 }
 
 
-test("Schema 2 migriert deterministisch auf Portrait- und Landscape-Raster", function () {
+test("Schema 2 migriert deterministisch auf das verfeinerte Raster", function () {
     const legacy = dashboardConfig.cloneConfiguration(
         dashboardConfig.DEFAULT_CONFIGURATION
     );
@@ -60,7 +60,7 @@ test("Schema 2 migriert deterministisch auf Portrait- und Landscape-Raster", fun
     const second = dashboardConfig.migrateConfiguration(legacy);
 
     assert.equal(first.migrated, true);
-    assert.equal(first.configuration.schemaVersion, 3);
+    assert.equal(first.configuration.schemaVersion, 4);
     assert.deepEqual(first.configuration, second.configuration);
     assert.deepEqual(
         first.configuration.dashboards.map(function (dashboard) {
@@ -77,8 +77,8 @@ test("Schema 2 migriert deterministisch auf Portrait- und Landscape-Raster", fun
         originalWidgetIds
     );
     first.configuration.dashboards.forEach(function (dashboard) {
-        assert.equal(dashboard.layouts.portrait.columns, 3);
-        assert.equal(dashboard.layouts.landscape.columns, 6);
+        assert.equal(dashboard.layouts.portrait.columns, 6);
+        assert.equal(dashboard.layouts.landscape.columns, 12);
         assert.equal(
             Object.keys(dashboard.layouts.portrait.items).length,
             dashboard.widgets.length
@@ -90,6 +90,53 @@ test("Schema 2 migriert deterministisch auf Portrait- und Landscape-Raster", fun
     });
     assert.equal(
         dashboardConfig.validateConfiguration(first.configuration),
+        true
+    );
+});
+
+
+test("Schema 3 skaliert x und w exakt einmal und erhält IDs, y und h", function () {
+    const sprint17 = dashboardConfig.cloneConfiguration(
+        dashboardConfig.DEFAULT_CONFIGURATION
+    );
+    const dashboard = sprint17.dashboards[0];
+    const widgetId = dashboard.widgets[0].id;
+
+    sprint17.schemaVersion = 3;
+    sprint17.dashboards.forEach(function (entry) {
+        entry.layouts.portrait.columns = 3;
+        entry.layouts.landscape.columns = 6;
+        ["portrait", "landscape"].forEach(function (profileName) {
+            Object.keys(entry.layouts[profileName].items).forEach(function (id) {
+                const item = entry.layouts[profileName].items[id];
+                const sourceWidget = entry.widgets.find(function (candidate) {
+                    return candidate.id === id;
+                });
+                item.x = Math.floor(item.x / 2);
+                item.w =
+                    sourceWidget.type === "climate" && profileName === "landscape"
+                        ? 2
+                        : Math.max(1, Math.floor(item.w / 2));
+            });
+        });
+    });
+    dashboard.layouts.portrait.items[widgetId] = {x: 1, y: 7, w: 1, h: 2};
+
+    const migrated = dashboardConfig.migrateConfiguration(sprint17);
+    const item = migrated.configuration.dashboards[0]
+        .layouts.portrait.items[widgetId];
+
+    assert.equal(migrated.migrated, true);
+    assert.equal(migrated.configuration.schemaVersion, 4);
+    assert.deepEqual(item, {x: 2, y: 7, w: 2, h: 2});
+    assert.equal(migrated.configuration.dashboards[0].id, dashboard.id);
+    assert.equal(migrated.configuration.dashboards[0].widgets[0].id, widgetId);
+    assert.deepEqual(
+        dashboardConfig.migrateConfiguration(migrated.configuration),
+        {configuration: migrated.configuration, migrated: false}
+    );
+    assert.equal(
+        dashboardConfig.validateConfiguration(migrated.configuration),
         true
     );
 });
@@ -114,23 +161,23 @@ test("Größen-Presets bestimmen die kollisionsfreie Erstplatzierung", function 
 
         assert.deepEqual(
             {w: items.compact.w, h: items.compact.h},
-            {w: 1, h: 1}
-        );
-        assert.deepEqual(
-            {w: items.normal.w, h: items.normal.h},
-            {w: 1, h: 1}
-        );
-        assert.deepEqual(
-            {w: items.wide.w, h: items.wide.h},
             {w: 2, h: 1}
         );
         assert.deepEqual(
+            {w: items.normal.w, h: items.normal.h},
+            {w: 3, h: 1}
+        );
+        assert.deepEqual(
+            {w: items.wide.w, h: items.wide.h},
+            {w: 6, h: 1}
+        );
+        assert.deepEqual(
             {w: items.tall.w, h: items.tall.h},
-            {w: 1, h: 2}
+            {w: 3, h: 2}
         );
         assert.deepEqual(
             {w: items.large.w, h: items.large.h},
-            {w: 2, h: 2}
+            {w: 6, h: 2}
         );
 
         for (firstIndex = 0; firstIndex < ids.length; firstIndex++) {
@@ -146,7 +193,7 @@ test("Größen-Presets bestimmen die kollisionsfreie Erstplatzierung", function 
         }
     });
 
-    assert.equal(layouts.landscape.items.climate.w, 2);
+    assert.equal(layouts.landscape.items.climate.w, 3);
 });
 
 
@@ -162,11 +209,11 @@ test("unsichtbare Widgets blockieren keine Zellen und werden sicher reaktiviert"
 
     assert.deepEqual(
         dashboard.layouts.portrait.items.hidden,
-        {x: 0, y: 0, w: 2, h: 2}
+        {x: 0, y: 0, w: 6, h: 2}
     );
     assert.deepEqual(
         dashboard.layouts.portrait.items.visible,
-        {x: 0, y: 0, w: 1, h: 1}
+        {x: 0, y: 0, w: 3, h: 1}
     );
 
     widgets[0].visible = true;
@@ -195,7 +242,7 @@ test("Rastervalidierung weist Grenzen, Fremdreferenzen und Kollisionen ab", func
         function (candidate, item) { item.y = -1; },
         function (candidate, item) { item.w = 0; },
         function (candidate, item) { item.h = 0; },
-        function (candidate, item) { item.x = 3; },
+        function (candidate, item) { item.x = 6; },
         function (candidate, item) { item.x = "1"; },
         function (candidate, item) { item.y = 100; },
         function (candidate, item) { item.h = 5; },
@@ -233,6 +280,28 @@ test("Rastervalidierung weist Grenzen, Fremdreferenzen und Kollisionen ab", func
         mutate(candidate, firstItem);
         expectInvalid(candidate);
     });
+});
+
+
+test("Backend erzwingt profil- und typspezifische Mindestgrößen", function () {
+    ["sensor", "binary", "light", "climate"].forEach(function (type) {
+        const candidate = dashboardConfig.cloneConfiguration(
+            dashboardConfig.DEFAULT_CONFIGURATION
+        );
+        const dashboard = candidate.dashboards[0];
+        const target = dashboard.widgets.find(function (entry) {
+            return entry.type === type;
+        });
+        const profileName = "landscape";
+        const minimum = Layout.getMinimumSize(target, profileName);
+
+        dashboard.layouts[profileName].items[target.id].w = minimum.w - 1;
+        expectInvalid(candidate);
+    });
+
+    const climate = widget("climate-min", 10, "compact", true, "climate");
+    assert.deepEqual(Layout.getMinimumSize(climate, "portrait"), {w: 2, h: 1});
+    assert.deepEqual(Layout.getMinimumSize(climate, "landscape"), {w: 3, h: 1});
 });
 
 

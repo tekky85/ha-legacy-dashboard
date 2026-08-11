@@ -47,7 +47,7 @@ function createHarness() {
                 status: 200,
                 text: async function () {
                     return JSON.stringify({
-                        schemaVersion: 3,
+                        schemaVersion: 4,
                         defaultDashboardId: "default",
                         dashboards: []
                     });
@@ -324,7 +324,7 @@ test("Layout-Entwurf verhindert Kollisionen und unterstützt Bewegung und Resize
         JSON.parse(JSON.stringify(
             dashboard.layouts.portrait.items[climateId]
         )),
-        {x: 1, y: 2, w: 1, h: 2}
+        {x: 0, y: 3, w: 3, h: 2}
     );
     assert.equal(admin.State.isDirty(), true);
 
@@ -335,8 +335,89 @@ test("Layout-Entwurf verhindert Kollisionen und unterstützt Bewegung und Resize
             admin.State.getSelectedDashboard()
                 .layouts.portrait.items[climateId]
         )),
-        {x: 1, y: 1, w: 1, h: 1}
+        {x: 0, y: 2, w: 3, h: 1}
     );
+});
+
+
+test("Admin-Raster snappt auf 6/12 Spalten und erzwingt Widget-Mindestgrößen", function () {
+    const harness = createHarness();
+    const admin = harness.admin;
+    admin.State.setConfiguration(freshConfiguration());
+
+    const dashboard = admin.State.getSelectedDashboard();
+    const byType = {};
+    dashboard.widgets.forEach(function (widget) {
+        if (!byType[widget.type]) {
+            byType[widget.type] = widget;
+        }
+    });
+
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(admin.Layout.COLUMNS)),
+        {portrait: 6, landscape: 12}
+    );
+    ["sensor", "binary", "light"].forEach(function (type) {
+        assert.deepEqual(
+            JSON.parse(JSON.stringify(
+                admin.Layout.minimumSize(byType[type], "landscape")
+            )),
+            {w: 2, h: 1}
+        );
+    });
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(
+            admin.Layout.minimumSize(byType.climate, "landscape")
+        )),
+        {w: 3, h: 1}
+    );
+
+    assert.equal(
+        admin.Layout.resize(
+            dashboard.id,
+            byType.sensor.id,
+            "portrait",
+            -1,
+            0
+        ),
+        true
+    );
+    assert.equal(
+        admin.Layout.resize(
+            dashboard.id,
+            byType.sensor.id,
+            "portrait",
+            -1,
+            0
+        ),
+        false
+    );
+
+    const portraitCell = admin.Layout.cellFromPoint(
+        {
+            dataset: {rowHeight: "194"},
+            getBoundingClientRect: function () {
+                return {left: 0, top: 0, width: 600};
+            }
+        },
+        "portrait",
+        250,
+        250
+    );
+    const landscapeCell = admin.Layout.cellFromPoint(
+        {
+            dataset: {rowHeight: "194"},
+            getBoundingClientRect: function () {
+                return {left: 0, top: 0, width: 1200};
+            }
+        },
+        "landscape",
+        250,
+        250
+    );
+
+    assert.deepEqual(JSON.parse(JSON.stringify(portraitCell)), {x: 2, y: 1});
+    assert.deepEqual(JSON.parse(JSON.stringify(landscapeCell)), {x: 2, y: 1});
 });
 
 

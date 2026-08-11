@@ -11,6 +11,11 @@ const PROFILES = [
 ];
 
 const PROFILE_COLUMNS = {
+    portrait: 6,
+    landscape: 12
+};
+
+const LEGACY_PROFILE_COLUMNS = {
     portrait: 3,
     landscape: 6
 };
@@ -19,11 +24,30 @@ const MAX_LAYOUT_ROWS = 100;
 const MAX_ITEM_HEIGHT = 4;
 
 const SIZE_DIMENSIONS = {
-    compact: {w: 1, h: 1},
-    normal: {w: 1, h: 1},
-    wide: {w: 2, h: 1},
-    tall: {w: 1, h: 2},
-    large: {w: 2, h: 2}
+    compact: {w: 2, h: 1},
+    normal: {w: 3, h: 1},
+    wide: {w: 6, h: 1},
+    tall: {w: 3, h: 2},
+    large: {w: 6, h: 2}
+};
+
+const WIDGET_MINIMUM_SIZES = {
+    sensor: {
+        portrait: {w: 2, h: 1},
+        landscape: {w: 2, h: 1}
+    },
+    binary: {
+        portrait: {w: 2, h: 1},
+        landscape: {w: 2, h: 1}
+    },
+    light: {
+        portrait: {w: 2, h: 1},
+        landscape: {w: 2, h: 1}
+    },
+    climate: {
+        portrait: {w: 2, h: 1},
+        landscape: {w: 3, h: 1}
+    }
 };
 
 
@@ -68,6 +92,25 @@ function cloneLayouts(layouts) {
 
 
 function getMinimumSize(widget, profileName) {
+
+    const typeRules =
+        WIDGET_MINIMUM_SIZES[widget.type] ||
+        WIDGET_MINIMUM_SIZES.sensor;
+
+    const minimum =
+        typeRules[profileName] ||
+        typeRules.portrait;
+
+
+    return {
+        w: minimum.w,
+        h: minimum.h
+    };
+
+}
+
+
+function getLegacyMinimumSize(widget, profileName) {
 
     return {
         w:
@@ -288,11 +331,9 @@ function validateItem(
     item,
     widget,
     profileName,
-    columns
+    columns,
+    minimum
 ) {
-
-    const minimum =
-        getMinimumSize(widget, profileName);
 
 
     if (
@@ -327,7 +368,11 @@ function validateItem(
 }
 
 
-function validateLayouts(dashboard) {
+function validateLayoutsWithRules(
+    dashboard,
+    profileColumns,
+    minimumSize
+) {
 
     const layouts = dashboard.layouts;
     const widgetById = Object.create(null);
@@ -362,7 +407,7 @@ function validateLayouts(dashboard) {
 
         const profile = layouts[profileName];
         const expectedColumns =
-            PROFILE_COLUMNS[profileName];
+            profileColumns[profileName];
 
 
         if (
@@ -392,7 +437,11 @@ function validateLayouts(dashboard) {
                 profile.items[widgetId],
                 widgetById[widgetId],
                 profileName,
-                expectedColumns
+                expectedColumns,
+                minimumSize(
+                    widgetById[widgetId],
+                    profileName
+                )
             );
 
         });
@@ -446,6 +495,66 @@ function validateLayouts(dashboard) {
 
 
     return true;
+
+}
+
+
+function validateLayouts(dashboard) {
+
+    return validateLayoutsWithRules(
+        dashboard,
+        PROFILE_COLUMNS,
+        getMinimumSize
+    );
+
+}
+
+
+function validateLegacyLayouts(dashboard) {
+
+    return validateLayoutsWithRules(
+        dashboard,
+        LEGACY_PROFILE_COLUMNS,
+        getLegacyMinimumSize
+    );
+
+}
+
+
+function migrateLegacyLayouts(layouts) {
+
+    const migrated = {};
+
+
+    PROFILES.forEach(function (profileName) {
+
+        const source = layouts[profileName];
+        const items = {};
+
+
+        Object.keys(source.items).forEach(function (widgetId) {
+
+            const item = source.items[widgetId];
+
+            items[widgetId] = {
+                x: item.x * 2,
+                y: item.y,
+                w: item.w * 2,
+                h: item.h
+            };
+
+        });
+
+
+        migrated[profileName] = {
+            columns: PROFILE_COLUMNS[profileName],
+            items: items
+        };
+
+    });
+
+
+    return migrated;
 
 }
 
@@ -590,11 +699,17 @@ function publicLayouts(dashboard, visibleWidgets) {
 module.exports = {
     PROFILES: PROFILES.slice(0),
     PROFILE_COLUMNS: Object.assign({}, PROFILE_COLUMNS),
+    LEGACY_PROFILE_COLUMNS:
+        Object.assign({}, LEGACY_PROFILE_COLUMNS),
+    WIDGET_MINIMUM_SIZES:
+        JSON.parse(JSON.stringify(WIDGET_MINIMUM_SIZES)),
     MAX_LAYOUT_ROWS: MAX_LAYOUT_ROWS,
     MAX_ITEM_HEIGHT: MAX_ITEM_HEIGHT,
     createLayouts: createLayouts,
     cloneLayouts: cloneLayouts,
     validateLayouts: validateLayouts,
+    validateLegacyLayouts: validateLegacyLayouts,
+    migrateLegacyLayouts: migrateLegacyLayouts,
     getMinimumSize: getMinimumSize,
     getPreferredSize: getPreferredSize,
     positionIsFree: positionIsFree,

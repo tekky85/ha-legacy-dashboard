@@ -14,7 +14,8 @@ const Layout =
     require("../services/layout");
 
 
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
+const GRID_SCHEMA_VERSION = 3;
 const SIZE_SCHEMA_VERSION = 2;
 const LEGACY_SCHEMA_VERSION = 1;
 
@@ -355,7 +356,9 @@ function validateConfigurationVersion(candidate, schemaVersion) {
         });
 
 
-        if (schemaVersion >= SCHEMA_VERSION) {
+        if (schemaVersion === GRID_SCHEMA_VERSION) {
+            Layout.validateLegacyLayouts(dashboard);
+        } else if (schemaVersion >= SCHEMA_VERSION) {
             Layout.validateLayouts(dashboard);
         }
 
@@ -413,7 +416,8 @@ function migrateConfiguration(candidate) {
         !candidate ||
         (
             candidate.schemaVersion !== LEGACY_SCHEMA_VERSION &&
-            candidate.schemaVersion !== SIZE_SCHEMA_VERSION
+            candidate.schemaVersion !== SIZE_SCHEMA_VERSION &&
+            candidate.schemaVersion !== GRID_SCHEMA_VERSION
         )
     ) {
         return {
@@ -434,8 +438,17 @@ function migrateConfiguration(candidate) {
     migrated.schemaVersion = SCHEMA_VERSION;
 
     migrated.dashboards.forEach(function (dashboard) {
-        dashboard.layouts =
-            Layout.createLayouts(dashboard.widgets);
+
+        if (candidate.schemaVersion === GRID_SCHEMA_VERSION) {
+            dashboard.layouts =
+                Layout.migrateLegacyLayouts(
+                    dashboard.layouts
+                );
+        } else {
+            dashboard.layouts =
+                Layout.createLayouts(dashboard.widgets);
+        }
+
     });
 
 

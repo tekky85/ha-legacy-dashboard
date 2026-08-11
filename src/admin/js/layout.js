@@ -3,17 +3,35 @@
 
     const PROFILES = ["portrait", "landscape"];
     const COLUMNS = {
-        portrait: 3,
-        landscape: 6
+        portrait: 6,
+        landscape: 12
     };
     const MAX_ROWS = 100;
     const MAX_HEIGHT = 4;
     const SIZE_DIMENSIONS = {
-        compact: {w: 1, h: 1},
-        normal: {w: 1, h: 1},
-        wide: {w: 2, h: 1},
-        tall: {w: 1, h: 2},
-        large: {w: 2, h: 2}
+        compact: {w: 2, h: 1},
+        normal: {w: 3, h: 1},
+        wide: {w: 6, h: 1},
+        tall: {w: 3, h: 2},
+        large: {w: 6, h: 2}
+    };
+    const MINIMUM_SIZES = {
+        sensor: {
+            portrait: {w: 2, h: 1},
+            landscape: {w: 2, h: 1}
+        },
+        binary: {
+            portrait: {w: 2, h: 1},
+            landscape: {w: 2, h: 1}
+        },
+        light: {
+            portrait: {w: 2, h: 1},
+            landscape: {w: 2, h: 1}
+        },
+        climate: {
+            portrait: {w: 2, h: 1},
+            landscape: {w: 3, h: 1}
+        }
     };
 
     function findDashboard(dashboardId) {
@@ -42,12 +60,12 @@
     }
 
     function minimumSize(widget, profileName) {
+        const typeRules = MINIMUM_SIZES[widget.type] || MINIMUM_SIZES.sensor;
+        const minimum = typeRules[profileName] || typeRules.portrait;
+
         return {
-            w:
-                widget.type === "climate" && profileName === "landscape"
-                    ? 2
-                    : 1,
-            h: 1
+            w: minimum.w,
+            h: minimum.h
         };
     }
 

@@ -18,6 +18,7 @@ function read(relativePath) {
 
 function createCard(widgetId) {
     return {
+        className: "card",
         style: {},
         getAttribute: function (name) {
             return name === "data-widget-id"
@@ -60,17 +61,17 @@ test("Legacy-Raster wechselt bei Rotation zwischen Portrait und Landscape", func
     ];
     const layouts = {
         portrait: {
-            columns: 3,
+            columns: 6,
             items: {
-                "sensor-one": {x: 0, y: 0, w: 1, h: 1},
-                "climate-one": {x: 1, y: 0, w: 2, h: 1}
+                "sensor-one": {x: 0, y: 0, w: 2, h: 1},
+                "climate-one": {x: 2, y: 0, w: 4, h: 1}
             }
         },
         landscape: {
-            columns: 6,
+            columns: 12,
             items: {
-                "sensor-one": {x: 1, y: 1, w: 1, h: 1},
-                "climate-one": {x: 2, y: 0, w: 3, h: 2}
+                "sensor-one": {x: 2, y: 1, w: 2, h: 1},
+                "climate-one": {x: 4, y: 0, w: 6, h: 2}
             }
         }
     };
@@ -126,7 +127,7 @@ test("Legacy-Raster nutzt Größen-Presets als sicheren Profil-Fallback", functi
         {
             portrait: null,
             landscape: {
-                columns: 6,
+                columns: 12,
                 items: {
                     wide: {
                         x: 0,
@@ -141,13 +142,118 @@ test("Legacy-Raster nutzt Größen-Presets als sicheren Profil-Fallback", functi
     );
     context.LegacyLayout.apply(container);
 
-    assert.equal(cards[0].style.width, "calc(33.33333333333333% - 20px)");
+    assert.equal(cards[0].style.width, "calc(50% - 20px)");
     assert.equal(cards[1].style.height, "460px");
-    assert.equal(cards[2].style.width, "calc(33.33333333333333% - 20px)");
+    assert.equal(cards[2].style.width, "calc(25% - 20px)");
     assert.equal(
         JSON.stringify(cards).indexOf("javascript"),
         -1
     );
+});
+
+
+test("Presentation Modes folgen Typ und Geometrie und werden je Profil gecacht", function () {
+    const context = vm.createContext({
+        window: {innerWidth: 768, innerHeight: 1024},
+        Math: Math,
+        isFinite: isFinite
+    });
+    const widgets = [
+        {id: "sensor", type: "sensor", size: "normal"},
+        {id: "binary", type: "binary", size: "normal"},
+        {id: "light", type: "light", size: "normal"},
+        {id: "climate", type: "climate", size: "normal"}
+    ];
+    const layouts = {
+        portrait: {
+            columns: 6,
+            items: {
+                sensor: {x: 0, y: 0, w: 2, h: 1},
+                binary: {x: 2, y: 0, w: 2, h: 1},
+                light: {x: 4, y: 0, w: 2, h: 1},
+                climate: {x: 0, y: 1, w: 2, h: 1}
+            }
+        },
+        landscape: {
+            columns: 12,
+            items: {
+                sensor: {x: 0, y: 0, w: 3, h: 1},
+                binary: {x: 3, y: 0, w: 3, h: 1},
+                light: {x: 6, y: 0, w: 3, h: 1},
+                climate: {x: 0, y: 1, w: 6, h: 2}
+            }
+        }
+    };
+    const cards = widgets.map(function (entry) {
+        return createCard(entry.id);
+    });
+    const container = createContainer(cards);
+
+    vm.runInContext(read("src/public/js/core/layout.js"), context);
+    context.LegacyLayout.configure(layouts, widgets);
+    context.LegacyLayout.apply(container);
+
+    assert.match(cards[0].className, /card-presentation-compact/);
+    assert.match(cards[1].className, /card-presentation-compact/);
+    assert.match(cards[2].className, /card-presentation-compact/);
+    assert.match(cards[3].className, /card-presentation-compact/);
+    assert.equal(context.LegacyLayout.getPresentationComputationCount(), 4);
+
+    context.LegacyLayout.apply(container);
+    assert.equal(context.LegacyLayout.getPresentationComputationCount(), 4);
+
+    context.window.innerWidth = 1024;
+    context.window.innerHeight = 768;
+    context.LegacyLayout.apply(container);
+
+    assert.match(cards[0].className, /card-presentation-normal/);
+    assert.match(cards[1].className, /card-presentation-normal/);
+    assert.match(cards[2].className, /card-presentation-normal/);
+    assert.match(cards[3].className, /card-presentation-expanded/);
+    assert.equal(context.LegacyLayout.getPresentationComputationCount(), 8);
+});
+
+
+test("Climate bleibt bis vier Spalten kompakt und wird ab fünf normal", function () {
+    const context = vm.createContext({
+        window: {innerWidth: 1024, innerHeight: 768},
+        Math: Math,
+        isFinite: isFinite
+    });
+
+    vm.runInContext(read("src/public/js/core/layout.js"), context);
+
+    assert.equal(
+        context.LegacyLayout.getPresentationMode({type: "climate"}, 4, 1),
+        "compact"
+    );
+    assert.equal(
+        context.LegacyLayout.getPresentationMode({type: "climate"}, 5, 1),
+        "normal"
+    );
+});
+
+
+test("kompakte Widget-CSS erhält Kerninformationen und Touchziele", function () {
+    const css = read("src/public/css/style.css");
+    const sensor = read("src/public/js/widgets/sensor.js");
+    const binary = read("src/public/js/widgets/binary.js");
+    const light = read("src/public/js/widgets/light.js");
+    const climate = read("src/public/js/widgets/climate.js");
+
+    assert.match(css, /card-presentation-compact/);
+    assert.match(css, /card-presentation-normal|card-presentation-expanded/);
+    assert.match(css, /\.climate-control\s*\{[\s\S]*?width:\s*44px;[\s\S]*?height:\s*44px;/);
+    assert.match(css, /text-overflow:\s*ellipsis/);
+    assert.match(sensor, /card-sensor/);
+    assert.match(sensor, /value/);
+    assert.match(binary, /card-binary/);
+    assert.match(binary, /status/);
+    assert.match(light, /light-control/);
+    assert.match(climate, /climate-current-value/);
+    assert.match(climate, /climate-target-value/);
+    assert.match(climate, /data-direction="-1"/);
+    assert.match(climate, /data-direction="1"/);
 });
 
 

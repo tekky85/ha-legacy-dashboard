@@ -192,6 +192,7 @@ Bedeutung von „fest“:
 | 16 | Configurable Tile Sizes | umgesetzt |
 | 17 | Drag-and-Drop Grid Layout | umgesetzt |
 | 18 | System Dashboard Foundation | umgesetzt |
+| 17.1 | Grid Refinement + Responsive Card Content (Korrektursprint nach 18) | umgesetzt |
 | 19 | Summary Dashboard MVP | neu geplant |
 | 20 | Error Dashboard MVP | neu geplant |
 | 21 | Registry & Diagnostic Enrichment | neu geplant |
@@ -670,6 +671,29 @@ src/services/issues/severity.js
 ```
 
 Keine weitere Konzentration der Logik in `app.js` oder `api.js`.
+
+---
+
+# Sprint 17.1 – Grid Refinement + Responsive Card Content
+
+## Status
+
+Umgesetzt nach Sprint 18 als gezielter Korrektursprint.
+
+## Ergebnis
+
+- persistentes Konfigurationsschema 4
+- Portraitraster von 3 auf 6 Spalten verfeinert
+- Landscaperaster von 6 auf 12 Spalten verfeinert
+- Schema-3-Migration skaliert `x` und `w` exakt einmal mit Faktor 2 und lässt
+  `y`/`h` unverändert
+- Size Presets dienen weiter der Erstplatzierung; Presentation Modes werden
+  nicht persistiert, sondern aus Typ, Breite und Höhe abgeleitet
+- `compact`, `normal` und `expanded` für Sensor, Binary, Light und Climate
+- Mindestgrößen in Backend und Admin-Editor
+- Light- und Climate-Bedienflächen bleiben ungefähr 44×44 Pixel
+- Legacy-Renderer bleibt ES5-/iOS-9-kompatibel und verwendet kein CSS Grid
+- Sprint-18-Systemrouten und Snapshotarchitektur bleiben fachlich unverändert
 
 ---
 

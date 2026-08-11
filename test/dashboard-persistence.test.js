@@ -74,7 +74,7 @@ test("fehlende Persistenz wird aus Sprint 13 migriert", function (t) {
         fs.readFileSync(configPath, "utf8")
     );
 
-    assert.equal(persisted.schemaVersion, 3);
+    assert.equal(persisted.schemaVersion, 4);
     assert.equal(
         persisted.defaultDashboardId,
         "default"
@@ -108,7 +108,7 @@ test("fehlende Persistenz wird aus Sprint 13 migriert", function (t) {
 });
 
 
-test("Schema 1 wird ohne fachliche Änderungen auf Schema 3 migriert", function (t) {
+test("Schema 1 wird ohne fachliche Änderungen auf Schema 4 migriert", function (t) {
 
     const configPath =
         createTemporaryConfigPath(t);
@@ -152,7 +152,7 @@ test("Schema 1 wird ohne fachliche Änderungen auf Schema 3 migriert", function 
 
     assert.equal(result.migrated, true);
     assert.equal(result.recovered, false);
-    assert.equal(persisted.schemaVersion, 3);
+    assert.equal(persisted.schemaVersion, 4);
     assert.deepEqual(
         persisted.dashboards.map(function (dashboard) {
             return {
@@ -190,7 +190,7 @@ test("Schema 1 wird ohne fachliche Änderungen auf Schema 3 migriert", function 
 });
 
 
-test("Sprint-16-Schema 2 wird atomar auf Schema 3 migriert", function (t) {
+test("Sprint-16-Schema 2 wird atomar auf Schema 4 migriert", function (t) {
 
     const configPath = createTemporaryConfigPath(t);
     const sprint16 = dashboardConfig.cloneConfiguration(
@@ -225,7 +225,7 @@ test("Sprint-16-Schema 2 wird atomar auf Schema 3 migriert", function (t) {
     const backup = JSON.parse(fs.readFileSync(configPath + ".bak", "utf8"));
 
     assert.equal(result.migrated, true);
-    assert.equal(persisted.schemaVersion, 3);
+    assert.equal(persisted.schemaVersion, 4);
     assert.equal(backup.schemaVersion, 2);
     assert.equal(
         Object.prototype.hasOwnProperty.call(
@@ -251,6 +251,65 @@ test("Sprint-16-Schema 2 wird atomar auf Schema 3 migriert", function (t) {
         originalIds
     );
     dashboardConfig.validateConfiguration(persisted);
+
+});
+
+
+test("Sprint-17-Schema 3 wird atomar genau einmal auf Schema 4 skaliert", function (t) {
+
+    const configPath = createTemporaryConfigPath(t);
+    const sprint17 = dashboardConfig.cloneConfiguration(
+        dashboardConfig.DEFAULT_CONFIGURATION
+    );
+
+    sprint17.schemaVersion = 3;
+    sprint17.dashboards.forEach(function (dashboard) {
+        dashboard.layouts.portrait.columns = 3;
+        dashboard.layouts.landscape.columns = 6;
+        ["portrait", "landscape"].forEach(function (profileName) {
+            Object.keys(dashboard.layouts[profileName].items).forEach(
+                function (widgetId) {
+                    const item = dashboard.layouts[profileName].items[widgetId];
+                    const widget = dashboard.widgets.find(function (candidate) {
+                        return candidate.id === widgetId;
+                    });
+                    item.x = Math.floor(item.x / 2);
+                    item.w =
+                        widget.type === "climate" && profileName === "landscape"
+                            ? 2
+                            : Math.max(1, Math.floor(item.w / 2));
+                }
+            );
+        });
+    });
+
+    const widgetId = sprint17.dashboards[0].widgets[0].id;
+    sprint17.dashboards[0].layouts.portrait.items[widgetId] = {
+        x: 1,
+        y: 7,
+        w: 1,
+        h: 2
+    };
+    writeConfiguration(configPath, sprint17);
+
+    const first = dashboardConfig.initialize({configPath: configPath});
+    const persisted = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    const backup = JSON.parse(fs.readFileSync(configPath + ".bak", "utf8"));
+
+    assert.equal(first.migrated, true);
+    assert.equal(backup.schemaVersion, 3);
+    assert.equal(persisted.schemaVersion, 4);
+    assert.deepEqual(
+        persisted.dashboards[0].layouts.portrait.items[widgetId],
+        {x: 2, y: 7, w: 2, h: 2}
+    );
+
+    const second = dashboardConfig.initialize({configPath: configPath});
+    const reloaded = JSON.parse(fs.readFileSync(configPath, "utf8"));
+
+    assert.equal(second.migrated, false);
+    assert.deepEqual(reloaded, persisted);
+    dashboardConfig.validateConfiguration(reloaded);
 
 });
 

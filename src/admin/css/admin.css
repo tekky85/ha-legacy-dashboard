@@ -411,6 +411,7 @@ input[readonly] {
 .layout-section {
     margin: 0 0 1.75rem;
     padding: 1rem;
+    overflow-x: auto;
     border: 1px solid var(--border);
     border-radius: 0.8rem;
     background: var(--surface-subtle);
@@ -436,7 +437,7 @@ input[readonly] {
 }
 
 .layout-editor-grid {
-    --layout-columns: 3;
+    --layout-columns: 6;
     position: relative;
     display: grid;
     grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
@@ -454,6 +455,14 @@ input[readonly] {
     background-size:
         calc(100% / var(--layout-columns)) 194px,
         calc(100% / var(--layout-columns)) 194px;
+}
+
+.layout-editor-grid[data-layout-grid="portrait"] {
+    min-width: 660px;
+}
+
+.layout-editor-grid[data-layout-grid="landscape"] {
+    min-width: 960px;
 }
 
 .layout-tile,

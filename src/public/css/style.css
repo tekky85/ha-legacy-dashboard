@@ -468,7 +468,7 @@ textarea {
     margin: 10px;
     padding: 22px;
 
-    overflow: hidden;
+    overflow: visible;
 
     background: #ffffff;
     color: #172033;
@@ -1125,6 +1125,271 @@ body.theme-dark .footer {
         font-size: 19px;
 
     }
+
+}
+
+
+/* =========================================================
+   GEOMETRY-DERIVED CARD PRESENTATION
+   ========================================================= */
+
+/*
+ * The ES5 layout renderer adds only these three validated classes. Geometry
+ * remains absolute-positioned Flexbox; the legacy wall display uses no CSS
+ * Grid, Flexbox gap, container queries, transforms, or zoom for sizing.
+ */
+
+.grid-layout-active .card {
+
+    min-width: 0;
+
+}
+
+.grid-layout-active .card .title,
+.grid-layout-active .card .subtitle {
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+}
+
+.grid.grid-layout-active .card-presentation-compact {
+
+    padding: 12px;
+
+}
+
+.grid.grid-layout-active .card-presentation-compact .card-header {
+
+    min-height: 40px;
+    margin-bottom: 6px;
+
+}
+
+.grid.grid-layout-active .card-presentation-compact .icon {
+
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+
+}
+
+.grid-layout-active .card-presentation-compact .icon svg {
+
+    width: 22px;
+    height: 22px;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-compact .value,
+.grid-layout-active .card-binary.card-presentation-compact .status {
+
+    margin: auto 0;
+    font-size: 36px;
+    line-height: 1.05;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-compact .value span {
+
+    margin-left: 3px;
+    font-size: 17px;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-compact .title,
+.grid-layout-active .card-sensor.card-presentation-compact .subtitle,
+.grid-layout-active .card-binary.card-presentation-compact .title,
+.grid-layout-active .card-binary.card-presentation-compact .subtitle {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-binary.card-presentation-compact .status {
+
+    font-size: 25px;
+    font-weight: 500;
+
+}
+
+.grid-layout-active .card-light.card-presentation-compact .card-header {
+
+    margin-bottom: 4px;
+
+}
+
+.grid-layout-active .card-light.card-presentation-compact .light-state {
+
+    min-width: 48px;
+    padding: 5px 8px;
+    font-size: 12px;
+
+}
+
+.grid-layout-active .card-light.card-presentation-compact .light-control {
+
+    min-height: 48px;
+    margin: auto 0;
+    padding: 8px;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+}
+
+.grid-layout-active .card-light.card-presentation-compact .light-control-track {
+
+    margin-right: 0;
+
+}
+
+.grid-layout-active .card-light.card-presentation-compact .light-control-label,
+.grid-layout-active .card-light.card-presentation-compact .title,
+.grid-layout-active .card-light.card-presentation-compact .subtitle {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact {
+
+    padding: 10px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .card-header {
+
+    min-height: 38px;
+    margin-bottom: 5px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .icon {
+
+    width: 36px;
+    height: 36px;
+    margin-right: 6px;
+    border-radius: 12px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .icon svg {
+
+    width: 21px;
+    height: 21px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-heading-copy {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-state {
+
+    min-width: 48px;
+    padding: 5px 7px;
+    font-size: 11px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-values {
+
+    display: block;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-current {
+
+    margin: 0 0 5px 0;
+    text-align: center;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-current-value {
+
+    font-size: 30px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-current-unit {
+
+    margin-left: 3px;
+    font-size: 15px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-current-label,
+.grid-layout-active .card-climate.card-presentation-compact .climate-target-label {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-target-row {
+
+    width: 100%;
+    padding: 3px;
+    border-radius: 15px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-control {
+
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    border-radius: 14px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-target {
+
+    min-width: 46px;
+    padding: 0 2px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-target-value {
+
+    margin-top: 0;
+    font-size: 19px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .climate-target-value small {
+
+    margin-left: 1px;
+    font-size: 12px;
+
+}
+
+.grid.grid-layout-active .card-presentation-expanded .icon {
+
+    width: 60px;
+    height: 60px;
+
+}
+
+.grid.grid-layout-active .card-presentation-expanded .icon svg {
+
+    width: 32px;
+    height: 32px;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-expanded .value {
+
+    font-size: 68px;
+
+}
+
+.grid-layout-active .card-binary.card-presentation-expanded .status {
+
+    font-size: 44px;
 
 }
 

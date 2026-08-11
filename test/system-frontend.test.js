@@ -232,7 +232,7 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=20/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=22/);
     assert.match(source, /Legacy\.http\.get/);
     assert.doesNotMatch(source, /\bconst\b|\blet\b|=>|`/);
     assert.doesNotMatch(source, /\bfetch\b|\bPromise\b|\basync\b|\bawait\b/);

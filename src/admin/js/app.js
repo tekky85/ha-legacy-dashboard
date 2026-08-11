@@ -375,8 +375,8 @@
             "p",
             "layout-help muted",
             profileName === "portrait"
-                ? "Portrait verwendet 3 Spalten."
-                : "Landscape verwendet 6 Spalten. Climate benötigt mindestens 2 Spalten."
+                ? "Portrait verwendet 6 Spalten. Mindestbreite: 2 Spalten."
+                : "Landscape verwendet 12 Spalten. Climate benötigt mindestens 3 Spalten."
         ));
         return section;
     }
