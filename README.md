@@ -57,6 +57,9 @@ browser.
 - separate persistent portrait and landscape grid layouts
 - graphical drag-and-drop and resize editor in the Admin UI
 - stable dashboard URLs with a backward-compatible default dashboard
+- fixed read-only system dashboards for Summary and Systemstatus
+- shared normalized Home Assistant snapshot with short-lived server cache
+- explicit stale, offline, and recovery states for system dashboards
 - protected, opt-in Admin API with a graphical configuration UI
 - Home Assistant reachability status
 - stale-data indicator with last successful refresh
@@ -159,6 +162,17 @@ http://gateway-address:3000/d/default
 http://gateway-address:3000/d/esszimmer
 ```
 
+The fixed system dashboards are always available separately from user
+dashboards and cannot be deleted or edited in the grid editor:
+
+```text
+http://gateway-address:3000/system/summary
+http://gateway-address:3000/system/errors
+```
+
+Sprint 18 provides the shared data and UI foundation only. Summary activity
+rules and issue classification follow in Sprint 19 and Sprint 20.
+
 ## iPad home-screen installation
 
 On the iPad, open the dashboard URL in Safari and select:
@@ -251,6 +265,20 @@ GET /api/dashboards/:dashboardId/state
 
 Unknown dashboard IDs return HTTP 404 and are never redirected to the default
 dashboard.
+
+Fixed read-only system dashboard data:
+
+```text
+GET /api/system-dashboards/status
+GET /api/system-dashboards/summary
+GET /api/system-dashboards/errors
+```
+
+All three endpoints use one normalized server-side Home Assistant state
+snapshot with a three-second in-memory cache. They return only reduced
+dashboard metadata and never raw Home Assistant state payloads. Summary and
+Error currently return empty placeholder collections by design; their full
+business logic is not part of Sprint 18.
 
 The optional Admin API and its separate graphical UI are documented below.
 They are disabled by default and are not used by the legacy dashboard
@@ -483,6 +511,13 @@ refresh. Partial failures are marked as partially available.
 Application events are written as one-line JSON logs. Request bodies,
 authorization headers, and Home Assistant tokens are never logged.
 
+The system snapshot retains the last successful normalized state when Home
+Assistant becomes unavailable. Its reduced API metadata marks the data as
+`stale`, reports the last successful collection time, and keeps gateway and
+Home Assistant reachability separate. Without any prior success, the system
+shell shows a clear offline state instead of an empty-success message. A later
+successful collection replaces the stale snapshot automatically.
+
 ## Project structure
 
 ```text
@@ -506,11 +541,18 @@ ha-legacy-dashboard/
     ├── server.js
     ├── routes/
     │   ├── admin.js
-    │   └── api.js
+    │   ├── api.js
+    │   └── system-dashboards.js
     ├── services/
     │   ├── dashboard-config-store.js
-    │   └── homeassistant.js
+    │   ├── homeassistant.js
+    │   ├── issues/
+    │   ├── summary/
+    │   └── system/
     └── public/
+        ├── system.html
+        ├── css/system.css
+        └── js/system/
 ```
 
 ## Development

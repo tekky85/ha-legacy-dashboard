@@ -185,13 +185,13 @@ Bedeutung von „fest“:
 | 9 | Lokale Mock- und Integrationstests | umgesetzt |
 | 10 | Deployment und Betrieb | umgesetzt |
 | 11 | Wall-Display-Betrieb | umgesetzt |
-| 12 | UI Polish + Release Baseline | geplant/umzusetzen gemäß Sprint-Datei |
-| 13 | Multi-Dashboard Foundation | geplant/umzusetzen gemäß Sprint-Datei |
-| 14 | Persistent Configuration + Admin API Foundation | geplant |
-| 15 | Admin Configuration UI | geplant |
-| 16 | Configurable Tile Sizes | geplant |
-| 17 | Drag-and-Drop Grid Layout | geplant |
-| 18 | System Dashboard Foundation | neu geplant |
+| 12 | UI Polish + Release Baseline | umgesetzt |
+| 13 | Multi-Dashboard Foundation | umgesetzt |
+| 14 | Persistent Configuration + Admin API Foundation | umgesetzt |
+| 15 | Admin Configuration UI | umgesetzt |
+| 16 | Configurable Tile Sizes | umgesetzt |
+| 17 | Drag-and-Drop Grid Layout | umgesetzt |
+| 18 | System Dashboard Foundation | umgesetzt |
 | 19 | Summary Dashboard MVP | neu geplant |
 | 20 | Error Dashboard MVP | neu geplant |
 | 21 | Registry & Diagnostic Enrichment | neu geplant |
@@ -570,6 +570,10 @@ docs/sprints/SPRINT-17.md
 
 # Sprint 18 – System Dashboard Foundation
 
+## Status
+
+Abgeschlossen
+
 ## Ziel
 
 Gemeinsame technische Grundlage für feste dynamische System-Dashboards schaffen.
@@ -628,10 +632,17 @@ Konzeptionell:
 ```text
 GET /api/system-dashboards/summary
 GET /api/system-dashboards/errors
-GET /api/system-dashboards/config
+GET /api/system-dashboards/status
 ```
 
 Die tatsächliche Route darf an die bestehende Architektur angepasst werden.
+
+Umgesetzt sind ein gemeinsamer Entity-State-Collector, ein normalisiertes
+internes Snapshotmodell, ein In-Memory-Cache mit drei Sekunden TTL und
+In-flight-Deduplizierung sowie Stale-/Offline-/Recovery-Semantik. Die
+Browserantworten enthalten nur reduzierte Metadaten. Die eigentlichen
+Summary- und Issue-Regeln bleiben Sprint 19 beziehungsweise Sprint 20
+vorbehalten.
 
 ## Anforderungen
 
@@ -1402,13 +1413,12 @@ Ziel bleibt:
 
 # Nächster Sprint
 
-Nach Abschluss von Sprint 17:
+Nach Abschluss von Sprint 18:
 
 ```text
-Sprint 18 – System Dashboard Foundation
+Sprint 19 – Summary Dashboard MVP
 ```
 
-Dieser Sprint soll zunächst nur die gemeinsame technische Grundlage schaffen.
-
-Er soll noch nicht versuchen, die gesamte Brainstorming-Spezifikation in einem
-einzigen Schritt umzusetzen.
+Dieser Sprint nutzt die gemeinsame Snapshot-Grundlage und implementiert die
+eigentliche, read-only Aktivitätsauswertung. Die Issue-Klassifikation bleibt
+weiterhin Sprint 20 vorbehalten.
