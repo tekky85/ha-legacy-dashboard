@@ -221,10 +221,10 @@ LightWidget.prototype.render =
                 '</button>' +
 
 
-                '<div class="title">' +
+                '<div class="title card-identity">' +
 
                     Legacy.html.escape(
-                        this.title
+                        this.getCardIdentity(data)
                     ) +
 
                 '</div>' +

@@ -84,6 +84,47 @@ Widget.prototype.getLayoutAttribute = function () {
 };
 
 
+Widget.prototype.getCardIdentity = function (data) {
+
+    var attributes =
+        data && data.attributes
+            ? data.attributes
+            : {};
+
+    var candidates = [
+        this.title,
+        this.subtitle,
+        attributes.friendly_name,
+        this.entity
+    ];
+
+    var index;
+    var value;
+
+
+    for (index = 0; index < candidates.length; index++) {
+
+        if (typeof candidates[index] !== "string") {
+            continue;
+        }
+
+        value = candidates[index].replace(
+            /^\s+|\s+$/g,
+            ""
+        );
+
+        if (value) {
+            return value;
+        }
+
+    }
+
+
+    return "Widget";
+
+};
+
+
 Widget.prototype.render = function () {
 
     return "";

@@ -194,6 +194,7 @@ Bedeutung von „fest“:
 | 18 | System Dashboard Foundation | umgesetzt |
 | 17.1 | Grid Refinement + Responsive Card Content (Korrektursprint nach 18) | umgesetzt |
 | 19 | Summary Dashboard MVP | umgesetzt |
+| 17.2 | Card Identity, Proportional Geometry & Theme Persistence (Korrektursprint nach 19) | umgesetzt |
 | 20 | Error Dashboard MVP | neu geplant |
 | 21 | Registry & Diagnostic Enrichment | neu geplant |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
@@ -859,6 +860,31 @@ Mindestens:
 - Entities ausschließen
 - technische/diagnostische Entities standardmäßig ausschließen
 - später erweiterbar für Einschlussregeln
+
+---
+
+# Sprint 17.2 – Card Identity, Proportional Geometry & Theme Persistence
+
+## Status
+
+Umgesetzt nach Sprint 19.
+
+## Ergebnis
+
+- Compact Sensor behält Wert und eindeutige Identität.
+- Compact Binary behält Zustand und eindeutige Identität.
+- Compact Light behält Zustand, Identität und Control.
+- Compact Climate behält Identität, Ist, Soll sowie Minus und Plus.
+- Die zentrale Identitätskette lautet Widgettitel, Kurztext/Raum,
+  `friendly_name`, Entity-ID.
+- Row Height wird mit Faktor `0.9`, Mindesthöhe `128px` und `20px` Gutter aus
+  der tatsächlichen Container-/Spaltenbreite berechnet.
+- Presentation Modes berücksichtigen Widgettyp, Rastergröße und effektive
+  Pixelbreite/-höhe; Geometrie und Entscheidung werden zwischen State-Polls
+  gecacht.
+- Das bestehende Theme unter `ha-legacy-theme` wird früh geladen und bleibt
+  auf Benutzer- und Systemrouten nach Reload erhalten.
+- Keine Backend-, Summary-/Error-Fachlogik- oder Write-Änderung.
 
 ---
 

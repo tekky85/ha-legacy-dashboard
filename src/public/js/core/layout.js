@@ -14,12 +14,17 @@ var LegacyLayout = (function () {
 
     var MAX_ROWS = 100;
     var MAX_HEIGHT = 4;
+    var CARD_GUTTER = 20;
+    var ROW_ASPECT_FACTOR = 0.9;
+    var MINIMUM_USABLE_ROW_HEIGHT = 128;
 
     var configuredLayouts = null;
     var configuredWidgets = [];
     var configuredWidgetById = {};
     var presentationCache = {};
     var presentationComputationCount = 0;
+    var geometryCache = {};
+    var geometryComputationCount = 0;
 
 
     function isInteger(value) {
@@ -278,6 +283,8 @@ var LegacyLayout = (function () {
         configuredWidgetById = {};
         presentationCache = {};
         presentationComputationCount = 0;
+        geometryCache = {};
+        geometryComputationCount = 0;
 
 
         for (index = 0; index < configuredWidgets.length; index++) {
@@ -288,9 +295,60 @@ var LegacyLayout = (function () {
     }
 
 
-    function getPresentationMode(widget, width, height) {
+    function getPresentationMode(
+        widget,
+        width,
+        height,
+        effectiveWidth,
+        effectiveHeight
+    ) {
 
         presentationComputationCount++;
+
+
+        if (
+            typeof effectiveWidth === "number" &&
+            typeof effectiveHeight === "number"
+        ) {
+
+            if (widget && widget.type === "climate") {
+
+                if (
+                    effectiveWidth >= 360 &&
+                    effectiveHeight >= 210
+                ) {
+                    return "expanded";
+                }
+
+                if (
+                    effectiveWidth < 200 ||
+                    effectiveHeight < 170
+                ) {
+                    return "compact";
+                }
+
+                return "normal";
+
+            }
+
+
+            if (
+                effectiveWidth >= 220 &&
+                effectiveHeight >= 210
+            ) {
+                return "expanded";
+            }
+
+            if (
+                effectiveWidth < 180 ||
+                effectiveHeight < 150
+            ) {
+                return "compact";
+            }
+
+            return "normal";
+
+        }
 
 
         if (height >= 2 || width >= 6) {
@@ -310,11 +368,19 @@ var LegacyLayout = (function () {
     }
 
 
-    function resolvePresentationMode(name, widget, item) {
+    function resolvePresentationMode(
+        name,
+        widget,
+        item,
+        effectiveWidth,
+        effectiveHeight
+    ) {
 
         var key = name + ":" + widget.id;
         var signature =
-            widget.type + ":" + item.w + ":" + item.h;
+            widget.type + ":" + item.w + ":" + item.h +
+            ":" + Math.round(effectiveWidth) +
+            ":" + Math.round(effectiveHeight);
         var cached = presentationCache[key];
 
 
@@ -328,13 +394,88 @@ var LegacyLayout = (function () {
             mode: getPresentationMode(
                 widget,
                 item.w,
-                item.h
+                item.h,
+                effectiveWidth,
+                effectiveHeight
             )
         };
 
         presentationCache[key] = cached;
 
         return cached.mode;
+
+    }
+
+
+    function calculateGridGeometry(containerWidth, columns) {
+
+        var safeWidth = parseFloat(containerWidth);
+        var columnWidth;
+        var rowHeight;
+
+
+        geometryComputationCount++;
+
+
+        if (!isFinite(safeWidth) || safeWidth <= 0) {
+            safeWidth = 1;
+        }
+
+
+        columnWidth = safeWidth / columns;
+
+        rowHeight = Math.max(
+            MINIMUM_USABLE_ROW_HEIGHT,
+            Math.round(
+                columnWidth * ROW_ASPECT_FACTOR
+            )
+        );
+
+
+        return {
+            containerWidth: safeWidth,
+            columnWidth: columnWidth,
+            rowHeight: rowHeight,
+            gutter: CARD_GUTTER
+        };
+
+    }
+
+
+    function resolveGridGeometry(name, container, columns) {
+
+        var containerWidth = parseFloat(container.clientWidth);
+        var signature;
+        var cached;
+
+
+        if (!isFinite(containerWidth) || containerWidth <= 0) {
+            containerWidth = parseFloat(window.innerWidth);
+        }
+
+
+        signature =
+            Math.round(containerWidth) + ":" + columns;
+
+        cached = geometryCache[name];
+
+
+        if (cached && cached.signature === signature) {
+            return cached.geometry;
+        }
+
+
+        cached = {
+            signature: signature,
+            geometry: calculateGridGeometry(
+                containerWidth,
+                columns
+            )
+        };
+
+        geometryCache[name] = cached;
+
+        return cached.geometry;
 
     }
 
@@ -360,7 +501,7 @@ var LegacyLayout = (function () {
         var name;
         var profile;
         var cards;
-        var rowHeight;
+        var geometry;
         var maximumRow = 0;
         var index;
         var card;
@@ -368,6 +509,8 @@ var LegacyLayout = (function () {
         var item;
         var widget;
         var presentationMode;
+        var effectiveWidth;
+        var effectiveHeight;
         var widthPercent;
 
 
@@ -389,10 +532,11 @@ var LegacyLayout = (function () {
         }
 
 
-        rowHeight =
-            name === "landscape"
-                ? 240
-                : 260;
+        geometry = resolveGridGeometry(
+            name,
+            container,
+            profile.columns
+        );
 
         container.className =
             "grid grid-layout-active layout-" +
@@ -413,10 +557,24 @@ var LegacyLayout = (function () {
                 continue;
             }
 
+            effectiveWidth = Math.max(
+                0,
+                item.w * geometry.columnWidth -
+                    geometry.gutter
+            );
+
+            effectiveHeight = Math.max(
+                0,
+                item.h * geometry.rowHeight -
+                    geometry.gutter
+            );
+
             presentationMode = resolvePresentationMode(
                 name,
                 widget,
-                item
+                item,
+                effectiveWidth,
+                effectiveHeight
             );
 
             applyPresentationMode(
@@ -430,11 +588,12 @@ var LegacyLayout = (function () {
             card.style.left =
                 item.x / profile.columns * 100 + "%";
             card.style.top =
-                item.y * rowHeight + "px";
+                item.y * geometry.rowHeight + "px";
             card.style.width =
-                "calc(" + widthPercent + "% - 20px)";
+                "calc(" + widthPercent + "% - " +
+                    geometry.gutter + "px)";
             card.style.height =
-                item.h * rowHeight - 20 + "px";
+                effectiveHeight + "px";
             card.style.minHeight = "0";
 
             maximumRow = Math.max(
@@ -446,7 +605,7 @@ var LegacyLayout = (function () {
 
 
         container.style.height =
-            maximumRow * rowHeight + "px";
+            maximumRow * geometry.rowHeight + "px";
 
     }
 
@@ -456,8 +615,12 @@ var LegacyLayout = (function () {
         apply: apply,
         getProfileName: profileName,
         getPresentationMode: getPresentationMode,
+        calculateGridGeometry: calculateGridGeometry,
         getPresentationComputationCount: function () {
             return presentationComputationCount;
+        },
+        getGeometryComputationCount: function () {
+            return geometryComputationCount;
         }
     };
 

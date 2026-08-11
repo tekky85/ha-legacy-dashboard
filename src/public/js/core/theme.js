@@ -54,9 +54,17 @@ var Theme = {
     },
 
 
-    updateBodyClass: function () {
+    updateElementClass: function (element) {
 
-        var className = document.body.className || "";
+        var className;
+
+
+        if (!element) {
+            return;
+        }
+
+
+        className = element.className || "";
 
         className = className.replace(
             /(^|\s)theme-dark(?=\s|$)/g,
@@ -83,7 +91,20 @@ var Theme = {
 
         }
 
-        document.body.className = className;
+        element.className = className;
+
+    },
+
+
+    updateThemeClasses: function () {
+
+        this.updateElementClass(
+            document.documentElement
+        );
+
+        this.updateElementClass(
+            document.body
+        );
 
     },
 
@@ -145,7 +166,7 @@ var Theme = {
 
         this.current = name;
 
-        this.updateBodyClass();
+        this.updateThemeClasses();
         this.updateButton();
 
         if (save !== false) {
@@ -173,6 +194,24 @@ var Theme = {
     },
 
 
+    loadEarly: function () {
+
+        var storedTheme =
+            this.readStoredTheme();
+
+
+        this.current =
+            storedTheme === "dark"
+                ? "dark"
+                : "light";
+
+        this.updateElementClass(
+            document.documentElement
+        );
+
+    },
+
+
     toggle: function () {
 
         if (this.current === "dark") {
@@ -188,3 +227,6 @@ var Theme = {
     }
 
 };
+
+
+Theme.loadEarly();

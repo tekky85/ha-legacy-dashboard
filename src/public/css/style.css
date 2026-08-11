@@ -23,6 +23,12 @@ html {
 
 }
 
+html.theme-dark {
+
+    background: #0d131c;
+
+}
+
 body {
 
     width: 100%;
@@ -754,6 +760,7 @@ textarea {
    DARK MODE
    ========================================================= */
 
+html.theme-dark body,
 body.theme-dark {
 
     background: #0d131c;
@@ -1154,53 +1161,67 @@ body.theme-dark .footer {
 
 }
 
+.grid-layout-active .card .card-identity {
+
+    min-width: 0;
+
+}
+
 .grid.grid-layout-active .card-presentation-compact {
 
-    padding: 12px;
+    padding: 8px;
+
+    -webkit-justify-content: center;
+    justify-content: center;
 
 }
 
-.grid.grid-layout-active .card-presentation-compact .card-header {
+.grid-layout-active .card-presentation-compact .card-identity {
 
-    min-height: 40px;
-    margin-bottom: 6px;
+    display: block;
+
+    width: 100%;
+    margin: 0 0 4px 0;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 16px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
 }
 
-.grid.grid-layout-active .card-presentation-compact .icon {
+.grid-layout-active .card-sensor.card-presentation-compact .card-header,
+.grid-layout-active .card-binary.card-presentation-compact .card-header {
 
-    width: 40px;
-    height: 40px;
-    border-radius: 13px;
-
-}
-
-.grid-layout-active .card-presentation-compact .icon svg {
-
-    width: 22px;
-    height: 22px;
+    display: none;
 
 }
 
 .grid-layout-active .card-sensor.card-presentation-compact .value,
 .grid-layout-active .card-binary.card-presentation-compact .status {
 
-    margin: auto 0;
-    font-size: 36px;
+    margin: 0 0 5px 0;
     line-height: 1.05;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-compact .value {
+
+    font-size: 34px;
 
 }
 
 .grid-layout-active .card-sensor.card-presentation-compact .value span {
 
     margin-left: 3px;
-    font-size: 17px;
+    font-size: 16px;
 
 }
 
-.grid-layout-active .card-sensor.card-presentation-compact .title,
 .grid-layout-active .card-sensor.card-presentation-compact .subtitle,
-.grid-layout-active .card-binary.card-presentation-compact .title,
 .grid-layout-active .card-binary.card-presentation-compact .subtitle {
 
     display: none;
@@ -1209,30 +1230,58 @@ body.theme-dark .footer {
 
 .grid-layout-active .card-binary.card-presentation-compact .status {
 
-    font-size: 25px;
+    font-size: 21px;
     font-weight: 500;
 
 }
 
 .grid-layout-active .card-light.card-presentation-compact .card-header {
 
-    margin-bottom: 4px;
+    min-height: 18px;
+    margin: 0 0 2px 0;
+
+    -webkit-order: 1;
+    order: 1;
+
+    -webkit-justify-content: flex-start;
+    justify-content: flex-start;
+
+}
+
+.grid-layout-active .card-light.card-presentation-compact .icon {
+
+    display: none;
 
 }
 
 .grid-layout-active .card-light.card-presentation-compact .light-state {
 
-    min-width: 48px;
-    padding: 5px 8px;
+    min-width: 0;
+    padding: 0;
+
+    background: transparent;
+
     font-size: 12px;
+    line-height: 18px;
+
+}
+
+.grid-layout-active .card-light.card-presentation-compact .card-identity {
+
+    -webkit-order: 2;
+    order: 2;
 
 }
 
 .grid-layout-active .card-light.card-presentation-compact .light-control {
 
     min-height: 48px;
-    margin: auto 0;
-    padding: 8px;
+    height: 48px;
+    margin: 0;
+    padding: 6px;
+
+    -webkit-order: 3;
+    order: 3;
 
     -webkit-justify-content: center;
     justify-content: center;
@@ -1246,7 +1295,6 @@ body.theme-dark .footer {
 }
 
 .grid-layout-active .card-light.card-presentation-compact .light-control-label,
-.grid-layout-active .card-light.card-presentation-compact .title,
 .grid-layout-active .card-light.card-presentation-compact .subtitle {
 
     display: none;
@@ -1255,70 +1303,73 @@ body.theme-dark .footer {
 
 .grid-layout-active .card-climate.card-presentation-compact {
 
-    padding: 10px;
+    padding: 8px;
 
 }
 
 .grid-layout-active .card-climate.card-presentation-compact .card-header {
 
-    min-height: 38px;
-    margin-bottom: 5px;
+    min-height: 16px;
+    margin-bottom: 4px;
 
 }
 
 .grid-layout-active .card-climate.card-presentation-compact .icon {
 
-    width: 36px;
-    height: 36px;
-    margin-right: 6px;
-    border-radius: 12px;
-
-}
-
-.grid-layout-active .card-climate.card-presentation-compact .icon svg {
-
-    width: 21px;
-    height: 21px;
+    display: none;
 
 }
 
 .grid-layout-active .card-climate.card-presentation-compact .climate-heading-copy {
 
-    display: none;
+    display: block;
+    width: 100%;
 
 }
 
+.grid-layout-active .card-climate.card-presentation-compact .card-identity {
+
+    margin: 0;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-compact .subtitle,
 .grid-layout-active .card-climate.card-presentation-compact .climate-state {
 
-    min-width: 48px;
-    padding: 5px 7px;
-    font-size: 11px;
+    display: none;
 
 }
 
 .grid-layout-active .card-climate.card-presentation-compact .climate-values {
 
-    display: block;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
 
 }
 
 .grid-layout-active .card-climate.card-presentation-compact .climate-current {
 
-    margin: 0 0 5px 0;
-    text-align: center;
+    margin: 0 5px 0 0;
+    text-align: left;
 
 }
 
 .grid-layout-active .card-climate.card-presentation-compact .climate-current-value {
 
-    font-size: 30px;
+    font-size: 24px;
 
 }
 
 .grid-layout-active .card-climate.card-presentation-compact .climate-current-unit {
 
     margin-left: 3px;
-    font-size: 15px;
+    font-size: 13px;
 
 }
 
@@ -1331,9 +1382,9 @@ body.theme-dark .footer {
 
 .grid-layout-active .card-climate.card-presentation-compact .climate-target-row {
 
-    width: 100%;
-    padding: 3px;
-    border-radius: 15px;
+    width: auto;
+    padding: 1px;
+    border-radius: 14px;
 
 }
 
@@ -1348,15 +1399,15 @@ body.theme-dark .footer {
 
 .grid-layout-active .card-climate.card-presentation-compact .climate-target {
 
-    min-width: 46px;
-    padding: 0 2px;
+    min-width: 44px;
+    padding: 0 1px;
 
 }
 
 .grid-layout-active .card-climate.card-presentation-compact .climate-target-value {
 
     margin-top: 0;
-    font-size: 19px;
+    font-size: 17px;
 
 }
 

@@ -384,15 +384,33 @@ light widgets require at least 2×1 cells in both profiles. Climate requires at
 least 2×1 in portrait and 3×1 in landscape. Backend validation and the Admin
 editor both enforce these limits.
 
-The legacy wall display calculates absolute percentage positions and fixed
-row heights from the validated raster. It deliberately uses neither CSS Grid
-nor arbitrary CSS strings. On rotation it reapplies the matching profile
-and its presentation mode without reloading dashboard data. Unchanged state
-refreshes reuse the cached presentation decision. Compact cards rearrange
-their content instead of globally scaling it; Light and Climate controls keep
-approximately 44-pixel touch targets. The container height is derived from
-the lowest occupied row. These rules remain compatible with Safari on iOS 9
-and ECMAScript 5.
+The legacy wall display calculates absolute percentage positions from the
+validated raster. Its row height is derived centrally from the real container
+width: `columnWidth = containerWidth / columns` and
+`rowHeight = max(round(columnWidth * 0.9), 128)`. The 20-pixel card gutter is
+subtracted when effective card width and height are calculated. It deliberately
+uses neither CSS Grid nor arbitrary CSS strings.
+
+On rotation or a relevant resize it reapplies the matching profile and derives
+the runtime presentation mode from widget type, `w`/`h`, and effective pixel
+width/height without reloading dashboard data. Unchanged state refreshes reuse
+the cached geometry and presentation decisions.
+
+Every compact card follows an identity contract. The visible one-line
+`card-identity` uses the configured widget title, then the configured short
+subtitle/room, then Home Assistant's `friendly_name`, and finally the entity ID.
+Sensor keeps value and identity, Binary keeps state and identity, Light keeps
+state, identity and control, and Climate keeps identity, current temperature,
+target temperature and both controls. Long identity text is ellipsized rather
+than hidden. Light and Climate controls retain approximately 44-pixel touch
+targets. These rules remain compatible with Safari on iOS 9 and ECMAScript 5.
+
+The wall display stores its Light/Dark choice under the existing
+`ha-legacy-theme` localStorage key. The external theme script applies the stored
+choice from the document head before the main UI starts, and safely falls back
+to Light when storage is unavailable. The same choice applies to `/`,
+`/d/:dashboardId`, `/system/summary`, and `/system/errors`; no inline script or
+relaxed Content Security Policy is required.
 
 The optional backend environment value `DASHBOARD_REFRESH_INTERVAL_MS`
 controls the automatic browser refresh between 3000 and 300000 milliseconds.

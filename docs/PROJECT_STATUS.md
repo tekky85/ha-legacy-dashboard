@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 11. August 2026, Sprint 19 implementiert
+Stand: 11. August 2026, Sprint 17.2 nach Sprint 19 implementiert
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -8,14 +8,16 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
-- Sprint-19-Ausgangscommit: `53ce672`
+- Sprint-17.2-Ausgangscommit: `8bf0a41`
 - Upstream vor Implementierung: `origin/main`
+- Sprint-19-Commit: `b4da718`
 - Sprint-18-Commit: `94ce1c0`
 - Sprint-17.1-Commit: `53ce672`
 
 Der Ausgangsarbeitsbaum war sauber und der vollständige Baseline-Testlauf
-bestand mit 99 von 99 Tests. Sprint 18 und Sprint 17.1 wurden im tatsächlichen
-Code geprüft, bevor Sprint 19 geändert wurde.
+bestand mit 108 von 108 Tests. Der tatsächliche Sprint-19-Code einschließlich
+Summary-Regeln, Schema 5, System-Snapshot, Admin-Einstellungen und
+Sicherheitsgrenzen wurde vor Sprint 17.2 geprüft.
 
 ## 2. Implementierte Sprints und Funktionen
 
@@ -30,6 +32,7 @@ Code geprüft, bevor Sprint 19 geändert wurde.
 | 18 | System Dashboard Foundation | umgesetzt |
 | 17.1 | 6/12-Raster und responsive Karteninhalte | umgesetzt |
 | 19 | Summary Dashboard MVP | umgesetzt |
+| 17.2 | Kartenidentität, proportionale Geometrie und Theme-Persistenz | umgesetzt |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -133,7 +136,7 @@ Rate Limit und atomare Persistenz.
 Die Systemansicht selbst fragt keine Entity-Inventar- oder HA-API direkt ab.
 Die Admin API bleibt standardmäßig deaktiviert.
 
-## 8. Legacy-Frontend
+## 8. Legacy-Frontend und Sprint 17.2
 
 Die Summary zeigt einen kompakten Aktivzähler und nur nichtleere
 Kategoriegruppen mit festem Inline-SVG, Titel, Kurzbeschreibung und Dauer.
@@ -141,10 +144,38 @@ Stale-, Offline- und Recovery-Hinweise bleiben sichtbar. Lange Namen werden
 ohne horizontales Überlaufen behandelt; Portrait und Landscape verwenden
 Flexbox und normale Blocklayouts.
 
+Alle Compact Cards besitzen nun eine sichtbare, einzeilige `card-identity`.
+Die Fallback-Reihenfolge ist: expliziter Widgettitel, konfigurierter
+Kurztext/Raum (`subtitle`), Home-Assistant-`friendly_name`, Entity-ID. Sensor
+behält Wert und Identität, Binary Zustand und Identität, Light Zustand,
+Identität und Control, Climate Identität, Ist, Soll sowie Minus und Plus.
+Lange Identitäten werden mit Ellipsis gekürzt und nicht pauschal versteckt.
+
+Die früheren starren Zeilenhöhen von 260px im Portrait und 240px im Landscape
+sind entfernt. Die zentrale Formel lautet:
+
+```text
+columnWidth = containerWidth / columns
+rowHeight = max(round(columnWidth * 0.9), 128)
+effectiveCardSize = rasterSize - 20px gutter
+```
+
+Presentation Modes berücksichtigen jetzt Widgettyp, `w`/`h` und die effektive
+Pixelbreite/-höhe. Geometrie und Presentation Mode werden pro Profil und
+relevanter Breite gecacht; State-Polls lösen keine unnötige Neuberechnung aus.
+Resize und Orientation Change wenden die passende Geometrie erneut an.
+
+Die bestehende Theme-Persistenz verwendet weiterhin ausschließlich den Key
+`ha-legacy-theme`. Das externe Theme-Skript läuft nun im Dokumentkopf und
+setzt die gespeicherte Klasse früh auf das Root-Element; nach Aufbau des Bodys
+werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
+`try/catch`. `/`, `/d/:dashboardId`, `/system/summary` und `/system/errors`
+übernehmen dieselbe Light-/Dark-Auswahl nach Reload. CSP wurde nicht gelockert.
+
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion ist 23.
+Assetversion ist 24.
 
 ## 9. Sicherheitsgrenzen
 
@@ -168,8 +199,11 @@ und werden weder an Wall-Display noch Summary ausgeliefert oder geloggt.
 | System-API | `src/routes/system-dashboards.js` |
 | Schema/Persistenz | `src/config/dashboard.js`, `src/services/dashboard-config-store.js` |
 | Legacy-Summary | `src/public/system.html`, `src/public/js/system/common.js`, `src/public/js/system/summary.js`, `src/public/css/system.css` |
+| Sprint-17.2-Layout | `src/public/js/core/layout.js`, `src/public/js/core/widget.js`, `src/public/css/style.css` |
+| Sprint-17.2-Widgets | `src/public/js/widgets/sensor.js`, `src/public/js/widgets/binary.js`, `src/public/js/widgets/light.js`, `src/public/js/widgets/climate.js` |
+| Theme | `src/public/js/core/theme.js`, `src/public/index.html`, `src/public/system.html` |
 | Admin-Einstellungen | `src/admin/index.html`, `src/admin/js/system-dashboards.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
-| Tests | `test/summary.test.js`, `test/system-foundation.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-ui.test.js` |
+| Tests | `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-ui.test.js` |
 
 ## 11. Tests
 
@@ -186,13 +220,23 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
 - Admin-Entwurf und geschützte Persistenz
 - unveränderte Write-Allowlists
 - ES5- und CSS-Verbote der Legacy-Oberfläche
+- Compact-Identity-Contract und vollständige Inhalte aller vier Widgets
+- proportionale, gutter-aware und gecachte Rastergeometrie
+- flächenabhängige Presentation Modes und Orientation Change
+- Dark-/Light-Persistenz, Reload und sichere Storage-Fehler
 - 1500 aktive Summary-Entities und 3000 normalisierte Entities
 
-Der abschließende lokale Lauf besteht mit 108 von 108 Tests. Alle
+Der abschließende lokale Lauf besteht mit 115 von 115 Tests. Alle
 JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
 `git diff --check` ist sauber. Die Browser-Abnahme bei 768×1024 und 1024×768
-zeigte keine horizontale Überbreite und keine Konsolenfehler. Die echte
-iOS-9-Abnahme erfolgt nach dem Produktions-Rollout auf dem iPad.
+prüfte die kleinsten erlaubten Sensor-, Binary-, Light- und Climate-Karten.
+Alle Identitäten und Pflichtinhalte waren sichtbar, alle Karten ohne
+horizontalen oder vertikalen Überlauf, die Seiten ohne horizontalen Überlauf
+und die Browserkonsole fehlerfrei. Rotation wechselte ohne Daten-Reload von
+Portrait zu Landscape. Dark und Light blieben jeweils nach Reload erhalten;
+Dark wurde außerdem auf `/d/esszimmer`, `/system/summary` und
+`/system/errors` bestätigt. Die echte Safari-iOS-9-Abnahme erfolgt nach dem
+Produktions-Rollout auf dem iPad.
 
 ## 12. Bekannte Einschränkungen und technischer Rest
 
@@ -203,17 +247,17 @@ iOS-9-Abnahme erfolgt nach dem Produktions-Rollout auf dem iPad.
   Ersteinrichtung kann daher eine kurze Admin-Auswahl erfordern.
 - Der Snapshot-Cache ist pro Node-Prozess und geht beim Neustart verloren.
 - Eine automatisierte echte Safari-iOS-9-Laufzeit steht nicht zur Verfügung;
-  ES5- und CSS-Regeln sind statisch und durch den vorhandenen iPad-Praxistest
-  abgesichert.
+  ES5-/CSS-Regeln und iPad-Abmessungen sind automatisiert geprüft, der reale
+  iPad-Praxistest bleibt nach dem Rollout erforderlich.
 
 ## 13. Roadmap-Abgleich und nächster Sprint
 
-Sprint 19 entspricht der Spezifikation: explizite read-only Aktivitätsregeln,
-stabile Kategorien/Prioritäten, reduzierte und privacy-sichere Payloads,
-persistente Ignorierliste, Admin-Bedienung über sanitisiertes Inventar,
-Legacy-Darstellung, Stale-Erhalt sowie Lasttests sind umgesetzt. Nicht
-vorgezogen wurden Error-Fachlogik, Registry-Anreicherung, weitere
-Schreibdomänen oder freie System-Dashboard-Layouts.
+Sprint 17.2 korrigiert ausschließlich die drei spezifizierten UX-Regressionen:
+Compact-Identität, proportionale Kartenhöhe und Theme-Persistenz. Sprint 19
+bleibt fachlich unverändert; ebenso Schema, Admin-Editor, Summary-/Error-
+Architektur, Drag/Resize und Write-Allowlists. Nicht vorgezogen wurden
+Error-Fachlogik, Registry-Anreicherung, weitere Schreibdomänen oder freie
+System-Dashboard-Layouts.
 
 Empfohlener nächster Schritt ist Sprint 20 – Error Dashboard MVP. Er soll auf
 demselben Snapshot und Cache Issues klassifizieren, ohne die Summary-Regeln

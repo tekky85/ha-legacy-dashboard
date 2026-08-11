@@ -84,7 +84,8 @@ test("Legacy-Raster wechselt bei Rotation zwischen Portrait und Landscape", func
     assert.match(container.className, /layout-portrait/);
     assert.equal(cards[0].style.left, "0%");
     assert.equal(cards[1].style.width, "calc(66.66666666666666% - 20px)");
-    assert.equal(container.style.height, "260px");
+    assert.equal(container.style.height, "128px");
+    assert.equal(cards[0].style.height, "108px");
 
     context.window.innerWidth = 1024;
     context.window.innerHeight = 768;
@@ -92,9 +93,9 @@ test("Legacy-Raster wechselt bei Rotation zwischen Portrait und Landscape", func
 
     assert.match(container.className, /layout-landscape/);
     assert.equal(cards[0].style.left, "16.666666666666664%");
-    assert.equal(cards[0].style.top, "240px");
-    assert.equal(cards[1].style.height, "460px");
-    assert.equal(container.style.height, "480px");
+    assert.equal(cards[0].style.top, "128px");
+    assert.equal(cards[1].style.height, "236px");
+    assert.equal(container.style.height, "256px");
 });
 
 
@@ -143,7 +144,7 @@ test("Legacy-Raster nutzt Größen-Presets als sicheren Profil-Fallback", functi
     context.LegacyLayout.apply(container);
 
     assert.equal(cards[0].style.width, "calc(50% - 20px)");
-    assert.equal(cards[1].style.height, "460px");
+    assert.equal(cards[1].style.height, "236px");
     assert.equal(cards[2].style.width, "calc(25% - 20px)");
     assert.equal(
         JSON.stringify(cards).indexOf("javascript"),
@@ -206,11 +207,12 @@ test("Presentation Modes folgen Typ und Geometrie und werden je Profil gecacht",
     context.window.innerHeight = 768;
     context.LegacyLayout.apply(container);
 
-    assert.match(cards[0].className, /card-presentation-normal/);
-    assert.match(cards[1].className, /card-presentation-normal/);
-    assert.match(cards[2].className, /card-presentation-normal/);
+    assert.match(cards[0].className, /card-presentation-compact/);
+    assert.match(cards[1].className, /card-presentation-compact/);
+    assert.match(cards[2].className, /card-presentation-compact/);
     assert.match(cards[3].className, /card-presentation-expanded/);
     assert.equal(context.LegacyLayout.getPresentationComputationCount(), 8);
+    assert.equal(context.LegacyLayout.getGeometryComputationCount(), 2);
 });
 
 
@@ -245,12 +247,21 @@ test("kompakte Widget-CSS erhält Kerninformationen und Touchziele", function ()
     assert.match(css, /card-presentation-normal|card-presentation-expanded/);
     assert.match(css, /\.climate-control\s*\{[\s\S]*?width:\s*44px;[\s\S]*?height:\s*44px;/);
     assert.match(css, /text-overflow:\s*ellipsis/);
+    assert.match(css, /\.card-identity/);
+    assert.doesNotMatch(
+        css,
+        /card-identity[^}]*display:\s*none/
+    );
     assert.match(sensor, /card-sensor/);
+    assert.match(sensor, /card-identity/);
     assert.match(sensor, /value/);
     assert.match(binary, /card-binary/);
+    assert.match(binary, /card-identity/);
     assert.match(binary, /status/);
     assert.match(light, /light-control/);
+    assert.match(light, /card-identity/);
     assert.match(climate, /climate-current-value/);
+    assert.match(climate, /card-identity/);
     assert.match(climate, /climate-target-value/);
     assert.match(climate, /data-direction="-1"/);
     assert.match(climate, /data-direction="1"/);
