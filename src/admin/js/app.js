@@ -5,8 +5,10 @@
     let pendingEntity = null;
     let entityLoadError = "";
     let activeLayoutProfile = "portrait";
+    let previewTheme = "light";
     let layoutDragState = null;
     let layoutResizeState = null;
+    let previewRefreshTimer = null;
 
     function byId(id) {
         return document.getElementById(id);
@@ -277,10 +279,128 @@
         return button;
     }
 
+    function previewPowerButton(label) {
+        const button = createElement(
+            "button",
+            "admin-preview-power",
+            ""
+        );
+        button.type = "button";
+        button.disabled = true;
+        button.setAttribute("aria-label", label);
+        button.innerHTML =
+            '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+                '<path d="M12 2v10"></path>' +
+                '<path d="M6.3 5.7a8 8 0 1 0 11.4 0"></path>' +
+            '</svg>';
+        return button;
+    }
+
+    function previewGeometry(profileName, item) {
+        const canvasWidth = profileName === "portrait" ? 768 : 1024;
+        const columns = admin.Layout.COLUMNS[profileName];
+        const geometry = LegacyPresentation.calculateGridGeometry(
+            canvasWidth,
+            columns
+        );
+
+        return {
+            width: Math.max(0, item.w * geometry.columnWidth - geometry.gutter),
+            height: Math.max(0, item.h * geometry.rowHeight - geometry.gutter)
+        };
+    }
+
+    function renderLivePreview(widget, item, profileName) {
+        const entity = admin.State.getPreviewEntity(widget.entity) || {
+            entity_id: widget.entity,
+            state: "unavailable"
+        };
+        const geometry = previewGeometry(profileName, item);
+        const mode = LegacyPresentation.getMode(
+            widget,
+            item.w,
+            item.h,
+            geometry.width,
+            geometry.height
+        );
+        const card = createElement(
+            "div",
+            "layout-card-preview admin-preview-" + widget.type +
+                " admin-preview-" + mode
+        );
+        const header = createElement("div", "admin-preview-header");
+        const icon = createElement("span", "admin-preview-icon");
+        const identity = createElement(
+            "strong",
+            "admin-preview-identity",
+            LegacyPresentation.getIdentity(widget, entity)
+        );
+        const content = createElement("div", "admin-preview-content");
+        const controls = createElement("div", "admin-preview-controls");
+        const modeLabel = createElement(
+            "span",
+            "admin-preview-mode",
+            mode + " · " + item.w + "×" + item.h
+        );
+        const state = entity.state || "unknown";
+
+        card.dataset.previewWidgetId = widget.id;
+        icon.innerHTML = LegacyIcons.get(widget.icon);
+        header.appendChild(icon);
+        header.appendChild(identity);
+        header.appendChild(modeLabel);
+        card.appendChild(header);
+
+        if (widget.type === "sensor") {
+            content.textContent =
+                state === "unknown" || state === "unavailable"
+                    ? "Nicht verfügbar"
+                    : state + (entity.unit_of_measurement || widget.unit
+                        ? " " + (entity.unit_of_measurement || widget.unit)
+                        : "");
+        } else if (widget.type === "binary") {
+            content.textContent = state === "on"
+                ? "Offen"
+                : state === "off"
+                    ? "Geschlossen"
+                    : "Nicht verfügbar";
+        } else if (widget.type === "light") {
+            content.textContent = state === "on"
+                ? "An"
+                : state === "off"
+                    ? "Aus"
+                    : "Nicht verfügbar";
+            controls.appendChild(previewPowerButton("Light-Vorschau"));
+        } else if (widget.type === "climate") {
+            const current = entity.current_temperature;
+            const target = entity.target_temperature;
+            content.textContent =
+                (current === null || typeof current === "undefined" ? "–" : current) +
+                "° → " +
+                (target === null || typeof target === "undefined" ? "–" : target) +
+                "°";
+            controls.appendChild(createElement("button", "admin-preview-step", "−"));
+            controls.appendChild(createElement("button", "admin-preview-step", "+"));
+            controls.appendChild(previewPowerButton("Climate-Vorschau"));
+            Array.prototype.forEach.call(
+                controls.getElementsByTagName("button"),
+                function (button) {
+                    button.type = "button";
+                    button.disabled = true;
+                }
+            );
+        }
+
+        card.appendChild(content);
+        if (controls.childNodes.length) {
+            card.appendChild(controls);
+        }
+        return card;
+    }
+
     function renderLayoutTile(dashboard, widget, profileName) {
         const item = dashboard.layouts[profileName].items[widget.id];
         const tile = createElement("article", "layout-tile");
-        const title = createElement("strong", "layout-tile-title", widget.title);
         const meta = createElement(
             "span",
             "layout-tile-meta",
@@ -292,7 +412,9 @@
         tile.dataset.layoutWidgetId = widget.id;
         tile.style.gridColumn = (item.x + 1) + " / span " + item.w;
         tile.style.gridRow = (item.y + 1) + " / span " + item.h;
-        tile.appendChild(title);
+        tile.appendChild(
+            renderLivePreview(widget, item, profileName)
+        );
         tile.appendChild(meta);
 
         controls.appendChild(layoutButton("←", "layout-left", widget.id, widget.title + " nach links"));
@@ -321,6 +443,7 @@
         const heading = createElement("div", "layout-heading");
         const headingText = createElement("div");
         const tabs = createElement("div", "layout-profile-tabs");
+        const themeTabs = createElement("div", "layout-theme-tabs");
         const grid = createElement("div", "layout-editor-grid");
         const profileName = activeLayoutProfile;
         const columns = admin.Layout.COLUMNS[profileName];
@@ -351,9 +474,28 @@
         });
 
         heading.appendChild(headingText);
-        heading.appendChild(tabs);
+        [
+            {id: "light", label: "Hell"},
+            {id: "dark", label: "Dunkel"}
+        ].forEach(function (theme) {
+            const button = createButton(
+                theme.label,
+                "preview-theme",
+                theme.id,
+                theme.id === previewTheme
+                    ? "button primary compact"
+                    : "button secondary compact"
+            );
+            button.setAttribute("aria-pressed", theme.id === previewTheme ? "true" : "false");
+            themeTabs.appendChild(button);
+        });
+        const viewControls = createElement("div", "layout-view-controls");
+        viewControls.appendChild(tabs);
+        viewControls.appendChild(themeTabs);
+        heading.appendChild(viewControls);
         section.appendChild(heading);
 
+        grid.classList.add("preview-theme-" + previewTheme);
         grid.dataset.layoutGrid = profileName;
         grid.dataset.rowHeight = "194";
         grid.style.setProperty("--layout-columns", String(columns));
@@ -795,20 +937,52 @@
         });
     }
 
+    function refreshVisiblePreviews() {
+        const dashboard = admin.State.getSelectedDashboard();
+
+        if (!dashboard || layoutDragState || layoutResizeState) {
+            return;
+        }
+
+        elements.dashboardEditor
+            .querySelectorAll("[data-layout-widget-id]")
+            .forEach(function (tile) {
+                const widget = dashboard.widgets.find(function (item) {
+                    return item.id === tile.dataset.layoutWidgetId;
+                });
+                const layoutItem = dashboard.layouts[activeLayoutProfile]
+                    .items[tile.dataset.layoutWidgetId];
+                const current = tile.querySelector(".layout-card-preview");
+
+                if (widget && layoutItem && current) {
+                    tile.replaceChild(
+                        renderLivePreview(widget, layoutItem, activeLayoutProfile),
+                        current
+                    );
+                }
+            });
+    }
+
     async function loadEntities() {
         entityLoadError = "";
 
         try {
-            const result = await admin.Api.getEntities();
+            const result = await admin.Api.getPreview();
             admin.State.setEntities(result.entities || []);
+            admin.State.setPreviewEntities(result.entities || []);
         } catch (error) {
             if (error.status === 401 || error.status === 403) {
+                if (previewRefreshTimer !== null) {
+                    window.clearInterval(previewRefreshTimer);
+                    previewRefreshTimer = null;
+                }
                 admin.Auth.clearToken();
                 showLogin(errorMessage(error));
                 return;
             }
             entityLoadError = errorMessage(error);
             admin.State.setEntities([]);
+            admin.State.setPreviewEntities([]);
         }
     }
 
@@ -819,6 +993,20 @@
         renderAll();
         await loadEntities();
         renderSummarySettings();
+        renderErrorSettings();
+        refreshVisiblePreviews();
+
+        if (previewRefreshTimer !== null) {
+            window.clearInterval(previewRefreshTimer);
+        }
+
+        previewRefreshTimer = window.setInterval(
+            async function () {
+                await loadEntities();
+                refreshVisiblePreviews();
+            },
+            15000
+        );
     }
 
     async function handleLogin(event) {
@@ -925,6 +1113,11 @@
             if (button.dataset.action === "layout-profile") {
                 activeLayoutProfile = button.dataset.id;
                 renderEditor();
+            } else if (button.dataset.action === "preview-theme") {
+                previewTheme = button.dataset.id === "dark"
+                    ? "dark"
+                    : "light";
+                renderEditor();
             } else if (button.dataset.action.indexOf("layout-") === 0) {
                 let changed = false;
 
@@ -1020,7 +1213,7 @@
         };
     }
 
-    function showLayoutPreview(grid, candidate, valid) {
+    function showLayoutPreview(grid, candidate, valid, widget) {
         const preview = grid.querySelector(".layout-preview");
         const previewWidth = Math.max(1, candidate.w);
         const previewHeight = Math.max(1, candidate.h);
@@ -1030,6 +1223,12 @@
             : "layout-preview is-invalid";
         preview.style.gridColumn = (candidate.x + 1) + " / span " + previewWidth;
         preview.style.gridRow = (candidate.y + 1) + " / span " + previewHeight;
+        preview.textContent = "";
+        if (widget) {
+            preview.appendChild(
+                renderLivePreview(widget, candidate, activeLayoutProfile)
+            );
+        }
     }
 
     function hideLayoutPreview(grid) {
@@ -1125,7 +1324,10 @@
                 state.widgetId,
                 activeLayoutProfile,
                 candidate
-            )
+            ),
+            dashboard.widgets.find(function (widget) {
+                return widget.id === state.widgetId;
+            })
         );
     }
 
@@ -1292,6 +1494,10 @@
     function bindEvents() {
         elements.loginForm.addEventListener("submit", handleLogin);
         elements.logoutButton.addEventListener("click", function () {
+            if (previewRefreshTimer !== null) {
+                window.clearInterval(previewRefreshTimer);
+                previewRefreshTimer = null;
+            }
             admin.Auth.clearToken();
             admin.State.clear();
             hideNotice();

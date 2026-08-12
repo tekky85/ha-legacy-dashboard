@@ -1065,6 +1065,62 @@ test(
                     -1
                 );
 
+                const preview = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/admin/preview",
+                    undefined,
+                    auth
+                );
+
+                assert.equal(preview.status, 200);
+                assert.equal(preview.json.entities.length, 2);
+                const sensorPreview =
+                    preview.json.entities.find(function (entity) {
+                        return entity.entity_id ===
+                            "sensor.office_temperature";
+                    });
+                const lightPreview =
+                    preview.json.entities.find(function (entity) {
+                        return entity.entity_id === "light.office";
+                    });
+                assert.equal(
+                    sensorPreview.state,
+                    "21.5"
+                );
+                assert.equal(
+                    sensorPreview.friendly_name,
+                    "Bürotemperatur"
+                );
+                assert.equal(
+                    lightPreview.current_temperature,
+                    null
+                );
+                assert.equal(
+                    lightPreview.target_temperature,
+                    null
+                );
+                assert.equal(
+                    JSON.stringify(preview.json).indexOf("must-not-leak"),
+                    -1
+                );
+                assert.equal(
+                    JSON.stringify(preview.json).indexOf("latitude"),
+                    -1
+                );
+                assert.equal(
+                    JSON.stringify(preview.json).indexOf("ALLOWED_"),
+                    -1
+                );
+                assert.equal(
+                    JSON.stringify(preview.json).indexOf(FAKE_HA_TOKEN),
+                    -1
+                );
+                assert.equal(
+                    JSON.stringify(preview.json).indexOf(FAKE_ADMIN_TOKEN),
+                    -1
+                );
+
                 const defaultDelete = await request(
                     gateway.port,
                     "DELETE",

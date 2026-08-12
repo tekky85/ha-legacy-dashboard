@@ -87,13 +87,22 @@ LightWidget.prototype.render =
                 : "neutral";
 
 
-        var disabled =
+        var capabilities =
 
-            available
+            data && data.gateway_capabilities
 
-                ? ""
+                ? data.gateway_capabilities
 
-                : ' disabled="disabled"';
+                : {};
+
+
+        var canControl =
+
+            isOn
+
+                ? capabilities.can_light_power_off === true
+
+                : capabilities.can_light_power_on === true;
 
 
         return "" +
@@ -137,88 +146,14 @@ LightWidget.prototype.render =
                 '</div>' +
 
 
-                '<button ' +
-
-                    'type="button" ' +
-
-                    'class="light-control is-' +
-
-                        Legacy.html.escape(
-                            stateClass
-                        ) +
-
-                    '" ' +
-
-                    'data-entity="' +
-
-                        Legacy.html.escape(
-                            this.entity
-                        ) +
-
-                    '" ' +
-
-                    'data-state="' +
-
-                        Legacy.html.escape(
-                            state
-                        ) +
-
-                    '" ' +
-
-                    'data-available="' +
-
-                        (
-                            available
-
-                                ? "true"
-
-                                : "false"
-                        ) +
-
-                    '" ' +
-
-                    'aria-pressed="' +
-
-                        (
-                            isOn
-
-                                ? "true"
-
-                                : "false"
-                        ) +
-
-                    '" ' +
-
-                    'aria-label="' +
-
-                        Legacy.html.escape(
-                            controlText
-                        ) +
-
-                    '"' +
-
-                    disabled +
-
-                '>' +
-
-
-                    '<span class="light-control-track">' +
-
-                        '<span class="light-control-knob"></span>' +
-
-                    '</span>' +
-
-
-                    '<span class="light-control-label">' +
-
-                        Legacy.html.escape(
-                            controlText
-                        ) +
-
-                    '</span>' +
-
-
-                '</button>' +
+                LegacyControls.powerButton({
+                    className: "light-control",
+                    entity: this.entity,
+                    state: state,
+                    available: available && canControl,
+                    disabled: !canControl,
+                    label: controlText
+                }) +
 
 
                 '<div class="title card-identity">' +

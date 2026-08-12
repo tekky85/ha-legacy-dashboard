@@ -86,6 +86,13 @@ Widget.prototype.getLayoutAttribute = function () {
 
 Widget.prototype.getCardIdentity = function (data) {
 
+    if (typeof LegacyPresentation !== "undefined") {
+        return LegacyPresentation.getIdentity(
+            this,
+            data
+        );
+    }
+
     var attributes =
         data && data.attributes
             ? data.attributes

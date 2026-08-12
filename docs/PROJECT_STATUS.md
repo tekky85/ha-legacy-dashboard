@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 11. August 2026, Sprint 20 implementiert
+Stand: 12. August 2026, Sprint 17.3 implementiert
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -8,16 +8,18 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
-- Sprint-20-Ausgangscommit: `62c823c`
+- Sprint-17.3-Ausgangscommit: `11ff013`
 - Upstream vor Implementierung: `origin/main`
+- Sprint-20-Feature-Commit: `fe38e60`
 - Sprint-19-Commit: `b4da718`
 - Sprint-18-Commit: `94ce1c0`
 - Sprint-17.1-Commit: `53ce672`
 
-Der Ausgangsarbeitsbaum war sauber und der vollständige Baseline-Testlauf
-bestand mit 115 von 115 Tests. Die tatsächlichen Sprint-17.2-, Sprint-18- und
-Sprint-19-Implementierungen einschließlich Layout-/Theme-Korrekturen,
-System-Snapshot, Cache und Summary wurden vor Sprint 20 geprüft.
+Der tatsächliche Sprint-20-Stand einschließlich Summary-/Error-APIs,
+System-Snapshot, Cache, Layout-/Theme-Korrekturen und produktiver Assetversion
+26 wurde vor Sprint 17.3 geprüft. Im Arbeitsbaum lag bereits eine begonnene,
+noch nicht committete Sprint-17.3-Implementierung; sie wurde vollständig gegen
+die Spezifikation geprüft, korrigiert und vervollständigt.
 
 ## 2. Implementierte Sprints und Funktionen
 
@@ -34,6 +36,7 @@ System-Snapshot, Cache und Summary wurden vor Sprint 20 geprüft.
 | 19 | Summary Dashboard MVP | umgesetzt |
 | 17.2 | Kartenidentität, proportionale Geometrie und Theme-Persistenz | umgesetzt |
 | 20 | Error Dashboard MVP | umgesetzt |
+| 17.3 | Live Card Preview, Unified Controls und Focus Mode | umgesetzt |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -217,20 +220,63 @@ werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion ist 26.
+Assetversion ist 28.
+
+## 8a. Sprint 17.3 – Preview, Controls und Focus
+
+Der Admin-Layouteditor lädt alle aktuellen Preview-Zustände gebündelt über
+`GET /api/admin/preview`. Der Endpunkt ist durch dieselbe standardmäßig
+deaktivierte Bearer-Authentifizierung wie die übrige Admin API geschützt und
+liefert ausschließlich Entity-ID, Domain, Friendly Name, Device Class,
+Einheit, State sowie die wenigen normalisierten Climate-Werte. Rohattribute,
+Tokens, Dienste und Write-Allowlists fehlen. Der Editor aktualisiert die Daten
+alle 15 Sekunden; Drag und Resize rendern lokal und erzeugen keine HA-Abfrage
+pro Frame. Controls in der Preview sind immer deaktiviert.
+
+`src/public/js/core/presentation.js` enthält die gemeinsamen reinen Regeln für
+Identität, Rastergeometrie und Presentation Mode. Admin und Legacy verwenden
+diese Regeln; eine große Renderer-Neuschreibung war nicht nötig. Der Editor
+zeigt Sensor, Binary, Light und Climate mit aktuellem Inhalt und unterstützt
+Portrait/Landscape sowie eine unabhängige Hell-/Dunkel-Vorschau.
+
+Light verwendet jetzt den gemeinsamen dashboard-eigenen Power-Button aus
+`src/public/js/controls/power.js`; Markup und CSS des alten iOS-Switches werden
+nicht mehr verwendet. Climate erhält denselben Power-Button zusätzlich zu
+Minus/Plus. Der enge Endpunkt `POST /api/climate/power` akzeptiert nur eine
+allowlist-geprüfte Climate-Entity und den Intent `on` oder `off`. Ausschalten
+ruft intern ausschließlich `climate.set_hvac_mode` mit `off` auf. Einschalten
+ist nur möglich, wenn genau ein Nicht-Off-Modus existiert oder für die bereits
+freigegebene Esszimmer-Entity der explizite Modus `heat` in den gemeldeten
+Modi enthalten ist. Capability-Flags werden ausschließlich serverseitig aus
+dem aktuellen HA-State erzeugt. Das Write-Rate-Limit greift vor dem HA-Zugriff.
+
+Ein Tap auf eine nicht interaktive Card-Fläche öffnet genau eine temporäre
+Focus Card als `position: fixed`-Overlay. Sie klont die bereits gerenderte
+Card, verwendet dadurch dieselben aktuellen Daten und startet keine zweite
+Pollingpipeline. Close-Button und Tap auf den Hintergrund schließen; das
+persistente Grid bleibt unverändert. Button-Taps stoppen die Weiterleitung und
+öffnen Focus nicht zusätzlich. Bei stale, offline, `unknown` oder
+`unavailable` werden die Controls deaktiviert.
+
+Compact Climate zeigt entsprechend dem Sprint-17.3-Contract Identität,
+Isttemperatur und – sofern sicher erlaubt – Power. Solltemperatur und Stepper
+bleiben in Normal/Expanded sowie vollständig im Focus sichtbar; so ragen die
+44-Pixel-Controls auch im kleinsten 3×1-Landscape-Layout nicht aus der Card.
 
 ## 9. Sicherheitsgrenzen
 
-Sprint 20 ist vollständig read-only. Es wurden keine HA-Services, Schreib-
-Endpoints oder automatischen Berechtigungen ergänzt. Die bestehenden
-Write-Allowlists in `src/routes/api.js` bleiben getrennt:
+Sprint 17.3 ergänzt als einzige Schreibfunktion den engen Climate-Power-Pfad;
+es gibt weiterhin keinen generischen Service-Proxy und keine automatische
+Berechtigung. Die bestehenden Write-Allowlists in `src/routes/api.js` bleiben
+getrennt und inhaltlich unverändert:
 
 - Climate: `climate.esszimmer_thermostate`
 - Light: `light.esszimmer_lampen`
 
-Summary-/Error-Erkennung, Security-/Ignorierlisten, Dashboard-Sichtbarkeit und Admin-Inventar
-erteilen keinerlei Schreibrecht. HA-Token und Admin-Token bleiben serverseitig
-und werden weder an Wall-Display noch Summary ausgeliefert oder geloggt.
+Summary-/Error-Erkennung, Security-/Ignorierlisten, Dashboard-Sichtbarkeit,
+Admin-Inventar, Preview und Focus erteilen keinerlei Schreibrecht. HA-Token
+und Admin-Token bleiben serverseitig und werden weder an Wall-Display noch
+Systemansichten ausgeliefert oder geloggt.
 
 ## 10. Relevante Dateien
 
@@ -243,9 +289,13 @@ und werden weder an Wall-Display noch Summary ausgeliefert oder geloggt.
 | Legacy-Systemansichten | `src/public/system.html`, `src/public/js/system/common.js`, `src/public/js/system/summary.js`, `src/public/js/system/errors.js`, `src/public/css/system.css` |
 | Sprint-17.2-Layout | `src/public/js/core/layout.js`, `src/public/js/core/widget.js`, `src/public/css/style.css` |
 | Sprint-17.2-Widgets | `src/public/js/widgets/sensor.js`, `src/public/js/widgets/binary.js`, `src/public/js/widgets/light.js`, `src/public/js/widgets/climate.js` |
+| Gemeinsame Presentation-Regeln | `src/public/js/core/presentation.js`, `src/public/js/core/layout.js`, `src/public/js/core/widget.js` |
+| Unified Controls und Focus | `src/public/js/controls/power.js`, `src/public/js/focus/focus.js`, `src/public/js/app.js`, `src/public/css/style.css` |
+| Climate Power | `src/services/climate-power.js`, `src/routes/api.js` |
+| Admin Live Preview | `src/routes/admin.js`, `src/admin/js/api.js`, `src/admin/js/state.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
 | Theme | `src/public/js/core/theme.js`, `src/public/index.html`, `src/public/system.html` |
 | Admin-Einstellungen | `src/admin/index.html`, `src/admin/js/system-dashboards.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
-| Tests | `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
+| Tests | `test/sprint-17-3.test.js`, `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
 
 ## 11. Tests
 
@@ -270,9 +320,16 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
 - proportionale, gutter-aware und gecachte Rastergeometrie
 - flächenabhängige Presentation Modes und Orientation Change
 - Dark-/Light-Persistenz, Reload und sichere Storage-Fehler
+- sanitisierte Admin-Batch-Preview ohne Tokens, Rohattribute oder Allowlists
+- gemeinsame Presentation-Regeln für Admin und Legacy
+- deaktivierte Preview-Controls und Focus ohne zusätzliche Pollingpipeline
+- dashboard-native Light Controls einschließlich Busy/Unavailable
+- Climate Power On/Off, Allowlist, Domain, State, HA-Fehler und Rate Limit
+- eindeutiger beziehungsweise explizit konfigurierter Power-On-Modus
+- Focus-Overlay, einzelner Focus und getrennte Card-/Control-Events
 - 1000-Entity-Issue-Lauf, 1500 aktive Summary-Entities und 3000 normalisierte Entities
 
-Der abschließende lokale Lauf besteht mit 127 von 127 Tests. Alle
+Der abschließende lokale Lauf besteht mit 135 von 135 Tests. Alle
 JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
 `git diff --check` ist sauber. Die Browser-Abnahme bei 768×1024 und 1024×768
 prüfte die kleinsten erlaubten Sensor-, Binary-, Light- und Climate-Karten.
@@ -297,14 +354,19 @@ Produktions-Rollout auf dem iPad.
 - Eine automatisierte echte Safari-iOS-9-Laufzeit steht nicht zur Verfügung;
   ES5-/CSS-Regeln und iPad-Abmessungen sind automatisiert geprüft, der reale
   iPad-Praxistest bleibt nach dem Rollout erforderlich.
+- Die Admin-Preview teilt Presentation-Regeln und Inhalte mit dem Wall-Display,
+  verwendet aber bewusst keinen vollständigen zweiten Legacy-DOM-Renderer.
+- Focus ist temporär und wird weder in der Dashboardkonfiguration noch im
+  Browser gespeichert.
 
 ## 13. Roadmap-Abgleich und nächster Sprint
 
-Sprint 20 füllt ausschließlich die vorhandene Issue Engine und erweitert die
-versionierte System-Dashboard-Konfiguration. Summary-Regeln, Drag/Resize,
-Theme und Write-Allowlists bleiben unverändert. Nicht vorgezogen wurden
-Registry-/Repairs-Daten, Grace Periods, Historie, weitere Schreibdomänen oder
-freie System-Dashboard-Layouts.
+Sprint 17.3 verändert weder Summary- noch Error-Fachlogik. Drag/Resize und die
+persistierte Rastergeometrie bleiben bestehen; Preview und Focus sind reine
+Darstellungszustände. Als einzige neue Write-Operation ist Climate Power eng
+auf die bereits vorhandene Climate-Allowlist und serverseitig bestimmte HVAC-
+Modi begrenzt. Nicht vorgezogen wurden Registry-/Repairs-Daten, Grace Periods,
+Historie, weitere Schreibdomänen oder freie System-Dashboard-Layouts.
 
 Empfohlener nächster Schritt ist Sprint 21 – Registry & Diagnostic Enrichment.
 Er beginnt mit einer Capability-Prüfung der tatsächlich eingesetzten Home-

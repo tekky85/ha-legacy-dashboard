@@ -46,7 +46,9 @@ function createWidgetContext() {
     });
 
     [
+        "src/public/js/core/presentation.js",
         "src/public/js/core/widget.js",
+        "src/public/js/controls/power.js",
         "src/public/js/widgets/sensor.js",
         "src/public/js/widgets/binary.js",
         "src/public/js/widgets/light.js",
@@ -95,7 +97,14 @@ test("Compact-Widgets behalten Identität und ihren primären Inhalt", function 
         attributes: {unit_of_measurement: "°C"}
     });
     const binaryHtml = binary.render({state: "on", attributes: {}});
-    const lightHtml = light.render({state: "on", attributes: {}});
+    const lightHtml = light.render({
+        state: "on",
+        attributes: {},
+        gateway_capabilities: {
+            can_light_power_on: true,
+            can_light_power_off: true
+        }
+    });
     const climateHtml = climate.render({
         state: "heat",
         attributes: {
@@ -105,6 +114,11 @@ test("Compact-Widgets behalten Identität und ihren primären Inhalt", function 
             max_temp: 35,
             target_temp_step: 0.5,
             hvac_action: "heating"
+        },
+        gateway_capabilities: {
+            can_set_temperature: true,
+            can_power_on: false,
+            can_power_off: true
         }
     });
 
@@ -114,7 +128,7 @@ test("Compact-Widgets behalten Identität und ihren primären Inhalt", function 
     assert.match(binaryHtml, /Offen/);
     assert.match(lightHtml, /card-identity[^>]*>Esszimmer</);
     assert.match(lightHtml, />An</);
-    assert.match(lightHtml, /class="light-control/);
+    assert.match(lightHtml, /class="dashboard-power-control light-control/);
     assert.match(climateHtml, /card-identity[^>]*>Heizung</);
     assert.match(climateHtml, /climate-current-value[^>]*>21\.8</);
     assert.match(climateHtml, /climate-target-value[^>]*>22\.5/);
@@ -381,12 +395,12 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
     const systemHtml = read("src/public/system.html");
 
     assert.ok(
-        indexHtml.indexOf("/js/core/theme.js?v=26") <
-            indexHtml.indexOf("/css/style.css?v=26")
+        indexHtml.indexOf("/js/core/theme.js?v=28") <
+            indexHtml.indexOf("/css/style.css?v=28")
     );
     assert.ok(
-        systemHtml.indexOf("/js/core/theme.js?v=26") <
-            systemHtml.indexOf("/css/style.css?v=26")
+        systemHtml.indexOf("/js/core/theme.js?v=28") <
+            systemHtml.indexOf("/css/style.css?v=28")
     );
     assert.equal(
         (indexHtml.match(/\/js\/core\/theme\.js/g) || []).length,
@@ -396,7 +410,7 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
         (systemHtml.match(/\/js\/core\/theme\.js/g) || []).length,
         1
     );
-    assert.match(indexHtml, /\/js\/app\.js\?v=26/);
-    assert.match(systemHtml, /\/js\/system\/summary\.js\?v=26/);
-    assert.match(systemHtml, /\/js\/system\/errors\.js\?v=26/);
+    assert.match(indexHtml, /\/js\/app\.js\?v=28/);
+    assert.match(systemHtml, /\/js\/system\/summary\.js\?v=28/);
+    assert.match(systemHtml, /\/js\/system\/errors\.js\?v=28/);
 });

@@ -110,6 +110,9 @@ var climateUpdateDelay =
 var lightRequestActive =
     false;
 
+var climatePowerRequestActive =
+    false;
+
 var pendingLightUpdate =
     null;
 
@@ -625,6 +628,11 @@ function updateClimateTargetDisplay(
 
         "<small>°C</small>";
 
+
+    if (typeof LegacyFocus !== "undefined") {
+        LegacyFocus.refresh();
+    }
+
 }
 
 /* =========================================================
@@ -939,7 +947,8 @@ function setClimateTemperature(
 
     if (
 
-        button.disabled
+        button.disabled ||
+        climatePowerRequestActive
 
     ) {
 
@@ -1094,7 +1103,9 @@ function dashboardControlUpdateInProgress() {
 
         climateUpdateInProgress() ||
 
-        lightUpdateInProgress()
+        lightUpdateInProgress() ||
+
+        climatePowerRequestActive
 
     );
 
@@ -1220,7 +1231,7 @@ function updateLightDisplay(
         );
 
         buttons[index].className =
-            "light-control is-" +
+            "dashboard-power-control light-control is-" +
             stateClass;
 
         buttons[index].disabled =
@@ -1296,7 +1307,7 @@ function updateLightDisplay(
     label =
 
         card.getElementsByClassName(
-            "light-control-label"
+            "dashboard-power-label"
         )[0];
 
 
@@ -1330,6 +1341,11 @@ function updateLightDisplay(
                 controlText
             );
 
+    }
+
+
+    if (typeof LegacyFocus !== "undefined") {
+        LegacyFocus.refresh();
     }
 
 }
@@ -1603,125 +1619,183 @@ function setLightState(button) {
 
 
 /* =========================================================
-   EVENT DELEGATION
+   CLIMATE POWER AND FOCUS INTERACTIONS
    ========================================================= */
 
-var dashboardElement =
+function setClimatePowerState(button) {
 
-    Legacy.dom.byId(
-        "dashboard"
+    var status = Legacy.dom.byId("updated");
+    var entityId = button.getAttribute("data-entity");
+    var currentState = button.getAttribute("data-state");
+    var available =
+        button.getAttribute("data-available") === "true";
+    var nextState;
+    var buttons;
+    var index;
+
+
+    if (
+        climatePowerRequestActive ||
+        climateUpdateInProgress() ||
+        button.disabled ||
+        !available ||
+        !entityId ||
+        (currentState !== "on" && currentState !== "off")
+    ) {
+        return;
+    }
+
+    nextState = currentState === "on" ? "off" : "on";
+    climatePowerRequestActive = true;
+    dashboardRefreshBlockedUntil =
+        new Date().getTime() + 3000;
+
+    buttons = document.getElementsByClassName(
+        "climate-power-control"
     );
 
+    for (index = 0; index < buttons.length; index++) {
+        if (buttons[index].getAttribute("data-entity") === entityId) {
+            buttons[index].disabled = true;
+            addClass(buttons[index], "is-busy");
+        }
+    }
 
-if (dashboardElement) {
+    if (status) {
+        status.innerHTML = nextState === "on"
+            ? "Thermostat wird eingeschaltet …"
+            : "Thermostat wird ausgeschaltet …";
+    }
 
-    dashboardElement.onclick =
+    Legacy.http.post(
+        "/api/climate/power",
+        {
+            entity: entityId,
+            state: nextState
+        },
+        function () {
+            climatePowerRequestActive = false;
+            dashboardRefreshBlockedUntil =
+                new Date().getTime() + 1200;
 
-        function (event) {
-
-            var currentElement;
-
-            event =
-                event || window.event;
-
-            currentElement =
-
-                event.target ||
-                event.srcElement;
-
-
-            while (
-
-                currentElement &&
-
-                currentElement !==
-                    dashboardElement
-
-            ) {
-
-                if (
-
-                    currentElement.tagName &&
-
-                    currentElement.tagName
-                        .toLowerCase() ===
-                            "button" &&
-
-                    hasClass(
-
-                        currentElement,
-
-                        "light-control"
-
-                    )
-
-                ) {
-
-                    if (
-                        event.preventDefault
-                    ) {
-
-                        event.preventDefault();
-
-                    }
-
-                    setLightState(
-
-                        currentElement
-
-                    );
-
-                    return;
-
-                }
-
-
-                if (
-
-                    currentElement.tagName &&
-
-                    currentElement.tagName
-                        .toLowerCase() ===
-                            "button" &&
-
-                    hasClass(
-
-                        currentElement,
-
-                        "climate-control"
-
-                    )
-
-                ) {
-
-                    if (
-                        event.preventDefault
-                    ) {
-
-                        event.preventDefault();
-
-                    }
-
-                    setClimateTemperature(
-
-                        currentElement
-
-                    );
-
-                    return;
-
-                }
-
-
-                currentElement =
-
-                    currentElement
-                        .parentNode;
-
+            if (status) {
+                status.innerHTML = nextState === "on"
+                    ? "Thermostat wurde eingeschaltet"
+                    : "Thermostat wurde ausgeschaltet";
             }
 
-        };
+            window.setTimeout(loadDashboard, 1200);
+        },
+        function (error) {
+            climatePowerRequestActive = false;
+            dashboardRefreshBlockedUntil =
+                new Date().getTime() + 1000;
 
+            if (status) {
+                status.innerHTML =
+                    "Fehler: " +
+                    (error && error.message
+                        ? error.message
+                        : "Befehl fehlgeschlagen");
+            }
+
+            window.setTimeout(loadDashboard, 1000);
+        }
+    );
+
+}
+
+
+function disableDashboardControls() {
+
+    var controls = document.getElementsByTagName("button");
+    var index;
+
+
+    for (index = 0; index < controls.length; index++) {
+        if (
+            hasClass(controls[index], "light-control") ||
+            hasClass(controls[index], "climate-control") ||
+            hasClass(controls[index], "climate-power-control")
+        ) {
+            controls[index].disabled = true;
+        }
+    }
+
+    if (typeof LegacyFocus !== "undefined") {
+        LegacyFocus.refresh();
+    }
+
+}
+
+
+function handleDashboardInteraction(event, boundary) {
+
+    var currentElement;
+
+
+    event = event || window.event;
+    currentElement = event.target || event.srcElement;
+
+
+    while (currentElement && currentElement !== boundary) {
+
+        if (
+            currentElement.tagName &&
+            currentElement.tagName.toLowerCase() === "button"
+        ) {
+
+            if (event.preventDefault) {
+                event.preventDefault();
+            }
+
+            if (event.stopPropagation) {
+                event.stopPropagation();
+            }
+
+            if (hasClass(currentElement, "light-control")) {
+                setLightState(currentElement);
+            } else if (hasClass(currentElement, "climate-control")) {
+                setClimateTemperature(currentElement);
+            } else if (hasClass(currentElement, "climate-power-control")) {
+                setClimatePowerState(currentElement);
+            }
+
+            return;
+        }
+
+        if (
+            hasClass(currentElement, "card") &&
+            typeof LegacyFocus !== "undefined"
+        ) {
+            LegacyFocus.open(currentElement);
+            return;
+        }
+
+        currentElement = currentElement.parentNode;
+    }
+
+}
+
+
+var dashboardElement = Legacy.dom.byId("dashboard");
+var focusContentElement = Legacy.dom.byId("focusContent");
+
+
+if (typeof LegacyFocus !== "undefined") {
+    LegacyFocus.initialize();
+}
+
+if (dashboardElement) {
+    dashboardElement.onclick = function (event) {
+        handleDashboardInteraction(event, dashboardElement);
+    };
+}
+
+if (focusContentElement) {
+    focusContentElement.onclick = function (event) {
+        handleDashboardInteraction(event, focusContentElement);
+    };
 }
 
 
@@ -2011,6 +2085,8 @@ function loadDashboard() {
 
             if (homeAssistantStatus === "offline") {
 
+                disableDashboardControls();
+
                 setConnectionDisplay(
                     "offline",
                     "Home Assistant offline",
@@ -2164,6 +2240,9 @@ function loadDashboard() {
             }
 
 
+            disableDashboardControls();
+
+
             setConnectionDisplay(
                 "offline",
                 "Gateway offline",
@@ -2217,6 +2296,8 @@ window.ononline =
 window.onoffline =
 
     function () {
+
+        disableDashboardControls();
 
         setConnectionDisplay(
             "offline",

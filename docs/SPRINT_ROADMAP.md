@@ -196,6 +196,7 @@ Bedeutung von „fest“:
 | 19 | Summary Dashboard MVP | umgesetzt |
 | 17.2 | Card Identity, Proportional Geometry & Theme Persistence (Korrektursprint nach 19) | umgesetzt |
 | 20 | Error Dashboard MVP | umgesetzt |
+| 17.3 | Live Card Preview, Unified Controls & Focus Mode (Korrektursprint nach 20) | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | neu geplant |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
 | 23 | Automation Impact & Advanced Diagnostics | neu geplant |
@@ -971,6 +972,32 @@ Keine aktiven Störungen erkannt.
 ```
 
 Bei HA-Ausfall niemals „alles OK“.
+
+---
+
+# Sprint 17.3 – Live Card Preview, Unified Controls & Focus Mode
+
+## Status
+
+Umgesetzt nach Sprint 20.
+
+## Ergebnis
+
+- Der Admin-Layouteditor zeigt aktuelle, sanitisierte Entity-Zustände als
+  Card-Preview in Portrait/Landscape sowie Hell/Dunkel.
+- Preview-Controls sind echte, deaktivierte Buttons und lösen niemals einen
+  Home-Assistant-Schreibzugriff aus.
+- Legacy und Admin verwenden dieselben reinen Regeln für Identität,
+  Rastergeometrie und Presentation Mode.
+- Light verwendet ein gemeinsames dashboard-eigenes Power-Control statt des
+  bisherigen iOS-Switch-Stils.
+- Climate Power verwendet ausschließlich `POST /api/climate/power`, die
+  bestehende Climate-Allowlist und serverseitig eindeutig ermittelte
+  Power-On-Modi.
+- Ein temporäres, Legacy-kompatibles Focus-Overlay zeigt den vollständigen
+  Card-Inhalt und erlaubte Controls, ohne das Raster zu verändern.
+- Summary- und Error-Fachlogik sowie alle bestehenden Write-Allowlists bleiben
+  unverändert.
 
 ---
 

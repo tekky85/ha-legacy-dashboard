@@ -306,6 +306,17 @@ var LegacyLayout = (function () {
         presentationComputationCount++;
 
 
+        if (typeof LegacyPresentation !== "undefined") {
+            return LegacyPresentation.getMode(
+                widget,
+                width,
+                height,
+                effectiveWidth,
+                effectiveHeight
+            );
+        }
+
+
         if (
             typeof effectiveWidth === "number" &&
             typeof effectiveHeight === "number"
@@ -415,6 +426,14 @@ var LegacyLayout = (function () {
 
 
         geometryComputationCount++;
+
+
+        if (typeof LegacyPresentation !== "undefined") {
+            return LegacyPresentation.calculateGridGeometry(
+                containerWidth,
+                columns
+            );
+        }
 
 
         if (!isFinite(safeWidth) || safeWidth <= 0) {

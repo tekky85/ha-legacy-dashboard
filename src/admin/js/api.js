@@ -98,6 +98,9 @@
         },
         getEntities: function () {
             return request("/entities");
+        },
+        getPreview: function () {
+            return request("/preview");
         }
     };
 }(window.HALegacyAdmin = window.HALegacyAdmin || {}));

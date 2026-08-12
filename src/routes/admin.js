@@ -268,6 +268,59 @@ function sanitizeEntity(state) {
 }
 
 
+function finiteOrNull(value) {
+
+    if (
+        value === null ||
+        typeof value === "undefined" ||
+        value === ""
+    ) {
+        return null;
+    }
+
+    const number = Number(value);
+
+    return Number.isFinite(number)
+        ? number
+        : null;
+
+}
+
+
+function sanitizePreviewEntity(state) {
+
+    const entity = sanitizeEntity(state);
+    const attributes =
+        state && state.attributes
+            ? state.attributes
+            : {};
+
+
+    entity.state =
+        state && typeof state.state === "string"
+            ? state.state
+            : "unknown";
+
+    entity.current_temperature =
+        finiteOrNull(attributes.current_temperature);
+    entity.target_temperature =
+        finiteOrNull(attributes.temperature);
+    entity.minimum_temperature =
+        finiteOrNull(attributes.min_temp);
+    entity.maximum_temperature =
+        finiteOrNull(attributes.max_temp);
+    entity.target_temperature_step =
+        finiteOrNull(attributes.target_temp_step);
+    entity.hvac_action =
+        typeof attributes.hvac_action === "string"
+            ? attributes.hvac_action
+            : null;
+
+    return entity;
+
+}
+
+
 router.use(requireAdmin);
 router.use(limitAdminWrites);
 
@@ -740,6 +793,52 @@ router.get("/entities", async function (req, res) {
 
         return res.status(502).json({
             error: "entity_inventory_unavailable"
+        });
+    }
+
+});
+
+
+router.get("/preview", async function (req, res) {
+
+    try {
+        const states = await ha.getAllEntities();
+
+        const entities = states
+            .filter(function (state) {
+                return Boolean(
+                    state &&
+                    typeof state.entity_id === "string" &&
+                    dashboardConfig.ENTITY_ID_PATTERN.test(
+                        state.entity_id
+                    )
+                );
+            })
+            .map(sanitizePreviewEntity)
+            .sort(function (first, second) {
+                return first.entity_id.localeCompare(
+                    second.entity_id
+                );
+            });
+
+        return res.json({
+            entities: entities,
+            fetched_at: new Date().toISOString()
+        });
+    } catch (error) {
+        logger.error(
+            "admin_preview_failed",
+            {
+                upstream_status:
+                    error.response && error.response.status
+                        ? error.response.status
+                        : null,
+                error_type: error.name
+            }
+        );
+
+        return res.status(502).json({
+            error: "preview_unavailable"
         });
     }
 

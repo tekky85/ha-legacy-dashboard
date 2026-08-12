@@ -5,6 +5,7 @@
     let draftConfiguration = null;
     let selectedDashboardId = null;
     let entities = [];
+    let previewEntities = [];
     let dirty = false;
 
     function clone(value) {
@@ -38,6 +39,7 @@
         draftConfiguration = null;
         selectedDashboardId = null;
         entities = [];
+        previewEntities = [];
         dirty = false;
     }
 
@@ -127,6 +129,16 @@
         },
         getEntities: function () {
             return clone(entities);
+        },
+        setPreviewEntities: function (nextEntities) {
+            previewEntities = clone(nextEntities || []);
+        },
+        getPreviewEntity: function (entityId) {
+            return clone(
+                previewEntities.find(function (entity) {
+                    return entity.entity_id === entityId;
+                }) || null
+            );
         },
         uniqueWidgetId: uniqueWidgetId
     };

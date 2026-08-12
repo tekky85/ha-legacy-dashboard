@@ -218,6 +218,10 @@ var Dashboard = {
 
         this.applyLayout();
 
+        if (typeof LegacyFocus !== "undefined") {
+            LegacyFocus.refresh();
+        }
+
     },
 
 

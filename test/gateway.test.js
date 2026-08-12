@@ -169,6 +169,9 @@ test(
         const mock = {
             authorizationHeaders: [],
             confirmationMode: "immediate",
+            climatePowerCalls: [],
+            climateState: "heat",
+            climateModes: ["off", "heat", "cool"],
             connectionError: false,
             hangEntity: null,
             lightServiceCalls: [],
@@ -201,6 +204,9 @@ test(
 
         function resetMock() {
             mock.confirmationMode = "immediate";
+            mock.climatePowerCalls = [];
+            mock.climateState = "heat";
+            mock.climateModes = ["off", "heat", "cool"];
             mock.connectionError = false;
             mock.hangEntity = null;
             mock.lightServiceCalls = [];
@@ -289,6 +295,30 @@ test(
                             ? "on"
                             : "off";
 
+                    res.end("[]");
+                    return;
+
+                }
+
+                if (
+                    req.method === "POST" &&
+                    req.url ===
+                        "/api/services/climate/set_hvac_mode"
+                ) {
+
+                    if (mock.serviceError) {
+                        res.statusCode = 500;
+                        res.end(JSON.stringify({
+                            message: "simulated service error"
+                        }));
+                        return;
+                    }
+
+                    const serviceData =
+                        JSON.parse(requestBody || "{}");
+
+                    mock.climatePowerCalls.push(serviceData);
+                    mock.climateState = serviceData.hvac_mode;
                     res.end("[]");
                     return;
 
@@ -395,13 +425,14 @@ test(
                                     mock.targetTemperature,
                                 min_temp: 10,
                                 max_temp: 30,
-                                target_temp_step: 0.5
+                                target_temp_step: 0.5,
+                                hvac_modes: mock.climateModes
                             }
                             : {};
 
                     const entityState =
                         entityId === CLIMATE_ENTITY
-                            ? "heat"
+                            ? mock.climateState
                             : entityId === LIGHT_ENTITY
                                 ? mock.lightState
                                 : "20";
@@ -574,7 +605,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=26"/
+                /src="\/js\/app\.js\?v=28"/
             );
 
             const manifest = await request(
@@ -593,7 +624,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=26"
+                "/js/app.js?v=28"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -1450,6 +1481,156 @@ test(
                     .indexOf(TEST_TOKEN),
                 -1
             );
+
+        });
+
+        await t.test("Climate Power schaltet nur über festen HVAC-Service", async function () {
+
+            resetMock();
+
+            const offResponse = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {
+                    entity: CLIMATE_ENTITY,
+                    state: "off",
+                    service: "delete_everything"
+                }
+            );
+
+            assert.equal(offResponse.status, 202);
+            assert.deepEqual(
+                mock.climatePowerCalls[0],
+                {
+                    entity_id: CLIMATE_ENTITY,
+                    hvac_mode: "off"
+                }
+            );
+
+            resetMock();
+            mock.climateState = "off";
+
+            const onResponse = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {
+                    entity: CLIMATE_ENTITY,
+                    state: "on"
+                }
+            );
+
+            assert.equal(onResponse.status, 202);
+            assert.deepEqual(
+                mock.climatePowerCalls[0],
+                {
+                    entity_id: CLIMATE_ENTITY,
+                    hvac_mode: "heat"
+                }
+            );
+
+        });
+
+        await t.test("Climate Power weist ungültige oder uneindeutige Wünsche ab", async function () {
+
+            resetMock();
+
+            const denied = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {
+                    entity: "climate.not_allowed",
+                    state: "off"
+                }
+            );
+
+            const wrongDomain = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {
+                    entity: LIGHT_ENTITY,
+                    state: "off"
+                }
+            );
+
+            const invalidState = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {
+                    entity: CLIMATE_ENTITY,
+                    state: "toggle"
+                }
+            );
+
+            mock.climateState = "off";
+            mock.climateModes = ["off", "cool", "dry"];
+
+            const ambiguous = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {
+                    entity: CLIMATE_ENTITY,
+                    state: "on"
+                }
+            );
+
+            assert.equal(denied.status, 403);
+            assert.equal(wrongDomain.status, 403);
+            assert.equal(invalidState.status, 400);
+            assert.equal(ambiguous.status, 409);
+            assert.equal(mock.climatePowerCalls.length, 0);
+
+        });
+
+        await t.test("Climate Power behandelt HA-Fehler und Write-Rate-Limit", async function () {
+
+            resetMock();
+            mock.serviceError = true;
+
+            const failed = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {
+                    entity: CLIMATE_ENTITY,
+                    state: "off"
+                }
+            );
+
+            assert.equal(failed.status, 502);
+            assert.equal(
+                JSON.stringify(failed.json).indexOf(TEST_TOKEN),
+                -1
+            );
+
+            resetMock();
+            let limited = null;
+            let index;
+
+            for (index = 0; index < 12; index += 1) {
+                mock.climateState = "heat";
+                limited = await request(
+                    gatewayPort,
+                    "POST",
+                    "/api/climate/power",
+                    {
+                        entity: CLIMATE_ENTITY,
+                        state: "off"
+                    }
+                );
+
+                if (limited.status === 429) {
+                    break;
+                }
+            }
+
+            assert.equal(limited.status, 429);
+            assert.ok(Number(limited.headers["retry-after"]) >= 1);
 
         });
 

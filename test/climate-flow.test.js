@@ -76,7 +76,7 @@ function createHarness(pathname) {
             if (name === "light-state") {
                 return [lightBadge];
             }
-            if (name === "light-control-label") {
+            if (name === "dashboard-power-label") {
                 return [lightLabel];
             }
             return [];
@@ -92,7 +92,7 @@ function createHarness(pathname) {
     };
 
     const lightButton = {
-        className: "light-control is-off",
+        className: "dashboard-power-control light-control is-off",
         disabled: false,
         tagName: "BUTTON",
         parentNode: lightCard,
@@ -186,6 +186,9 @@ function createHarness(pathname) {
                 return [lightButton];
             }
             return [];
+        },
+        getElementsByTagName: function () {
+            return [lightButton, minus, plus];
         }
     };
 

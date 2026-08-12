@@ -20,6 +20,9 @@ const logger =
 const writeRateLimit =
     require("../services/write-rate-limit");
 
+const climatePower =
+    require("../services/climate-power");
+
 const projectPackage =
     require("../../package.json");
 
@@ -46,6 +49,55 @@ const ALLOWED_LIGHT_ENTITIES = [
     "light.esszimmer_lampen"
 
 ];
+
+
+function addControlCapabilities(entities) {
+
+    Object.keys(entities).forEach(function (entityId) {
+
+        const state = entities[entityId];
+
+        if (!state || typeof state !== "object") {
+            return;
+        }
+
+        if (
+            ALLOWED_LIGHT_ENTITIES.indexOf(entityId) !== -1
+        ) {
+            const available =
+                state.state === "on" ||
+                state.state === "off";
+
+            state.gateway_capabilities = {
+                can_light_power_on: available,
+                can_light_power_off: available
+            };
+        }
+
+        if (
+            ALLOWED_CLIMATE_ENTITIES.indexOf(entityId) !== -1
+        ) {
+            const power = climatePower.capabilities(
+                entityId,
+                state
+            );
+
+            state.gateway_capabilities = {
+                can_set_temperature: Boolean(
+                    state.state !== "off" &&
+                    state.state !== "unknown" &&
+                    state.state !== "unavailable"
+                ),
+                can_power_on: power.canPowerOn,
+                can_power_off: power.canPowerOff
+            };
+        }
+
+    });
+
+    return entities;
+
+}
 
 
 router.use("/admin", adminRoutes);
@@ -180,7 +232,7 @@ async function sendDashboardState(
 
         return res.json(
             addDashboardMeta(
-                entities,
+                addControlCapabilities(entities),
                 dashboardEntities
             )
         );
@@ -410,6 +462,151 @@ router.get(
             timestamp: new Date().toISOString(),
             home_assistant: homeAssistant
         });
+
+    }
+
+);
+
+
+/* =========================================================
+   SET CLIMATE POWER STATE
+   ========================================================= */
+
+router.post(
+
+    "/climate/power",
+
+    async function (req, res) {
+
+        const body = req.body || {};
+        const entityId = body.entity;
+        const requestedState = body.state;
+
+
+        if (
+            typeof entityId !== "string" ||
+            entityId.split(".")[0] !== "climate" ||
+            ALLOWED_CLIMATE_ENTITIES.indexOf(entityId) === -1
+        ) {
+            return res.status(403).json({
+                error:
+                    "Diese Klima-Entität ist nicht freigegeben"
+            });
+        }
+
+        if (
+            requestedState !== "on" &&
+            requestedState !== "off"
+        ) {
+            return res.status(400).json({
+                error: "Der Klimazustand ist ungültig"
+            });
+        }
+
+
+        if (
+            !allowWrite(
+                res,
+                "climate:" + entityId
+            )
+        ) {
+            return;
+        }
+
+
+        try {
+
+            const currentState =
+                await ha.getEntity(entityId);
+
+            const powerCapabilities =
+                climatePower.capabilities(
+                    entityId,
+                    currentState
+                );
+
+            let targetMode;
+
+
+            if (
+                currentState.state === "unavailable" ||
+                currentState.state === "unknown"
+            ) {
+                return res.status(503).json({
+                    error:
+                        "Das Thermostat ist nicht verfügbar"
+                });
+            }
+
+            if (requestedState === "on") {
+                targetMode = climatePower.resolvePowerOnMode(
+                    entityId,
+                    currentState
+                );
+
+                if (!powerCapabilities.canPowerOn || !targetMode) {
+                    return res.status(409).json({
+                        error:
+                            "Das Thermostat kann nicht eindeutig eingeschaltet werden"
+                    });
+                }
+            } else {
+                targetMode = "off";
+
+                if (!powerCapabilities.canPowerOff) {
+                    return res.status(409).json({
+                        error:
+                            "Das Thermostat kann nicht sicher ausgeschaltet werden"
+                    });
+                }
+            }
+
+
+            await ha.callService(
+                "climate",
+                "set_hvac_mode",
+                {
+                    entity_id: entityId,
+                    hvac_mode: targetMode
+                }
+            );
+
+
+            logger.info(
+                "climate_power_set",
+                {
+                    entity_id: entityId,
+                    state: requestedState
+                }
+            );
+
+
+            return res.status(202).json({
+                ok: true,
+                entity: entityId,
+                state: requestedState
+            });
+
+        } catch (error) {
+
+            logger.error(
+                "climate_power_failed",
+                {
+                    entity_id: entityId,
+                    upstream_status:
+                        error.response && error.response.status
+                            ? error.response.status
+                            : null,
+                    error: error.message
+                }
+            );
+
+            return res.status(502).json({
+                error:
+                    "Home Assistant konnte den Befehl nicht ausführen"
+            });
+
+        }
 
     }
 

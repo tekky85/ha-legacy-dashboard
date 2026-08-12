@@ -56,6 +56,7 @@ browser.
 - five validated responsive tile-size presets per widget
 - separate persistent portrait and landscape grid layouts
 - graphical drag-and-drop and resize editor in the Admin UI
+- live Admin card previews with sanitized current entity values
 - stable dashboard URLs with a backward-compatible default dashboard
 - fixed read-only system dashboards for Summary and Systemstatus
 - read-only Summary activity rules grouped by category and priority
@@ -73,6 +74,9 @@ browser.
 - security headers, payload limit, and write rate limit
 - climate card
 - climate target-temperature controls
+- allowlisted climate power control with server-derived capabilities
+- dashboard-native Light and Climate power buttons
+- temporary full-card focus overlay without grid reflow
 - iOS home-screen standalone mode
 - local Apple touch icons
 - web app manifest for modern browsers
@@ -282,8 +286,9 @@ GET /api/system-dashboards/errors
 All three endpoints use one normalized server-side Home Assistant state
 snapshot with a three-second in-memory cache. They return only reduced
 dashboard data and never raw Home Assistant state payloads. Summary returns
-explicitly recognized activities; Error remains a placeholder until Sprint
-20. Media titles are omitted by default.
+explicitly recognized activities. Error returns separately classified
+`unavailable` and `unknown` issues with severity and duration. Media titles
+are omitted by default.
 
 The optional Admin API and its separate graphical UI are documented below.
 They are disabled by default and are not used by the legacy dashboard
@@ -303,6 +308,25 @@ Example body:
   "temperature": 22.5
 }
 ```
+
+Set the allowlisted climate power state when the server can derive an
+unambiguous safe HVAC mode:
+
+```text
+POST /api/climate/power
+```
+
+Example body:
+
+```json
+{
+  "entity": "climate.esszimmer_thermostate",
+  "state": "off"
+}
+```
+
+Only the intents `on` and `off` are accepted. The browser cannot select a
+Home Assistant domain, service, or HVAC mode.
 
 Set the allowlisted Esszimmer light state:
 
@@ -409,6 +433,12 @@ target temperature and both controls. Long identity text is ellipsized rather
 than hidden. Light and Climate controls retain approximately 44-pixel touch
 targets. These rules remain compatible with Safari on iOS 9 and ECMAScript 5.
 
+The Light widget uses the shared dashboard-native power button instead of an
+iOS-style switch. A tap on a non-interactive card area opens one temporary
+fixed-position Focus Card. It shows the full rendered card and its authorized
+controls without changing the persisted grid geometry. Control taps do not
+also open Focus, and stale or unavailable data disables controls.
+
 The wall display stores its Light/Dark choice under the existing
 `ha-legacy-theme` localStorage key. The external theme script applies the stored
 choice from the document head before the main UI starts, and safely falls back
@@ -511,12 +541,18 @@ POST   /api/admin/dashboards/:id/widgets
 PUT    /api/admin/dashboards/:id/widgets/:widgetId
 DELETE /api/admin/dashboards/:id/widgets/:widgetId
 GET    /api/admin/entities
+GET    /api/admin/preview
 ```
 
 Admin writes are rate-limited. The entity inventory contains only entity ID,
 domain, friendly name, device class, and unit of measurement. Tokens, raw
 states, arbitrary attributes, internal paths, services, and write allowlists
 are not returned.
+
+The protected preview route adds only the current state and the small set of
+sanitized climate values needed for rendering. The Admin layout editor polls
+this batch response moderately; its visible controls are always disabled and
+never call a write endpoint.
 
 Enabling the API still does not grant Home Assistant write permissions.
 Climate and Light remain controlled exclusively by their hard-coded backend
@@ -545,7 +581,9 @@ The UI supports:
 - adding supported Sensor, Binary Sensor, Light, and Climate widgets
 - editing widget title, subtitle, icon, unit, visibility, order, and tile size
 - choosing `compact`, `normal`, `wide`, `tall`, or `large` from a fixed select
-- switching between three-column portrait and six-column landscape layouts
+- switching between six-column portrait and twelve-column landscape layouts
+- previewing real sanitized values in compact, normal, and expanded cards
+- previewing both portrait/landscape profiles and Light/Dark presentation
 - moving widgets by mouse drag or modern touch/pointer input with grid snapping
 - resizing widgets in whole cells with a handle
 - moving and resizing with visible, keyboard-focusable alternative buttons
