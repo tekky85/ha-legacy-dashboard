@@ -2414,9 +2414,9 @@ body.theme-dark .dashboard-power-control.is-on {
 
     display: none;
 
-    padding: 22px;
+    padding: 16px;
 
-    overflow: auto;
+    overflow: hidden;
 
     background: rgba(9, 15, 24, 0.68);
 
@@ -2439,13 +2439,19 @@ body.theme-dark .dashboard-power-control.is-on {
 
     position: relative;
 
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex-direction: column;
+    flex-direction: column;
+
     width: 100%;
-    max-width: 620px;
+    max-width: 760px;
     max-height: 100%;
 
-    padding: 54px 18px 18px 18px;
+    padding: 10px;
 
-    overflow: auto;
+    overflow: hidden;
 
     border-radius: 24px;
 
@@ -2455,15 +2461,28 @@ body.theme-dark .dashboard-power-control.is-on {
 
 }
 
+.focus-toolbar {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+
+    min-height: 44px;
+    margin-bottom: 4px;
+
+}
+
 .focus-close {
 
-    position: absolute;
-
-    top: 8px;
-    right: 10px;
-
     width: 44px;
+    min-width: 44px;
     height: 44px;
+    min-height: 44px;
 
     padding: 0;
 
@@ -2483,6 +2502,18 @@ body.theme-dark .dashboard-power-control.is-on {
 
 }
 
+.focus-content {
+
+    width: 100%;
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    -webkit-overflow-scrolling: touch;
+
+}
+
 .focus-content .focus-card {
 
     position: relative;
@@ -2492,23 +2523,261 @@ body.theme-dark .dashboard-power-control.is-on {
 
     width: 100%;
     height: auto;
-    min-height: 270px;
+    min-height: 0;
 
     margin: 0;
+    padding: 20px;
 
-    overflow: visible;
+    overflow: hidden;
+
+    -webkit-justify-content: flex-start;
+    justify-content: flex-start;
 
 }
 
-.focus-content .card-climate.focus-card {
+.focus-header,
+.focus-primary,
+.focus-controls,
+.focus-secondary {
 
-    min-height: 300px;
+    width: 100%;
+    min-width: 0;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
 
 }
 
 .focus-content .focus-card .card-identity {
 
     display: block;
+
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+
+}
+
+.focus-content .focus-header > .card-identity {
+
+    margin-bottom: 14px;
+
+    font-size: 24px;
+    line-height: 1.2;
+
+}
+
+.focus-content .card-sensor .focus-primary,
+.focus-content .card-binary .focus-primary {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    margin-bottom: 12px;
+
+}
+
+.focus-content .card-sensor .card-header,
+.focus-content .card-binary .card-header {
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    min-height: 0;
+    margin: 0 18px 0 0;
+
+}
+
+.focus-content .card-sensor .value,
+.focus-content .card-binary .status {
+
+    min-width: 0;
+    margin: 0;
+
+}
+
+.focus-content .card-sensor .value {
+
+    font-size: 64px;
+
+}
+
+.focus-content .card-binary .status {
+
+    font-size: 42px;
+
+}
+
+.focus-content .focus-secondary .subtitle {
+
+    margin-top: 0;
+
+}
+
+.focus-content .card-light .focus-primary {
+
+    margin-bottom: 14px;
+
+}
+
+.focus-content .card-light .card-header {
+
+    min-height: 54px;
+    margin: 0;
+
+}
+
+.focus-content .card-light .focus-controls {
+
+    margin-bottom: 12px;
+
+}
+
+.focus-content .card-light .light-control.dashboard-power-control {
+
+    min-height: 52px;
+    margin: 0;
+
+}
+
+.focus-content .card-climate .focus-header {
+
+    margin-bottom: 14px;
+
+}
+
+.focus-content .card-climate .card-header {
+
+    min-height: 46px;
+    margin: 0;
+
+}
+
+.focus-content .card-climate .climate-heading-copy .title,
+.focus-content .card-climate .climate-heading-copy .subtitle {
+
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+
+}
+
+.focus-content .card-climate .climate-heading-copy .title {
+
+    font-size: 21px;
+
+}
+
+.focus-content .card-climate .focus-primary {
+
+    margin-bottom: 14px;
+
+}
+
+.focus-content .card-climate .climate-current {
+
+    margin: 0;
+    text-align: center;
+
+}
+
+.focus-content .card-climate .focus-controls {
+
+    width: 100%;
+
+}
+
+.focus-content .card-climate .climate-target-row {
+
+    width: 100%;
+    margin: 0;
+
+}
+
+.focus-landscape .card-climate.focus-card {
+
+    -webkit-flex-direction: row;
+    flex-direction: row;
+
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+}
+
+.focus-landscape .card-climate .focus-header {
+
+    width: 100%;
+    margin-bottom: 10px;
+
+}
+
+.focus-landscape .card-climate .focus-primary {
+
+    width: 34%;
+    margin: 0;
+    padding-right: 16px;
+
+}
+
+.focus-landscape .card-climate .focus-controls {
+
+    width: 66%;
+
+}
+
+.focus-short .focus-shell {
+
+    padding: 6px;
+
+}
+
+.focus-short .focus-toolbar {
+
+    margin-bottom: 2px;
+
+}
+
+.focus-short .focus-card {
+
+    padding: 14px;
+
+}
+
+.focus-short .focus-content .focus-header > .card-identity,
+.focus-short .focus-content .card-climate .focus-header,
+.focus-short .focus-content .card-climate .focus-primary {
+
+    margin-bottom: 8px;
+
+}
+
+.focus-short .focus-content .card-sensor .value {
+
+    font-size: 52px;
+
+}
+
+.focus-short .focus-content .card-binary .status {
+
+    font-size: 34px;
+
+}
+
+.focus-short .focus-content .card-climate .climate-current-value {
+
+    font-size: 42px;
+
+}
+
+body.focus-page-locked {
+
+    overflow: hidden;
 
 }
 
@@ -2530,13 +2799,44 @@ body.theme-dark .focus-close {
 
     .focus-overlay {
 
-        padding: 10px;
+        padding: 8px;
 
     }
 
     .focus-shell {
 
-        padding: 52px 10px 10px 10px;
+        padding: 8px;
+
+    }
+
+    .focus-content .focus-card {
+
+        padding: 16px;
+
+    }
+
+    .focus-content .focus-header > .card-identity {
+
+        font-size: 21px;
+
+    }
+
+    .focus-content .card-sensor .card-header,
+    .focus-content .card-binary .card-header {
+
+        margin-right: 12px;
+
+    }
+
+    .focus-content .card-sensor .value {
+
+        font-size: 52px;
+
+    }
+
+    .focus-content .card-binary .status {
+
+        font-size: 34px;
 
     }
 

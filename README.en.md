@@ -41,6 +41,7 @@ The legacy frontend remains framework-free and uses the existing `Legacy.http` /
 - portrait and landscape layouts
 - configurable card sizes
 - responsive compact / normal / expanded presentation
+- viewport-aware Focus Card with prioritized values and controls
 - Light and Climate control through explicitly allowed backend endpoints
 - Light/Dark mode
 - stale-data and reconnect behavior
@@ -179,6 +180,10 @@ The current gallery was captured from the unchanged application using a local, c
 ![Compact cards in landscape layout](docs/screenshots/dashboards/compact-cards.png)
 
 #### Focus Card
+
+The Focus Card uses the actually visible viewport, keeps core values and
+allowed controls reachable without unnecessary scrolling, and preserves the
+dashboard position.
 
 ![Open focus card](docs/screenshots/dashboards/focus-card.png)
 

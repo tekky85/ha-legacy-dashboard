@@ -197,6 +197,7 @@ Bedeutung von „fest“:
 | 17.2 | Card Identity, Proportional Geometry & Theme Persistence (Korrektursprint nach 19) | umgesetzt |
 | 20 | Error Dashboard MVP | umgesetzt |
 | 17.3 | Live Card Preview, Unified Controls & Focus Mode (Korrektursprint nach 20) | umgesetzt |
+| 17.4 | Focus Overlay Layout Stabilization (Korrektursprint nach 21) | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
 | 23 | Automation Impact & Advanced Diagnostics | neu geplant |
@@ -998,6 +999,32 @@ Umgesetzt nach Sprint 20.
   Card-Inhalt und erlaubte Controls, ohne das Raster zu verändern.
 - Summary- und Error-Fachlogik sowie alle bestehenden Write-Allowlists bleiben
   unverändert.
+
+---
+
+# Sprint 17.4 – Focus Overlay Layout Stabilization
+
+## Status
+
+Umgesetzt nach Sprint 21.
+
+## Ergebnis
+
+- Die Focus Card verwendet `window.innerWidth` und `window.innerHeight` mit
+  sicheren DOM-Fallbacks statt einer ausschließlich statischen CSS-Höhe.
+- Sensor, Binary, Light und Climate erhalten getrennte Focus-Regionen für
+  Identität, Primärwert, Controls und sekundäre Informationen.
+- Feste Focus-Mindesthöhen und doppelte Overlay-/Shell-Scrollcontainer wurden
+  entfernt; nur der Focus-Inhalt scrollt kontrolliert bei echter Überhöhe.
+- Light Power sowie Climate Ist, Soll, Minus, Plus und erlaubtes Power-Control
+  bleiben im iPad-Portrait- und -Landscape-Viewport ohne unnötiges Scrollen
+  erreichbar.
+- Resize und Orientation Change vermessen den offenen Focus neu, ohne einen
+  zweiten Focus oder eine neue Pollingpipeline zu erzeugen.
+- Der Dashboard-Hintergrund wird während Focus gesperrt und die vorherige
+  Scrollposition beim Schließen wiederhergestellt.
+- Summary-/Error-Fachlogik, Write-Routen, Allowlisten und HA-Sicherheitsgrenzen
+  bleiben unverändert.
 
 ---
 
