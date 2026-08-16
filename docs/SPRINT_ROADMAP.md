@@ -198,6 +198,7 @@ Bedeutung von „fest“:
 | 20 | Error Dashboard MVP | umgesetzt |
 | 17.3 | Live Card Preview, Unified Controls & Focus Mode (Korrektursprint nach 20) | umgesetzt |
 | 17.4 | Focus Overlay Layout Stabilization (Korrektursprint nach 21) | umgesetzt |
+| 17.5 | Native Focus Renderer & Mobile Safari Stabilization (Korrektursprint nach 17.4) | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
 | 23 | Automation Impact & Advanced Diagnostics | neu geplant |
@@ -1025,6 +1026,33 @@ Umgesetzt nach Sprint 21.
   Scrollposition beim Schließen wiederhergestellt.
 - Summary-/Error-Fachlogik, Write-Routen, Allowlisten und HA-Sicherheitsgrenzen
   bleiben unverändert.
+
+---
+
+# Sprint 17.5 – Native Focus Renderer & Mobile Safari Stabilization
+
+## Status
+
+Umgesetzt nach Sprint 17.4.
+
+## Ergebnis
+
+- Focus ist keine weitere Grid-Kartengröße mehr, sondern eine eigenständige
+  Interaction View aus Widgetdefinition, aktuellem Zustand und den bereits
+  serverseitig bestimmten Capabilities.
+- `renderSensorFocus`, `renderBinaryFocus`, `renderLightFocus` und
+  `renderClimateFocus` erzeugen Focus-eigenes DOM ohne Clone, `x/y/w/h`,
+  Grid-Inline-Geometrie oder Compact-/Normal-/Expanded-Klassen.
+- Ein reines Focus View Model bindet State Refresh, stale/unavailable und
+  erlaubte Controls an die stabile Widget-ID, ohne eine zweite Pollingpipeline.
+- Der abgeschottete Focus-CSS-Namespace setzt echte Viewportbreiten,
+  `box-sizing` und expliziten Shrink-Schutz für Panel, Widgets und Controls.
+- Minus/Plus bleiben 56×56 Pixel und Power mindestens 54 Pixel hoch; Portrait,
+  Landscape und ein kleiner 320×460-Legacy-Viewport bleiben ohne Überlauf.
+- Der Sprint-17.4-Scroll-Lock, Theme-Persistenz, Grid, Admin Preview,
+  Summary-/Error-Fachlogik und alle Write-Sicherheitsgrenzen bleiben erhalten.
+- Die echte iPad-Air-2-/iPadOS-15.8.5- sowie iOS-9-Safari-Abnahme bleibt nach
+  dem produktiven Rollout als manueller Gerätecheck dokumentiert.
 
 ---
 

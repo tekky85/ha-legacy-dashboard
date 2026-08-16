@@ -41,7 +41,7 @@ The legacy frontend remains framework-free and uses the existing `Legacy.http` /
 - portrait and landscape layouts
 - configurable card sizes
 - responsive compact / normal / expanded presentation
-- viewport-aware Focus Card with prioritized values and controls
+- independent viewport-aware Focus view with prioritized values and controls
 - Light and Climate control through explicitly allowed backend endpoints
 - Light/Dark mode
 - stale-data and reconnect behavior
@@ -181,9 +181,13 @@ The current gallery was captured from the unchanged application using a local, c
 
 #### Focus Card
 
-The Focus Card uses the actually visible viewport, keeps core values and
-allowed controls reachable without unnecessary scrolling, and preserves the
-dashboard position.
+The Focus view is a separate interaction view: it is rebuilt from the widget
+definition, current state and server-determined capabilities, and it clones
+neither Grid DOM nor Grid geometry. Its own Focus classes, actual viewport
+dimensions and explicit shrink protection keep core values and allowed
+controls reachable in Mobile Safari while preserving the dashboard position.
+Automated checks cover 768×1024, 1024×768 and the small 320×460 legacy
+viewport; physical Safari acceptance remains part of the device rollout.
 
 ![Open focus card](docs/screenshots/dashboards/focus-card.png)
 

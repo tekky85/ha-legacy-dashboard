@@ -41,7 +41,7 @@ Das Legacy-Frontend bleibt frameworkfrei und verwendet die vorhandene `Legacy.ht
 - Portrait- und Landscape-Layouts
 - konfigurierbare Card-Größen
 - responsive Compact-/Normal-/Expanded-Darstellung
-- viewportbasierte Focus Card mit priorisierten Werten und Controls
+- eigenständige, viewportbasierte Focus-Ansicht mit priorisierten Werten und Controls
 - Light- und Climate-Steuerung über explizit freigegebene Backend-Endpunkte
 - Light/Dark Mode
 - Stale-Data- und Reconnect-Verhalten
@@ -182,8 +182,14 @@ Die aktuelle Galerie wurde mit der unveränderten Anwendung und einem lokalen, k
 
 #### Focus Card
 
-Die Focus Card nutzt den real sichtbaren Viewport, hält Kernwerte und erlaubte
-Controls ohne unnötiges Scrollen erreichbar und bewahrt die Dashboardposition.
+Die Focus-Ansicht ist eine eigenständige Interaction View: Sie wird aus
+Widgetdefinition, aktuellem Zustand und serverseitig bestimmten Capabilities
+neu aufgebaut und klont weder Grid-DOM noch Grid-Geometrie. Eigene
+Focus-Klassen, echte Viewportmaße und expliziter Shrink-Schutz halten Kernwerte
+und erlaubte Controls auch in Mobile Safari erreichbar und bewahren die
+Dashboardposition. Automatisiert geprüft werden 768×1024, 1024×768 und der
+kleine Legacy-Viewport 320×460; die physische Safari-Abnahme bleibt Bestandteil
+des Geräte-Rollouts.
 
 ![Geöffnete Focus Card](docs/screenshots/dashboards/focus-card.png)
 

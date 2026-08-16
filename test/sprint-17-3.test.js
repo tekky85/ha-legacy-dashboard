@@ -164,20 +164,23 @@ test("Unified Controls ersetzen den iOS-Switch und bleiben touch-tauglich", func
 });
 
 
-test("Focus Mode bleibt Overlay, nutzt vorhandene Karten und trennt Controls", function () {
+test("Focus Mode bleibt Overlay und trennt Grid-DOM von Controls", function () {
     const focus = read("src/public/js/focus/focus.js");
+    const renderer = read("src/public/js/focus/renderer.js");
     const app = read("src/public/js/app.js");
     const html = read("src/public/index.html");
     const css = read("src/public/css/style.css");
 
     assert.match(html, /id="focusOverlay"/);
     assert.match(html, /id="focusClose"[^>]*class="focus-close"|id="focusClose"/);
-    assert.match(focus, /cloneNode\(true\)/);
+    assert.doesNotMatch(focus, /cloneNode\(true\)/);
+    assert.match(renderer, /renderClimateFocus/);
+    assert.match(renderer, /focus-climate-control/);
     assert.match(focus, /focusedWidgetId/);
     assert.match(focus, /event\.target \|\| event\.srcElement/);
     assert.match(focus, /=== overlay/);
     assert.match(css, /\.focus-overlay\s*\{[\s\S]*position:\s*fixed/);
-    assert.match(css, /\.focus-content \.focus-card/);
+    assert.match(css, /\.focus-widget\s*\{/);
     assert.match(app, /event\.stopPropagation/);
     assert.match(app, /LegacyFocus\.open/);
     assert.match(app, /disableDashboardControls/);

@@ -1,20 +1,24 @@
 /*
- * Viewport-aware focus-card overlay. The focused card is assembled from a
- * clone of the currently rendered card, so it uses the same state and never
- * starts another poll or gains capabilities of its own.
+ * Native Focus interaction view lifecycle.
+ *
+ * A source provider supplies widget definition + current sanitized state.
+ * The dedicated Focus View Model and renderer create independent DOM; Grid
+ * DOM, layout coordinates and presentation classes are never consumed.
  */
 
 var LegacyFocus = (function () {
 
     var overlay = null;
-    var shell = null;
+    var panel = null;
     var content = null;
     var closeButton = null;
+    var sourceProvider = null;
     var focusedWidgetId = "";
     var resizeTimer = null;
     var scrollLocked = false;
     var savedScroll = null;
     var previousFocus = null;
+    var lastModel = null;
 
 
     function hasClass(element, className) {
@@ -58,203 +62,6 @@ var LegacyFocus = (function () {
     }
 
 
-    function firstByClass(element, className) {
-
-        var matches;
-
-
-        if (!element) {
-            return null;
-        }
-
-        matches = element.getElementsByClassName(className);
-
-        return matches.length ? matches[0] : null;
-
-    }
-
-
-    function createRegion(className) {
-
-        var region = document.createElement("div");
-
-
-        region.className = className;
-
-        return region;
-
-    }
-
-
-    function appendRegion(card, region) {
-
-        if (region && region.childNodes.length) {
-            card.appendChild(region);
-        }
-
-    }
-
-
-    function clearChildren(element) {
-
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
-        }
-
-    }
-
-
-    function cardForWidget(widgetId) {
-
-        var dashboard = document.getElementById("dashboard");
-        var cards;
-        var index;
-
-
-        if (!dashboard) {
-            return null;
-        }
-
-        cards = dashboard.getElementsByClassName("card");
-
-        for (index = 0; index < cards.length; index++) {
-            if (
-                cards[index].getAttribute("data-widget-id") ===
-                    widgetId
-            ) {
-                return cards[index];
-            }
-        }
-
-        return null;
-
-    }
-
-
-    function structureStandardCard(clone) {
-
-        var cardHeader = firstByClass(clone, "card-header");
-        var identity = firstByClass(clone, "card-identity");
-        var value = firstByClass(clone, "value");
-        var status = firstByClass(clone, "status");
-        var lightControl = firstByClass(clone, "light-control");
-        var subtitle = firstByClass(clone, "subtitle");
-        var header = createRegion("focus-header");
-        var primary = createRegion("focus-primary");
-        var controls = createRegion("focus-controls");
-        var secondary = createRegion("focus-secondary");
-
-
-        if (identity) {
-            header.appendChild(identity);
-        }
-
-        if (cardHeader) {
-            primary.appendChild(cardHeader);
-        }
-
-        if (value) {
-            primary.appendChild(value);
-        }
-
-        if (status) {
-            primary.appendChild(status);
-        }
-
-        if (lightControl) {
-            controls.appendChild(lightControl);
-        }
-
-        if (subtitle) {
-            secondary.appendChild(subtitle);
-        }
-
-        clearChildren(clone);
-        appendRegion(clone, header);
-        appendRegion(clone, primary);
-        appendRegion(clone, controls);
-        appendRegion(clone, secondary);
-
-    }
-
-
-    function structureClimateCard(clone) {
-
-        var cardHeader = firstByClass(clone, "card-header");
-        var current = firstByClass(clone, "climate-current");
-        var targetRow = firstByClass(clone, "climate-target-row");
-        var header = createRegion("focus-header");
-        var primary = createRegion("focus-primary");
-        var controls = createRegion("focus-controls");
-
-
-        if (cardHeader) {
-            header.appendChild(cardHeader);
-        }
-
-        if (current) {
-            primary.appendChild(current);
-        }
-
-        if (targetRow) {
-            controls.appendChild(targetRow);
-        }
-
-        clearChildren(clone);
-        appendRegion(clone, header);
-        appendRegion(clone, primary);
-        appendRegion(clone, controls);
-
-    }
-
-
-    function prepareClone(card) {
-
-        var clone = card.cloneNode(true);
-        var className = clone.className || "";
-
-
-        className = className
-            .replace(/\s*card-size-(compact|normal|wide|tall|large)/g, "")
-            .replace(/\s*card-presentation-(compact|normal|expanded)/g, "");
-
-        clone.className =
-            className +
-            " focus-card card-presentation-expanded";
-
-        clone.removeAttribute("style");
-        clone.setAttribute("role", "document");
-
-        if (hasClass(clone, "card-climate")) {
-            structureClimateCard(clone);
-        } else {
-            structureStandardCard(clone);
-        }
-
-        return clone;
-
-    }
-
-
-    function render(card) {
-
-        var scrollTop;
-
-
-        if (!content || !card) {
-            return;
-        }
-
-        scrollTop = content.scrollTop || 0;
-        content.innerHTML = "";
-        content.appendChild(
-            prepareClone(card)
-        );
-        content.scrollTop = scrollTop;
-
-    }
-
-
     function getFocusViewportMetrics() {
 
         var documentElement = document.documentElement || {};
@@ -288,14 +95,17 @@ var LegacyFocus = (function () {
         var margin = width <= 520 ? 8 : 16;
         var availableWidth = Math.max(0, width - (margin * 2));
         var availableHeight = Math.max(0, height - (margin * 2));
+        var panelWidth = Math.min(760, availableWidth);
 
 
         return {
             width: width,
             height: height,
             margin: margin,
-            maxWidth: Math.min(760, availableWidth),
+            panelWidth: panelWidth,
+            maxWidth: panelWidth,
             maxHeight: availableHeight,
+            minimumPanelHeight: Math.min(260, availableHeight),
             landscape: width > height,
             shortViewport: height < 480
         };
@@ -308,7 +118,7 @@ var LegacyFocus = (function () {
         var geometry;
 
 
-        if (!overlay || !shell || !focusedWidgetId) {
+        if (!overlay || !panel || !focusedWidgetId) {
             return;
         }
 
@@ -319,21 +129,24 @@ var LegacyFocus = (function () {
         overlay.style.width = geometry.width + "px";
         overlay.style.height = geometry.height + "px";
         overlay.style.padding = geometry.margin + "px";
-        shell.style.maxWidth = geometry.maxWidth + "px";
-        shell.style.maxHeight = geometry.maxHeight + "px";
 
-        removeClass(overlay, "focus-landscape");
-        removeClass(overlay, "focus-portrait");
-        removeClass(overlay, "focus-short");
+        panel.style.width = geometry.panelWidth + "px";
+        panel.style.maxWidth = geometry.panelWidth + "px";
+        panel.style.maxHeight = geometry.maxHeight + "px";
+        panel.style.minHeight = geometry.minimumPanelHeight + "px";
+
+        removeClass(overlay, "focus-layout-landscape");
+        removeClass(overlay, "focus-layout-portrait");
+        removeClass(overlay, "focus-layout-short");
         addClass(
             overlay,
             geometry.landscape
-                ? "focus-landscape"
-                : "focus-portrait"
+                ? "focus-layout-landscape"
+                : "focus-layout-portrait"
         );
 
         if (geometry.shortViewport) {
-            addClass(overlay, "focus-short");
+            addClass(overlay, "focus-layout-short");
         }
 
     }
@@ -418,18 +231,67 @@ var LegacyFocus = (function () {
     }
 
 
-    function open(card) {
+    function sourceForWidget(widgetId) {
 
-        var widgetId;
+        if (typeof sourceProvider !== "function") {
+            return null;
+        }
+
+        return sourceProvider(widgetId);
+
+    }
 
 
-        if (!overlay || !card || !hasClass(card, "card")) {
+    function render() {
+
+        var source;
+        var model;
+        var markup;
+        var scrollTop;
+
+
+        if (!content || !focusedWidgetId) {
+            return false;
+        }
+
+        source = sourceForWidget(focusedWidgetId);
+
+        if (!source) {
+            return false;
+        }
+
+        model = LegacyFocusViewModel.create(source);
+        markup = LegacyFocusRenderer.render(model);
+
+        if (!model || !markup) {
+            return false;
+        }
+
+        scrollTop = content.scrollTop || 0;
+
+        if (content.innerHTML !== markup) {
+            content.innerHTML = markup;
+            content.scrollTop = scrollTop;
+        }
+
+        lastModel = model;
+
+        return true;
+
+    }
+
+
+    function open(widgetId) {
+
+        if (
+            !overlay ||
+            typeof widgetId !== "string" ||
+            !/^[a-z0-9][a-z0-9-]{0,62}$/.test(widgetId)
+        ) {
             return;
         }
 
-        widgetId = card.getAttribute("data-widget-id") || "";
-
-        if (!widgetId) {
+        if (!sourceForWidget(widgetId)) {
             return;
         }
 
@@ -439,7 +301,12 @@ var LegacyFocus = (function () {
         }
 
         focusedWidgetId = widgetId;
-        render(card);
+
+        if (!render()) {
+            close();
+            return;
+        }
+
         overlay.className = "focus-overlay is-visible";
         overlay.setAttribute("aria-hidden", "false");
         applyViewportGeometry();
@@ -461,12 +328,13 @@ var LegacyFocus = (function () {
         }
 
         focusedWidgetId = "";
+        lastModel = null;
         overlay.className = "focus-overlay";
         overlay.setAttribute("aria-hidden", "true");
         overlay.removeAttribute("style");
 
-        if (shell) {
-            shell.removeAttribute("style");
+        if (panel) {
+            panel.removeAttribute("style");
         }
 
         if (content) {
@@ -486,18 +354,11 @@ var LegacyFocus = (function () {
 
     function refresh() {
 
-        var card;
-
-
         if (!focusedWidgetId) {
             return;
         }
 
-        card = cardForWidget(focusedWidgetId);
-
-        if (card) {
-            render(card);
-        } else {
+        if (!render()) {
             close();
         }
 
@@ -522,13 +383,16 @@ var LegacyFocus = (function () {
     }
 
 
-    function initialize() {
+    function initialize(provider) {
 
         overlay = document.getElementById("focusOverlay");
-        shell = document.getElementById("focusShell");
+        panel = document.getElementById("focusShell");
         content = document.getElementById("focusContent");
+        sourceProvider = typeof provider === "function"
+            ? provider
+            : null;
 
-        if (!overlay || !shell || !content) {
+        if (!overlay || !panel || !content) {
             return;
         }
 
@@ -541,9 +405,7 @@ var LegacyFocus = (function () {
         overlay.onclick = function (event) {
             event = event || window.event;
 
-            if (
-                (event.target || event.srcElement) === overlay
-            ) {
+            if ((event.target || event.srcElement) === overlay) {
                 close();
             }
         };
@@ -567,6 +429,9 @@ var LegacyFocus = (function () {
         refresh: refresh,
         getViewportMetrics: getFocusViewportMetrics,
         calculateGeometry: calculateFocusGeometry,
+        getModel: function () {
+            return lastModel;
+        },
         isOpen: function () {
             return Boolean(focusedWidgetId);
         }

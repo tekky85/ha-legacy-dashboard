@@ -485,6 +485,17 @@ function updateClimateTargetDisplay(
     step
 ) {
 
+    if (
+        typeof Dashboard !== "undefined" &&
+        typeof Dashboard.updateEntityAttribute === "function"
+    ) {
+        Dashboard.updateEntityAttribute(
+            entityId,
+            "temperature",
+            temperature
+        );
+    }
+
     var buttons =
 
         document.getElementsByClassName(
@@ -1117,6 +1128,16 @@ function updateLightDisplay(
     state
 ) {
 
+    if (
+        typeof Dashboard !== "undefined" &&
+        typeof Dashboard.updateEntityState === "function"
+    ) {
+        Dashboard.updateEntityState(
+            entityId,
+            state
+        );
+    }
+
     var buttons =
 
         document.getElementsByClassName(
@@ -1650,12 +1671,16 @@ function setClimatePowerState(button) {
     dashboardRefreshBlockedUntil =
         new Date().getTime() + 3000;
 
-    buttons = document.getElementsByClassName(
-        "climate-power-control"
-    );
+    buttons = document.getElementsByTagName("button");
 
     for (index = 0; index < buttons.length; index++) {
-        if (buttons[index].getAttribute("data-entity") === entityId) {
+        if (
+            (
+                hasClass(buttons[index], "climate-power-control") ||
+                hasClass(buttons[index], "focus-climate-power-control")
+            ) &&
+            buttons[index].getAttribute("data-entity") === entityId
+        ) {
             buttons[index].disabled = true;
             addClass(buttons[index], "is-busy");
         }
@@ -1712,11 +1737,22 @@ function disableDashboardControls() {
     var index;
 
 
+    if (
+        typeof Dashboard !== "undefined" &&
+        typeof Dashboard.setControlsDisabled === "function"
+    ) {
+        Dashboard.setControlsDisabled(true);
+    }
+
+
     for (index = 0; index < controls.length; index++) {
         if (
             hasClass(controls[index], "light-control") ||
             hasClass(controls[index], "climate-control") ||
-            hasClass(controls[index], "climate-power-control")
+            hasClass(controls[index], "climate-power-control") ||
+            hasClass(controls[index], "focus-light-control") ||
+            hasClass(controls[index], "focus-climate-control") ||
+            hasClass(controls[index], "focus-climate-power-control")
         ) {
             controls[index].disabled = true;
         }
@@ -1753,11 +1789,20 @@ function handleDashboardInteraction(event, boundary) {
                 event.stopPropagation();
             }
 
-            if (hasClass(currentElement, "light-control")) {
+            if (
+                hasClass(currentElement, "light-control") ||
+                hasClass(currentElement, "focus-light-control")
+            ) {
                 setLightState(currentElement);
-            } else if (hasClass(currentElement, "climate-control")) {
+            } else if (
+                hasClass(currentElement, "climate-control") ||
+                hasClass(currentElement, "focus-climate-control")
+            ) {
                 setClimateTemperature(currentElement);
-            } else if (hasClass(currentElement, "climate-power-control")) {
+            } else if (
+                hasClass(currentElement, "climate-power-control") ||
+                hasClass(currentElement, "focus-climate-power-control")
+            ) {
                 setClimatePowerState(currentElement);
             }
 
@@ -1768,7 +1813,9 @@ function handleDashboardInteraction(event, boundary) {
             hasClass(currentElement, "card") &&
             typeof LegacyFocus !== "undefined"
         ) {
-            LegacyFocus.open(currentElement);
+            LegacyFocus.open(
+                currentElement.getAttribute("data-widget-id") || ""
+            );
             return;
         }
 
@@ -1783,7 +1830,9 @@ var focusContentElement = Legacy.dom.byId("focusContent");
 
 
 if (typeof LegacyFocus !== "undefined") {
-    LegacyFocus.initialize();
+    LegacyFocus.initialize(function (widgetId) {
+        return Dashboard.getFocusSource(widgetId);
+    });
 }
 
 if (dashboardElement) {

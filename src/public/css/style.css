@@ -2398,7 +2398,7 @@ body.theme-dark .dashboard-power-control.is-on {
 
 
 /* =========================================================
-   FOCUS CARD OVERLAY
+   NATIVE FOCUS INTERACTION VIEW
    ========================================================= */
 
 .focus-overlay {
@@ -2420,6 +2420,8 @@ body.theme-dark .dashboard-power-control.is-on {
 
     background: rgba(9, 15, 24, 0.68);
 
+    box-sizing: border-box;
+
 }
 
 .focus-overlay.is-visible {
@@ -2435,7 +2437,7 @@ body.theme-dark .dashboard-power-control.is-on {
 
 }
 
-.focus-shell {
+.focus-panel {
 
     position: relative;
 
@@ -2445,7 +2447,14 @@ body.theme-dark .dashboard-power-control.is-on {
     -webkit-flex-direction: column;
     flex-direction: column;
 
-    width: 100%;
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+
+    width: 760px;
+    min-width: 280px;
     max-width: 760px;
     max-height: 100%;
 
@@ -2459,6 +2468,16 @@ body.theme-dark .dashboard-power-control.is-on {
 
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
 
+    box-sizing: border-box;
+
+}
+
+.focus-panel *,
+.focus-panel *:before,
+.focus-panel *:after {
+
+    box-sizing: border-box;
+
 }
 
 .focus-toolbar {
@@ -2468,6 +2487,9 @@ body.theme-dark .dashboard-power-control.is-on {
 
     -webkit-flex: 0 0 auto;
     flex: 0 0 auto;
+
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
 
     -webkit-justify-content: flex-end;
     justify-content: flex-end;
@@ -2507,6 +2529,9 @@ body.theme-dark .dashboard-power-control.is-on {
     width: 100%;
     min-height: 0;
 
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+
     overflow-x: hidden;
     overflow-y: auto;
 
@@ -2514,28 +2539,198 @@ body.theme-dark .dashboard-power-control.is-on {
 
 }
 
-.focus-content .focus-card {
+.focus-widget {
 
     position: relative;
 
-    left: auto;
-    top: auto;
-
     width: 100%;
-    height: auto;
-    min-height: 0;
+    min-width: 0;
+    min-height: 220px;
 
     margin: 0;
-    padding: 20px;
+    padding: 24px;
 
     overflow: hidden;
 
-    -webkit-justify-content: flex-start;
-    justify-content: flex-start;
+    border: 1px solid #e0e6ee;
+    border-radius: 20px;
+
+    background: #ffffff;
+
+    box-shadow: 0 12px 30px rgba(27, 39, 51, 0.13);
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
 
 }
 
-.focus-header,
+.focus-header {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-bottom: 22px;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+}
+
+.focus-icon {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    -webkit-flex: 0 0 64px;
+    flex: 0 0 64px;
+
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+
+    width: 64px;
+    min-width: 64px;
+    height: 64px;
+    min-height: 64px;
+
+    margin-right: 18px;
+
+    border-radius: 20px;
+
+    background: #e9eef5;
+    color: #5f6f82;
+
+}
+
+.focus-icon svg {
+
+    width: 34px;
+    height: 34px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+
+}
+
+.focus-icon-temperature,
+.focus-icon-heating {
+
+    background: #fff0eb;
+    color: #d8582f;
+
+}
+
+.focus-icon-humidity,
+.focus-icon-cooling {
+
+    background: #e7f2ff;
+    color: #2c71b8;
+
+}
+
+.focus-icon-success,
+.focus-icon-on {
+
+    background: #e8f5ec;
+    color: #237a45;
+
+}
+
+.focus-icon-danger {
+
+    background: #fdecea;
+    color: #b83d36;
+
+}
+
+.focus-heading {
+
+    min-width: 0;
+
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+
+}
+
+.focus-identity {
+
+    display: block;
+
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+
+}
+
+.focus-subtitle {
+
+    margin-top: 5px;
+
+    color: #6a7889;
+
+    font-size: 16px;
+    line-height: 1.35;
+
+}
+
+.focus-state {
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+
+    margin-left: 14px;
+    padding: 8px 12px;
+
+    border-radius: 999px;
+
+    background: #e8edf3;
+    color: #526174;
+
+    font-size: 15px;
+    font-weight: 700;
+
+}
+
+.focus-state-on,
+.focus-state-success {
+
+    background: #e6f3e9;
+    color: #237a45;
+
+}
+
+.focus-state-heating,
+.focus-state-danger {
+
+    background: #fdebe6;
+    color: #ad4728;
+
+}
+
 .focus-primary,
 .focus-controls,
 .focus-secondary {
@@ -2546,29 +2741,13 @@ body.theme-dark .dashboard-power-control.is-on {
     -webkit-flex: 0 0 auto;
     flex: 0 0 auto;
 
-}
-
-.focus-content .focus-card .card-identity {
-
-    display: block;
-
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
 
 }
 
-.focus-content .focus-header > .card-identity {
-
-    margin-bottom: 14px;
-
-    font-size: 24px;
-    line-height: 1.2;
-
-}
-
-.focus-content .card-sensor .focus-primary,
-.focus-content .card-binary .focus-primary {
+.focus-sensor-primary,
+.focus-binary-primary {
 
     display: -webkit-flex;
     display: flex;
@@ -2576,131 +2755,327 @@ body.theme-dark .dashboard-power-control.is-on {
     -webkit-align-items: center;
     align-items: center;
 
-    margin-bottom: 12px;
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    min-height: 92px;
+    margin: 8px 0 16px;
 
 }
 
-.focus-content .card-sensor .card-header,
-.focus-content .card-binary .card-header {
-
-    -webkit-flex: 0 0 auto;
-    flex: 0 0 auto;
-
-    min-height: 0;
-    margin: 0 18px 0 0;
-
-}
-
-.focus-content .card-sensor .value,
-.focus-content .card-binary .status {
-
-    min-width: 0;
-    margin: 0;
-
-}
-
-.focus-content .card-sensor .value {
+.focus-value {
 
     font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
 
 }
 
-.focus-content .card-binary .status {
+.focus-unit {
+
+    margin-left: 8px;
+
+    color: #59697c;
+
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+
+}
+
+.focus-binary-state {
 
     font-size: 42px;
+    font-weight: 700;
+    line-height: 1.1;
 
 }
 
-.focus-content .focus-secondary .subtitle {
+.focus-binary-state-danger {
 
-    margin-top: 0;
-
-}
-
-.focus-content .card-light .focus-primary {
-
-    margin-bottom: 14px;
+    color: #b83d36;
 
 }
 
-.focus-content .card-light .card-header {
+.focus-binary-state-success {
 
-    min-height: 54px;
-    margin: 0;
-
-}
-
-.focus-content .card-light .focus-controls {
-
-    margin-bottom: 12px;
+    color: #237a45;
 
 }
 
-.focus-content .card-light .light-control.dashboard-power-control {
+.focus-secondary {
 
-    min-height: 52px;
-    margin: 0;
+    margin-top: 16px;
 
-}
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 
-.focus-content .card-climate .focus-header {
+    color: #718094;
 
-    margin-bottom: 14px;
-
-}
-
-.focus-content .card-climate .card-header {
-
-    min-height: 46px;
-    margin: 0;
-
-}
-
-.focus-content .card-climate .climate-heading-copy .title,
-.focus-content .card-climate .climate-heading-copy .subtitle {
-
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
-
-}
-
-.focus-content .card-climate .climate-heading-copy .title {
-
-    font-size: 21px;
-
-}
-
-.focus-content .card-climate .focus-primary {
-
-    margin-bottom: 14px;
-
-}
-
-.focus-content .card-climate .climate-current {
-
-    margin: 0;
+    font-size: 15px;
     text-align: center;
 
 }
 
-.focus-content .card-climate .focus-controls {
+.focus-light-controls {
 
-    width: 100%;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    padding: 20px 0 8px;
 
 }
 
-.focus-content .card-climate .climate-target-row {
+.focus-action {
 
-    width: 100%;
-    margin: 0;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+
+    min-width: 54px;
+    min-height: 54px;
+
+    border: 1px solid #cfd8e4;
+    border-radius: 16px;
+
+    background: #f7f9fc;
+    color: #27364a;
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+    appearance: none;
 
 }
 
-.focus-landscape .card-climate.focus-card {
+.focus-action:disabled {
 
-    -webkit-flex-direction: row;
-    flex-direction: row;
+    cursor: default;
+    opacity: 0.5;
+
+}
+
+.focus-power-action {
+
+    min-width: 180px;
+    padding: 0 20px;
+
+}
+
+.focus-power-action.is-on {
+
+    border-color: #9ccdac;
+    background: #e8f5ec;
+    color: #1d6f3d;
+
+}
+
+.focus-power-icon {
+
+    display: block;
+
+    -webkit-flex: 0 0 24px;
+    flex: 0 0 24px;
+
+    width: 24px;
+    height: 24px;
+
+    margin-right: 10px;
+
+}
+
+.focus-power-icon svg {
+
+    width: 24px;
+    height: 24px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+
+}
+
+.focus-action-label {
+
+    font-size: 16px;
+    font-weight: 700;
+
+}
+
+.focus-climate-primary {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: baseline;
+    align-items: baseline;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    min-height: 86px;
+    margin-bottom: 16px;
+
+}
+
+.focus-current-value {
+
+    font-size: 54px;
+    font-weight: 700;
+    line-height: 1;
+
+}
+
+.focus-current-unit {
+
+    margin-left: 6px;
+
+    color: #59697c;
+
+    font-size: 24px;
+    font-weight: 600;
+
+}
+
+.focus-current-label {
+
+    margin-left: 12px;
+
+    color: #718094;
+
+    font-size: 15px;
+
+}
+
+.focus-climate-controls {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex-direction: column;
+    flex-direction: column;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+}
+
+.focus-target {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-align-items: baseline;
+    align-items: baseline;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+
+    min-width: 150px;
+    margin-bottom: 14px;
+
+}
+
+.focus-target-label {
+
+    margin-right: 10px;
+
+    color: #718094;
+
+    font-size: 16px;
+
+}
+
+.focus-target-value {
+
+    font-size: 32px;
+    font-weight: 700;
+
+}
+
+.focus-target-value small {
+
+    margin-left: 4px;
+
+    color: #59697c;
+
+    font-size: 18px;
+
+}
+
+.focus-step-controls {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+
+    margin-bottom: 14px;
+
+}
+
+.focus-step-action {
+
+    width: 56px;
+    min-width: 56px;
+    height: 56px;
+    min-height: 56px;
+
+    margin: 0 6px;
+    padding: 0;
+
+}
+
+.focus-step-icon {
+
+    width: 26px;
+    height: 26px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 2.4;
+
+}
+
+.focus-state-unavailable .focus-action,
+.focus-state-stale .focus-action {
+
+    cursor: default;
+    opacity: 0.5;
+
+}
+
+.focus-layout-landscape .focus-widget-climate {
+
+    display: -webkit-flex;
+    display: flex;
 
     -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
@@ -2710,68 +3085,124 @@ body.theme-dark .dashboard-power-control.is-on {
 
 }
 
-.focus-landscape .card-climate .focus-header {
+.focus-layout-landscape .focus-widget-climate .focus-header {
 
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
 
 }
 
-.focus-landscape .card-climate .focus-primary {
+.focus-layout-landscape .focus-widget-climate .focus-climate-primary {
 
-    width: 34%;
+    width: 36%;
     margin: 0;
     padding-right: 16px;
 
 }
 
-.focus-landscape .card-climate .focus-controls {
+.focus-layout-landscape .focus-widget-climate .focus-climate-controls {
 
-    width: 66%;
+    width: 64%;
+
+    -webkit-flex-direction: row;
+    flex-direction: row;
+
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+
+    -webkit-justify-content: center;
+    justify-content: center;
 
 }
 
-.focus-short .focus-shell {
+.focus-layout-landscape .focus-widget-climate .focus-target,
+.focus-layout-landscape .focus-widget-climate .focus-step-controls {
+
+    margin: 6px;
+
+}
+
+.focus-layout-landscape .focus-widget-climate .focus-power-action {
+
+    margin: 6px;
+
+}
+
+.focus-layout-short .focus-panel {
 
     padding: 6px;
 
 }
 
-.focus-short .focus-toolbar {
+.focus-layout-short .focus-toolbar {
 
+    min-height: 42px;
     margin-bottom: 2px;
 
 }
 
-.focus-short .focus-card {
+.focus-layout-short .focus-widget {
 
+    min-height: 0;
     padding: 14px;
 
 }
 
-.focus-short .focus-content .focus-header > .card-identity,
-.focus-short .focus-content .card-climate .focus-header,
-.focus-short .focus-content .card-climate .focus-primary {
+.focus-layout-short .focus-header {
 
     margin-bottom: 8px;
 
 }
 
-.focus-short .focus-content .card-sensor .value {
+.focus-layout-short .focus-icon {
 
-    font-size: 52px;
+    -webkit-flex-basis: 50px;
+    flex-basis: 50px;
+
+    width: 50px;
+    min-width: 50px;
+    height: 50px;
+    min-height: 50px;
 
 }
 
-.focus-short .focus-content .card-binary .status {
+.focus-layout-short .focus-climate-primary {
 
-    font-size: 34px;
+    min-height: 58px;
+    margin-bottom: 6px;
 
 }
 
-.focus-short .focus-content .card-climate .climate-current-value {
+.focus-layout-short .focus-current-value {
 
     font-size: 42px;
+
+}
+
+.focus-layout-short .focus-target,
+.focus-layout-short .focus-step-controls {
+
+    margin-bottom: 7px;
+
+}
+
+.focus-layout-short .focus-climate-controls {
+
+    -webkit-flex-direction: row;
+    flex-direction: row;
+
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+}
+
+.focus-layout-short .focus-climate-controls > * {
+
+    margin-right: 5px;
+    margin-left: 5px;
 
 }
 
@@ -2781,17 +3212,31 @@ body.focus-page-locked {
 
 }
 
-body.theme-dark .focus-shell {
+body.theme-dark .focus-panel {
 
     background: #101923;
 
 }
 
-body.theme-dark .focus-close {
+body.theme-dark .focus-close,
+body.theme-dark .focus-widget,
+body.theme-dark .focus-action {
 
     border-color: #39475a;
     background: #253142;
     color: #f0f4f8;
+
+}
+
+body.theme-dark .focus-subtitle,
+body.theme-dark .focus-unit,
+body.theme-dark .focus-current-unit,
+body.theme-dark .focus-current-label,
+body.theme-dark .focus-target-label,
+body.theme-dark .focus-target-value small,
+body.theme-dark .focus-secondary {
+
+    color: #aeb9c7;
 
 }
 
@@ -2803,40 +3248,69 @@ body.theme-dark .focus-close {
 
     }
 
-    .focus-shell {
+    .focus-panel {
 
+        min-width: 0;
         padding: 8px;
 
     }
 
-    .focus-content .focus-card {
+    .focus-widget {
 
         padding: 16px;
 
     }
 
-    .focus-content .focus-header > .card-identity {
+    .focus-header {
 
-        font-size: 21px;
+        margin-bottom: 14px;
 
     }
 
-    .focus-content .card-sensor .card-header,
-    .focus-content .card-binary .card-header {
+    .focus-icon {
+
+        -webkit-flex-basis: 54px;
+        flex-basis: 54px;
+
+        width: 54px;
+        min-width: 54px;
+        height: 54px;
+        min-height: 54px;
 
         margin-right: 12px;
 
     }
 
-    .focus-content .card-sensor .value {
+    .focus-identity {
+
+        font-size: 21px;
+
+    }
+
+    .focus-state {
+
+        margin-left: 8px;
+        padding: 7px 9px;
+
+        font-size: 14px;
+
+    }
+
+    .focus-value {
 
         font-size: 52px;
 
     }
 
-    .focus-content .card-binary .status {
+    .focus-binary-state {
 
         font-size: 34px;
+
+    }
+
+    .focus-power-action {
+
+        min-width: 170px;
 
     }
 

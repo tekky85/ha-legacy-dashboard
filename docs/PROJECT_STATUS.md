@@ -1,6 +1,7 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 16. August 2026, Sprint 17.4 implementiert und vollständig geprüft
+Stand: 16. August 2026, Sprint 17.5 implementiert und lokal vollständig geprüft;
+physische Safari-Geräteabnahme nach Rollout ausstehend
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -8,6 +9,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-17.5-Ausgangscommit: `251309d`
 - Sprint-17.4-Ausgangscommit: `ce91dcb`
 - Sprint-21-Commit: `a441880`
 - Sprint-21-Ausgangscommit: `f8f3d3a`
@@ -19,8 +21,8 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 - Sprint-18-Commit: `94ce1c0`
 - Sprint-17.1-Commit: `53ce672`
 
-Die Sprint-17.4-Implementierung baut auf dem bereits committeten und gepushten
-Sprint-21-Stand auf. Die bestehende
+Die Sprint-17.5-Implementierung baut auf dem vollständig ausgerollten
+Sprint-17.4-Stand auf. Die bestehende
 Dashboard-Konfiguration, Summary-/Error-Fachlogik und die Write-Allowlists
 wurden nicht verändert.
 
@@ -47,6 +49,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 20 | Error Dashboard MVP | umgesetzt |
 | 17.3 | Live Card Preview, Unified Controls und Focus Mode | umgesetzt |
 | 17.4 | Focus Overlay Layout Stabilization | umgesetzt |
+| 17.5 | Native Focus Renderer und Mobile-Safari-Stabilisierung | umgesetzt |
 | D1 | Zweisprachige Dokumentation und Screenshot-Baseline | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 
@@ -232,7 +235,7 @@ werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion ist 30.
+Assetversion ist 31.
 
 ## 8a. Sprint 17.3 – Preview, Controls und Focus
 
@@ -310,6 +313,51 @@ Widgettypen passen in 768×1024 und 1024×768 vollständig ohne Scrollen. Beim
 fixiert. Beim Schließen werden vorherige Inline-Styles und Scrollposition
 wiederhergestellt.
 
+## 8c. Sprint 17.5 – Native Focus Renderer
+
+Die verbliebene iPadOS-Regression lag nicht an einer falschen
+Viewport-Messung. Der Sprint-17.4-Focus verwendete weiterhin
+`card.cloneNode(true)`: Zwar wurde der äußere Inline-Style entfernt, der Clone
+behielt jedoch `.card`, `.card-climate` beziehungsweise die übrigen
+Widgetklassen, verschachteltes Grid-DOM und zusätzlich
+`card-presentation-expanded`. Damit griffen weiterhin allgemeine
+Card-/Widget-Regeln sowie die Media Queries bei 599, 739 und 900 Pixeln. Die
+Focus-Overrides ersetzten nur einen Teil dieser Regeln. Gleichzeitig waren
+Panel und verschachtelte Flex-Inhalte ohne durchgängigen Shrink-Schutz; Mobile
+WebKit durfte sie unter seiner Min-Content-/Fixed-Overlay-Berechnung stärker
+komprimieren als macOS Safari. `transform`, `scale` oder `zoom` waren nicht
+beteiligt, und `window.innerWidth`/`window.innerHeight` lieferten korrekte
+Werte.
+
+Focus ist nun architektonisch vom Grid getrennt:
+
+```text
+Widgetdefinition + sanitierter State + Gateway-Capabilities
+                         |
+                         v
+                 Focus View Model
+                         |
+                         v
+          typgetrennter nativer Focus Renderer
+```
+
+`view-model.js` erzeugt eine kleine, seiteneffektfreie Datenstruktur.
+`renderer.js` besitzt eigene Renderer für Sensor, Binary, Light und Climate.
+`focus.js` verwaltet ausschließlich Lifecycle, Viewport, Rotation, Scroll-Lock
+und Refresh. Es gibt kein `cloneNode`, keine Grid-DOM-Suche und keine Übernahme
+von `x/y/w/h`, Inline-Größen oder Presentation-Klassen. Das Dashboard liefert
+die Daten über eine stabile Widget-ID; optimistische Light-/Climate-Updates
+aktualisieren denselben Zustands-Cache, sodass ein offener Focus aktuell
+bleibt.
+
+Der CSS-Block verwendet ausschließlich den `focus-*`-Namespace. Panel,
+Widget, Header, Kernbereiche und Controls besitzen konsistentes
+`box-sizing`; Panel, Widget und Interaktionen dürfen nicht schrumpfen. Die
+Panelbreite wird aus dem sichtbaren Viewport als echter Pixelwert gesetzt und
+bei 760 Pixeln begrenzt. Minus und Plus sind 56×56 Pixel, Power ist mindestens
+54 Pixel hoch. Stale und unavailable deaktivieren die bestehenden Controls,
+ohne neue Berechtigungen abzuleiten.
+
 ## 9. Sicherheitsgrenzen
 
 Sprint 17.3 ergänzt als einzige Schreibfunktion den engen Climate-Power-Pfad;
@@ -337,12 +385,12 @@ Systemansichten ausgeliefert oder geloggt.
 | Sprint-17.2-Layout | `src/public/js/core/layout.js`, `src/public/js/core/widget.js`, `src/public/css/style.css` |
 | Sprint-17.2-Widgets | `src/public/js/widgets/sensor.js`, `src/public/js/widgets/binary.js`, `src/public/js/widgets/light.js`, `src/public/js/widgets/climate.js` |
 | Gemeinsame Presentation-Regeln | `src/public/js/core/presentation.js`, `src/public/js/core/layout.js`, `src/public/js/core/widget.js` |
-| Unified Controls und Focus | `src/public/js/controls/power.js`, `src/public/js/focus/focus.js`, `src/public/js/app.js`, `src/public/index.html`, `src/public/css/style.css` |
+| Unified Controls und Focus | `src/public/js/controls/power.js`, `src/public/js/focus/view-model.js`, `src/public/js/focus/renderer.js`, `src/public/js/focus/focus.js`, `src/public/js/core/dashboard.js`, `src/public/js/app.js`, `src/public/index.html`, `src/public/css/style.css` |
 | Climate Power | `src/services/climate-power.js`, `src/routes/api.js` |
 | Admin Live Preview | `src/routes/admin.js`, `src/admin/js/api.js`, `src/admin/js/state.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
 | Theme | `src/public/js/core/theme.js`, `src/public/index.html`, `src/public/system.html` |
 | Admin-Einstellungen | `src/admin/index.html`, `src/admin/js/system-dashboards.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
-| Tests | `test/sprint-17-4.test.js`, `test/sprint-17-3.test.js`, `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
+| Tests | `test/sprint-17-5.test.js`, `test/sprint-17-4.test.js`, `test/sprint-17-3.test.js`, `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
 
 ## 11. Tests
 
@@ -376,6 +424,8 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
 - Focus-Overlay, einzelner Focus und getrennte Card-/Control-Events
 - reale Focus-Viewport-Geometrie, priorisierte Widgetregionen, Rotation,
   Scroll-Lock/-Restore und Poll-Refresh ohne Neuvermessung
+- native Focus-Renderer für alle vier Widgettypen, View-Model-State-Binding,
+  CSS-Isolation, fehlende Grid-Geometrie und nicht schrumpfende Touchziele
 - 1000-Entity-Issue-Lauf, 1500 aktive Summary-Entities und 3000 normalisierte Entities
 - WebSocket-Authentifizierung, Request-Korrelation, Timeouts, Disconnect,
   begrenzter Reconnect sowie synchrone Konstruktor-/Sendefehler
@@ -385,25 +435,31 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
   Area-Priorität, Disabled/Hidden/Registry-only und Config-/Repair-Issues
 - 3000 Entities, 500 Devices, 50 Areas, 100 Config Entries und 100 Repairs
 
-Der abschließende vollständige Lauf besteht mit 158 von 158 Tests. Der isolierte
-Sprint-17.4-Satz besteht mit 8 von 8 Tests. Der Sprint-21-Satz besteht mit 15
-von 15 Tests; sein größter Synthetikfall mit 3000
+Der abschließende vollständige Lauf besteht mit 164 von 164 Tests. Der
+gezielte Focus-/Interaktionssatz besteht mit 28 von 28 Tests, davon 8 neue
+Sprint-17.5-Tests. Der Sprint-21-Satz bleibt mit 15 von 15 Tests grün; sein
+größter Synthetikfall mit 3000
 Entities, 500 Devices, 50 Areas, 100 Config Entries und 100 Repairs benötigte
-36 ms. Alle JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
+35 ms. Alle JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
 `git diff --check` ist sauber.
 
 Die Browser-Abnahme an der real laufenden Anwendung mit kontrolliertem
 localhost-HA-Mock und Fake-Credentials bestätigte Sensor, Binary, Light und
-Climate Focus bei 768×1024 und 1024×768 ohne vertikalen oder horizontalen
-Überlauf. Light Power sowie Climate Minus, Plus und Power sind sichtbar;
-Rotation lässt Focus offen und passt die Geometrie an. Außerdem bestätigte sie
-Light und Dark, Summary-Enrichment,
-vier Issue-Typen mit reduziertem Kontext, fünf verfügbare Diagnosequellen,
-Matter `unsupported`, Offline-Stale-Fallback und Recovery. Die Browserkonsole
-blieb fehlerfrei. `summary.png` und `errors.png` wurden neu aufgenommen;
-`system-diagnostics.png` wurde ergänzt und `focus-card.png` mit der realen
-kontrollierten Demo-Anwendung aktualisiert. Die echte Safari-iOS-9-Abnahme erfolgt
-nach einem später freigegebenen Produktions-Rollout auf dem iPad.
+Climate Focus. Bei 768×1024 ist das Climate-Widget 716 Pixel breit, bei
+1024×768 740 Pixel; beide haben weder horizontalen noch vertikalen Überlauf.
+Minus und Plus bleiben 56×56 Pixel, Power 54 Pixel hoch. Im kleinen
+320×460-Viewport ist das Panel 304 Pixel breit, sämtliche drei Climate-
+Controls bleiben vollständig sichtbar und ohne Überlauf. Light Power sowie
+Climate Plus/Minus wurden im geöffneten Focus betätigt; State und Sollwert
+aktualisierten sich, ohne den Focus zu schließen. Summary und Errors blieben
+funktionsfähig, die Browserkonsole fehlerfrei.
+
+Dieser kontrollierte Lauf verwendet den In-App-Browser und ersetzt keine echte
+Safari-Laufzeit. Das vom Anwender bestätigte gute Verhalten unter macOS Safari
+13.7.8 ist die Ausgangsbasis; die Post-Rollout-Abnahme auf macOS Safari,
+iPad Air 2 mit iPadOS 15.8.5 und dem Legacy-iOS-9-Gerät bleibt manuell. Der
+sichtbar geänderte echte Demo-Screenshot `focus-card.png` wurde aktualisiert;
+Summary-, Error- und Admin-Screenshots benötigen keine Änderung.
 
 ## 12. Bekannte Einschränkungen und technischer Rest
 
