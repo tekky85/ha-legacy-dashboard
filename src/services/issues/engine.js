@@ -34,6 +34,7 @@ function entityLookup(entityIds) {
 function createIssue(entity, settings, securityRelevant, nowMilliseconds) {
 
     const attributes = entity.attributes || {};
+    const context = entity.context || {};
     const state = String(entity.state || "").toLowerCase();
     const severity = Severity.issueSeverity(
         state,
@@ -44,11 +45,12 @@ function createIssue(entity, settings, securityRelevant, nowMilliseconds) {
         settings.entityTitles[entity.entityId];
     const baseTitle =
         configuredTitle ||
+        context.deviceName ||
         attributes.friendlyName ||
         entity.entityId;
 
 
-    if (!severity) {
+    if (!severity || context.disabledBy) {
         return null;
     }
 
@@ -81,9 +83,129 @@ function createIssue(entity, settings, securityRelevant, nowMilliseconds) {
             ),
         domain: entity.domain,
         deviceClass: attributes.deviceClass || null,
+        deviceName: context.deviceName || null,
+        areaName: context.areaName || null,
+        integration: context.integration || null,
+        platform: context.platform || null,
+        entityCategory: context.entityCategory || null,
+        disabledBy: context.disabledBy || null,
         metadata: {
             state: state
         }
+    };
+
+}
+
+
+function configEntrySeverity(state) {
+
+    if (
+        state === "setup_error" ||
+        state === "migration_error" ||
+        state === "failed_unload"
+    ) {
+        return "error";
+    }
+
+    if (state === "setup_retry") {
+        return "warning";
+    }
+
+    return null;
+
+}
+
+
+function configEntryIssue(entry) {
+
+    const state = String(entry.state || "").toLowerCase();
+    const severity = configEntrySeverity(state);
+
+    if (!severity || entry.disabledBy) {
+        return null;
+    }
+
+    const descriptions = {
+        setup_error: "Integration konnte nicht geladen werden.",
+        migration_error: "Integration konnte nicht migriert werden.",
+        failed_unload: "Integration konnte nicht sauber entladen werden.",
+        setup_retry: "Einrichtung wird durch Home Assistant erneut versucht."
+    };
+
+    return {
+        id: "config-entry-" + entry.entryId + "-" + state,
+        source: "config_entry",
+        severity: severity,
+        status: "active",
+        title: entry.title || entry.domain || "Home Assistant Integration",
+        description: descriptions[state],
+        state: state,
+        securityRelevant: false,
+        durationSeconds: null,
+        domain: entry.domain || null,
+        integration: entry.title || entry.domain || null,
+        platform: entry.domain || null,
+        fixable: false
+    };
+
+}
+
+
+function repairIssue(repair) {
+
+    if (!repair || repair.status !== "active") {
+        return null;
+    }
+
+    return {
+        id: repair.id,
+        source: "home_assistant_repair",
+        severity:
+            Severity.LEVELS.indexOf(repair.severity) !== -1
+                ? repair.severity
+                : "info",
+        status: "active",
+        title: repair.title,
+        description: repair.description,
+        state: "repair",
+        securityRelevant: false,
+        durationSeconds: null,
+        domain: repair.domain || null,
+        fixable: repair.fixable === true
+    };
+
+}
+
+
+function matterIssue(issue) {
+
+    if (!issue || issue.status !== "active") {
+        return null;
+    }
+
+    return {
+        id: String(issue.id || "matter-diagnostic"),
+        source: "matter_diagnostic",
+        severity:
+            Severity.LEVELS.indexOf(issue.severity) !== -1
+                ? issue.severity
+                : "warning",
+        status: "active",
+        title: String(issue.title || "Matter-Komponente beeinträchtigt"),
+        description: String(issue.description || "Matter-Diagnose meldet eine Störung."),
+        state: "diagnostic",
+        securityRelevant: false,
+        durationSeconds: null,
+        domain: "matter",
+        affectedDevices:
+            Number.isInteger(issue.affectedDevices)
+                ? issue.affectedDevices
+                : null,
+        affectedEntities:
+            Number.isInteger(issue.affectedEntities)
+                ? issue.affectedEntities
+                : null,
+        fixable: false
     };
 
 }
@@ -104,7 +226,12 @@ function summarize(issues) {
 
     issues.forEach(function (issue) {
         summary[issue.severity] += 1;
-        summary[issue.state] += 1;
+        if (
+            issue.state === "unavailable" ||
+            issue.state === "unknown"
+        ) {
+            summary[issue.state] += 1;
+        }
     });
 
     return summary;
@@ -148,7 +275,7 @@ function groupIssues(issues) {
         critical: "Kritisch",
         error: "Fehler",
         warning: "Warnungen",
-        info: "Unbekannt"
+        info: "Info"
     };
 
     return Severity.LEVELS.map(function (severity) {
@@ -207,6 +334,42 @@ function buildIssues(snapshot, configuration) {
 
     });
 
+    const configEntries = snapshot.metadata &&
+        snapshot.metadata.configEntries
+        ? snapshot.metadata.configEntries
+        : {};
+
+    Object.keys(configEntries).forEach(function (entryId) {
+        const issue = configEntryIssue(configEntries[entryId]);
+        if (issue) {
+            issues.push(issue);
+        }
+    });
+
+    const repairs = snapshot.diagnostics &&
+        Array.isArray(snapshot.diagnostics.repairs)
+        ? snapshot.diagnostics.repairs
+        : [];
+
+    repairs.forEach(function (repair) {
+        const issue = repairIssue(repair);
+        if (issue) {
+            issues.push(issue);
+        }
+    });
+
+    const matter = snapshot.diagnostics &&
+        Array.isArray(snapshot.diagnostics.matter)
+        ? snapshot.diagnostics.matter
+        : [];
+
+    matter.forEach(function (diagnostic) {
+        const issue = matterIssue(diagnostic);
+        if (issue) {
+            issues.push(issue);
+        }
+    });
+
     Severity.sortIssues(issues);
 
     const summary = summarize(issues);
@@ -242,8 +405,11 @@ function buildIssues(snapshot, configuration) {
 
 module.exports = {
     buildIssues: buildIssues,
+    configEntryIssue: configEntryIssue,
+    configEntrySeverity: configEntrySeverity,
     createIssue: createIssue,
     groupIssues: groupIssues,
     overallStatus: overallStatus,
+    repairIssue: repairIssue,
     summarize: summarize
 };

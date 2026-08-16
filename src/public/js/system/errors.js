@@ -126,27 +126,63 @@
             );
         }
 
-        details.appendChild(
-            createElement(
-                "code",
-                "error-entity-id",
-                issue.entityId || "Unbekannte Entity"
-            )
-        );
-        details.appendChild(
-            createElement(
-                "span",
-                "error-state",
-                "State: " + (issue.state || "unknown")
-            )
-        );
-        details.appendChild(
-            createElement(
-                "span",
-                "error-duration",
-                formatDuration(issue.durationSeconds)
-            )
-        );
+        if (issue.areaName) {
+            details.appendChild(
+                createElement("span", "error-area", "Raum: " + issue.areaName)
+            );
+        }
+
+        if (issue.deviceName) {
+            details.appendChild(
+                createElement("span", "error-device", "Gerät: " + issue.deviceName)
+            );
+        }
+
+        if (issue.integration) {
+            details.appendChild(
+                createElement("span", "error-integration", "Integration: " + issue.integration)
+            );
+        }
+
+        if (issue.entityId) {
+            details.appendChild(
+                createElement(
+                    "code",
+                    "error-entity-id",
+                    "Entity: " + issue.entityId
+                )
+            );
+        }
+
+        if (issue.state) {
+            details.appendChild(
+                createElement(
+                    "span",
+                    "error-state",
+                    "Status: " + issue.state
+                )
+            );
+        }
+
+        if (typeof issue.durationSeconds === "number") {
+            details.appendChild(
+                createElement(
+                    "span",
+                    "error-duration",
+                    formatDuration(issue.durationSeconds)
+                )
+            );
+        }
+
+        if (issue.fixable) {
+            details.appendChild(
+                createElement(
+                    "span",
+                    "error-fixable",
+                    "In Home Assistant reparierbar"
+                )
+            );
+        }
 
         if (issue.securityRelevant) {
             details.appendChild(

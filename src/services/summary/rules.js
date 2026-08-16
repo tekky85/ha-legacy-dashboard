@@ -97,6 +97,7 @@ function durationSeconds(startedAt, nowMilliseconds) {
 function createItem(entity, definition, nowMilliseconds, details) {
 
     const attributes = entity.attributes || {};
+    const context = entity.context || {};
     const categoryDefinition =
         CATEGORY_DEFINITIONS[definition.category];
 
@@ -105,14 +106,21 @@ function createItem(entity, definition, nowMilliseconds, details) {
         entityIds: [entity.entityId],
         category: definition.category,
         priority: categoryDefinition.priority,
-        title: attributes.friendlyName || entity.entityId,
+        title:
+            context.deviceName ||
+            attributes.friendlyName ||
+            entity.entityId,
         state: entity.state,
         startedAt: entity.lastChanged,
         durationSeconds:
             durationSeconds(entity.lastChanged, nowMilliseconds),
         icon: definition.icon,
         metadata: {
-            domain: entity.domain
+            domain: entity.domain,
+            areaName: context.areaName || null,
+            deviceName: context.deviceName || null,
+            integration: context.integration || null,
+            platform: context.platform || null
         }
     };
 
@@ -139,6 +147,16 @@ function activityDefinition(entity, settings) {
         typeof attributes.currentPosition === "number"
             ? " (" + Math.round(attributes.currentPosition) + " %)"
             : "";
+
+    const context = entity.context || {};
+
+    if (
+        context.disabledBy ||
+        context.entityCategory === "diagnostic" ||
+        context.entityCategory === "config"
+    ) {
+        return null;
+    }
 
     if (state === "unknown" || state === "unavailable") {
         return null;

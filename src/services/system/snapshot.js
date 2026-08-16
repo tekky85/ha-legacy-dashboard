@@ -154,7 +154,7 @@ function normalizeEntities(rawStates) {
 
 function cloneEntity(entity) {
 
-    return {
+    const clone = {
         entityId: entity.entityId,
         domain: entity.domain,
         state: entity.state,
@@ -162,6 +162,31 @@ function cloneEntity(entity) {
         lastChanged: entity.lastChanged,
         lastUpdated: entity.lastUpdated
     };
+
+    if (entity.context) {
+        clone.context = Object.assign({}, entity.context);
+    }
+
+    return clone;
+
+}
+
+
+function cloneSources(sources, stale) {
+
+    const result = {};
+
+    Object.keys(sources || {}).forEach(function (name) {
+        const source = sources[name] || {};
+        result[name] = Object.assign({}, source);
+
+        if (name !== "states" && stale && source.ok) {
+            result[name].ok = false;
+            result[name].stale = true;
+        }
+    });
+
+    return result;
 
 }
 
@@ -181,7 +206,11 @@ function createSuccessful(rawStates, collectedAt) {
         },
         sources: {
             states: {
+                supported: true,
                 ok: true,
+                stale: false,
+                lastSuccessfulAt: collectedAt,
+                errorCode: null,
                 error: null
             }
         },
@@ -194,7 +223,9 @@ function createSuccessful(rawStates, collectedAt) {
 function createStale(lastSuccessful, collectedAt, errorCode) {
 
     return {
-        version: 1,
+        version: lastSuccessful && lastSuccessful.version
+            ? lastSuccessful.version
+            : 1,
         collectedAt: collectedAt,
         lastSuccessfulCollectionAt:
             lastSuccessful
@@ -207,24 +238,78 @@ function createStale(lastSuccessful, collectedAt, errorCode) {
         homeAssistant: {
             reachable: false
         },
-        sources: {
-            states: {
-                ok: false,
-                error:
-                    errorCode ||
-                    "home_assistant_unavailable"
+        sources: Object.assign(
+            cloneSources(
+                lastSuccessful ? lastSuccessful.sources : {},
+                true
+            ),
+            {
+                states: {
+                    supported: true,
+                    ok: false,
+                    stale: true,
+                    lastSuccessfulAt:
+                        lastSuccessful
+                            ? lastSuccessful.lastSuccessfulCollectionAt
+                            : null,
+                    errorCode:
+                        errorCode ||
+                        "home_assistant_unavailable",
+                    error:
+                        errorCode ||
+                        "home_assistant_unavailable"
+                }
             }
-        },
+        ),
         entities:
             lastSuccessful
                 ? lastSuccessful.entities.map(cloneEntity)
-                : []
+                : [],
+        metadata:
+            lastSuccessful && lastSuccessful.metadata
+                ? lastSuccessful.metadata
+                : undefined,
+        diagnostics:
+            lastSuccessful && lastSuccessful.diagnostics
+                ? lastSuccessful.diagnostics
+                : undefined,
+        capabilities:
+            lastSuccessful && lastSuccessful.capabilities
+                ? lastSuccessful.capabilities
+                : undefined
+    };
+
+}
+
+
+function publicSource(source) {
+
+    const errorCode =
+        source.errorCode || source.error || null;
+
+    return {
+        supported:
+            typeof source.supported === "boolean"
+                ? source.supported
+                : null,
+        ok: source.ok === true,
+        stale: source.stale === true,
+        last_successful_at:
+            source.lastSuccessfulAt || null,
+        error_code: errorCode,
+        error: errorCode
     };
 
 }
 
 
 function toPublicMeta(snapshot) {
+
+    const sources = {};
+
+    Object.keys(snapshot.sources || {}).forEach(function (name) {
+        sources[name] = publicSource(snapshot.sources[name] || {});
+    });
 
     return {
         gateway: {
@@ -243,20 +328,8 @@ function toPublicMeta(snapshot) {
         collected_at: snapshot.collectedAt,
         last_successful_update:
             snapshot.lastSuccessfulCollectionAt,
-        sources: {
-            states: {
-                ok: Boolean(
-                    snapshot.sources &&
-                    snapshot.sources.states &&
-                    snapshot.sources.states.ok
-                ),
-                error:
-                    snapshot.sources &&
-                    snapshot.sources.states
-                        ? snapshot.sources.states.error
-                        : "system_snapshot_unavailable"
-            }
-        },
+        sources: sources,
+        capabilities: Object.assign({}, snapshot.capabilities || {}),
         entity_count: snapshot.entities.length
     };
 
@@ -269,5 +342,6 @@ module.exports = {
     normalizeAttributes: normalizeAttributes,
     normalizeEntities: normalizeEntities,
     normalizeEntity: normalizeEntity,
+    publicSource: publicSource,
     toPublicMeta: toPublicMeta
 };

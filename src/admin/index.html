@@ -123,6 +123,19 @@
                             <div id="errorIgnoredEntities" class="system-entity-list"></div>
                             <small>Security-Markierungen erteilen keine Schreibrechte. Karenzzeiten folgen erst in Sprint 22.</small>
                         </div>
+
+                        <div class="system-settings-subsection diagnostic-sources" aria-labelledby="diagnosticSourcesTitle">
+                            <h4 id="diagnosticSourcesTitle">Diagnostic Sources</h4>
+                            <p class="diagnostic-sources-note">Nur lesend; Aktionen bleiben ausschließlich in Home Assistant.</p>
+                            <dl id="diagnosticSourcesList" class="diagnostic-source-list">
+                                <div><dt>Entity Registry</dt><dd>Wird geprüft …</dd></div>
+                                <div><dt>Device Registry</dt><dd>Wird geprüft …</dd></div>
+                                <div><dt>Area Registry</dt><dd>Wird geprüft …</dd></div>
+                                <div><dt>Config Entries</dt><dd>Wird geprüft …</dd></div>
+                                <div><dt>Repairs</dt><dd>Wird geprüft …</dd></div>
+                                <div><dt>Matter Diagnostics</dt><dd>Wird geprüft …</dd></div>
+                            </dl>
+                        </div>
                     </section>
                 </aside>
 
@@ -291,8 +304,8 @@
     <script src="/admin/js/widgets.js" defer></script>
     <script src="/admin/js/entities.js" defer></script>
     <script src="/admin/js/system-dashboards.js" defer></script>
-    <script src="/js/core/icons.js?v=28" defer></script>
-    <script src="/js/core/presentation.js?v=28" defer></script>
+    <script src="/js/core/icons.js?v=29" defer></script>
+    <script src="/js/core/presentation.js?v=29" defer></script>
     <script src="/admin/js/app.js" defer></script>
 </body>
 </html>

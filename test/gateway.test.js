@@ -168,6 +168,7 @@ test(
 
         const mock = {
             authorizationHeaders: [],
+            websocketAuthorizationHeaders: [],
             confirmationMode: "immediate",
             climatePowerCalls: [],
             climateState: "heat",
@@ -227,9 +228,15 @@ test(
 
             let requestBody = "";
 
-            mock.authorizationHeaders.push(
-                req.headers.authorization
-            );
+            if (req.url === "/api/websocket") {
+                mock.websocketAuthorizationHeaders.push(
+                    req.headers.authorization
+                );
+            } else {
+                mock.authorizationHeaders.push(
+                    req.headers.authorization
+                );
+            }
 
             req.on("data", function (chunk) {
                 requestBody += chunk;
@@ -605,7 +612,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=28"/
+                /src="\/js\/app\.js\?v=29"/
             );
 
             const manifest = await request(
@@ -624,7 +631,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=28"
+                "/js/app.js?v=29"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -1676,6 +1683,18 @@ test(
                 function (header) {
                     return header ===
                         "Bearer " + TEST_TOKEN;
+                }
+            )
+        );
+
+        assert.ok(
+            mock.websocketAuthorizationHeaders.length > 0
+        );
+
+        assert.ok(
+            mock.websocketAuthorizationHeaders.every(
+                function (header) {
+                    return typeof header === "undefined";
                 }
             )
         );

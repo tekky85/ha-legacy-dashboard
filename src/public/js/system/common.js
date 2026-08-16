@@ -156,6 +156,22 @@ var SystemDashboard = (function () {
 
         var stale = meta.stale === true;
 
+        var sources = meta.sources || {};
+        var metadataPartial = false;
+        var sourceName;
+
+        for (sourceName in sources) {
+            if (
+                Object.prototype.hasOwnProperty.call(sources, sourceName) &&
+                sourceName !== "states" &&
+                sources[sourceName] &&
+                sources[sourceName].supported !== false &&
+                sources[sourceName].ok !== true
+            ) {
+                metadataPartial = true;
+            }
+        }
+
 
         lastPayload = payload;
 
@@ -193,6 +209,12 @@ var SystemDashboard = (function () {
                     "Verbindung wiederhergestellt. " + emptyMessage,
                     "recovered"
                 );
+            } else if (metadataPartial) {
+                setBanner(
+                    "Metadaten teilweise verfügbar. Zustandsdaten bleiben aktuell.",
+                    "warning"
+                );
+                setMessage(emptyMessage, "");
             } else {
                 setBanner("", "");
                 setMessage(emptyMessage, "");

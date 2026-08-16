@@ -115,6 +115,33 @@
             );
         }
 
+        var metadata = item.metadata || {};
+        var context = createElement("div", "summary-item-context");
+
+        if (metadata.areaName) {
+            context.appendChild(
+                createElement(
+                    "span",
+                    "summary-item-area",
+                    "Raum: " + metadata.areaName
+                )
+            );
+        }
+
+        if (metadata.integration) {
+            context.appendChild(
+                createElement(
+                    "span",
+                    "summary-item-integration",
+                    "Integration: " + metadata.integration
+                )
+            );
+        }
+
+        if (context.childNodes.length > 0) {
+            body.appendChild(context);
+        }
+
         row.appendChild(createIcon(item.category || "other"));
         row.appendChild(body);
 

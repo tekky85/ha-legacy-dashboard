@@ -61,6 +61,7 @@ Features include:
 - portrait / landscape layouts
 - live card preview
 - light / dark preview
+- read-only status of diagnostic Home Assistant sources
 
 ### Summary Dashboard
 
@@ -95,6 +96,28 @@ Shows, among other things:
 
 `unknown` and `unavailable` are intentionally treated as distinct states.
 
+### Registry and Diagnostic Enrichment
+
+The gateway enriches REST-based state data on the server with read-only
+metadata from the Entity, Device and Area Registries, Config Entries and,
+when supported, Home Assistant Repairs. A single authenticated Home Assistant
+WebSocket connection exists exclusively in the backend. The browser receives
+neither WebSocket access nor credentials or raw registry data.
+
+Sources are capability-driven and cached independently:
+
+- Entity, Device and Area Registries: 60 seconds
+- Config Entries: 30 seconds
+- Repairs: 30 seconds
+- Matter diagnostics: 60 seconds or controlled `unsupported`
+
+Partial failures leave the existing REST state snapshot, Summary and System
+Status operational. Entity issues can therefore show device, area,
+integration and platform context. Disabled entities are not treated as
+`unavailable`, and registry entries without a state are not automatically
+classified as orphaned. Config Entry problems and Repairs remain notices only,
+without reload, reauthentication, repair or Matter actions.
+
 ## Security Model
 
 Mandatory rules:
@@ -110,6 +133,9 @@ Mandatory rules:
 - payload limits
 - security headers
 - secret redaction
+- Home Assistant WebSocket exclusively in the backend
+- registries, Config Entries, Repairs and Matter are read-only in Sprint 21
+- no raw registry API or generic WebSocket command API
 
 ```text
 Entity visible != Entity writable
@@ -136,38 +162,53 @@ The legacy frontend deliberately avoids:
 
 Product screenshots must be real captures of the running application or a controlled demo/mock instance of the real application. Do not use generated mockups as product screenshots.
 
+The current gallery was captured from the unchanged application using a local, controlled Home Assistant mock with fake credentials. It contains no production data.
+
 ### User Dashboards
 
-```text
-docs/screenshots/dashboards/main-light.png
-docs/screenshots/dashboards/main-dark.png
-docs/screenshots/dashboards/compact-cards.png
-docs/screenshots/dashboards/focus-card.png
-```
+#### Light Mode
+
+![User dashboard in light mode](docs/screenshots/dashboards/main-light.png)
+
+#### Dark Mode
+
+![User dashboard in dark mode](docs/screenshots/dashboards/main-dark.png)
+
+#### Compact Cards in Landscape Layout
+
+![Compact cards in landscape layout](docs/screenshots/dashboards/compact-cards.png)
+
+#### Focus Card
+
+![Open focus card](docs/screenshots/dashboards/focus-card.png)
 
 ### Admin
 
-```text
-docs/screenshots/admin/dashboard-management.png
-docs/screenshots/admin/layout-editor.png
-docs/screenshots/admin/live-preview.png
-```
+#### Dashboard Management
+
+![Dashboard management in the Admin area](docs/screenshots/admin/dashboard-management.png)
+
+#### Layout Editor
+
+![Grid-based layout editor](docs/screenshots/admin/layout-editor.png)
+
+#### Live Preview
+
+![Live preview in landscape and dark mode](docs/screenshots/admin/live-preview.png)
+
+#### Diagnostic Sources
+
+![Read-only status of diagnostic Home Assistant sources](docs/screenshots/admin/system-diagnostics.png)
 
 ### System Dashboards
 
-```text
-docs/screenshots/system/summary.png
-docs/screenshots/system/errors.png
-```
+#### Summary
 
-Once files exist, they can be embedded, for example:
+![Summary Dashboard with active states](docs/screenshots/system/summary.png)
 
-```md
-![Dashboard – Light Mode](docs/screenshots/dashboards/main-light.png)
-![Admin – Layout Editor](docs/screenshots/admin/layout-editor.png)
-![Summary Dashboard](docs/screenshots/system/summary.png)
-![Error Dashboard](docs/screenshots/system/errors.png)
-```
+#### System Status
+
+![Error Dashboard with unavailable and unknown states](docs/screenshots/system/errors.png)
 
 ## Screenshot Maintenance
 
@@ -203,6 +244,7 @@ docs/
       dashboard-management.png
       layout-editor.png
       live-preview.png
+      system-diagnostics.png
     system/
       summary.png
       errors.png
@@ -236,7 +278,9 @@ Production credentials must never be used for local integration tests.
 
 ## Deployment
 
-Standalone operation supports Debian-based LXC/VM systems with systemd. The architecture also remains suitable for future Home Assistant App packaging.
+Standalone operation requires Node.js 22 or newer and supports Debian-based
+LXC/VM systems with systemd. The architecture also remains suitable for future
+Home Assistant App packaging.
 
 ## Project Status and Roadmap
 

@@ -61,6 +61,7 @@ Dazu gehören unter anderem:
 - Portrait-/Landscape-Layouts
 - Live-Card-Vorschau
 - Light-/Dark-Vorschau
+- read-only Status der diagnostischen Home-Assistant-Quellen
 
 ### Summary Dashboard
 
@@ -95,6 +96,29 @@ Zeigt unter anderem:
 
 `unknown` und `unavailable` werden bewusst getrennt behandelt.
 
+### Registry- und Diagnoseanreicherung
+
+Das Gateway ergänzt die REST-basierten State-Daten serverseitig um
+read-only Metadaten aus Entity-, Device- und Area Registry, Config Entries
+und – sofern unterstützt – Home Assistant Repairs. Dafür existiert genau im
+Backend eine authentifizierte Home-Assistant-WebSocket-Verbindung. Der Browser
+erhält weder WebSocket-Zugriff noch Zugangsdaten oder rohe Registry-Daten.
+
+Die Quellen werden capability-gesteuert abgefragt und getrennt gecacht:
+
+- Entity, Device und Area Registry: 60 Sekunden
+- Config Entries: 30 Sekunden
+- Repairs: 30 Sekunden
+- Matter-Diagnostik: 60 Sekunden beziehungsweise kontrolliert `unsupported`
+
+Teilweise Ausfälle lassen den bestehenden REST-State-Snapshot und damit
+Summary und Systemstatus weiterlaufen. Entity-Issues können dadurch
+Geräte-, Raum-, Integrations- und Plattformkontext anzeigen. Deaktivierte
+Entities werden nicht mit `unavailable` gleichgesetzt; Registry-Einträge ohne
+State werden nicht pauschal als verwaist klassifiziert. Config-Entry-Probleme
+und Repairs erscheinen ausschließlich als Hinweise – ohne Reload-, Reauth-,
+Repair- oder Matter-Aktionen.
+
 ## Sicherheitsmodell
 
 Verbindlich:
@@ -110,6 +134,9 @@ Verbindlich:
 - Payload Limits
 - Security Header
 - Secret Redaction
+- Home-Assistant-WebSocket ausschließlich im Backend
+- Registries, Config Entries, Repairs und Matter in Sprint 21 ausschließlich read-only
+- keine rohe Registry- oder generische WebSocket-Command-API
 
 ```text
 Entity sichtbar != Entity schreibbar
@@ -136,38 +163,53 @@ Im Legacy-Frontend werden bewusst nicht verwendet:
 
 Produkt-Screenshots müssen echte Aufnahmen der laufenden Anwendung oder einer kontrollierten Demo-/Mock-Instanz der echten Anwendung sein. Keine generierten Mockups als Produkt-Screenshot verwenden.
 
+Die aktuelle Galerie wurde mit der unveränderten Anwendung und einem lokalen, kontrollierten Home-Assistant-Mock mit Fake-Credentials aufgenommen. Sie enthält keine Produktionsdaten.
+
 ### Benutzerdashboards
 
-```text
-docs/screenshots/dashboards/main-light.png
-docs/screenshots/dashboards/main-dark.png
-docs/screenshots/dashboards/compact-cards.png
-docs/screenshots/dashboards/focus-card.png
-```
+#### Light Mode
+
+![Benutzerdashboard im Light Mode](docs/screenshots/dashboards/main-light.png)
+
+#### Dark Mode
+
+![Benutzerdashboard im Dark Mode](docs/screenshots/dashboards/main-dark.png)
+
+#### Kompakte Karten im Landscape-Layout
+
+![Kompakte Karten im Landscape-Layout](docs/screenshots/dashboards/compact-cards.png)
+
+#### Focus Card
+
+![Geöffnete Focus Card](docs/screenshots/dashboards/focus-card.png)
 
 ### Admin
 
-```text
-docs/screenshots/admin/dashboard-management.png
-docs/screenshots/admin/layout-editor.png
-docs/screenshots/admin/live-preview.png
-```
+#### Dashboard-Verwaltung
+
+![Dashboard-Verwaltung im Admin-Bereich](docs/screenshots/admin/dashboard-management.png)
+
+#### Layout-Editor
+
+![Rasterbasierter Layout-Editor](docs/screenshots/admin/layout-editor.png)
+
+#### Live-Vorschau
+
+![Live-Vorschau in Landscape und Dark Mode](docs/screenshots/admin/live-preview.png)
+
+#### Diagnostische Quellen
+
+![Read-only Status der diagnostischen Home-Assistant-Quellen](docs/screenshots/admin/system-diagnostics.png)
 
 ### System-Dashboards
 
-```text
-docs/screenshots/system/summary.png
-docs/screenshots/system/errors.png
-```
+#### Summary
 
-Sobald die Dateien vorhanden sind, können sie hier eingebunden werden, z. B.:
+![Summary Dashboard mit aktiven Zuständen](docs/screenshots/system/summary.png)
 
-```md
-![Dashboard – Light Mode](docs/screenshots/dashboards/main-light.png)
-![Admin – Layout Editor](docs/screenshots/admin/layout-editor.png)
-![Summary Dashboard](docs/screenshots/system/summary.png)
-![Error Dashboard](docs/screenshots/system/errors.png)
-```
+#### Systemstatus
+
+![Error Dashboard mit unavailable- und unknown-Zuständen](docs/screenshots/system/errors.png)
 
 ## Screenshot-Pflege
 
@@ -203,6 +245,7 @@ docs/
       dashboard-management.png
       layout-editor.png
       live-preview.png
+      system-diagnostics.png
     system/
       summary.png
       errors.png
@@ -236,7 +279,9 @@ Produktionscredentials dürfen niemals für lokale Integrationstests verwendet w
 
 ## Deployment
 
-Der Standalone-Betrieb unterstützt Debian-basierte LXC-/VM-Systeme mit systemd. Die Architektur bleibt zusätzlich für eine spätere Home-Assistant-App-Verpackung geeignet.
+Der Standalone-Betrieb setzt Node.js 22 oder neuer voraus und unterstützt
+Debian-basierte LXC-/VM-Systeme mit systemd. Die Architektur bleibt zusätzlich
+für eine spätere Home-Assistant-App-Verpackung geeignet.
 
 ## Projektstatus und Roadmap
 

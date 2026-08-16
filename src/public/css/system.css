@@ -473,6 +473,22 @@
     overflow-wrap: break-word;
 }
 
+.summary-item-context {
+    margin: 3px -8px 0 0;
+}
+
+.summary-item-context span {
+    display: inline-block;
+    margin: 0 8px 2px 0;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 15px;
+}
+
+.error-fixable {
+    font-weight: 800;
+}
+
 .network-banner.is-warning {
     border-color: #f0cf9f;
     background: #fff8eb;

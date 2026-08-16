@@ -1,4 +1,5 @@
 const Snapshot = require("./snapshot");
+const Enrichment = require("./enrichment");
 
 
 function createCollector(options) {
@@ -7,6 +8,7 @@ function createCollector(options) {
     const ha = settings.homeAssistant || require("../homeassistant");
     const log = settings.logger || require("../logger");
     const clock = settings.clock || Date.now;
+    const diagnostics = settings.diagnostics || null;
 
 
     return {
@@ -23,10 +25,41 @@ function createCollector(options) {
             try {
 
                 const states = await ha.getAllEntities();
-                const snapshot = Snapshot.createSuccessful(
+                let snapshot = Snapshot.createSuccessful(
                     states,
                     new Date(clock()).toISOString()
                 );
+
+                if (
+                    diagnostics &&
+                    typeof diagnostics.getSnapshot === "function"
+                ) {
+                    try {
+                        snapshot = Enrichment.attach(
+                            snapshot,
+                            await diagnostics.getSnapshot()
+                        );
+                    } catch (diagnosticError) {
+                        snapshot = Enrichment.attach(
+                            snapshot,
+                            Enrichment.unavailable(
+                                diagnosticError && diagnosticError.code
+                                    ? diagnosticError.code
+                                    : "metadata_unavailable"
+                            )
+                        );
+
+                        log.warn(
+                            "system_metadata_enrichment_failed",
+                            {
+                                error_code:
+                                    diagnosticError && diagnosticError.code
+                                        ? diagnosticError.code
+                                        : "metadata_unavailable"
+                            }
+                        );
+                    }
+                }
 
                 log.info(
                     "system_snapshot_collection_succeeded",

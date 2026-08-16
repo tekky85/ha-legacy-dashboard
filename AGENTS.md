@@ -460,6 +460,22 @@ Before modifying the project:
 11. Summarize changed files.
 12. Provide deployment and verification commands.
 
+## Documentation and screenshot maintenance
+
+If a sprint changes visible UI, evaluate whether repository screenshots and
+README image references must be updated.
+
+If product documentation changes, keep `README.de.md` and `README.en.md`
+semantically synchronized.
+
+Never use generated mockups as product screenshots. Product screenshots must
+come from the real running application or a controlled demo/mock instance of
+the real application.
+
+Before committing screenshots, verify that they contain no tokens, unwanted
+internal IP addresses, private person/device names, security-sensitive entity
+names, private media information, or location data.
+
 ## Definition of done
 
 A change is complete only when:

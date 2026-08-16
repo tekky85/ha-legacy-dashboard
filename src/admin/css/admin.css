@@ -944,6 +944,63 @@ dialog::backdrop {
     font-size: 0.78rem;
 }
 
+.diagnostic-sources h4 {
+    margin: 0 0 0.35rem;
+    font-size: 0.95rem;
+}
+
+.diagnostic-sources-note {
+    margin: 0 0 0.7rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
+.diagnostic-source-list {
+    margin: 0;
+}
+
+.diagnostic-source-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.78rem;
+}
+
+.diagnostic-source-row:last-child {
+    border-bottom: 0;
+}
+
+.diagnostic-source-row dt,
+.diagnostic-source-row dd {
+    margin: 0;
+}
+
+.diagnostic-source-status {
+    margin-left: 0.7rem;
+    font-weight: 750;
+    text-align: right;
+}
+
+.diagnostic-source-status.is-available {
+    color: #067647;
+}
+
+.diagnostic-source-status.is-unsupported {
+    color: #667085;
+}
+
+.diagnostic-source-status.is-stale {
+    color: #b54708;
+}
+
+.diagnostic-source-status.is-error {
+    color: #b42318;
+}
+
 @media (max-width: 850px) {
     .workspace {
         grid-template-columns: 1fr;

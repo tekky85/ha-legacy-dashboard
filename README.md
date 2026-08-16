@@ -9,4 +9,6 @@ A lightweight external Home Assistant dashboard for legacy browsers and wall dis
 
 ## Screenshots
 
-The repository uses real screenshots of the running application. See the language-specific README files for the current screenshot gallery and maintenance rules.
+![HA Legacy Dashboard – Light Mode](docs/screenshots/dashboards/main-light.png)
+
+The repository uses real screenshots of the running application. See the language-specific README files for the complete gallery and its maintenance rules.

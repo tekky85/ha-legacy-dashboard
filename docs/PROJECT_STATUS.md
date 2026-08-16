@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 12. August 2026, Sprint 17.3 implementiert
+Stand: 16. August 2026, Sprint 21 zur Prüfung vorbereitet
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -8,12 +8,19 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-21-Ausgangscommit: `f8f3d3a`
+- Sprint-D1-Ausgangscommit: `0881705`
 - Sprint-17.3-Ausgangscommit: `11ff013`
 - Upstream vor Implementierung: `origin/main`
 - Sprint-20-Feature-Commit: `fe38e60`
 - Sprint-19-Commit: `b4da718`
 - Sprint-18-Commit: `94ce1c0`
 - Sprint-17.1-Commit: `53ce672`
+
+Der Arbeitsbaum enthält den noch uncommitteten Sprint-D1-Dokumentationsstand
+und die darauf aufbauende Sprint-21-Implementierung. Es wurde nichts
+committet oder gepusht. Die bestehende Dashboard-Konfiguration und die
+Write-Allowlists wurden nicht verändert.
 
 Der tatsächliche Sprint-20-Stand einschließlich Summary-/Error-APIs,
 System-Snapshot, Cache, Layout-/Theme-Korrekturen und produktiver Assetversion
@@ -37,6 +44,8 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 17.2 | Kartenidentität, proportionale Geometrie und Theme-Persistenz | umgesetzt |
 | 20 | Error Dashboard MVP | umgesetzt |
 | 17.3 | Live Card Preview, Unified Controls und Focus Mode | umgesetzt |
+| D1 | Zweisprachige Dokumentation und Screenshot-Baseline | zur Prüfung vorbereitet |
+| 21 | Registry & Diagnostic Enrichment | zur Prüfung vorbereitet |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -220,7 +229,7 @@ werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion ist 28.
+Assetversion ist 29.
 
 ## 8a. Sprint 17.3 – Preview, Controls und Focus
 
@@ -328,23 +337,33 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
 - eindeutiger beziehungsweise explizit konfigurierter Power-On-Modus
 - Focus-Overlay, einzelner Focus und getrennte Card-/Control-Events
 - 1000-Entity-Issue-Lauf, 1500 aktive Summary-Entities und 3000 normalisierte Entities
+- WebSocket-Authentifizierung, Request-Korrelation, Timeouts, Disconnect,
+  begrenzter Reconnect sowie synchrone Konstruktor-/Sendefehler
+- getrennte Registry-/Config-/Repairs-Capabilities, TTL, In-flight-Deduplizierung,
+  Stale-Fallback, Recovery und vollständiger WebSocket-Ausfall
+- Registry-Sanitization, Single-Config-Entry-Modell, Legacy-Fallback,
+  Area-Priorität, Disabled/Hidden/Registry-only und Config-/Repair-Issues
+- 3000 Entities, 500 Devices, 50 Areas, 100 Config Entries und 100 Repairs
 
-Der abschließende lokale Lauf besteht mit 135 von 135 Tests. Alle
-JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
-`git diff --check` ist sauber. Die Browser-Abnahme bei 768×1024 und 1024×768
-prüfte die kleinsten erlaubten Sensor-, Binary-, Light- und Climate-Karten.
-Alle Identitäten und Pflichtinhalte waren sichtbar, alle Karten ohne
-horizontalen oder vertikalen Überlauf, die Seiten ohne horizontalen Überlauf
-und die Browserkonsole fehlerfrei. Rotation wechselte ohne Daten-Reload von
-Portrait zu Landscape. Dark und Light blieben jeweils nach Reload erhalten;
-Dark wurde außerdem auf `/d/esszimmer`, `/system/summary` und
-`/system/errors` bestätigt. Die echte Safari-iOS-9-Abnahme erfolgt nach dem
-Produktions-Rollout auf dem iPad.
+Der abschließende vollständige Lauf besteht mit 150 von 150 Tests. Der isolierte
+Sprint-21-Satz besteht mit 15 von 15 Tests; sein größter Synthetikfall mit 3000
+Entities, 500 Devices, 50 Areas, 100 Config Entries und 100 Repairs benötigte
+36 ms. Alle JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
+`git diff --check` ist sauber.
+
+Die Browser-Abnahme an der real laufenden Anwendung mit kontrolliertem
+localhost-HA-Mock und Fake-Credentials bestätigte Light und Dark,
+768×1024 und 1024×768 ohne horizontalen Überlauf, Summary-Enrichment,
+vier Issue-Typen mit reduziertem Kontext, fünf verfügbare Diagnosequellen,
+Matter `unsupported`, Offline-Stale-Fallback und Recovery. Die Browserkonsole
+blieb fehlerfrei. `summary.png` und `errors.png` wurden neu aufgenommen;
+`system-diagnostics.png` wurde ergänzt. Die echte Safari-iOS-9-Abnahme erfolgt
+nach einem später freigegebenen Produktions-Rollout auf dem iPad.
 
 ## 12. Bekannte Einschränkungen und technischer Rest
 
-- Registry-, Device-, Area-, Config-Entry- und Repairs-Anreicherung folgen
-  frühestens in Sprint 21.
+- Matter besitzt aktuell keine belastbar belegte generische Read-only-
+  Diagnose-API und wird daher ohne Command-Probe als `unsupported` gemeldet.
 - Grace Periods, erwartete Offlinezustände, Flapping und Aggregation folgen
   Sprint 22; kurze Ausfälle erscheinen im MVP daher sofort.
 - Es gibt noch keine Issue-Historie oder Acknowledgements.
@@ -361,13 +380,89 @@ Produktions-Rollout auf dem iPad.
 
 ## 13. Roadmap-Abgleich und nächster Sprint
 
-Sprint 17.3 verändert weder Summary- noch Error-Fachlogik. Drag/Resize und die
-persistierte Rastergeometrie bleiben bestehen; Preview und Focus sind reine
-Darstellungszustände. Als einzige neue Write-Operation ist Climate Power eng
-auf die bereits vorhandene Climate-Allowlist und serverseitig bestimmte HVAC-
-Modi begrenzt. Nicht vorgezogen wurden Registry-/Repairs-Daten, Grace Periods,
-Historie, weitere Schreibdomänen oder freie System-Dashboard-Layouts.
+Sprint 21 entspricht der Roadmap: Der REST-State-Collector bleibt bestehen,
+während fest codierte Backend-WebSocket-Adapter ausschließlich read-only
+Metadaten ergänzen. Die sichtbaren Summary-/Error-Regeln wurden nur um sicheren
+Kontext, Kategorie-Filter und klar belegte Config-/Repair-Issues erweitert.
+Nicht vorgezogen wurden Grace Periods, Flapping, Device-Aggregation, Historie,
+weitere Schreibdomänen oder freie System-Dashboard-Layouts.
 
-Empfohlener nächster Schritt ist Sprint 21 – Registry & Diagnostic Enrichment.
-Er beginnt mit einer Capability-Prüfung der tatsächlich eingesetzten Home-
-Assistant-Version und ergänzt nur stabile, sicher reduzierbare Diagnosequellen.
+Empfohlener nächster Schritt ist Sprint 22 – Rules, Grace Periods & Device
+Aggregation. Voraussetzung sind reale Betriebsbeobachtungen zu kurzzeitigen
+Ausfällen, erwarteten Offline-Zuständen und sinnvollen Karenzzeiten; Sprint 21
+liefert dafür jetzt den stabilen Device-/Area-/Integrationskontext.
+
+## 14. Dokumentation und Screenshot-Baseline
+
+Die kompakte Root-README verlinkt die vollständigen deutschen und englischen
+Versionen. `README.de.md` und `README.en.md` sind semantisch synchron und
+dokumentieren Architektur, Legacy-Kompatibilität, Funktionen, Admin- und
+Systemansichten, Sicherheitsmodell, Entwicklung, Tests, Deployment und
+Roadmap ohne schnell veraltende Testzahlen oder Commit-IDs.
+
+Die Screenshot-Baseline umfasst Light Mode, Dark Mode, Compact Cards, Focus
+Card, Dashboard-Verwaltung, Layout-Editor, Live Preview, diagnostische Quellen,
+Summary und Systemstatus. Alle Aufnahmen stammen aus der real laufenden
+Anwendung mit einem kontrollierten localhost Home-Assistant-Mock und
+Fake-Credentials. Vor der Ablage wurden sie auf Tokens, interne IP-Adressen,
+private Namen, sicherheitskritische Entity-Namen, Medien- und Standortdaten
+geprüft.
+
+`AGENTS.md` verlangt künftig bei sichtbaren UI-Änderungen eine Prüfung der
+Screenshots und README-Bildverweise, hält die semantische Synchronität beider
+Sprachversionen fest und verbietet generierte Mockups als Produkt-Screenshots.
+
+## 15. Sprint 21 – Registry & Diagnostic Enrichment
+
+Der Sprint-18-State-Collector bleibt unverändert REST-basiert. Zusätzlich
+existiert ausschließlich im Backend ein authentifizierter Home-Assistant-
+WebSocket-Client mit eindeutigen Request-IDs, Request-/Connect-Timeouts,
+kontrolliertem Disconnect und auf fünf Versuche begrenztem exponentiellem
+Reconnect-Backoff. Die eingebaute WebSocket-Implementierung setzt Node.js 22
+oder neuer voraus; die Mindestversion ist in `package.json` festgehalten.
+
+Fest codierte interne Read-only-Adapter verwenden genau diese Commands:
+
+```text
+config/entity_registry/list
+config/device_registry/list
+config/area_registry/list
+config_entries/get
+repairs/list_issues
+```
+
+Unbekannte Commands werden als `unsupported` behandelt. Für Matter ist keine
+belastbar belegte generische Read-only-Diagnose-API vorhanden; deshalb bleibt
+die Capability kontrolliert `false`, ohne einen Matter-Command zu senden.
+
+Entity-, Device- und Area Registry werden 60 Sekunden, Config Entries und
+Repairs 30 Sekunden gecacht. Parallele Aktualisierungen teilen denselben
+In-flight-Request. Jede Quelle führt `supported`, `ok`, `stale`,
+`lastSuccessfulAt` und `errorCode`; ein Fehler einer Quelle zerstört weder
+andere Enrichments noch den REST-State-Snapshot.
+
+Die Enrichment-Maps sind nach Entity-, Device-, Area- und Config-Entry-ID
+indiziert. Area-Auflösung priorisiert Entity Area vor Device Area und verwendet
+keine Namensheuristik. Device-Namen priorisieren `name_by_user` vor `name` und
+Friendly Name. Das aktuelle Single-Config-Entry-/Subentry-Modell wird direkt
+verarbeitet; ältere Array-Antworten erhalten einen defensiven eindeutigen
+Fallback.
+
+Browser-Payloads enthalten ausschließlich benötigte Kontextfelder wie Device-
+und Area-Name, Integration, Plattform und Entity Category. MAC-Adressen,
+Seriennummern, Identifier, Connections, Registry-Rohdaten und Zugangsdaten
+werden nicht öffentlich normalisiert. Diagnostic-/Config-Entities stören
+Summary nicht. Disabled Entities erzeugen keine unavailable-Issues;
+registry-only wird nicht automatisch als verwaist bewertet.
+
+`setup_error`, `migration_error` und `failed_unload` erzeugen Config-Entry-
+Issues mit Severity Error; `setup_retry` wird als Warning behandelt. Loaded,
+unbekannte States und deaktivierte Config Entries erzeugen kein Issue. Repairs
+werden mit Critical/Error/Warning beziehungsweise defensiv Info normalisiert;
+`fixable` zeigt nur „In Home Assistant reparierbar“ und bietet keine Aktion.
+
+Der geschützte Read-only-Endpunkt
+`GET /api/admin/system-diagnostics/status` liefert ausschließlich Source-
+Status, Capabilities und TTLs. Es gibt keine Raw-Registry-, WebSocket-Proxy-,
+Repair-, Reload-, Reauth-, Registry- oder Matter-Schreibroute. Climate- und
+Light-Allowlists bleiben unverändert.

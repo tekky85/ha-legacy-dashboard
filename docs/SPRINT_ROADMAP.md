@@ -197,7 +197,7 @@ Bedeutung von „fest“:
 | 17.2 | Card Identity, Proportional Geometry & Theme Persistence (Korrektursprint nach 19) | umgesetzt |
 | 20 | Error Dashboard MVP | umgesetzt |
 | 17.3 | Live Card Preview, Unified Controls & Focus Mode (Korrektursprint nach 20) | umgesetzt |
-| 21 | Registry & Diagnostic Enrichment | neu geplant |
+| 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
 | 23 | Automation Impact & Advanced Diagnostics | neu geplant |
 | 24 | Home Assistant App Packaging | verschoben |
@@ -1003,6 +1003,10 @@ Umgesetzt nach Sprint 20.
 
 # Sprint 21 – Registry & Diagnostic Enrichment
 
+## Status
+
+Umgesetzt nach Sprint 17.3 und D1.
+
 ## Ziel
 
 System-Dashboards mit zusätzlichen strukturierten HA-Metadaten anreichern.
@@ -1048,6 +1052,27 @@ Y Entities betroffen
 ```
 
 statt nur vieler einzelner Entity-Fehler.
+
+## Ergebnis
+
+- Ein ausschließlich serverseitiger, authentifizierter HA-WebSocket-Client
+  verarbeitet eindeutige IDs, Timeouts, Disconnect und begrenzten Reconnect.
+- Feste Read-only-Adapter lesen Entity-, Device- und Area Registry,
+  Config Entries und – capability-gesteuert – Repairs.
+- Matter besitzt keine belastbar belegte generische Read-only-Diagnose-API und
+  bleibt deshalb kontrolliert `unsupported`; es wird kein Matter-Command
+  gesendet.
+- Unabhängige TTL-Caches verhindern Registry-Abrufe pro Browser-Poll und
+  deduplizieren parallele Aktualisierungen.
+- Summary und Errors erhalten nur reduzierte Device-, Area-, Integrations- und
+  Plattformfelder; rohe Registries, Identifier, Connections und Secrets
+  bleiben im Backend.
+- Disabled, hidden, unavailable, unknown und registry-only werden getrennt
+  behandelt.
+- Problematische Config-Entry-States und Repairs werden read-only in die
+  bestehende Issue Engine normalisiert.
+- Der Admin-Systembereich zeigt nur Source-Status, keine Registry-Inhalte und
+  keine Aktionen.
 
 ---
 

@@ -101,6 +101,9 @@
         },
         getPreview: function () {
             return request("/preview");
+        },
+        getDiagnosticsStatus: function () {
+            return request("/system-diagnostics/status");
         }
     };
 }(window.HALegacyAdmin = window.HALegacyAdmin || {}));

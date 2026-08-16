@@ -986,12 +986,60 @@
         }
     }
 
+    function renderDiagnosticsStatus(payload) {
+        const names = [
+            ["entityRegistry", "Entity Registry"],
+            ["deviceRegistry", "Device Registry"],
+            ["areaRegistry", "Area Registry"],
+            ["configEntries", "Config Entries"],
+            ["repairs", "Repairs"],
+            ["matter", "Matter Diagnostics"]
+        ];
+        const labels = {
+            available: "Verfügbar",
+            unsupported: "Nicht unterstützt",
+            stale: "Veraltet",
+            error: "Fehler"
+        };
+        const sources = payload && payload.sources
+            ? payload.sources
+            : {};
+
+        elements.diagnosticSourcesList.textContent = "";
+
+        names.forEach(function (definition) {
+            const source = sources[definition[0]] || {status: "error"};
+            const row = createElement("div", "diagnostic-source-row");
+            const title = createElement("dt", "", definition[1]);
+            const status = createElement(
+                "dd",
+                "diagnostic-source-status is-" + source.status,
+                labels[source.status] || labels.error
+            );
+
+            row.appendChild(title);
+            row.appendChild(status);
+            elements.diagnosticSourcesList.appendChild(row);
+        });
+    }
+
+    async function loadDiagnosticsStatus() {
+        try {
+            renderDiagnosticsStatus(
+                await admin.Api.getDiagnosticsStatus()
+            );
+        } catch (error) {
+            renderDiagnosticsStatus(null);
+        }
+    }
+
     async function loadAdministration() {
         const configuration = await admin.Api.getConfiguration();
         admin.State.setConfiguration(configuration);
         showAdministration();
         renderAll();
         await loadEntities();
+        await loadDiagnosticsStatus();
         renderSummarySettings();
         renderErrorSettings();
         refreshVisiblePreviews();
@@ -1485,7 +1533,7 @@
             "summaryIgnoredEntities", "errorSecurityEntitySelect",
             "errorSecurityAdd", "errorSecurityEntities",
             "errorIgnoreEntitySelect", "errorIgnoreAdd",
-            "errorIgnoredEntities"
+            "errorIgnoredEntities", "diagnosticSourcesList"
         ].forEach(function (id) {
             elements[id] = byId(id);
         });

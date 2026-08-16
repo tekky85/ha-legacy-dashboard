@@ -13,6 +13,9 @@ const logger =
 const Layout =
     require("../services/layout");
 
+const System =
+    require("../services/system");
+
 const writeRateLimit =
     require("../services/write-rate-limit");
 
@@ -839,6 +842,31 @@ router.get("/preview", async function (req, res) {
 
         return res.status(502).json({
             error: "preview_unavailable"
+        });
+    }
+
+});
+
+
+router.get("/system-diagnostics/status", async function (req, res) {
+
+    try {
+        return res.json(
+            await System.getDiagnosticsStatus()
+        );
+    } catch (error) {
+        logger.warn(
+            "admin_system_diagnostics_failed",
+            {
+                error_code:
+                    error && error.code
+                        ? error.code
+                        : "diagnostics_unavailable"
+            }
+        );
+
+        return res.status(503).json({
+            error: "diagnostics_status_unavailable"
         });
     }
 
