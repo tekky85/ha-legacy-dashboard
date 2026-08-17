@@ -15,9 +15,9 @@
 
 <title>HA Legacy Dashboard – System</title>
 
-<script src="/js/core/theme.js?v=32"></script>
-<link rel="stylesheet" href="/css/style.css?v=32">
-<link rel="stylesheet" href="/css/system.css?v=32">
+<script src="/js/core/theme.js?v=33"></script>
+<link rel="stylesheet" href="/css/style.css?v=33">
+<link rel="stylesheet" href="/css/system.css?v=33">
 
 </head>
 
@@ -120,6 +120,39 @@
                 <strong id="summaryActiveCount">0</strong>
                 <span>aktiv</span>
             </div>
+
+            <div class="system-filter-bar" role="toolbar" aria-label="Aktive Zustände filtern">
+                <button id="summaryFilterAll" class="system-filter-button system-filter-button-active is-active" type="button" aria-pressed="true">
+                    <span>Alle</span><strong id="summaryAllCount">0</strong>
+                </button>
+                <button id="summaryFilterOpen" class="system-filter-button" type="button" aria-pressed="false">
+                    <span>Offen</span><strong id="summaryOpenCount">0</strong>
+                </button>
+                <button id="summaryFilterPowered" class="system-filter-button" type="button" aria-pressed="false">
+                    <span>Licht &amp; Strom</span><strong id="summaryPoweredCount">0</strong>
+                </button>
+                <button id="summaryFilterActive" class="system-filter-button" type="button" aria-pressed="false">
+                    <span>Aktiv</span><strong id="summaryActiveFilterCount">0</strong>
+                </button>
+                <button id="summaryFilterClimate" class="system-filter-button" type="button" aria-pressed="false">
+                    <span>Klima</span><strong id="summaryClimateCount">0</strong>
+                </button>
+                <button id="summaryFilterMedia" class="system-filter-button" type="button" aria-pressed="false">
+                    <span>Medien</span><strong id="summaryMediaCount">0</strong>
+                </button>
+                <button id="summaryFilterSecurity" class="system-filter-button" type="button" aria-pressed="false">
+                    <span>Sicherheit</span><strong id="summarySecurityCount">0</strong>
+                </button>
+            </div>
+
+            <div class="system-column-control" role="toolbar" aria-label="Spaltenanzahl der Summary">
+                <span class="system-column-label">Ansicht:</span>
+                <button id="summaryColumn1" class="system-column-button" type="button" aria-label="Summary einspaltig anzeigen" aria-pressed="false">1</button>
+                <button id="summaryColumn2" class="system-column-button system-column-button-active is-active" type="button" aria-label="Summary zweispaltig anzeigen" aria-pressed="true">2</button>
+                <button id="summaryColumn3" class="system-column-button" type="button" aria-label="Summary dreispaltig anzeigen" aria-pressed="false">3</button>
+            </div>
+
+            <p id="summaryFilterEmpty" class="system-filter-empty" hidden>Keine passenden aktiven Zustände.</p>
             <div id="summaryGroups" class="summary-groups"></div>
         </div>
 
@@ -130,25 +163,32 @@
                 <strong id="errorOverallLabel">Wird geprüft</strong>
             </div>
 
-            <div class="error-filters" role="toolbar" aria-label="Störungen filtern">
-                <button id="errorFilterAll" class="error-filter is-active" type="button" aria-pressed="true">
+            <div class="system-filter-bar" role="toolbar" aria-label="Störungen filtern">
+                <button id="errorFilterAll" class="system-filter-button system-filter-button-active is-active" type="button" aria-pressed="true">
                     <span>Alle</span><strong id="errorAllCount">0</strong>
                 </button>
-                <button id="errorFilterCritical" class="error-filter" type="button" aria-pressed="false">
+                <button id="errorFilterCritical" class="system-filter-button" type="button" aria-pressed="false">
                     <span>Kritisch</span><strong id="errorCriticalCount">0</strong>
                 </button>
-                <button id="errorFilterError" class="error-filter" type="button" aria-pressed="false">
+                <button id="errorFilterError" class="system-filter-button" type="button" aria-pressed="false">
                     <span>Fehler</span><strong id="errorErrorCount">0</strong>
                 </button>
-                <button id="errorFilterWarning" class="error-filter" type="button" aria-pressed="false">
+                <button id="errorFilterWarning" class="system-filter-button" type="button" aria-pressed="false">
                     <span>Warnungen</span><strong id="errorWarningCount">0</strong>
                 </button>
-                <button id="errorFilterUnknown" class="error-filter" type="button" aria-pressed="false">
+                <button id="errorFilterUnknown" class="system-filter-button" type="button" aria-pressed="false">
                     <span>Unknown</span><strong id="errorUnknownCount">0</strong>
                 </button>
             </div>
 
-            <p id="errorFilterEmpty" class="error-filter-empty" hidden>Keine Störungen in dieser Kategorie.</p>
+            <div class="system-column-control" role="toolbar" aria-label="Spaltenanzahl des Systemstatus">
+                <span class="system-column-label">Ansicht:</span>
+                <button id="errorColumn1" class="system-column-button" type="button" aria-label="Systemstatus einspaltig anzeigen" aria-pressed="false">1</button>
+                <button id="errorColumn2" class="system-column-button system-column-button-active is-active" type="button" aria-label="Systemstatus zweispaltig anzeigen" aria-pressed="true">2</button>
+                <button id="errorColumn3" class="system-column-button" type="button" aria-label="Systemstatus dreispaltig anzeigen" aria-pressed="false">3</button>
+            </div>
+
+            <p id="errorFilterEmpty" class="system-filter-empty" hidden>Keine Störungen in dieser Kategorie.</p>
             <div id="errorGroups" class="error-groups"></div>
         </div>
 
@@ -176,10 +216,10 @@
 
 </div>
 
-<script src="/js/core/compat.js?v=32"></script>
-<script src="/js/system/common.js?v=32"></script>
-<script src="/js/system/summary.js?v=32"></script>
-<script src="/js/system/errors.js?v=32"></script>
+<script src="/js/core/compat.js?v=33"></script>
+<script src="/js/system/common.js?v=33"></script>
+<script src="/js/system/summary.js?v=33"></script>
+<script src="/js/system/errors.js?v=33"></script>
 
 </body>
 

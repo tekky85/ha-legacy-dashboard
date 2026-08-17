@@ -5,15 +5,13 @@ var Theme = {
     current: "light",
 
 
-    readStoredTheme: function () {
+    readStoredValue: function (key) {
 
         try {
 
             if (window.localStorage) {
 
-                return window.localStorage.getItem(
-                    this.storageKey
-                );
+                return window.localStorage.getItem(key);
 
             }
 
@@ -28,28 +26,33 @@ var Theme = {
     },
 
 
-    storeTheme: function (name) {
+    storeValue: function (key, value) {
 
         try {
 
             if (window.localStorage) {
 
-                window.localStorage.setItem(
-                    this.storageKey,
-                    name
-                );
+                window.localStorage.setItem(key, value);
 
             }
 
         } catch (error) {
 
-            /*
-             * Einige ältere Safari-Versionen können bei
-             * LocalStorage im privaten Modus Fehler werfen.
-             * Das Dashboard funktioniert trotzdem weiter.
-             */
+            /* Safari private mode may reject storage writes. */
 
         }
+
+    },
+
+
+    readStoredTheme: function () {
+        return this.readStoredValue(this.storageKey);
+
+    },
+
+
+    storeTheme: function (name) {
+        this.storeValue(this.storageKey, name);
 
     },
 

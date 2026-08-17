@@ -12,6 +12,19 @@
         other: "<circle cx=\"5\" cy=\"12\" r=\"1\"></circle><circle cx=\"12\" cy=\"12\" r=\"1\"></circle><circle cx=\"19\" cy=\"12\" r=\"1\"></circle>"
     };
 
+    var FILTERS = [
+        {name: "all", buttonId: "summaryFilterAll", countId: "summaryAllCount"},
+        {name: "open", buttonId: "summaryFilterOpen", countId: "summaryOpenCount"},
+        {name: "powered", buttonId: "summaryFilterPowered", countId: "summaryPoweredCount"},
+        {name: "active", buttonId: "summaryFilterActive", countId: "summaryActiveFilterCount"},
+        {name: "climate", buttonId: "summaryFilterClimate", countId: "summaryClimateCount"},
+        {name: "media", buttonId: "summaryFilterMedia", countId: "summaryMediaCount"},
+        {name: "security", buttonId: "summaryFilterSecurity", countId: "summarySecurityCount"}
+    ];
+
+    var filterController = null;
+    var lastPayload = null;
+
 
     function createElement(tagName, className, text) {
 
@@ -150,39 +163,94 @@
     }
 
 
-    function render(payload, connectionState) {
+    function filterDefinitions(payload) {
 
-        var overview = SystemDashboard.byId("summaryOverview");
+        return payload && Object.prototype.toString.call(
+            payload.filters
+        ) === "[object Array]"
+            ? payload.filters
+            : [];
+
+    }
+
+
+    function activeFilterDefinition(payload) {
+
+        var definitions = filterDefinitions(payload);
+        var selected = filterController
+            ? filterController.getSelected()
+            : "all";
+        var index;
+
+        for (index = 0; index < definitions.length; index++) {
+            if (definitions[index].id === selected) {
+                return definitions[index];
+            }
+        }
+
+        return {
+            id: "all",
+            categories: []
+        };
+
+    }
+
+
+    function filterCounts(payload) {
+
+        var counts = {};
+        var definitions = filterDefinitions(payload);
+        var index;
+
+        for (index = 0; index < definitions.length; index++) {
+            counts[definitions[index].id] = definitions[index].count || 0;
+        }
+
+        return counts;
+
+    }
+
+
+    function categoryMatches(category, definition) {
+
+        if (definition.id === "all") {
+            return true;
+        }
+
+        return Object.prototype.toString.call(
+            definition.categories
+        ) === "[object Array]" &&
+            definition.categories.indexOf(category) !== -1;
+
+    }
+
+
+    function renderGroups(payload) {
+
         var groupsElement = SystemDashboard.byId("summaryGroups");
+        var emptyElement = SystemDashboard.byId("summaryFilterEmpty");
         var groups = payload && Object.prototype.toString.call(
             payload.groups
         ) === "[object Array]"
             ? payload.groups
             : [];
-
-        var count = payload && typeof payload.activeCount === "number"
-            ? payload.activeCount
-            : 0;
-
+        var definition = activeFilterDefinition(payload);
+        var renderedItems = 0;
         var index;
 
-
-        if (!overview || !groupsElement) {
+        if (!groupsElement) {
             return;
         }
 
-        if (connectionState === "offline") {
-            overview.hidden = true;
-            return;
-        }
-
-        overview.hidden = false;
         groupsElement.innerHTML = "";
-        SystemDashboard.setText("summaryActiveCount", String(count));
 
         for (index = 0; index < groups.length; index++) {
 
-            if (!groups[index].items || groups[index].items.length === 0) {
+            if (
+                !groups[index].items ||
+                groups[index].items.length === 0 ||
+                !categoryMatches(groups[index].category, definition)
+            ) {
                 continue;
             }
 
@@ -219,12 +287,45 @@
                 list.appendChild(
                     createItem(groups[index].items[itemIndex])
                 );
+                renderedItems += 1;
             }
 
             section.appendChild(list);
             groupsElement.appendChild(section);
 
         }
+
+        if (emptyElement) {
+            emptyElement.hidden = renderedItems !== 0;
+        }
+
+    }
+
+
+    function render(payload, connectionState) {
+
+        var overview = SystemDashboard.byId("summaryOverview");
+        var count = payload && typeof payload.activeCount === "number"
+            ? payload.activeCount
+            : 0;
+
+
+        if (!overview) {
+            return;
+        }
+
+        if (connectionState === "offline") {
+            overview.hidden = true;
+            return;
+        }
+
+        lastPayload = payload;
+        overview.hidden = false;
+        SystemDashboard.setText("summaryActiveCount", String(count));
+        if (filterController) {
+            filterController.update(filterCounts(payload));
+        }
+        renderGroups(payload);
 
         if (connectionState === "online" || connectionState === "recovered") {
             SystemDashboard.setMessage(
@@ -247,6 +348,20 @@
             window.location.pathname || ""
         )
     ) {
+        filterController = SystemDashboard.createFilterController(
+            FILTERS,
+            function () {
+                if (lastPayload) {
+                    filterController.update(filterCounts(lastPayload));
+                    renderGroups(lastPayload);
+                }
+            }
+        );
+        SystemDashboard.createColumnController(
+            "summary",
+            "summaryGroups",
+            ["summaryColumn1", "summaryColumn2", "summaryColumn3"]
+        );
         SystemDashboard.start({
             kind: "summary",
             title: "Summary",

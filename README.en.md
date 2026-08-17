@@ -80,6 +80,11 @@ Shows currently relevant states such as:
 - active heating/cooling
 - active media playback
 
+The existing normalized categories can be filtered directly by All, Open,
+Light & Power, Active, Climate, Media, and Security. Filters and views switch
+without another Home Assistant request. Summary has its own safely persisted
+1/2/3-column view and falls back in a controlled manner on narrow viewports.
+
 ### Errors / System Status Dashboard
 
 ```text
@@ -97,12 +102,19 @@ Shows, among other things:
 - clickable filters for All, Critical, Error, Warning, and Unknown
 - compact Device Cards for entity issues sharing the same real `device_id`
 - child-entity details collapsed by default
-- a single-column layout on narrow and a two-column layout on wider viewports
+- a separately persisted 1/2/3-column view with responsive fallback
 
 `unknown` and `unavailable` are intentionally treated as distinct states.
 Entities without a `device_id`, as well as Config Entry, Repair, and Matter
 notices, remain visible as standalone issues. Grouping is strictly a read-only
 presentation layer and changes neither severity rules nor write permissions.
+
+A central risk class uses only reliable domain, device-class, and registry
+metadata. `unknown` and `unavailable` are classified as `critical` for safety
+sensors such as smoke, CO, gas, or moisture and for security sensors such as
+doors, windows, openings, garage doors, and locks. Normal and diagnostic
+sensors retain the milder rules; name patterns alone never produce a critical
+classification. Explicit `securityEntities` continue to take precedence.
 
 ### Registry and Diagnostic Enrichment
 

@@ -1,4 +1,5 @@
 const Snapshot = require("../system/snapshot");
+const Risk = require("./risk");
 const Severity = require("./severity");
 
 
@@ -36,9 +37,20 @@ function createIssue(entity, settings, securityRelevant, nowMilliseconds) {
     const attributes = entity.attributes || {};
     const context = entity.context || {};
     const state = String(entity.state || "").toLowerCase();
+    const inferredRiskClass = Risk.classify(
+        attributes.deviceClass,
+        context.entityCategory,
+        entity.domain
+    );
+    const riskClass = securityRelevant
+        ? "security"
+        : inferredRiskClass;
+    const effectiveSecurityRelevant =
+        securityRelevant || Risk.isCritical(riskClass);
     const severity = Severity.issueSeverity(
         state,
-        securityRelevant
+        effectiveSecurityRelevant,
+        riskClass
     );
     const configuredTitle =
         settings.entityTitles &&
@@ -69,10 +81,13 @@ function createIssue(entity, settings, securityRelevant, nowMilliseconds) {
                 : "Der aktuelle Zustand der Entity ist unbekannt.",
         entityId: entity.entityId,
         state: state,
-        securityRelevant: securityRelevant,
+        securityRelevant: effectiveSecurityRelevant,
+        riskClass: riskClass,
         potentiallySecurityRelevant:
             Severity.potentiallySecurityRelevant(
-                attributes.deviceClass
+                attributes.deviceClass,
+                context.entityCategory,
+                entity.domain
             ),
         startedAt: entity.lastChanged,
         updatedAt: entity.lastUpdated,

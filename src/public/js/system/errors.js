@@ -28,6 +28,7 @@
     var activeFilter = "all";
     var expandedGroups = {};
     var lastPayload = null;
+    var filterController = null;
 
 
     function createElement(tagName, className, text) {
@@ -205,27 +206,8 @@
 
     function updateFilterButtons(counts) {
 
-        var index;
-
-        for (index = 0; index < FILTERS.length; index++) {
-            var definition = FILTERS[index];
-            var button = SystemDashboard.byId(definition.buttonId);
-            var selected = definition.name === activeFilter;
-
-            SystemDashboard.setText(
-                definition.countId,
-                String(counts[definition.name] || 0)
-            );
-
-            if (button) {
-                button.className =
-                    "error-filter" +
-                    (selected ? " is-active" : "");
-                button.setAttribute(
-                    "aria-pressed",
-                    selected ? "true" : "false"
-                );
-            }
+        if (filterController) {
+            filterController.update(counts);
         }
 
     }
@@ -620,25 +602,6 @@
     }
 
 
-    function bindFilters() {
-
-        var index;
-
-        for (index = 0; index < FILTERS.length; index++) {
-            (function (definition) {
-                var button = SystemDashboard.byId(definition.buttonId);
-
-                if (button) {
-                    button.onclick = function () {
-                        selectFilter(definition.name);
-                    };
-                }
-            }(FILTERS[index]));
-        }
-
-    }
-
-
     function render(payload, connectionState) {
 
         var overview = SystemDashboard.byId("errorsOverview");
@@ -675,7 +638,15 @@
             window.location.pathname || ""
         )
     ) {
-        bindFilters();
+        filterController = SystemDashboard.createFilterController(
+            FILTERS,
+            selectFilter
+        );
+        SystemDashboard.createColumnController(
+            "errors",
+            "errorGroups",
+            ["errorColumn1", "errorColumn2", "errorColumn3"]
+        );
         SystemDashboard.start({
             kind: "errors",
             title: "Systemstatus",

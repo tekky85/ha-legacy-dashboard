@@ -103,6 +103,7 @@ function publicChild(issue, entity, registry) {
                 ? issue.durationSeconds
                 : null,
         securityRelevant: issue.securityRelevant === true,
+        riskClass: issue.riskClass || "normal",
         description: issue.description || null,
         source: issue.source || null,
         fixable: issue.fixable === true
@@ -175,6 +176,7 @@ function createDeviceGroup(deviceId, issue, entity, metadata) {
         integration: context.integration,
         severity: issue.severity,
         securityRelevant: issue.securityRelevant === true,
+        riskClass: issue.riskClass || "normal",
         issueCount: 1,
         durationSeconds:
             typeof issue.durationSeconds === "number"
@@ -203,6 +205,7 @@ function addToDeviceGroup(group, issue, entity, registry, metadata) {
 
     if (severity !== -1 && severity < currentSeverity) {
         group.severity = issue.severity;
+        group.riskClass = issue.riskClass || "normal";
     }
 
     if (issue.securityRelevant === true) {
@@ -250,6 +253,7 @@ function createStandalone(issue, entity, registry) {
         integration: issue.integration || null,
         severity: issue.severity,
         securityRelevant: issue.securityRelevant === true,
+        riskClass: issue.riskClass || "normal",
         issueCount: 1,
         durationSeconds: child.durationSeconds,
         counts: counts,

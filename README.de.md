@@ -80,6 +80,12 @@ Zeigt aktuell relevante Zustände, z. B.:
 - aktive Heiz-/Kühlvorgänge
 - Medienwiedergabe
 
+Die vorhandenen normalisierten Kategorien lassen sich direkt nach Alle,
+Offen, Licht & Strom, Aktiv, Klima, Medien und Sicherheit filtern. Filter und
+Ansicht wechseln ohne neue Home-Assistant-Abfrage. Für Summary kann eine
+eigene 1-/2-/3-Spaltenansicht sicher im Browser gespeichert werden; auf zu
+schmalen Viewports fällt sie kontrolliert zurück.
+
 ### Fehler-/Systemstatus-Dashboard
 
 ```text
@@ -97,13 +103,21 @@ Zeigt unter anderem:
 - klickbare Filter für Alle, Kritisch, Fehler, Warnungen und Unknown
 - kompakte Device Cards für Entity-Issues mit derselben echten `device_id`
 - standardmäßig eingeklappte Child-Entity-Details
-- einspaltige Darstellung auf schmalen und zweispaltige Darstellung auf breiteren Viewports
+- getrennt persistierte 1-/2-/3-Spaltenansicht mit responsivem Fallback
 
 `unknown` und `unavailable` werden bewusst getrennt behandelt.
 Entities ohne `device_id` sowie Config-Entry-, Repair- und Matter-Hinweise
 bleiben als eigenständige Issues sichtbar. Die Gruppierung ist ausschließlich
 eine read-only Präsentationsschicht und verändert weder Severity-Regeln noch
 Schreibrechte.
+
+Eine zentrale Risk-Class nutzt ausschließlich verlässliche Domain-, Device-
+Class- und Registry-Metadaten. `unknown` und `unavailable` werden für Safety-
+Sensoren wie Rauch, CO, Gas oder Feuchtigkeit sowie für Security-Sensoren wie
+Tür, Fenster, Öffnung, Garagentor und Schloss als `critical` bewertet. Normale
+und diagnostische Sensoren behalten die milderen Regeln; reine Namensmuster
+erzeugen keine kritische Einstufung. Explizite `securityEntities` bleiben
+vorrangig.
 
 ### Registry- und Diagnoseanreicherung
 

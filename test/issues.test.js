@@ -67,7 +67,7 @@ test("unavailable und unknown bleiben getrennt und normalisiert", function () {
 });
 
 
-test("Security- und Ignore-Konfiguration bestimmen Severity ohne Heuristik", function () {
+test("Security-Konfiguration und Risk Class bestimmen Severity ohne Namensheuristik", function () {
     const result = build(
         [
             rawState("binary_sensor.rauch", "unavailable", {
@@ -92,14 +92,21 @@ test("Security- und Ignore-Konfiguration bestimmen Severity ohne Heuristik", fun
     assert.deepEqual(
         result.issues.map(function (issue) {
             return [issue.entityId, issue.severity, issue.securityRelevant];
+        }).sort(function (first, second) {
+            return first[0].localeCompare(second[0]);
         }),
         [
-            ["binary_sensor.rauch", "critical", true],
-            ["binary_sensor.gas", "error", true],
-            ["binary_sensor.hinweis", "warning", false]
+            ["binary_sensor.gas", "critical", true],
+            ["binary_sensor.hinweis", "critical", true],
+            ["binary_sensor.rauch", "critical", true]
         ]
     );
-    assert.equal(result.issues[2].potentiallySecurityRelevant, true);
+    assert.equal(
+        result.issues.every(function (issue) {
+            return issue.potentiallySecurityRelevant === true;
+        }),
+        true
+    );
     assert.equal(result.overallStatus, "critical");
     assert.equal(
         result.issues.some(function (issue) {
@@ -165,7 +172,7 @@ test("Gesamtstatus unterscheidet OK, Warning, Error, Critical und stale", functi
     assert.equal(build(
         [rawState("sensor.error", "unknown")],
         settings(["sensor.error"])
-    ).overallStatus, "error");
+    ).overallStatus, "critical");
     assert.equal(build(
         [rawState("sensor.critical", "unavailable")],
         settings(["sensor.critical"])
@@ -282,8 +289,8 @@ test("1000 Entities werden schnell, korrekt und kompakt ausgewertet", function (
     );
 
     assert.equal(first.issues.length, 70);
-    assert.equal(first.summary.critical, 5);
-    assert.equal(first.summary.error, 3);
+    assert.equal(first.summary.critical, 8);
+    assert.equal(first.summary.error, 0);
     assert.equal(first.summary.warning, 45);
     assert.equal(first.summary.info, 17);
     assert.deepEqual(first, second);

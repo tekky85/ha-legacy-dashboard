@@ -201,6 +201,7 @@ Bedeutung von „fest“:
 | 17.5 | Native Focus Renderer & Mobile Safari Stabilization (Korrektursprint nach 17.4) | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
+| 21.2 | System Dashboard Filters, Column Views & Risk Severity | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
 | 23 | Automation Impact & Advanced Diagnostics | neu geplant |
 | 24 | Home Assistant App Packaging | verschoben |
@@ -1158,6 +1159,34 @@ Umgesetzt nach Sprint 21.
 
 ---
 
+# Sprint 21.2 – System Dashboard Filters, Column Views & Risk Severity
+
+## Status
+
+Umgesetzt nach Sprint 21.1.
+
+## Ergebnis
+
+- Summary filtert ohne Reload über die bereits serverseitig normalisierten
+  Kategorien `open`, `powered`, `running`, `cleaning`, `climate`, `media`,
+  `movement` und `security`; im Browser existiert keine zweite Fachlogik.
+- Summary und Errors verwenden dieselbe ES5-kompatible Filterdarstellung.
+- Beide System-Dashboards besitzen getrennt persistierte 1-/2-/3-Spalten-
+  Präferenzen mit Flexbox, Width/Wrapping und responsivem Fallback.
+- Die zentrale Risk Class unterscheidet `safety`, `security`, `normal` und
+  `diagnostic` anhand normalisierter Domain-, Device-Class- und Registry-
+  Metadaten, ohne Name-only-Heuristik.
+- Safety-/Security-Entities werden für `unknown` und `unavailable` als
+  Critical bewertet; normale und diagnostische Entities behalten die
+  bisherigen milderen Regeln.
+- Explizite `securityEntities` bleiben vorrangig. Device Groups übernehmen
+  weiterhin die höchste Child-Severity und werden nur über echte `device_id`
+  gebildet.
+- Filter und Spaltenwechsel sind rein lokal, erzeugen keine HA-Abfrage und
+  weder neue Write-Routen noch Write-Berechtigungen.
+
+---
+
 # Sprint 22 – Rules, Grace Periods & Device Aggregation
 
 ## Ziel
@@ -1598,6 +1627,7 @@ nächste Planung
 20  Error Dashboard MVP
 21  Registry & Diagnostic Enrichment
 21.1 Error Dashboard Device Aggregation & Navigation
+21.2 System Dashboard Filters, Column Views & Risk Severity
 22  Rules, Grace Periods & Device Aggregation
 23  Automation Impact & Advanced Diagnostics
 24  Home Assistant App Packaging
@@ -1627,15 +1657,16 @@ Ziel bleibt:
 
 # Nächster Sprint
 
-Nach Abschluss von Sprint 21.1:
+Nach Abschluss von Sprint 21.2:
 
 ```text
 Sprint 22 – Rules, Grace Periods & Device Aggregation
 ```
 
-Die Device-Aggregation des Error Dashboards ist bereits eine reine
-Präsentationsfunktion aus Sprint 21.1. Sprint 22 ergänzt fachliche Karenz-,
-Flapping- und erwartete Offline-Regeln sowie die geplante semantische
-Geräteaggregation im Summary Dashboard. Diese Regeln benötigen eine eigene
+Die Device-Aggregation des Error Dashboards bleibt die reine Präsentations-
+funktion aus Sprint 21.1; Sprint 21.2 ergänzt lokale Filter/Spaltenansichten
+und eine metadatenbasierte Risk Class. Sprint 22 ergänzt fachliche Karenz-,
+Flapping- und erwartete Offline-Regeln sowie die geplante semantische Geräte-
+aggregation im Summary Dashboard. Diese Regeln benötigen eine eigene
 Spezifikation und dürfen die bestehenden Write-Sicherheitsgrenzen nicht
 verändern.

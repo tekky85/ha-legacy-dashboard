@@ -20,6 +20,7 @@ function createElement() {
         children: [],
         attributes: {},
         onclick: null,
+        disabled: false,
         appendChild: function (child) {
             this.children.push(child);
             return child;
@@ -32,6 +33,8 @@ function createElement() {
         }
     };
 
+    element.childNodes = element.children;
+
     Object.defineProperty(element, "innerHTML", {
         get: function () {
             return this._innerHTML || "";
@@ -39,6 +42,7 @@ function createElement() {
         set: function (value) {
             this._innerHTML = String(value);
             this.children = [];
+            this.childNodes = this.children;
         }
     });
 
@@ -47,11 +51,14 @@ function createElement() {
 }
 
 
-function createHarness(pathname, entryFile) {
+function createHarness(pathname, entryFile, options) {
 
+    options = options || {};
     const elements = {};
     const requests = [];
     const timers = [];
+    const listeners = {};
+    const storage = options.storage || {};
 
     [
         "connectionBadge", "connectionLabel", "entityCount",
@@ -64,7 +71,14 @@ function createHarness(pathname, entryFile) {
         "errorAllCount", "errorCriticalCount", "errorErrorCount",
         "errorWarningCount", "errorUnknownCount", "errorFilterAll",
         "errorFilterCritical", "errorFilterError", "errorFilterWarning",
-        "errorFilterUnknown", "errorFilterEmpty", "errorGroups"
+        "errorFilterUnknown", "errorFilterEmpty", "errorGroups",
+        "summaryFilterAll", "summaryFilterOpen", "summaryFilterPowered",
+        "summaryFilterActive", "summaryFilterClimate", "summaryFilterMedia",
+        "summaryFilterSecurity", "summaryAllCount", "summaryOpenCount",
+        "summaryPoweredCount", "summaryActiveFilterCount",
+        "summaryClimateCount", "summaryMediaCount", "summarySecurityCount",
+        "summaryFilterEmpty", "summaryColumn1", "summaryColumn2",
+        "summaryColumn3", "errorColumn1", "errorColumn2", "errorColumn3"
     ].forEach(function (id) {
         elements[id] = createElement();
     });
@@ -116,11 +130,28 @@ function createHarness(pathname, entryFile) {
         },
         Theme: {
             load: function () {},
-            toggle: function () {}
+            toggle: function () {},
+            readStoredValue: function (key) {
+                if (options.storageFailure) {
+                    return null;
+                }
+                return Object.prototype.hasOwnProperty.call(storage, key)
+                    ? storage[key]
+                    : null;
+            },
+            storeValue: function (key, value) {
+                if (!options.storageFailure) {
+                    storage[key] = value;
+                }
+            }
         },
         window: {
+            innerWidth: options.width || 1024,
             location: {
                 pathname: pathname
+            },
+            addEventListener: function (name, callback) {
+                listeners[name] = callback;
             },
             clearTimeout: function () {},
             setInterval: function () {},
@@ -149,8 +180,11 @@ function createHarness(pathname, entryFile) {
 
     return {
         elements: elements,
+        listeners: listeners,
         requests: requests,
-        timers: timers
+        storage: storage,
+        timers: timers,
+        window: context.window
     };
 
 }
@@ -539,6 +573,149 @@ test("Error-Filter und Device-Details arbeiten ohne Reload", function () {
 });
 
 
+test("Summary-Filter nutzen Serverkategorien ohne Reload und mit eigenem Empty State", function () {
+
+    const harness = createHarness(
+        "/system/summary",
+        "summary.js"
+    );
+
+    harness.requests[0].success({
+        activeCount: 2,
+        message: "2 aktive Zustände.",
+        filters: [
+            {id: "all", count: 2, categories: ["open", "powered"]},
+            {id: "open", count: 1, categories: ["open"]},
+            {id: "powered", count: 1, categories: ["powered"]},
+            {id: "active", count: 0, categories: ["running", "cleaning", "movement"]},
+            {id: "climate", count: 0, categories: ["climate"]},
+            {id: "media", count: 0, categories: ["media"]},
+            {id: "security", count: 0, categories: ["security"]}
+        ],
+        groups: [
+            {
+                category: "open",
+                title: "Offen",
+                items: [{
+                    title: "Demo-Fenster",
+                    category: "open",
+                    durationSeconds: 60,
+                    metadata: {}
+                }]
+            },
+            {
+                category: "powered",
+                title: "Eingeschaltet",
+                items: [{
+                    title: "Demo-Licht",
+                    category: "powered",
+                    durationSeconds: 120,
+                    metadata: {}
+                }]
+            }
+        ],
+        meta: meta(true, false, "2026-08-11T18:00:00.000Z")
+    });
+
+    assert.equal(harness.elements.summaryGroups.children.length, 2);
+    assert.equal(harness.elements.summaryAllCount.innerHTML, "2");
+    assert.equal(harness.elements.summaryOpenCount.innerHTML, "1");
+
+    harness.elements.summaryFilterOpen.onclick();
+    assert.equal(harness.requests.length, 1);
+    assert.equal(harness.elements.summaryGroups.children.length, 1);
+    assert.match(harness.elements.summaryFilterOpen.className, /is-active/);
+
+    harness.elements.summaryFilterClimate.onclick();
+    assert.equal(harness.elements.summaryGroups.children.length, 0);
+    assert.equal(harness.elements.summaryFilterEmpty.hidden, false);
+    assert.equal(
+        harness.elements.summaryFilterEmpty.innerHTML,
+        ""
+    );
+
+    const staleHarness = createHarness(
+        "/system/summary",
+        "summary.js"
+    );
+    staleHarness.requests[0].success({
+        activeCount: 1,
+        message: "1 aktiver Zustand.",
+        filters: [
+            {id: "all", count: 1, categories: ["open"]},
+            {id: "climate", count: 0, categories: ["climate"]}
+        ],
+        groups: [{
+            category: "open",
+            title: "Offen",
+            items: [{title: "Demo-Fenster", category: "open", metadata: {}}]
+        }],
+        meta: meta(false, true, "2026-08-11T18:00:00.000Z")
+    });
+    staleHarness.elements.summaryFilterClimate.onclick();
+    assert.match(staleHarness.elements.networkBanner.innerHTML, /Letzte Systemdaten/);
+    assert.match(staleHarness.elements.systemMessage.className, /is-stale/);
+    assert.equal(staleHarness.elements.summaryFilterEmpty.hidden, false);
+});
+
+
+test("Summary und Errors speichern Spalten getrennt und fallen responsiv zurück", function () {
+
+    const storage = {
+        systemSummaryColumns: "3",
+        systemErrorsColumns: "2"
+    };
+    const summary = createHarness(
+        "/system/summary",
+        "summary.js",
+        {storage: storage, width: 1024}
+    );
+    const errors = createHarness(
+        "/system/errors",
+        "errors.js",
+        {storage: storage, width: 1024}
+    );
+
+    assert.match(summary.elements.summaryGroups.className, /system-columns-3/);
+    assert.match(errors.elements.errorGroups.className, /system-columns-2/);
+
+    summary.elements.summaryColumn1.onclick();
+    errors.elements.errorColumn3.onclick();
+    assert.equal(storage.systemSummaryColumns, "1");
+    assert.equal(storage.systemErrorsColumns, "3");
+    assert.equal(summary.requests.length, 1);
+    assert.equal(errors.requests.length, 1);
+
+    const reloaded = createHarness(
+        "/system/summary",
+        "summary.js",
+        {storage: storage, width: 1024}
+    );
+    assert.match(reloaded.elements.summaryGroups.className, /system-columns-1/);
+
+    const narrow = createHarness(
+        "/system/errors",
+        "errors.js",
+        {storage: {systemErrorsColumns: "3"}, width: 600}
+    );
+    assert.match(narrow.elements.errorGroups.className, /system-columns-1/);
+    assert.equal(narrow.elements.errorColumn3.disabled, true);
+
+    narrow.window.innerWidth = 1024;
+    narrow.listeners.resize();
+    assert.match(narrow.elements.errorGroups.className, /system-columns-3/);
+
+    assert.doesNotThrow(function () {
+        const noStorage = createHarness(
+            "/system/summary",
+            "summary.js",
+            {storageFailure: true, width: 1024}
+        );
+        noStorage.elements.summaryColumn2.onclick();
+    });
+});
+
+
 test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
 
     const html = fs.readFileSync(
@@ -563,10 +740,11 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=32/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=33/);
     assert.match(html, /id="errorOverallLabel"/);
     assert.match(html, /id="errorFilterAll"/);
     assert.match(html, /id="errorUnknownCount"/);
+    assert.match(html, /Keine passenden aktiven Zustände\./);
     assert.match(source, /Legacy\.http\.get/);
     assert.match(source, /MAX_RENDERED_ISSUES\s*=\s*200/);
     assert.doesNotMatch(source, /\bconst\b|\blet\b|=>|`/);

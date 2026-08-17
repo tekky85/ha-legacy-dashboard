@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 17. August 2026, Sprint 21.1 implementiert und lokal vollständig geprüft;
+Stand: 17. August 2026, Sprint 21.2 implementiert und lokal vollständig geprüft;
 physische Safari-Geräteabnahme nach Rollout ausstehend
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
@@ -9,6 +9,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-21.2-Ausgangscommit: `7cacfb0`
 - Sprint-21.1-Ausgangscommit: `6ab4e93`
 - Sprint-17.5-Ausgangscommit: `251309d`
 - Sprint-17.4-Ausgangscommit: `ce91dcb`
@@ -54,6 +55,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | D1 | Zweisprachige Dokumentation und Screenshot-Baseline | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
+| 21.2 | System Dashboard Filters, Column Views & Risk Severity | umgesetzt |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -105,25 +107,38 @@ Titel, Zustand, Startzeit, Dauer, festes Icon, Beschreibung und die Domain.
 Medientitel fehlen standardmäßig vollständig und werden nur nach explizitem
 Admin-Opt-in ergänzt.
 
+Sprint 21.2 ergänzt eine Filterdefinition direkt im serverseitigen Summary-
+Payload. Alle, Offen, Licht & Strom, Aktiv, Klima, Medien und Sicherheit
+verwenden ausschließlich die bereits normalisierten Sprint-19-Kategorien;
+der Browser ordnet keine Entities fachlich neu ein. Filter wechseln ohne
+Reload und ohne HA-Abfrage. Ein leerer Teilfilter zeigt „Keine passenden
+aktiven Zustände“, während Stale-/Offline-Hinweise unverändert sichtbar
+bleiben.
+
 ## 4a. Error Dashboard MVP
 
 `/system/errors` beantwortet getrennt von Summary die Frage, welche Entities
 aktuell nicht funktionieren. Nur die States `unavailable` und `unknown`
 erzeugen im MVP Issues; beide bleiben in API und UI unterscheidbar.
 
-Die zentrale Severity-Regel lautet:
+Die zentrale Severity-Regel lautet jetzt:
 
 ```text
 normal unavailable  -> warning
 normal unknown      -> info
-security unavailable -> critical
-security unknown     -> error
+safety/security unavailable -> critical
+safety/security unknown     -> critical
 ```
 
-Security-Relevanz entsteht ausschließlich durch die explizite persistente
-Admin-Konfiguration. Bekannte Device Classes wie `smoke`, `gas` oder
-`moisture` sind nur ein Hinweis und erhöhen die Severity nicht selbständig.
-Ignorierte Entities erscheinen nicht in der aktiven Fehlerliste.
+Eine zentrale Risk Class unterscheidet `safety`, `security`, `normal` und
+`diagnostic`. Sie nutzt ausschließlich normalisierte Domain-, Device-Class-
+und Registry-Metadaten. Smoke, CO, Gas, Moisture/Water sowie Door, Window,
+Opening, Garage Door und Lock werden bei `unknown` oder `unavailable` als
+Critical bewertet. Normale und diagnostische Entities behalten die bisherigen
+milderen Regeln; Entity-Name und Entity-ID sind keine Klassifikationsquelle.
+Explizite `securityEntities` bleiben vorrangig und werden ebenfalls für beide
+Ausfallstates Critical. Ignorierte Entities erscheinen nicht in der aktiven
+Fehlerliste.
 
 Issues enthalten ausschließlich normalisierte Anzeigefelder: ID, Quelle,
 Severity, aktiven Status, Titel, Kurzbeschreibung, Entity-ID, State,
@@ -144,8 +159,11 @@ Config-Entry-, Repair-, Matter- und System-Issues bleiben Standalone.
 Die Kopfzahlen sind als Filter für Alle, Kritisch, Fehler, Warnungen und
 Unknown bedienbar. Unknown filtert weiterhin den State und ist keine neue
 Severity. Child-Entities sind standardmäßig eingeklappt und werden erst beim
-Öffnen der Details in den DOM eingefügt. Das Layout verwendet auf breiteren
-Viewports zwei Flexbox-Spalten und unter 700 Pixeln eine Spalte.
+Öffnen der Details in den DOM eingefügt. Summary und Errors verwenden dieselbe
+Filterdarstellung und besitzen getrennte persistente 1-/2-/3-Spalten-
+Präferenzen. Unter 701 Pixeln wird auf eine, unter 900 Pixeln höchstens auf
+zwei Spalten zurückgefallen; bei wieder ausreichender Breite wird die
+gespeicherte Präferenz erneut angewendet.
 
 ## 5. Collector, Cache und Ausfallsemantik
 
@@ -456,15 +474,21 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
 - ES5-Filter ohne Reload, Unknown-State-Filter, eingeklappte/lazy gerenderte
   Child-Details und ein-/zweispaltige Flexbox-Regeln
 - 3000 Entities, 500 Devices und 200 aktive Entity-Issues für Sprint 21.1
+- Summary-Filterdefinitionen und Counts aus bestehenden Kategorien
+- Safety-/Security-Risk-Class für Unknown und Unavailable, normale und
+  diagnostische Gegenbeispiele sowie fehlende Name-only-Heuristik
+- getrennte Storage-Präferenzen, Reload, Storage Failure und responsive
+  1-/2-/3-Spalten-Fallbacks für Summary und Errors
 
-Der abschließende vollständige Lauf besteht mit 170 von 170 Tests. Der
+Der abschließende vollständige Lauf besteht mit 179 von 179 Tests. Der
 gezielte Focus-/Interaktionssatz besteht mit 28 von 28 Tests, davon 8 neue
 Sprint-17.5-Tests. Der Sprint-21-Satz bleibt mit 15 von 15 Tests grün; sein
 größter Synthetikfall mit 3000
 Entities, 500 Devices, 50 Areas, 100 Config Entries und 100 Repairs benötigte
 42 ms. Die sechs Sprint-21.1-Tests sind grün; die Aggregation von 3000
-Entities, 500 Devices und 200 aktiven Issues benötigte im vollständigen Lauf
-44 ms. Alle JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
+Entities, 500 Devices und 200 aktiven Issues blieb unter 1,5 Sekunden. Die
+gezielte Sprint-21.2-Regression besteht mit 33 von 33 Tests. Alle
+JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
 `git diff --check` ist sauber.
 
 Die Browser-Abnahme an der real laufenden Anwendung mit kontrolliertem
@@ -475,17 +499,21 @@ Minus und Plus bleiben 56×56 Pixel, Power 54 Pixel hoch. Im kleinen
 320×460-Viewport ist das Panel 304 Pixel breit, sämtliche drei Climate-
 Controls bleiben vollständig sichtbar und ohne Überlauf. Light Power sowie
 Climate Plus/Minus wurden im geöffneten Focus betätigt; State und Sollwert
-aktualisierten sich, ohne den Focus zu schließen. Summary und Errors blieben
-funktionsfähig, die Browserkonsole fehlerfrei.
+aktualisierten sich, ohne den Focus zu schließen. Die Sprint-21.2-Abnahme
+bestätigte für Summary und Errors bei 1280×720 drei Spalten mit 332-Pixel-
+Cards ohne horizontalen Überlauf. Bei 768×1024 greifen zwei Spalten mit
+310-Pixel-Cards; bei 320×460 eine Spalte, kein horizontaler Überlauf und ein
+44-Pixel-Detailsbutton. Critical-Filter und Child-Details zeigen die neuen
+Risk-Severities und tatsächlichen States korrekt.
 
 Dieser kontrollierte Lauf verwendet den In-App-Browser und ersetzt keine echte
 Safari-Laufzeit. Das vom Anwender bestätigte gute Verhalten unter macOS Safari
 13.7.8 ist die Ausgangsbasis; die Post-Rollout-Abnahme auf macOS Safari,
 iPad Air 2 mit iPadOS 15.8.5 und dem Legacy-iOS-9-Gerät bleibt manuell. Der
-sichtbar geänderte echte Demo-Screenshot `focus-card.png` bleibt gültig. Für
-Sprint 21.1 wurde `errors.png` aus der echten Systemseite mit einem
-kontrollierten localhost-Demo-Payload und Fake-Daten aktualisiert; Summary-
-und Admin-Screenshots benötigen keine Änderung.
+sichtbar geänderte echte Demo-Screenshot `focus-card.png` bleibt gültig.
+`summary.png` und `errors.png` wurden für Sprint 21.2 aus der echten
+Systemseite mit einem kontrollierten localhost-Demo-Payload und ausschließlich
+künstlichen Daten aktualisiert; Admin-Screenshots benötigen keine Änderung.
 
 ## 12. Bekannte Einschränkungen und technischer Rest
 
@@ -509,19 +537,21 @@ und Admin-Screenshots benötigen keine Änderung.
 
 ## 13. Roadmap-Abgleich und nächster Sprint
 
-Sprint 21 und 21.1 entsprechen der Roadmap: Der REST-State-Collector bleibt bestehen,
+Sprint 21, 21.1 und 21.2 entsprechen der Roadmap: Der REST-State-Collector bleibt bestehen,
 während fest codierte Backend-WebSocket-Adapter ausschließlich read-only
 Metadaten ergänzen. Die Error Engine wurde nur um sicheren Kontext und klar
-belegte Config-/Repair-Issues ergänzt; Kategorie-Filter und Device Cards liegen
-getrennt davon in der Presentation-Schicht. Nicht vorgezogen wurden Grace
+belegte Config-/Repair-Issues ergänzt; Device Cards liegen getrennt davon in
+der Presentation-Schicht. Summary-Filterkategorien entstehen serverseitig;
+Filter- und Spaltenwechsel bleiben rein lokal. Nicht vorgezogen wurden Grace
 Periods, Flapping, fachliche Summary-Aggregation, Historie,
 weitere Schreibdomänen oder freie System-Dashboard-Layouts.
 
 Empfohlener nächster Schritt ist Sprint 22 – Rules, Grace Periods & Device
 Aggregation. Voraussetzung sind reale Betriebsbeobachtungen zu kurzzeitigen
 Ausfällen, erwarteten Offline-Zuständen und sinnvollen Karenzzeiten; Sprint 21
-liefert dafür den stabilen Device-/Area-/Integrationskontext und Sprint 21.1
-die davon getrennte Error-Präsentation.
+liefert dafür den stabilen Device-/Area-/Integrationskontext, Sprint 21.1 die
+davon getrennte Error-Präsentation und Sprint 21.2 die korrigierte Risk-
+Severity sowie die lokale Ansichtssteuerung.
 
 ## 14. Dokumentation und Screenshot-Baseline
 
@@ -634,3 +664,46 @@ Die Messung erfolgte in einem modernen In-App-Browser und belegt die
 responsive Web-Darstellung, ersetzt aber keine physische Safari-iOS-9-
 Laufzeit. Die reale iPad-/Legacy-Geräteabnahme bleibt nach dem Deployment
 erforderlich.
+
+## 17. Sprint 21.2 – Filter, Spaltenansichten und Risk Severity
+
+`src/services/summary/engine.js` liefert sieben Filterdefinitionen mit ID,
+Label, Count und den zugrunde liegenden bestehenden Kategorien. Das
+ES5-Frontend vergleicht nur diese vom Server gelieferten Kategorien und führt
+keine zweite Activity- oder Entity-Klassifikation aus. Der Filterwechsel
+verändert ausschließlich den vorhandenen DOM.
+
+`src/public/js/system/common.js` stellt die gemeinsame Filtersteuerung und den
+Column Controller bereit. Summary und Errors speichern 1, 2 oder 3 getrennt
+unter `systemSummaryColumns` und `systemErrorsColumns` über die fehlertolerante
+Storage-Funktion aus `theme.js`. Bei Storage-Fehlern gilt weiter das
+viewportabhängige Default. Die Containerklassen `system-columns-1`, `-2` und
+`-3` steuern ausschließlich Flexbox-/Width-/Wrap-Regeln; CSS Grid, Flexbox-
+`gap` und ResizeObserver werden nicht verwendet.
+
+`src/services/issues/risk.js` ist die einzige Risk-Class-Quelle. Reliable
+Safety-Device-Classes sind Smoke, Carbon Monoxide, Gas, Moisture, Safety und
+Water; Security umfasst Door, Window, Opening, Garage Door und Lock sowie die
+verlässlichen Domains Lock und Alarm Control Panel. `entity_category =
+diagnostic` wird als Diagnostic klassifiziert, sofern keine belegte Safety-
+oder Security-Device-Class vorliegt. Name-only-Heuristiken existieren nicht.
+
+Die Severity-Priorität ist im aktuell unterstützten Konfigurationsmodell:
+
+```text
+1. explizite securityEntities
+2. Risk Class aus normalisierten Metadaten
+3. bestehende State-Regel
+4. Fallback
+```
+
+Ein allgemeiner Severity-Override ist im Schema 6 nicht vorhanden und wurde
+nicht neu eingeführt. Safety/Security `unknown` und `unavailable` sind
+Critical; normale `unknown` bleiben Info und normale `unavailable` Warning.
+Sprint-21.1-Gruppen übernehmen weiterhin die höchste Child-Severity, und nur
+eine echte `device_id` darf Entity-Issues zusammenfassen.
+
+Filter, Spaltenansicht und Risk Class fügen keine Route, keine Home-Assistant-
+Abfrage, keine Serviceaktion und keine Write-Berechtigung hinzu. Climate- und
+Light-Allowlists sowie Admin-, Registry-, Repair- und Matter-Sicherheitsgrenzen
+bleiben unverändert.

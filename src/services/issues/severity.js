@@ -1,9 +1,11 @@
 /*
  * Central Sprint-20 severity policy.
  *
- * Explicit security configuration is authoritative. Device classes may be
- * exposed as a hint, but never elevate an entity by themselves.
+ * Explicit security configuration is authoritative. Reliable normalized
+ * risk metadata may additionally elevate safety/security entities.
  */
+
+const Risk = require("./risk");
 
 const LEVELS = [
     "critical",
@@ -12,26 +14,21 @@ const LEVELS = [
     "info"
 ];
 
-const SECURITY_DEVICE_CLASSES = [
-    "smoke",
-    "carbon_monoxide",
-    "gas",
-    "moisture",
-    "safety"
-];
+function issueSeverity(state, securityRelevant, riskClass) {
 
-
-function issueSeverity(state, securityRelevant) {
+    const criticalRisk =
+        securityRelevant === true ||
+        Risk.isCritical(riskClass);
 
     if (state === "unavailable") {
-        return securityRelevant
+        return criticalRisk
             ? "critical"
             : "warning";
     }
 
     if (state === "unknown") {
-        return securityRelevant
-            ? "error"
+        return criticalRisk
+            ? "critical"
             : "info";
     }
 
@@ -40,11 +37,11 @@ function issueSeverity(state, securityRelevant) {
 }
 
 
-function potentiallySecurityRelevant(deviceClass) {
+function potentiallySecurityRelevant(deviceClass, entityCategory, domain) {
 
-    return SECURITY_DEVICE_CLASSES.indexOf(
-        String(deviceClass || "").toLowerCase()
-    ) !== -1;
+    return Risk.isCritical(
+        Risk.classify(deviceClass, entityCategory, domain)
+    );
 
 }
 

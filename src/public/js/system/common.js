@@ -297,6 +297,254 @@ var SystemDashboard = (function () {
     }
 
 
+    function createFilterController(definitions, onChange) {
+
+        var selected = "all";
+        var index;
+
+
+        function update(counts) {
+
+            var definition;
+            var button;
+            var active;
+            var itemIndex;
+
+            for (itemIndex = 0; itemIndex < definitions.length; itemIndex++) {
+                definition = definitions[itemIndex];
+                button = byId(definition.buttonId);
+                active = definition.name === selected;
+
+                if (definition.countId) {
+                    setText(
+                        definition.countId,
+                        String(counts && counts[definition.name] || 0)
+                    );
+                }
+
+                if (button) {
+                    button.className =
+                        "system-filter-button" +
+                        (active
+                            ? " system-filter-button-active is-active"
+                            : "");
+                    button.setAttribute(
+                        "aria-pressed",
+                        active ? "true" : "false"
+                    );
+                }
+            }
+
+        }
+
+
+        function select(name) {
+
+            var known = false;
+            var itemIndex;
+
+            for (itemIndex = 0; itemIndex < definitions.length; itemIndex++) {
+                if (definitions[itemIndex].name === name) {
+                    known = true;
+                    break;
+                }
+            }
+
+            selected = known ? name : "all";
+            update({});
+
+            if (typeof onChange === "function") {
+                onChange(selected);
+            }
+
+        }
+
+
+        for (index = 0; index < definitions.length; index++) {
+            (function (definition) {
+                var button = byId(definition.buttonId);
+
+                if (button) {
+                    button.onclick = function () {
+                        select(definition.name);
+                    };
+                }
+            }(definitions[index]));
+        }
+
+
+        return {
+            getSelected: function () {
+                return selected;
+            },
+            select: select,
+            update: update
+        };
+
+    }
+
+
+    function viewportWidth() {
+
+        if (typeof window.innerWidth === "number" && window.innerWidth > 0) {
+            return window.innerWidth;
+        }
+
+        if (
+            document.documentElement &&
+            document.documentElement.clientWidth
+        ) {
+            return document.documentElement.clientWidth;
+        }
+
+        if (document.body && document.body.clientWidth) {
+            return document.body.clientWidth;
+        }
+
+        return 1024;
+
+    }
+
+
+    function replaceColumnClass(element, count) {
+
+        var className;
+
+        if (!element) {
+            return;
+        }
+
+        className = String(element.className || "")
+            .replace(/(^|\s)system-columns-[123](?=\s|$)/g, " ")
+            .replace(/\s+/g, " ")
+            .replace(/^\s+|\s+$/g, "");
+
+        element.className =
+            className +
+            (className ? " " : "") +
+            "system-columns-" + count;
+
+    }
+
+
+    function createColumnController(type, containerId, buttonIds) {
+
+        var storageKey = type === "summary"
+            ? "systemSummaryColumns"
+            : "systemErrorsColumns";
+        var stored = Theme.readStoredValue(storageKey);
+        var preference = /^[123]$/.test(String(stored || ""))
+            ? Number(stored)
+            : null;
+        var effective = 1;
+
+
+        function maximumColumns() {
+
+            var width = viewportWidth();
+
+            if (width <= 700) {
+                return 1;
+            }
+
+            if (width < 900) {
+                return 2;
+            }
+
+            return 3;
+
+        }
+
+
+        function preferredColumns() {
+            return preference || (viewportWidth() <= 700 ? 1 : 2);
+        }
+
+
+        function apply() {
+
+            var maximum = maximumColumns();
+            var preferred = preferredColumns();
+            var count;
+
+            effective = preferred > maximum ? maximum : preferred;
+            replaceColumnClass(byId(containerId), effective);
+
+            for (count = 1; count <= 3; count++) {
+                var button = byId(buttonIds[count - 1]);
+                var active = count === effective;
+                var disabled = count > maximum;
+
+                if (button) {
+                    button.className =
+                        "system-column-button" +
+                        (active
+                            ? " system-column-button-active is-active"
+                            : "");
+                    button.disabled = disabled;
+                    button.setAttribute(
+                        "aria-pressed",
+                        active ? "true" : "false"
+                    );
+                    button.setAttribute(
+                        "aria-disabled",
+                        disabled ? "true" : "false"
+                    );
+                }
+            }
+
+        }
+
+
+        function select(count) {
+
+            if (count < 1 || count > maximumColumns()) {
+                return;
+            }
+
+            preference = count;
+            Theme.storeValue(storageKey, String(count));
+            apply();
+
+        }
+
+
+        var index;
+        for (index = 0; index < buttonIds.length; index++) {
+            (function (count) {
+                var button = byId(buttonIds[count - 1]);
+
+                if (button) {
+                    button.onclick = function () {
+                        if (!button.disabled) {
+                            select(count);
+                        }
+                    };
+                }
+            }(index + 1));
+        }
+
+        if (window.addEventListener) {
+            window.addEventListener("resize", apply, false);
+            window.addEventListener("orientationchange", apply, false);
+        }
+
+        apply();
+
+        return {
+            apply: apply,
+            getEffective: function () {
+                return effective;
+            },
+            getPreference: function () {
+                return preference;
+            },
+            select: select
+        };
+
+    }
+
+
     function start(settings) {
 
         var themeButton = byId("themeButton");
@@ -364,6 +612,8 @@ var SystemDashboard = (function () {
         setText: setText,
         setMessage: setMessage,
         formatTimestamp: formatTimestamp,
+        createFilterController: createFilterController,
+        createColumnController: createColumnController,
         start: start
     };
 
