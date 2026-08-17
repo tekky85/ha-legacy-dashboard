@@ -612,7 +612,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=31"/
+                /src="\/js\/app\.js\?v=32"/
             );
 
             const manifest = await request(
@@ -631,7 +631,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=31"
+                "/js/app.js?v=32"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -921,6 +921,16 @@ test(
             assert.equal(errors.json.summary.unavailable, 1);
             assert.equal(errors.json.summary.unknown, 1);
             assert.equal(errors.json.overallStatus, "warning");
+            assert.equal(errors.json.presentationVersion, 1);
+            assert.deepEqual(errors.json.filters, {
+                all: 2,
+                critical: 0,
+                error: 0,
+                warning: 1,
+                unknown: 1
+            });
+            assert.equal(errors.json.groups.length, 2);
+            assert.equal(errors.json.groups[0].type, "standalone");
             assert.equal(summary.json.meta.entity_count, 3);
             assert.equal(errors.json.meta.entity_count, 3);
             assert.equal(status.json.cache_ttl_ms, 3000);

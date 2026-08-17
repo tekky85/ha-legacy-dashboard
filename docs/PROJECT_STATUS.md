@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 16. August 2026, Sprint 17.5 implementiert und lokal vollständig geprüft;
+Stand: 17. August 2026, Sprint 21.1 implementiert und lokal vollständig geprüft;
 physische Safari-Geräteabnahme nach Rollout ausstehend
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
@@ -9,6 +9,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-21.1-Ausgangscommit: `6ab4e93`
 - Sprint-17.5-Ausgangscommit: `251309d`
 - Sprint-17.4-Ausgangscommit: `ce91dcb`
 - Sprint-21-Commit: `a441880`
@@ -52,6 +53,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 17.5 | Native Focus Renderer und Mobile-Safari-Stabilisierung | umgesetzt |
 | D1 | Zweisprachige Dokumentation und Screenshot-Baseline | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
+| 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -129,6 +131,21 @@ Security-Flag, Start-/Updatezeit, Dauer, Domain und soweit vorhanden Device
 Class. Titel folgen Widget-Konfiguration, Friendly Name und Entity-ID. Die
 Sortierung ist Critical, Error, Warning, Info, danach Security, Dauer, Titel
 und Entity-ID.
+
+Sprint 21.1 setzt auf dieses unveränderte Engine-Ergebnis eine separate
+Presentation-Schicht. Entity-Issues werden nur dann zu einer Device Card
+zusammengefasst, wenn der Sprint-21-Snapshot für sie dieselbe echte
+`device_id` enthält. Gleiche Namen, Räume, Domains oder Integrationen sind
+keine Gruppierungsquelle. Device Cards zeigen die höchste Child-Severity, ein
+propagiertes Security-Flag, die älteste aktive Child-Dauer, Issue-Counts sowie
+Device Name, Raum und Integration. Entities ohne Device-ID und alle
+Config-Entry-, Repair-, Matter- und System-Issues bleiben Standalone.
+
+Die Kopfzahlen sind als Filter für Alle, Kritisch, Fehler, Warnungen und
+Unknown bedienbar. Unknown filtert weiterhin den State und ist keine neue
+Severity. Child-Entities sind standardmäßig eingeklappt und werden erst beim
+Öffnen der Details in den DOM eingefügt. Das Layout verwendet auf breiteren
+Viewports zwei Flexbox-Spalten und unter 700 Pixeln eine Spalte.
 
 ## 5. Collector, Cache und Ausfallsemantik
 
@@ -235,7 +252,7 @@ werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion ist 31.
+Assetversion ist 32.
 
 ## 8a. Sprint 17.3 – Preview, Controls und Focus
 
@@ -377,7 +394,7 @@ Systemansichten ausgeliefert oder geloggt.
 
 | Bereich | Dateien |
 |---|---|
-| Regeln und Engines | `src/services/summary/rules.js`, `src/services/summary/engine.js`, `src/services/issues/engine.js`, `src/services/issues/severity.js` |
+| Regeln und Engines | `src/services/summary/rules.js`, `src/services/summary/engine.js`, `src/services/issues/engine.js`, `src/services/issues/severity.js`, `src/services/issues/presentation.js` |
 | Snapshot und Cache | `src/services/system/snapshot.js`, `src/services/system/cache.js`, `src/services/system/index.js` |
 | System-API | `src/routes/system-dashboards.js` |
 | Schema/Persistenz | `src/config/dashboard.js`, `src/services/dashboard-config-store.js` |
@@ -390,7 +407,7 @@ Systemansichten ausgeliefert oder geloggt.
 | Admin Live Preview | `src/routes/admin.js`, `src/admin/js/api.js`, `src/admin/js/state.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
 | Theme | `src/public/js/core/theme.js`, `src/public/index.html`, `src/public/system.html` |
 | Admin-Einstellungen | `src/admin/index.html`, `src/admin/js/system-dashboards.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
-| Tests | `test/sprint-17-5.test.js`, `test/sprint-17-4.test.js`, `test/sprint-17-3.test.js`, `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
+| Tests | `test/sprint-21-1.test.js`, `test/sprint-21.test.js`, `test/sprint-17-5.test.js`, `test/sprint-17-4.test.js`, `test/sprint-17-3.test.js`, `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
 
 ## 11. Tests
 
@@ -434,13 +451,20 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
 - Registry-Sanitization, Single-Config-Entry-Modell, Legacy-Fallback,
   Area-Priorität, Disabled/Hidden/Registry-only und Config-/Repair-Issues
 - 3000 Entities, 500 Devices, 50 Areas, 100 Config Entries und 100 Repairs
+- echte Device-ID-Aggregation, Standalone-Regeln, Gruppen-Severity, Security-
+  Propagation, älteste Dauer, Filter-Counts und deterministische Sortierung
+- ES5-Filter ohne Reload, Unknown-State-Filter, eingeklappte/lazy gerenderte
+  Child-Details und ein-/zweispaltige Flexbox-Regeln
+- 3000 Entities, 500 Devices und 200 aktive Entity-Issues für Sprint 21.1
 
-Der abschließende vollständige Lauf besteht mit 164 von 164 Tests. Der
+Der abschließende vollständige Lauf besteht mit 170 von 170 Tests. Der
 gezielte Focus-/Interaktionssatz besteht mit 28 von 28 Tests, davon 8 neue
 Sprint-17.5-Tests. Der Sprint-21-Satz bleibt mit 15 von 15 Tests grün; sein
 größter Synthetikfall mit 3000
 Entities, 500 Devices, 50 Areas, 100 Config Entries und 100 Repairs benötigte
-35 ms. Alle JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
+42 ms. Die sechs Sprint-21.1-Tests sind grün; die Aggregation von 3000
+Entities, 500 Devices und 200 aktiven Issues benötigte im vollständigen Lauf
+44 ms. Alle JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
 `git diff --check` ist sauber.
 
 Die Browser-Abnahme an der real laufenden Anwendung mit kontrolliertem
@@ -458,15 +482,19 @@ Dieser kontrollierte Lauf verwendet den In-App-Browser und ersetzt keine echte
 Safari-Laufzeit. Das vom Anwender bestätigte gute Verhalten unter macOS Safari
 13.7.8 ist die Ausgangsbasis; die Post-Rollout-Abnahme auf macOS Safari,
 iPad Air 2 mit iPadOS 15.8.5 und dem Legacy-iOS-9-Gerät bleibt manuell. Der
-sichtbar geänderte echte Demo-Screenshot `focus-card.png` wurde aktualisiert;
-Summary-, Error- und Admin-Screenshots benötigen keine Änderung.
+sichtbar geänderte echte Demo-Screenshot `focus-card.png` bleibt gültig. Für
+Sprint 21.1 wurde `errors.png` aus der echten Systemseite mit einem
+kontrollierten localhost-Demo-Payload und Fake-Daten aktualisiert; Summary-
+und Admin-Screenshots benötigen keine Änderung.
 
 ## 12. Bekannte Einschränkungen und technischer Rest
 
 - Matter besitzt aktuell keine belastbar belegte generische Read-only-
   Diagnose-API und wird daher ohne Command-Probe als `unsupported` gemeldet.
-- Grace Periods, erwartete Offlinezustände, Flapping und Aggregation folgen
-  Sprint 22; kurze Ausfälle erscheinen im MVP daher sofort.
+- Grace Periods, erwartete Offlinezustände und Flapping folgen Sprint 22;
+  kurze Ausfälle erscheinen im MVP daher sofort. Die Error-Präsentation ist
+  bereits nach echter Device-ID aggregiert; semantische Summary-Aggregation
+  bleibt für Sprint 22 geplant.
 - Es gibt noch keine Issue-Historie oder Acknowledgements.
 - Switch-Ausschlüsse sind absichtlich explizit statt heuristisch; die
   Ersteinrichtung kann daher eine kurze Admin-Auswahl erfordern.
@@ -481,17 +509,19 @@ Summary-, Error- und Admin-Screenshots benötigen keine Änderung.
 
 ## 13. Roadmap-Abgleich und nächster Sprint
 
-Sprint 21 entspricht der Roadmap: Der REST-State-Collector bleibt bestehen,
+Sprint 21 und 21.1 entsprechen der Roadmap: Der REST-State-Collector bleibt bestehen,
 während fest codierte Backend-WebSocket-Adapter ausschließlich read-only
-Metadaten ergänzen. Die sichtbaren Summary-/Error-Regeln wurden nur um sicheren
-Kontext, Kategorie-Filter und klar belegte Config-/Repair-Issues erweitert.
-Nicht vorgezogen wurden Grace Periods, Flapping, Device-Aggregation, Historie,
+Metadaten ergänzen. Die Error Engine wurde nur um sicheren Kontext und klar
+belegte Config-/Repair-Issues ergänzt; Kategorie-Filter und Device Cards liegen
+getrennt davon in der Presentation-Schicht. Nicht vorgezogen wurden Grace
+Periods, Flapping, fachliche Summary-Aggregation, Historie,
 weitere Schreibdomänen oder freie System-Dashboard-Layouts.
 
 Empfohlener nächster Schritt ist Sprint 22 – Rules, Grace Periods & Device
 Aggregation. Voraussetzung sind reale Betriebsbeobachtungen zu kurzzeitigen
 Ausfällen, erwarteten Offline-Zuständen und sinnvollen Karenzzeiten; Sprint 21
-liefert dafür jetzt den stabilen Device-/Area-/Integrationskontext.
+liefert dafür den stabilen Device-/Area-/Integrationskontext und Sprint 21.1
+die davon getrennte Error-Präsentation.
 
 ## 14. Dokumentation und Screenshot-Baseline
 
@@ -567,3 +597,40 @@ Der geschützte Read-only-Endpunkt
 Status, Capabilities und TTLs. Es gibt keine Raw-Registry-, WebSocket-Proxy-,
 Repair-, Reload-, Reauth-, Registry- oder Matter-Schreibroute. Climate- und
 Light-Allowlists bleiben unverändert.
+
+## 16. Sprint 21.1 – Error Dashboard Device Aggregation & Navigation
+
+`src/services/issues/presentation.js` ist die einzige neue serverseitige
+Schicht. Sie erhält den unveränderten Rückgabewert der Sprint-20-Issue-Engine
+und den bereits gecachten Sprint-21-Snapshot. Ein linear aufgebauter
+Entity-Index und ein `issuesByDeviceId`-Dictionary verhindern quadratische
+Suchen. Nur `entity_state`-Issues mit derselben normalisierten Device-ID werden
+zusammengeführt; alle übrigen Issue-Quellen bleiben Standalone.
+
+Die Route liefert zusätzlich `presentationVersion: 1`, Filter-Counts und ein
+einheitliches Gruppenmodell. Device Groups enthalten nur benötigte Child-
+Felder und keinen Registry-Rohdatensatz. Die ursprüngliche normalisierte
+`issues`-Liste bleibt für Kompatibilität erhalten; Detection, Summary,
+Overall-Status und Severity werden nicht neu berechnet.
+
+Der Legacy-Renderer bindet fünf statische Buttons per `onclick`, hält genau
+einen lokalen Filter aktiv und erzeugt keine Navigation oder neue Anfrage.
+Der aktive Filter ist durch Häkchen, Rahmen und `aria-pressed` auch ohne Farbe
+erkennbar. Device-Details sind initial leer; Child-DOM wird erst beim Öffnen
+erzeugt und beim Schließen entfernt. Auf breiten Viewports verwenden Cards
+48 Prozent plus definierte Ränder, unter 700 Pixeln 100 Prozent. `flex-start`
+verhindert, dass eine geöffnete Card die Nachbar-Card künstlich streckt.
+
+Die kontrollierte Browserabnahme ergab:
+
+- 1024×768: zwei Spalten, Cardbreite 414 Pixel, kein horizontaler Überlauf
+- 768×1024: zwei Spalten, Cardbreite 310 Pixel, kein horizontaler Überlauf
+- 320×460: eine Spalte, 44-Pixel-Details-Button, kein horizontaler Überlauf
+- Details öffnen/schließen korrekt; Unknown zeigt nur Gruppen mit Unknown-
+  Child und im geöffneten Gerät nur das passende Child
+- Light und Dark funktionieren; Browserkonsole ohne Warnungen oder Fehler
+
+Die Messung erfolgte in einem modernen In-App-Browser und belegt die
+responsive Web-Darstellung, ersetzt aber keine physische Safari-iOS-9-
+Laufzeit. Die reale iPad-/Legacy-Geräteabnahme bleibt nach dem Deployment
+erforderlich.

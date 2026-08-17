@@ -80,12 +80,12 @@ test("Focus besitzt View Model und typgetrennte native Renderer", function () {
     assert.match(renderer, /function renderClimateFocus/);
     assert.match(html, /class="focus-panel"/);
     assert.ok(
-        html.indexOf("/js/focus/view-model.js?v=31") <
-            html.indexOf("/js/focus/renderer.js?v=31")
+        html.indexOf("/js/focus/view-model.js?v=32") <
+            html.indexOf("/js/focus/renderer.js?v=32")
     );
     assert.ok(
-        html.indexOf("/js/focus/renderer.js?v=31") <
-            html.indexOf("/js/focus/focus.js?v=31")
+        html.indexOf("/js/focus/renderer.js?v=32") <
+            html.indexOf("/js/focus/focus.js?v=32")
     );
 });
 

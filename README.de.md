@@ -94,8 +94,16 @@ Zeigt unter anderem:
 - Schweregrade
 - Stale-/Offline-Zustände
 - letzten erfolgreichen Aktualisierungszeitpunkt
+- klickbare Filter für Alle, Kritisch, Fehler, Warnungen und Unknown
+- kompakte Device Cards für Entity-Issues mit derselben echten `device_id`
+- standardmäßig eingeklappte Child-Entity-Details
+- einspaltige Darstellung auf schmalen und zweispaltige Darstellung auf breiteren Viewports
 
 `unknown` und `unavailable` werden bewusst getrennt behandelt.
+Entities ohne `device_id` sowie Config-Entry-, Repair- und Matter-Hinweise
+bleiben als eigenständige Issues sichtbar. Die Gruppierung ist ausschließlich
+eine read-only Präsentationsschicht und verändert weder Severity-Regeln noch
+Schreibrechte.
 
 ### Registry- und Diagnoseanreicherung
 
@@ -114,7 +122,9 @@ Die Quellen werden capability-gesteuert abgefragt und getrennt gecacht:
 
 Teilweise Ausfälle lassen den bestehenden REST-State-Snapshot und damit
 Summary und Systemstatus weiterlaufen. Entity-Issues können dadurch
-Geräte-, Raum-, Integrations- und Plattformkontext anzeigen. Deaktivierte
+Geräte-, Raum-, Integrations- und Plattformkontext anzeigen und werden im
+Systemstatus ausschließlich über ihre echte `device_id` zu Device Cards
+zusammengefasst. Deaktivierte
 Entities werden nicht mit `unavailable` gleichgesetzt; Registry-Einträge ohne
 State werden nicht pauschal als verwaist klassifiziert. Config-Entry-Probleme
 und Repairs erscheinen ausschließlich als Hinweise – ohne Reload-, Reauth-,

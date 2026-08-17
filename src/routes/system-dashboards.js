@@ -2,6 +2,7 @@ const express = require("express");
 
 const DashboardConfig = require("../config/dashboard");
 const Issues = require("../services/issues/engine");
+const IssuePresentation = require("../services/issues/presentation");
 const Snapshot = require("../services/system/snapshot");
 const System = require("../services/system");
 const Summary = require("../services/summary/engine");
@@ -84,9 +85,12 @@ router.get("/errors", async function (req, res) {
     return loadSnapshot(
         res,
         function (snapshot) {
-            return Issues.buildIssues(
+            return IssuePresentation.build(
                 snapshot,
-                DashboardConfig.getErrorsConfiguration()
+                Issues.buildIssues(
+                    snapshot,
+                    DashboardConfig.getErrorsConfiguration()
+                )
             );
         }
     );

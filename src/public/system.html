@@ -15,9 +15,9 @@
 
 <title>HA Legacy Dashboard – System</title>
 
-<script src="/js/core/theme.js?v=31"></script>
-<link rel="stylesheet" href="/css/style.css?v=31">
-<link rel="stylesheet" href="/css/system.css?v=31">
+<script src="/js/core/theme.js?v=32"></script>
+<link rel="stylesheet" href="/css/style.css?v=32">
+<link rel="stylesheet" href="/css/system.css?v=32">
 
 </head>
 
@@ -130,15 +130,25 @@
                 <strong id="errorOverallLabel">Wird geprüft</strong>
             </div>
 
-            <div class="error-stats" aria-label="Störungsübersicht">
-                <div><strong id="errorCriticalCount">0</strong><span>Kritisch</span></div>
-                <div><strong id="errorErrorCount">0</strong><span>Fehler</span></div>
-                <div><strong id="errorWarningCount">0</strong><span>Warnungen</span></div>
-                <div><strong id="errorInfoCount">0</strong><span>Info</span></div>
-                <div><strong id="errorUnavailableCount">0</strong><span>unavailable</span></div>
-                <div><strong id="errorUnknownCount">0</strong><span>unknown</span></div>
+            <div class="error-filters" role="toolbar" aria-label="Störungen filtern">
+                <button id="errorFilterAll" class="error-filter is-active" type="button" aria-pressed="true">
+                    <span>Alle</span><strong id="errorAllCount">0</strong>
+                </button>
+                <button id="errorFilterCritical" class="error-filter" type="button" aria-pressed="false">
+                    <span>Kritisch</span><strong id="errorCriticalCount">0</strong>
+                </button>
+                <button id="errorFilterError" class="error-filter" type="button" aria-pressed="false">
+                    <span>Fehler</span><strong id="errorErrorCount">0</strong>
+                </button>
+                <button id="errorFilterWarning" class="error-filter" type="button" aria-pressed="false">
+                    <span>Warnungen</span><strong id="errorWarningCount">0</strong>
+                </button>
+                <button id="errorFilterUnknown" class="error-filter" type="button" aria-pressed="false">
+                    <span>Unknown</span><strong id="errorUnknownCount">0</strong>
+                </button>
             </div>
 
+            <p id="errorFilterEmpty" class="error-filter-empty" hidden>Keine Störungen in dieser Kategorie.</p>
             <div id="errorGroups" class="error-groups"></div>
         </div>
 
@@ -166,10 +176,10 @@
 
 </div>
 
-<script src="/js/core/compat.js?v=31"></script>
-<script src="/js/system/common.js?v=31"></script>
-<script src="/js/system/summary.js?v=31"></script>
-<script src="/js/system/errors.js?v=31"></script>
+<script src="/js/core/compat.js?v=32"></script>
+<script src="/js/system/common.js?v=32"></script>
+<script src="/js/system/summary.js?v=32"></script>
+<script src="/js/system/errors.js?v=32"></script>
 
 </body>
 

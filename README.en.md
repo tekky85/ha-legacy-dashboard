@@ -94,8 +94,15 @@ Shows, among other things:
 - severity levels
 - stale/offline conditions
 - last successful update time
+- clickable filters for All, Critical, Error, Warning, and Unknown
+- compact Device Cards for entity issues sharing the same real `device_id`
+- child-entity details collapsed by default
+- a single-column layout on narrow and a two-column layout on wider viewports
 
 `unknown` and `unavailable` are intentionally treated as distinct states.
+Entities without a `device_id`, as well as Config Entry, Repair, and Matter
+notices, remain visible as standalone issues. Grouping is strictly a read-only
+presentation layer and changes neither severity rules nor write permissions.
 
 ### Registry and Diagnostic Enrichment
 
@@ -114,7 +121,8 @@ Sources are capability-driven and cached independently:
 
 Partial failures leave the existing REST state snapshot, Summary and System
 Status operational. Entity issues can therefore show device, area,
-integration and platform context. Disabled entities are not treated as
+integration and platform context and are combined into Device Cards in System
+Status exclusively through their real `device_id`. Disabled entities are not treated as
 `unavailable`, and registry entries without a state are not automatically
 classified as orphaned. Config Entry problems and Repairs remain notices only,
 without reload, reauthentication, repair or Matter actions.

@@ -200,6 +200,7 @@ Bedeutung von „fest“:
 | 17.4 | Focus Overlay Layout Stabilization (Korrektursprint nach 21) | umgesetzt |
 | 17.5 | Native Focus Renderer & Mobile Safari Stabilization (Korrektursprint nach 17.4) | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
+| 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
 | 23 | Automation Impact & Advanced Diagnostics | neu geplant |
 | 24 | Home Assistant App Packaging | verschoben |
@@ -1131,6 +1132,32 @@ statt nur vieler einzelner Entity-Fehler.
 
 ---
 
+# Sprint 21.1 – Error Dashboard Device Aggregation & Navigation
+
+## Status
+
+Umgesetzt nach Sprint 21.
+
+## Ergebnis
+
+- Die unveränderten Sprint-20-/21-Issues werden in einer eigenen read-only
+  Presentation-Schicht ausschließlich über eine echte `device_id` zu Device
+  Cards aggregiert.
+- Entities ohne Device-ID sowie Config-Entry-, Repair-, Matter- und sonstige
+  System-Issues bleiben Standalone.
+- Group Severity entspricht der höchsten Child-Severity, Security-Relevanz
+  wird propagiert und die älteste aktive Child-Dauer bestimmt die Gruppendauer.
+- Alle, Kritisch, Fehler, Warnungen und Unknown sind ohne Reload einzeln
+  filterbar; Unknown bleibt ein State-Filter.
+- Child-Entities sind standardmäßig eingeklappt und werden erst beim
+  ES5-kompatiblen Details-Toggle in den DOM eingefügt.
+- Breite Viewports verwenden ein zweispaltiges Flexbox-Layout, schmale
+  Viewports eine Spalte; CSS Grid und Flexbox-`gap` bleiben ausgeschlossen.
+- Es gibt keine zusätzliche Home-Assistant-Abfrage, keine neue Admin-
+  Konfiguration und keine Write-Funktion.
+
+---
+
 # Sprint 22 – Rules, Grace Periods & Device Aggregation
 
 ## Ziel
@@ -1570,6 +1597,7 @@ nächste Planung
 19  Summary Dashboard MVP
 20  Error Dashboard MVP
 21  Registry & Diagnostic Enrichment
+21.1 Error Dashboard Device Aggregation & Navigation
 22  Rules, Grace Periods & Device Aggregation
 23  Automation Impact & Advanced Diagnostics
 24  Home Assistant App Packaging
@@ -1599,12 +1627,15 @@ Ziel bleibt:
 
 # Nächster Sprint
 
-Nach Abschluss von Sprint 18:
+Nach Abschluss von Sprint 21.1:
 
 ```text
-Sprint 19 – Summary Dashboard MVP
+Sprint 22 – Rules, Grace Periods & Device Aggregation
 ```
 
-Dieser Sprint nutzt die gemeinsame Snapshot-Grundlage und implementiert die
-eigentliche, read-only Aktivitätsauswertung. Die Issue-Klassifikation bleibt
-weiterhin Sprint 20 vorbehalten.
+Die Device-Aggregation des Error Dashboards ist bereits eine reine
+Präsentationsfunktion aus Sprint 21.1. Sprint 22 ergänzt fachliche Karenz-,
+Flapping- und erwartete Offline-Regeln sowie die geplante semantische
+Geräteaggregation im Summary Dashboard. Diese Regeln benötigen eine eigene
+Spezifikation und dürfen die bestehenden Write-Sicherheitsgrenzen nicht
+verändern.

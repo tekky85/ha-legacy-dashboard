@@ -321,6 +321,250 @@
     line-height: 18px;
 }
 
+.error-filters {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin: 0 -4px 13px;
+}
+
+.error-filter {
+    position: relative;
+    min-height: 44px;
+    margin: 0 4px 8px;
+    padding: 8px 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 11px;
+    background: #eef2f7;
+    color: #334155;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    line-height: 20px;
+    cursor: pointer;
+}
+
+.error-filter strong {
+    display: inline-block;
+    min-width: 22px;
+    margin-left: 5px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 12px;
+    text-align: center;
+}
+
+.error-filter.is-active {
+    border-width: 2px;
+    border-color: #334155;
+    padding: 7px 10px;
+    box-shadow: inset 0 -3px 0 #334155;
+}
+
+.error-filter.is-active:before {
+    margin-right: 5px;
+    content: "\2713";
+    font-weight: 900;
+}
+
+.error-filter-empty {
+    margin: 4px 0 16px;
+    padding: 14px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    color: #475569;
+    font-size: 14px;
+    text-align: center;
+}
+
+.error-groups {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    align-items: flex-start;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.error-card {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 48%;
+    min-width: 0;
+    margin: 0 1% 12px;
+    padding: 13px;
+    border: 1px solid #e2e8f0;
+    border-left-width: 4px;
+    border-radius: 14px;
+    background: #f8fafc;
+}
+
+.error-card-critical,
+.error-card-error {
+    border-left-color: #dc2626;
+}
+
+.error-card-warning {
+    border-left-color: #d97706;
+}
+
+.error-card-info {
+    border-left-color: #2563eb;
+}
+
+.error-card-header {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    align-items: flex-start;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    min-width: 0;
+    margin: 0 0 9px;
+}
+
+.error-card-title {
+    min-width: 0;
+    margin: 0;
+    padding-right: 9px;
+    color: #0f172a;
+    font-size: 16px;
+    line-height: 21px;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.error-card-severity {
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 850;
+    line-height: 17px;
+    text-transform: uppercase;
+}
+
+.error-card-critical .error-card-severity,
+.error-card-error .error-card-severity {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.error-card-warning .error-card-severity {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.error-card-info .error-card-severity {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.error-device-summary strong,
+.error-device-summary span,
+.error-standalone-details span,
+.error-standalone-details code {
+    display: block;
+    margin: 0 0 4px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 17px;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.error-device-summary .error-device-count {
+    color: #334155;
+    font-size: 13px;
+}
+
+.error-device-summary .error-security,
+.error-standalone-details .error-security {
+    font-weight: 850;
+}
+
+.error-details-toggle {
+    min-height: 44px;
+    margin: 8px 0 0;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #334155;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.error-device-details {
+    display: none;
+    margin: 9px 0 0;
+}
+
+.error-device-card.is-expanded .error-device-details {
+    display: block;
+}
+
+.error-child-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.error-child {
+    margin: 0 0 7px;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.error-child-title,
+.error-child-entity {
+    display: block;
+    margin-bottom: 3px;
+    color: #334155;
+    font-size: 12px;
+    line-height: 17px;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.error-child-details span {
+    display: inline-block;
+    margin: 0 8px 2px 0;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 15px;
+}
+
+.error-card .error-item-description {
+    margin: 0 0 7px;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.error-groups .error-more {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0 1% 12px;
+}
+
 .summary-count {
     display: inline-block;
     min-width: 92px;
@@ -646,6 +890,66 @@ body.theme-dark .error-entity-id {
     color: #aebdd0;
 }
 
+body.theme-dark .error-filter {
+    border-color: #475569;
+    background: #263448;
+    color: #dbe7f4;
+}
+
+body.theme-dark .error-filter strong {
+    background: #172131;
+    color: #f1f5f9;
+}
+
+body.theme-dark .error-filter.is-active {
+    border-color: #dbe7f4;
+    box-shadow: inset 0 -3px 0 #dbe7f4;
+}
+
+body.theme-dark .error-filter-empty {
+    border-color: #475569;
+    color: #aebdd0;
+}
+
+body.theme-dark .error-card {
+    border-color: #334155;
+    background: #1d2939;
+}
+
+body.theme-dark .error-card-critical,
+body.theme-dark .error-card-error {
+    border-left-color: #f87171;
+}
+
+body.theme-dark .error-card-warning {
+    border-left-color: #fb923c;
+}
+
+body.theme-dark .error-card-info {
+    border-left-color: #60a5fa;
+}
+
+body.theme-dark .error-card-title,
+body.theme-dark .error-device-summary .error-device-count,
+body.theme-dark .error-child-title,
+body.theme-dark .error-child-entity {
+    color: #f1f5f9;
+}
+
+body.theme-dark .error-device-summary span,
+body.theme-dark .error-standalone-details span,
+body.theme-dark .error-standalone-details code,
+body.theme-dark .error-child-details span {
+    color: #aebdd0;
+}
+
+body.theme-dark .error-details-toggle,
+body.theme-dark .error-child {
+    border-color: #475569;
+    background: #172131;
+    color: #dbe7f4;
+}
+
 body.theme-dark .network-banner.is-warning {
     border-color: #684b28;
     background: #39291b;
@@ -691,6 +995,12 @@ body.theme-dark .network-banner.is-success {
     .error-severity-label {
         display: block;
         margin-top: 2px;
+    }
+
+    .error-card {
+        width: 100%;
+        margin-right: 0;
+        margin-left: 0;
     }
 }
 

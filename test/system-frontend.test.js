@@ -14,9 +14,8 @@ const PUBLIC_PATH = path.join(
 
 function createElement() {
 
-    return {
+    const element = {
         className: "",
-        innerHTML: "",
         hidden: false,
         children: [],
         attributes: {},
@@ -27,8 +26,23 @@ function createElement() {
         },
         setAttribute: function (name, value) {
             this.attributes[name] = value;
+        },
+        getAttribute: function (name) {
+            return this.attributes[name];
         }
     };
+
+    Object.defineProperty(element, "innerHTML", {
+        get: function () {
+            return this._innerHTML || "";
+        },
+        set: function (value) {
+            this._innerHTML = String(value);
+            this.children = [];
+        }
+    });
+
+    return element;
 
 }
 
@@ -47,9 +61,10 @@ function createHarness(pathname, entryFile) {
         "updated", "wallClock", "wallDate", "summaryOverview",
         "summaryGroups", "summaryActiveCount", "errorsOverview",
         "errorOverall", "errorOverallSymbol", "errorOverallLabel",
-        "errorCriticalCount", "errorErrorCount", "errorWarningCount",
-        "errorInfoCount", "errorUnavailableCount", "errorUnknownCount",
-        "errorGroups"
+        "errorAllCount", "errorCriticalCount", "errorErrorCount",
+        "errorWarningCount", "errorUnknownCount", "errorFilterAll",
+        "errorFilterCritical", "errorFilterError", "errorFilterWarning",
+        "errorFilterUnknown", "errorFilterEmpty", "errorGroups"
     ].forEach(function (id) {
         elements[id] = createElement();
     });
@@ -292,6 +307,7 @@ test("Error-Shell zeigt Status, Severity-Gruppen, States und Recovery", function
         overallStatus: "critical",
         message: "2 aktive Störungen erkannt.",
         summary: {
+            total: 2,
             critical: 1,
             error: 0,
             warning: 0,
@@ -336,8 +352,8 @@ test("Error-Shell zeigt Status, Severity-Gruppen, States und Recovery", function
     assert.equal(harness.elements.errorsOverview.hidden, false);
     assert.match(harness.elements.errorOverall.className, /is-critical/);
     assert.equal(harness.elements.errorOverallLabel.innerHTML, "Kritisch");
+    assert.equal(harness.elements.errorAllCount.innerHTML, "2");
     assert.equal(harness.elements.errorCriticalCount.innerHTML, "1");
-    assert.equal(harness.elements.errorUnavailableCount.innerHTML, "1");
     assert.equal(harness.elements.errorUnknownCount.innerHTML, "1");
     assert.equal(harness.elements.errorGroups.children.length, 2);
 
@@ -387,14 +403,139 @@ test("Error-Shell zeigt Status, Severity-Gruppen, States und Recovery", function
         meta: meta(true, false, "2026-08-11T18:00:00.000Z")
     });
 
+    assert.equal(largeHarness.elements.errorGroups.children.length, 201);
     assert.equal(
-        largeHarness.elements.errorGroups.children[0].children[1].children.length,
-        200
-    );
-    assert.equal(
-        largeHarness.elements.errorGroups.children[1].className,
+        largeHarness.elements.errorGroups.children[200].className,
         "error-more"
     );
+});
+
+
+test("Error-Filter und Device-Details arbeiten ohne Reload", function () {
+
+    const harness = createHarness(
+        "/system/errors",
+        "errors.js"
+    );
+
+    harness.requests[0].success({
+        overallStatus: "critical",
+        message: "3 aktive Störungen erkannt.",
+        summary: {
+            total: 3,
+            critical: 1,
+            warning: 1,
+            info: 1,
+            unknown: 1
+        },
+        filters: {
+            all: 3,
+            critical: 1,
+            error: 0,
+            warning: 1,
+            unknown: 1
+        },
+        groups: [
+            {
+                id: "device-demo",
+                type: "device",
+                title: "Rauchmelder Flur",
+                areaName: "Flur",
+                integration: "ZHA",
+                severity: "critical",
+                securityRelevant: true,
+                issueCount: 2,
+                durationSeconds: 1080,
+                counts: {
+                    critical: 1,
+                    error: 0,
+                    warning: 0,
+                    info: 1,
+                    unknown: 1
+                },
+                issues: [
+                    {
+                        title: "Rauchalarm",
+                        entityId: "binary_sensor.rauch_alarm",
+                        state: "unavailable",
+                        severity: "critical",
+                        durationSeconds: 1080
+                    },
+                    {
+                        title: "Batterie",
+                        entityId: "sensor.rauch_batterie",
+                        state: "unknown",
+                        severity: "info",
+                        durationSeconds: 300
+                    }
+                ]
+            },
+            {
+                id: "repair-demo",
+                type: "standalone",
+                title: "Home Assistant Repair",
+                description: "Hinweis",
+                severity: "warning",
+                state: "repair",
+                issueCount: 1,
+                durationSeconds: null,
+                counts: {
+                    critical: 0,
+                    error: 0,
+                    warning: 1,
+                    info: 0,
+                    unknown: 0
+                },
+                issues: []
+            }
+        ],
+        meta: meta(true, false, "2026-08-11T18:00:00.000Z")
+    });
+
+    assert.equal(harness.elements.errorGroups.children.length, 2);
+    assert.match(harness.elements.errorFilterAll.className, /is-active/);
+    assert.equal(
+        harness.elements.errorFilterAll.getAttribute("aria-pressed"),
+        "true"
+    );
+
+    const deviceCard = harness.elements.errorGroups.children[0];
+    const details = deviceCard.children[2];
+    const toggle = deviceCard.children[3];
+
+    assert.doesNotMatch(deviceCard.className, /is-expanded/);
+    assert.equal(details.children.length, 0);
+    assert.equal(toggle.getAttribute("aria-expanded"), "false");
+
+    toggle.onclick();
+    assert.match(deviceCard.className, /is-expanded/);
+    assert.equal(toggle.getAttribute("aria-expanded"), "true");
+    assert.equal(details.children[0].children.length, 2);
+
+    toggle.onclick();
+    assert.doesNotMatch(deviceCard.className, /is-expanded/);
+    assert.equal(details.children.length, 0);
+
+    harness.elements.errorFilterWarning.onclick();
+    assert.equal(harness.requests.length, 1);
+    assert.equal(harness.elements.errorGroups.children.length, 1);
+    assert.match(harness.elements.errorFilterWarning.className, /is-active/);
+
+    harness.elements.errorFilterUnknown.onclick();
+    assert.equal(harness.elements.errorGroups.children.length, 1);
+    assert.equal(
+        harness.elements.errorGroups.children[0].children[3]
+            .getAttribute("aria-expanded"),
+        "false"
+    );
+
+    harness.elements.errorFilterError.onclick();
+    assert.equal(harness.elements.errorGroups.children.length, 0);
+    assert.equal(harness.elements.errorFilterEmpty.hidden, false);
+
+    harness.elements.errorFilterAll.onclick();
+    assert.equal(harness.elements.errorGroups.children.length, 2);
+    assert.equal(harness.elements.errorFilterEmpty.hidden, true);
 });
 
 
@@ -422,9 +563,9 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=31/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=32/);
     assert.match(html, /id="errorOverallLabel"/);
-    assert.match(html, /id="errorUnavailableCount"/);
+    assert.match(html, /id="errorFilterAll"/);
     assert.match(html, /id="errorUnknownCount"/);
     assert.match(source, /Legacy\.http\.get/);
     assert.match(source, /MAX_RENDERED_ISSUES\s*=\s*200/);
