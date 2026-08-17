@@ -4,17 +4,35 @@
 
 var LegacyControls = (function () {
 
+    function powerIcon() {
+
+        return "" +
+            '<span class="dashboard-control-power-icon dashboard-power-icon" ' +
+                'aria-hidden="true">' +
+                '<svg width="24" height="24" viewBox="0 0 24 24" ' +
+                    'focusable="false" aria-hidden="true">' +
+                    '<path d="M12 3v10"></path>' +
+                    '<path d="M6.3 6.7a8 8 0 1 0 11.4 0"></path>' +
+                '</svg>' +
+            '</span>';
+
+    }
+
     function powerButton(options) {
 
         var settings = options || {};
         var state = settings.state;
         var isOn = state === "on";
         var available = settings.available === true;
-        var stateClass = available
-            ? isOn
-                ? "on"
-                : "off"
-            : "neutral";
+        var isBusy = settings.busy === true;
+        var hasError = settings.error === true || state === "error";
+        var stateClass = hasError
+            ? "error"
+            : available
+                ? isOn
+                    ? "on"
+                    : "off"
+                : "unavailable";
         var label = settings.label || (
             available
                 ? isOn
@@ -24,14 +42,20 @@ var LegacyControls = (function () {
         );
         var disabled =
             settings.disabled === true ||
+            isBusy ||
             !available;
+
+        var modifierClasses =
+            " is-" + stateClass +
+            (isBusy ? " is-busy" : "") +
+            (disabled ? " is-disabled" : "");
 
 
         return "" +
-            '<button type="button" class="dashboard-power-control ' +
+            '<button type="button" class="dashboard-control ' +
+                'dashboard-control-power dashboard-power-control ' +
                 Legacy.html.escape(settings.className || "") +
-                ' is-' +
-                Legacy.html.escape(stateClass) +
+                Legacy.html.escape(modifierClasses) +
                 '" data-entity="' +
                 Legacy.html.escape(settings.entity || "") +
                 '" data-state="' +
@@ -45,13 +69,8 @@ var LegacyControls = (function () {
                 '"' +
                 (disabled ? ' disabled="disabled"' : "") +
             '>' +
-                '<span class="dashboard-power-icon" aria-hidden="true">' +
-                    '<svg viewBox="0 0 24 24" focusable="false">' +
-                        '<path d="M12 2v10"></path>' +
-                        '<path d="M6.3 5.7a8 8 0 1 0 11.4 0"></path>' +
-                    '</svg>' +
-                '</span>' +
-                '<span class="dashboard-power-label">' +
+                powerIcon() +
+                '<span class="dashboard-control-power-label dashboard-power-label">' +
                     Legacy.html.escape(label) +
                 '</span>' +
             '</button>';
@@ -60,6 +79,7 @@ var LegacyControls = (function () {
 
 
     return {
+        powerIcon: powerIcon,
         powerButton: powerButton
     };
 

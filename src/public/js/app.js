@@ -1252,8 +1252,10 @@ function updateLightDisplay(
         );
 
         buttons[index].className =
+            "dashboard-control dashboard-control-power " +
             "dashboard-power-control light-control is-" +
-            stateClass;
+            (available ? stateClass : "unavailable") +
+            (available ? "" : " is-disabled");
 
         buttons[index].disabled =
             !available;

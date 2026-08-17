@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 17. August 2026, Sprint 21.2 implementiert und lokal vollständig geprüft;
+Stand: 17. August 2026, Sprint 17.6 auf Basis von Sprint 21.2 implementiert;
 physische Safari-Geräteabnahme nach Rollout ausstehend
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
@@ -9,6 +9,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-17.6-Ausgangscommit: `5a95f3d`
 - Sprint-21.2-Ausgangscommit: `7cacfb0`
 - Sprint-21.1-Ausgangscommit: `6ab4e93`
 - Sprint-17.5-Ausgangscommit: `251309d`
@@ -23,8 +24,8 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 - Sprint-18-Commit: `94ce1c0`
 - Sprint-17.1-Commit: `53ce672`
 
-Die Sprint-17.5-Implementierung baut auf dem vollständig ausgerollten
-Sprint-17.4-Stand auf. Die bestehende
+Die Sprint-17.6-Implementierung baut auf dem vollständig ausgerollten
+Sprint-21.2-Stand und der getrennten Sprint-17.5-Focus-Architektur auf. Die bestehende
 Dashboard-Konfiguration, Summary-/Error-Fachlogik und die Write-Allowlists
 wurden nicht verändert.
 
@@ -52,6 +53,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 17.3 | Live Card Preview, Unified Controls und Focus Mode | umgesetzt |
 | 17.4 | Focus Overlay Layout Stabilization | umgesetzt |
 | 17.5 | Native Focus Renderer und Mobile-Safari-Stabilisierung | umgesetzt |
+| 17.6 | Power Control Alignment und SVG-Stabilisierung | umgesetzt |
 | D1 | Zweisprachige Dokumentation und Screenshot-Baseline | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
@@ -270,7 +272,7 @@ werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion ist 32.
+Assetversion ist 34.
 
 ## 8a. Sprint 17.3 – Preview, Controls und Focus
 
@@ -393,6 +395,38 @@ bei 760 Pixeln begrenzt. Minus und Plus sind 56×56 Pixel, Power ist mindestens
 54 Pixel hoch. Stale und unavailable deaktivieren die bestehenden Controls,
 ohne neue Berechtigungen abzuleiten.
 
+## 8d. Sprint 17.6 – Power Control Alignment und Icon-Stabilisierung
+
+Die Fehlausrichtung hatte keine aktuelle Unicode-Glyphe als Hauptursache: Der
+Grid-Renderer verwendete bereits ein Inline-SVG. Tatsächlich bestanden jedoch
+zwei getrennte Implementierungen. Grid nutzte `LegacyControls.powerButton`,
+während Focus einen eigenen Button, ein zweites SVG und abweichende CSS-Regeln
+erzeugte. Die sichtbare Pfadgeometrie des Grid-SVG lag innerhalb der 24×24-
+`viewBox` leicht oberhalb der optischen Mitte. Beim Focus-SVG fehlte zusätzlich
+`display: block`, sodass dort auch die Inline-SVG-Baseline wirksam blieb. Beide
+Buttonpfade erbten außerdem Text-`line-height` und unterschieden sich bei Höhe,
+Padding und Zustandsklassen. Mobile Safari konnte den sichtbaren Inhalt deshalb
+anders ausrichten als Desktop Safari.
+
+`src/public/js/controls/power.js` ist nun die einzige Power-Control- und
+Power-Icon-Quelle für Light und Climate in Grid und Focus. Das echte
+`button`-Element enthält ein 24×24-Pixel-Inline-SVG mit fester `viewBox` sowie
+optional ein Label. On, Off, Busy, Disabled, Unavailable und Error verändern
+nur Darstellung und Verfügbarkeit, nicht die Boxgeometrie.
+
+Die gemeinsame CSS-Basis neutralisiert native Safari-Appearance, Text- und
+SVG-Baselines mit `line-height: 1` beziehungsweise `0`, setzt `display: block`
+für das SVG, symmetrisches Padding, `border-box`, unveränderliche Iconmaße und
+robustes Ellipsis-Verhalten für lange Labels. Der SVG-Pfad selbst ist um einen
+Pixel nach unten korrigiert; Button-Padding oder CSS-Transforms dienen nicht als
+Zentrierungshack. Climate Normal verwendet 46×46,
+Light Compact 48×48, Light Normal 52 Pixel Höhe und Focus 54 Pixel Höhe.
+
+Sprint 17.5 bleibt architektonisch erhalten: Der Focus Renderer baut weiterhin
+eigenes Focus-DOM aus View Model und Gateway-Capabilities und übernimmt keine
+Grid-Geometrie, Größen- oder Presentation-Klassen. Gemeinsam sind nur Power-
+Renderer, SVG und Zustandsbasis.
+
 ## 9. Sicherheitsgrenzen
 
 Sprint 17.3 ergänzt als einzige Schreibfunktion den engen Climate-Power-Pfad;
@@ -420,12 +454,12 @@ Systemansichten ausgeliefert oder geloggt.
 | Sprint-17.2-Layout | `src/public/js/core/layout.js`, `src/public/js/core/widget.js`, `src/public/css/style.css` |
 | Sprint-17.2-Widgets | `src/public/js/widgets/sensor.js`, `src/public/js/widgets/binary.js`, `src/public/js/widgets/light.js`, `src/public/js/widgets/climate.js` |
 | Gemeinsame Presentation-Regeln | `src/public/js/core/presentation.js`, `src/public/js/core/layout.js`, `src/public/js/core/widget.js` |
-| Unified Controls und Focus | `src/public/js/controls/power.js`, `src/public/js/focus/view-model.js`, `src/public/js/focus/renderer.js`, `src/public/js/focus/focus.js`, `src/public/js/core/dashboard.js`, `src/public/js/app.js`, `src/public/index.html`, `src/public/css/style.css` |
+| Unified Power Control und Focus | `src/public/js/controls/power.js`, `src/public/js/focus/view-model.js`, `src/public/js/focus/renderer.js`, `src/public/js/focus/focus.js`, `src/public/js/core/dashboard.js`, `src/public/js/app.js`, `src/public/index.html`, `src/public/css/style.css` |
 | Climate Power | `src/services/climate-power.js`, `src/routes/api.js` |
 | Admin Live Preview | `src/routes/admin.js`, `src/admin/js/api.js`, `src/admin/js/state.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
 | Theme | `src/public/js/core/theme.js`, `src/public/index.html`, `src/public/system.html` |
 | Admin-Einstellungen | `src/admin/index.html`, `src/admin/js/system-dashboards.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
-| Tests | `test/sprint-21-1.test.js`, `test/sprint-21.test.js`, `test/sprint-17-5.test.js`, `test/sprint-17-4.test.js`, `test/sprint-17-3.test.js`, `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
+| Tests | `test/sprint-17-6.test.js`, `test/sprint-21-1.test.js`, `test/sprint-21.test.js`, `test/sprint-17-5.test.js`, `test/sprint-17-4.test.js`, `test/sprint-17-3.test.js`, `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
 
 ## 11. Tests
 
@@ -461,6 +495,8 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
   Scroll-Lock/-Restore und Poll-Refresh ohne Neuvermessung
 - native Focus-Renderer für alle vier Widgettypen, View-Model-State-Binding,
   CSS-Isolation, fehlende Grid-Geometrie und nicht schrumpfende Touchziele
+- ein gemeinsamer Power-Renderer für Light und Climate in Grid und Focus,
+  feste SVG-Geometrie, alle Control-Zustände und neutralisierte Safari-Baselines
 - 1000-Entity-Issue-Lauf, 1500 aktive Summary-Entities und 3000 normalisierte Entities
 - WebSocket-Authentifizierung, Request-Korrelation, Timeouts, Disconnect,
   begrenzter Reconnect sowie synchrone Konstruktor-/Sendefehler
@@ -480,14 +516,17 @@ Dienste und Fake-Credentials. Abgedeckt sind insbesondere:
 - getrennte Storage-Präferenzen, Reload, Storage Failure und responsive
   1-/2-/3-Spalten-Fallbacks für Summary und Errors
 
-Der abschließende vollständige Lauf besteht mit 179 von 179 Tests. Der
+Der abschließende vollständige Lauf besteht mit 184 von 184 Tests. Der
 gezielte Focus-/Interaktionssatz besteht mit 28 von 28 Tests, davon 8 neue
-Sprint-17.5-Tests. Der Sprint-21-Satz bleibt mit 15 von 15 Tests grün; sein
+Sprint-17.5-Tests. Die fünf neuen Sprint-17.6-Tests prüfen gemeinsamen Renderer,
+SVG, Zustände, Geometrie, Focus-Isolation, ES5 und unveränderte Write-Fläche.
+Der gezielte Sprint-17.6-/Layout-/System-Satz besteht mit 50 von 50 Tests. Der
+Sprint-21-Satz bleibt mit 15 von 15 Tests grün; sein
 größter Synthetikfall mit 3000
 Entities, 500 Devices, 50 Areas, 100 Config Entries und 100 Repairs benötigte
 42 ms. Die sechs Sprint-21.1-Tests sind grün; die Aggregation von 3000
 Entities, 500 Devices und 200 aktiven Issues blieb unter 1,5 Sekunden. Die
-gezielte Sprint-21.2-Regression besteht mit 33 von 33 Tests. Alle
+gezielte Sprint-21.2-Regression besteht mit 33 von 33 Tests. Alle 79
 JavaScriptdateien unter `src/` und `test/` bestehen `node --check`;
 `git diff --check` ist sauber.
 
@@ -514,6 +553,18 @@ sichtbar geänderte echte Demo-Screenshot `focus-card.png` bleibt gültig.
 `summary.png` und `errors.png` wurden für Sprint 21.2 aus der echten
 Systemseite mit einem kontrollierten localhost-Demo-Payload und ausschließlich
 künstlichen Daten aktualisiert; Admin-Screenshots benötigen keine Änderung.
+
+Für Sprint 17.6 wurde die reale Anwendung zusätzlich gegen einen kontrollierten
+localhost-HA-Mock mit Fake-Credentials geprüft. Bei 1024×768 und 768×1024 lagen
+Grid-Icon und Buttonmittelpunkt jeweils exakt übereinander; Light Compact blieb
+48×48 Pixel, Climate Compact 46×46 Pixel. Im Climate Focus war das gemeinsame
+Power-Control 54 Pixel hoch, Icon-plus-Label als Gruppe horizontal und das Icon
+vertikal exakt zentriert. 320×460 und 1024×768 zeigten keinen sichtbaren
+Überlauf; Plus und Light Power aktualisierten den offenen Focus, ohne ihn zu
+schließen. Die Browserkonsole blieb ohne Warnung oder Fehler. Die vorhandenen
+Dashboard-/Focus-Screenshots wurden geprüft und bleiben repräsentativ, da
+Sprint 17.6 keine beabsichtigte Designänderung außer der Zentrierung einführt;
+es wurde kein künstlich erzeugter Ersatz-Screenshot committed.
 
 ## 12. Bekannte Einschränkungen und technischer Rest
 

@@ -42,6 +42,7 @@ function createContext() {
         }
     });
 
+    vm.runInContext(read("src/public/js/controls/power.js"), context);
     vm.runInContext(read("src/public/js/focus/view-model.js"), context);
     vm.runInContext(read("src/public/js/focus/renderer.js"), context);
     return context;
@@ -80,12 +81,12 @@ test("Focus besitzt View Model und typgetrennte native Renderer", function () {
     assert.match(renderer, /function renderClimateFocus/);
     assert.match(html, /class="focus-panel"/);
     assert.ok(
-        html.indexOf("/js/focus/view-model.js?v=33") <
-            html.indexOf("/js/focus/renderer.js?v=33")
+        html.indexOf("/js/focus/view-model.js?v=34") <
+            html.indexOf("/js/focus/renderer.js?v=34")
     );
     assert.ok(
-        html.indexOf("/js/focus/renderer.js?v=33") <
-            html.indexOf("/js/focus/focus.js?v=33")
+        html.indexOf("/js/focus/renderer.js?v=34") <
+            html.indexOf("/js/focus/focus.js?v=34")
     );
 });
 

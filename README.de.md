@@ -42,6 +42,7 @@ Das Legacy-Frontend bleibt frameworkfrei und verwendet die vorhandene `Legacy.ht
 - konfigurierbare Card-Größen
 - responsive Compact-/Normal-/Expanded-Darstellung
 - eigenständige, viewportbasierte Focus-Ansicht mit priorisierten Werten und Controls
+- gemeinsames, SVG-basiertes Power-Control für Light und Climate in Grid und Focus
 - Light- und Climate-Steuerung über explizit freigegebene Backend-Endpunkte
 - Light/Dark Mode
 - Stale-Data- und Reconnect-Verhalten
@@ -214,6 +215,11 @@ und erlaubte Controls auch in Mobile Safari erreichbar und bewahren die
 Dashboardposition. Automatisiert geprüft werden 768×1024, 1024×768 und der
 kleine Legacy-Viewport 320×460; die physische Safari-Abnahme bleibt Bestandteil
 des Geräte-Rollouts.
+
+Light und Climate verwenden in Grid und Focus denselben echten Power-Button
+mit fest dimensioniertem Inline-SVG. Damit hängen Zentrierung und Darstellung
+nicht von Unicode-Glyphen, Font-Baselines oder nativen Safari-Button-Paddings
+ab; die eigenständige Focus-Geometrie bleibt davon unberührt.
 
 ![Geöffnete Focus Card](docs/screenshots/dashboards/focus-card.png)
 

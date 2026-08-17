@@ -1618,75 +1618,6 @@ body.theme-dark .status-neutral {
 
 }
 
-.light-control {
-
-    display: -webkit-flex;
-    display: flex;
-
-    -webkit-align-items: center;
-    align-items: center;
-
-    -webkit-justify-content: space-between;
-    justify-content: space-between;
-
-    width: 100%;
-    min-height: 62px;
-
-    margin: auto 0 18px 0;
-    padding: 10px 16px;
-
-    border: 1px solid #dce3ec;
-    border-radius: 18px;
-
-    background: #f6f8fb;
-    color: #344054;
-
-    cursor: pointer;
-
-    -webkit-appearance: none;
-    appearance: none;
-
-    -webkit-user-select: none;
-    user-select: none;
-
-    transition:
-        background-color 0.15s ease,
-        border-color 0.15s ease,
-        color 0.15s ease,
-        -webkit-transform 0.1s ease;
-
-}
-
-.light-control:active {
-
-    -webkit-transform: scale(0.97);
-    transform: scale(0.97);
-
-}
-
-.light-control:focus {
-
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
-
-}
-
-.light-control.is-on {
-
-    border-color: #f0c86b;
-
-    background: #fff8df;
-    color: #8a5100;
-
-}
-
-.light-control[disabled] {
-
-    opacity: 0.42;
-    cursor: default;
-
-}
-
 body.theme-dark .icon.light {
 
     background: #283443;
@@ -1711,24 +1642,6 @@ body.theme-dark .light-state {
 body.theme-dark .light-state-on {
 
     background: #4b3718;
-    color: #ffd071;
-
-}
-
-body.theme-dark .light-control {
-
-    border-color: #39475a;
-
-    background: #111a26;
-    color: #e7edf5;
-
-}
-
-body.theme-dark .light-control.is-on {
-
-    border-color: #705321;
-
-    background: #392d18;
     color: #ffd071;
 
 }
@@ -2237,7 +2150,7 @@ body.theme-dark .climate-control:active {
    UNIFIED POWER CONTROLS
    ========================================================= */
 
-.dashboard-power-control {
+.dashboard-control-power {
 
     display: -webkit-flex;
     display: flex;
@@ -2251,6 +2164,7 @@ body.theme-dark .climate-control:active {
     min-width: 46px;
     min-height: 46px;
 
+    margin: 0;
     padding: 0 12px;
 
     border: 1px solid #dce3ec;
@@ -2263,26 +2177,45 @@ body.theme-dark .climate-control:active {
 
     cursor: pointer;
 
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
+
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+
     -webkit-appearance: none;
     appearance: none;
 
+    -webkit-user-select: none;
+    user-select: none;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        -webkit-transform 0.1s ease;
+
 }
 
-.dashboard-power-control:active {
+.dashboard-control-power:active {
 
     -webkit-transform: scale(0.92);
     transform: scale(0.92);
 
 }
 
-.dashboard-power-control:focus {
+.dashboard-control-power:focus {
 
     outline: 2px solid #3b82f6;
     outline-offset: 2px;
 
 }
 
-.dashboard-power-control.is-on {
+.dashboard-control-power.is-on {
 
     border-color: #e7b84f;
     background: #fff5d7;
@@ -2290,8 +2223,18 @@ body.theme-dark .climate-control:active {
 
 }
 
-.dashboard-power-control[disabled],
-.dashboard-power-control.is-busy {
+.dashboard-control-power.is-error {
+
+    border-color: #d68a82;
+    background: #fff0ee;
+    color: #9b332c;
+
+}
+
+.dashboard-control-power[disabled],
+.dashboard-control-power.is-disabled,
+.dashboard-control-power.is-busy,
+.dashboard-control-power.is-unavailable {
 
     opacity: 0.4;
     cursor: default;
@@ -2299,19 +2242,23 @@ body.theme-dark .climate-control:active {
 
 }
 
-.dashboard-power-icon {
+.dashboard-control-power-icon {
 
     display: block;
 
     width: 24px;
     height: 24px;
 
+    line-height: 0;
+
+    pointer-events: none;
+
     -webkit-flex: 0 0 auto;
     flex: 0 0 auto;
 
 }
 
-.dashboard-power-icon svg {
+.dashboard-control-power-icon svg {
 
     display: block;
 
@@ -2324,19 +2271,37 @@ body.theme-dark .climate-control:active {
     stroke-linecap: round;
     stroke-linejoin: round;
 
+    pointer-events: none;
+
 }
 
-.dashboard-power-label {
+.dashboard-control-power-label {
+
+    display: block;
+
+    min-width: 0;
 
     margin-left: 10px;
 
     font-size: 15px;
     font-weight: 600;
+    line-height: 1.2;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    pointer-events: none;
+
+    -webkit-flex: 0 1 auto;
+    flex: 0 1 auto;
 
 }
 
 .light-control.dashboard-power-control {
 
+    width: 100%;
+    height: 52px;
     min-height: 52px;
     margin: auto 0 18px 0;
     padding: 0 16px;
@@ -2373,6 +2338,14 @@ body.theme-dark .dashboard-power-control.is-on {
     border-color: #705321;
     background: #493717;
     color: #ffd071;
+
+}
+
+body.theme-dark .dashboard-control-power.is-error {
+
+    border-color: #7f413d;
+    background: #3b2222;
+    color: #ffaaa2;
 
 }
 
@@ -2869,9 +2842,11 @@ body.theme-dark .dashboard-power-control.is-on {
 
 }
 
-.focus-power-action {
+.focus-power-action.dashboard-control-power {
 
     min-width: 180px;
+    min-height: 54px;
+    height: 54px;
     padding: 0 20px;
 
 }
@@ -2884,37 +2859,11 @@ body.theme-dark .dashboard-power-control.is-on {
 
 }
 
-.focus-power-icon {
-
-    display: block;
-
-    -webkit-flex: 0 0 24px;
-    flex: 0 0 24px;
-
-    width: 24px;
-    height: 24px;
-
-    margin-right: 10px;
-
-}
-
-.focus-power-icon svg {
-
-    width: 24px;
-    height: 24px;
-
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 2;
-
-}
-
-.focus-action-label {
+.focus-power-action .dashboard-control-power-label {
 
     font-size: 16px;
     font-weight: 700;
+    line-height: 1.2;
 
 }
 

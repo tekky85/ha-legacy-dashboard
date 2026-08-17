@@ -128,7 +128,7 @@ test("Compact-Widgets behalten Identität und ihren primären Inhalt", function 
     assert.match(binaryHtml, /Offen/);
     assert.match(lightHtml, /card-identity[^>]*>Esszimmer</);
     assert.match(lightHtml, />An</);
-    assert.match(lightHtml, /class="dashboard-power-control light-control/);
+    assert.match(lightHtml, /dashboard-power-control light-control/);
     assert.match(climateHtml, /card-identity[^>]*>Heizung</);
     assert.match(climateHtml, /climate-current-value[^>]*>21\.8</);
     assert.match(climateHtml, /climate-target-value[^>]*>22\.5/);
@@ -395,12 +395,12 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
     const systemHtml = read("src/public/system.html");
 
     assert.ok(
-        indexHtml.indexOf("/js/core/theme.js?v=33") <
-            indexHtml.indexOf("/css/style.css?v=33")
+        indexHtml.indexOf("/js/core/theme.js?v=34") <
+            indexHtml.indexOf("/css/style.css?v=34")
     );
     assert.ok(
-        systemHtml.indexOf("/js/core/theme.js?v=33") <
-            systemHtml.indexOf("/css/style.css?v=33")
+        systemHtml.indexOf("/js/core/theme.js?v=34") <
+            systemHtml.indexOf("/css/style.css?v=34")
     );
     assert.equal(
         (indexHtml.match(/\/js\/core\/theme\.js/g) || []).length,
@@ -410,7 +410,7 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
         (systemHtml.match(/\/js\/core\/theme\.js/g) || []).length,
         1
     );
-    assert.match(indexHtml, /\/js\/app\.js\?v=33/);
-    assert.match(systemHtml, /\/js\/system\/summary\.js\?v=33/);
-    assert.match(systemHtml, /\/js\/system\/errors\.js\?v=33/);
+    assert.match(indexHtml, /\/js\/app\.js\?v=34/);
+    assert.match(systemHtml, /\/js\/system\/summary\.js\?v=34/);
+    assert.match(systemHtml, /\/js\/system\/errors\.js\?v=34/);
 });

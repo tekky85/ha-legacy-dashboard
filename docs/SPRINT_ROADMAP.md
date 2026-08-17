@@ -199,6 +199,7 @@ Bedeutung von „fest“:
 | 17.3 | Live Card Preview, Unified Controls & Focus Mode (Korrektursprint nach 20) | umgesetzt |
 | 17.4 | Focus Overlay Layout Stabilization (Korrektursprint nach 21) | umgesetzt |
 | 17.5 | Native Focus Renderer & Mobile Safari Stabilization (Korrektursprint nach 17.4) | umgesetzt |
+| 17.6 | Power Control Alignment & Icon Stabilization (Korrektursprint nach 17.5) | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
 | 21.2 | System Dashboard Filters, Column Views & Risk Severity | umgesetzt |
@@ -1055,6 +1056,37 @@ Umgesetzt nach Sprint 17.4.
   Summary-/Error-Fachlogik und alle Write-Sicherheitsgrenzen bleiben erhalten.
 - Die echte iPad-Air-2-/iPadOS-15.8.5- sowie iOS-9-Safari-Abnahme bleibt nach
   dem produktiven Rollout als manueller Gerätecheck dokumentiert.
+
+---
+
+# Sprint 17.6 – Power Control Alignment & Icon Stabilization
+
+## Status
+
+Umgesetzt nach Sprint 21.2.
+
+## Ergebnis
+
+- Light und Climate verwenden in Compact, Normal und Focus denselben
+  `LegacyControls.powerButton` mit einem einzigen fest dimensionierten
+  Inline-SVG; der Focus Renderer besitzt keine zweite Power-Icon-
+  Implementierung mehr.
+- Die Fehlausrichtung entstand durch zwei getrennte Button-/SVG-Pfade: Die
+  sichtbare Grid-Pfadgeometrie lag im `viewBox` leicht oberhalb der optischen
+  Mitte; das Focus-SVG blieb zusätzlich inline und damit baseline-abhängig.
+  Grid und Focus erbten außerdem unterschiedliche `line-height`-, Padding- und
+  Größenregeln.
+- Der gemeinsame Button neutralisiert native Safari-Appearance, Text- und
+  SVG-Baselines, verwendet symmetrisches Padding, explizites `border-box` und
+  feste 46-/48-/52-/54-Pixel-Kontextgrößen bei mindestens 44 Pixel Touchziel.
+- On, Off, Busy, Disabled, Unavailable und Error verwenden dieselbe
+  Control-Geometrie; Icon-only und Icon-plus-Label stammen aus demselben DOM.
+- Die native Sprint-17.5-Focus-Architektur bleibt vollständig von Grid-
+  Geometrie und Presentation-Klassen getrennt.
+- Summary-/Error-Logik, Home-Assistant-Aufrufe, Write-Routen und Allowlisten
+  bleiben unverändert.
+- Die physische Abnahme auf macOS Safari, iPad Air 2 und iOS 9 bleibt nach dem
+  produktiven Rollout ein manueller Gerätecheck.
 
 ---
 

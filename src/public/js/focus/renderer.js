@@ -66,40 +66,19 @@ var LegacyFocusRenderer = (function () {
     }
 
 
-    function powerIcon() {
-
-        return "" +
-            '<span class="focus-power-icon" aria-hidden="true">' +
-                '<svg viewBox="0 0 24 24" focusable="false">' +
-                    '<path d="M12 2v10"></path>' +
-                    '<path d="M6.3 5.7a8 8 0 1 0 11.4 0"></path>' +
-                '</svg>' +
-            '</span>';
-
-    }
-
-
     function powerButton(model, hookClass) {
 
         var enabled = model.powerAvailable === true;
 
 
-        return "" +
-            '<button type="button" class="focus-action focus-power-action ' +
-                hookClass +
-                (model.isOn ? " is-on" : " is-off") +
-                '" data-entity="' + escape(model.entity) +
-                '" data-state="' + (model.isOn ? "on" : "off") +
-                '" data-available="' + (enabled ? "true" : "false") +
-                '" aria-pressed="' + (model.isOn ? "true" : "false") +
-                '" aria-label="' + escape(model.powerLabel) + '"' +
-                (enabled ? "" : ' disabled="disabled"') +
-            '>' +
-                powerIcon() +
-                '<span class="focus-action-label">' +
-                    escape(model.powerLabel) +
-                '</span>' +
-            '</button>';
+        return LegacyControls.powerButton({
+            className: "focus-action focus-power-action " + hookClass,
+            entity: model.entity,
+            state: model.isOn ? "on" : "off",
+            available: enabled,
+            disabled: !enabled,
+            label: model.powerLabel
+        });
 
     }
 
