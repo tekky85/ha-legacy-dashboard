@@ -1273,18 +1273,15 @@ body.theme-dark .footer {
 
 }
 
-.grid-layout-active .card-light.card-presentation-compact .light-control {
+.grid-layout-active .card-light.card-presentation-compact .light-control-row {
 
     min-height: 48px;
     height: 48px;
     margin: 0;
-    padding: 6px;
+    padding: 0;
 
     -webkit-order: 3;
     order: 3;
-
-    -webkit-justify-content: center;
-    justify-content: center;
 
 }
 
@@ -1883,17 +1880,15 @@ body.theme-dark .light-state-on {
 
 .climate-target-row {
 
-    display: -webkit-flex;
-    display: flex;
+    display: block;
 
-    -webkit-align-items: center;
-    align-items: center;
+    width: 100%;
+    min-width: 0;
 
-    -webkit-justify-content:
-        space-between;
+    text-align: center;
 
-    justify-content:
-        space-between;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
 
     -webkit-flex: 0 0 auto;
     flex: 0 0 auto;
@@ -1908,7 +1903,7 @@ body.theme-dark .light-state-on {
 
 }
 
-.climate-control {
+.climate-target-group {
 
     display: -webkit-flex;
     display: flex;
@@ -1916,8 +1911,20 @@ body.theme-dark .light-state-on {
     -webkit-align-items: center;
     align-items: center;
 
-    -webkit-justify-content: center;
-    justify-content: center;
+    -webkit-justify-content:
+        space-between;
+
+    justify-content:
+        space-between;
+
+    width: 100%;
+    min-width: 0;
+
+}
+
+.climate-control {
+
+    display: inline-block;
 
     width: 46px;
     height: 46px;
@@ -1935,7 +1942,13 @@ body.theme-dark .light-state-on {
         0 3px 10px
         rgba(23, 32, 51, 0.08);
 
-    line-height: normal;
+    font-family: inherit;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
+
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
 
     cursor: pointer;
 
@@ -2150,7 +2163,54 @@ body.theme-dark .climate-control:active {
    UNIFIED POWER CONTROLS
    ========================================================= */
 
-.dashboard-control-power {
+.dashboard-control-row {
+
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+
+    text-align: center;
+
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+
+}
+
+.dashboard-control-group {
+
+    display: inline-block;
+
+    max-width: 100%;
+
+    text-align: center;
+    vertical-align: middle;
+
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+
+}
+
+.dashboard-control {
+
+    display: inline-block;
+
+    margin: 0;
+
+    font-family: inherit;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
+
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+
+    -webkit-appearance: none;
+    appearance: none;
+
+}
+
+.dashboard-control-content {
 
     display: -webkit-flex;
     display: flex;
@@ -2160,6 +2220,29 @@ body.theme-dark .climate-control:active {
 
     -webkit-justify-content: center;
     justify-content: center;
+
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+
+    text-align: center;
+
+    pointer-events: none;
+
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+
+}
+
+.dashboard-control-step-content {
+
+    line-height: 0;
+
+}
+
+.dashboard-control-power {
+
+    display: inline-block;
 
     min-width: 46px;
     min-height: 46px;
@@ -2300,14 +2383,25 @@ body.theme-dark .climate-control:active {
 
 .light-control.dashboard-power-control {
 
+    display: block;
+
     width: 100%;
     height: 52px;
     min-height: 52px;
-    margin: auto 0 18px 0;
+    margin: 0;
     padding: 0 16px;
 
-    -webkit-justify-content: center;
-    justify-content: center;
+}
+
+.light-control-row {
+
+    margin: auto 0 18px 0;
+
+}
+
+.light-control-group {
+
+    width: 100%;
 
 }
 
@@ -2358,8 +2452,11 @@ body.theme-dark .dashboard-control-power.is-error {
     margin: 0;
     padding: 0;
 
-    -webkit-align-self: flex-end;
-    align-self: flex-end;
+}
+
+.grid-layout-active .card-light.card-presentation-compact .light-control-group {
+
+    width: auto;
 
 }
 
@@ -2792,26 +2889,13 @@ body.theme-dark .dashboard-control-power.is-error {
 
 .focus-light-controls {
 
-    display: -webkit-flex;
-    display: flex;
-
-    -webkit-justify-content: center;
-    justify-content: center;
-
     padding: 20px 0 8px;
 
 }
 
 .focus-action {
 
-    display: -webkit-inline-flex;
-    display: inline-flex;
-
-    -webkit-align-items: center;
-    align-items: center;
-
-    -webkit-justify-content: center;
-    justify-content: center;
+    display: inline-block;
 
     -webkit-flex: 0 0 auto;
     flex: 0 0 auto;
@@ -2976,16 +3060,24 @@ body.theme-dark .dashboard-control-power.is-error {
 
 .focus-step-controls {
 
-    display: -webkit-flex;
-    display: flex;
+    display: inline-block;
 
-    -webkit-flex: 0 0 auto;
-    flex: 0 0 auto;
+    white-space: nowrap;
 
-    -webkit-flex-shrink: 0;
-    flex-shrink: 0;
+    text-align: center;
+    vertical-align: middle;
+
+}
+
+.focus-temperature-control-row {
 
     margin-bottom: 14px;
+
+}
+
+.focus-power-control-group {
+
+    min-width: 0;
 
 }
 
@@ -3002,6 +3094,8 @@ body.theme-dark .dashboard-control-power.is-error {
 }
 
 .focus-step-icon {
+
+    display: block;
 
     width: 26px;
     height: 26px;
@@ -3065,14 +3159,10 @@ body.theme-dark .dashboard-control-power.is-error {
 }
 
 .focus-layout-landscape .focus-widget-climate .focus-target,
-.focus-layout-landscape .focus-widget-climate .focus-step-controls {
+.focus-layout-landscape .focus-widget-climate .focus-temperature-control-row,
+.focus-layout-landscape .focus-widget-climate .focus-power-control-row {
 
-    margin: 6px;
-
-}
-
-.focus-layout-landscape .focus-widget-climate .focus-power-action {
-
+    width: auto;
     margin: 6px;
 
 }
@@ -3129,7 +3219,7 @@ body.theme-dark .dashboard-control-power.is-error {
 }
 
 .focus-layout-short .focus-target,
-.focus-layout-short .focus-step-controls {
+.focus-layout-short .focus-temperature-control-row {
 
     margin-bottom: 7px;
 
@@ -3152,6 +3242,13 @@ body.theme-dark .dashboard-control-power.is-error {
 
     margin-right: 5px;
     margin-left: 5px;
+
+}
+
+.focus-layout-short .focus-temperature-control-row,
+.focus-layout-short .focus-power-control-row {
+
+    width: auto;
 
 }
 

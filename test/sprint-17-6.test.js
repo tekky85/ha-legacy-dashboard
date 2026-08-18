@@ -147,7 +147,8 @@ test("Power Control bildet alle gemeinsamen Zustände ohne Geometriewechsel ab",
 test("Power-Geometrie neutralisiert Safari-Button- und SVG-Baselines", function () {
     const css = read("src/public/css/style.css");
 
-    assert.match(css, /\.dashboard-control-power\s*\{[\s\S]*?display:\s*-webkit-flex;[\s\S]*?align-items:\s*center;[\s\S]*?justify-content:\s*center;/);
+    assert.match(css, /\.dashboard-control-content\s*\{[\s\S]*?display:\s*-webkit-flex;[\s\S]*?align-items:\s*center;[\s\S]*?justify-content:\s*center;/);
+    assert.match(css, /\.dashboard-control-power\s*\{[\s\S]*?display:\s*inline-block;/);
     assert.match(css, /\.dashboard-control-power\s*\{[\s\S]*?line-height:\s*1;[\s\S]*?-webkit-box-sizing:\s*border-box;[\s\S]*?-webkit-appearance:\s*none;/);
     assert.match(css, /\.dashboard-control-power-icon\s*\{[\s\S]*?width:\s*24px;[\s\S]*?height:\s*24px;[\s\S]*?line-height:\s*0;/);
     assert.match(css, /\.dashboard-control-power-icon svg\s*\{[\s\S]*?display:\s*block;/);

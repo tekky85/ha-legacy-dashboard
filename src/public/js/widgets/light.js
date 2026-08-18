@@ -146,14 +146,20 @@ LightWidget.prototype.render =
                 '</div>' +
 
 
-                LegacyControls.powerButton({
-                    className: "light-control",
-                    entity: this.entity,
-                    state: state,
-                    available: available && canControl,
-                    disabled: !canControl,
-                    label: controlText
-                }) +
+                LegacyControls.controlRow(
+                    LegacyControls.powerButton({
+                        className: "light-control",
+                        entity: this.entity,
+                        state: state,
+                        available: available && canControl,
+                        disabled: !canControl,
+                        label: controlText
+                    }),
+                    {
+                        className: "card-control-row light-control-row",
+                        groupClassName: "light-control-group"
+                    }
+                ) +
 
 
                 '<div class="title card-identity">' +

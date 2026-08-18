@@ -226,7 +226,11 @@ des Geräte-Rollouts.
 Light und Climate verwenden in Grid und Focus denselben echten Power-Button
 mit fest dimensioniertem Inline-SVG. Damit hängen Zentrierung und Darstellung
 nicht von Unicode-Glyphen, Font-Baselines oder nativen Safari-Button-Paddings
-ab; die eigenständige Focus-Geometrie bleibt davon unberührt.
+ab. Eine gemeinsame Control-Hierarchie zentriert die volle Control-Zone, die
+Gruppe und den Button-Inhalt getrennt. Native Buttons sind dabei nicht selbst
+der Flex-Layout-Container; das umgeht die fehleranfällige interne Button-Box
+älterer Mobile-Safari-Versionen. Die eigenständige Focus-Geometrie bleibt
+davon unberührt.
 
 ![Geöffnete Focus Card](docs/screenshots/dashboards/focus-card.png)
 

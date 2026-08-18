@@ -90,7 +90,7 @@ var LegacyFocusRenderer = (function () {
 
         return "" +
             '<button type="button" ' +
-                'class="focus-action focus-step-action focus-climate-control" ' +
+                'class="dashboard-control dashboard-control-step focus-action focus-step-action focus-climate-control" ' +
                 'data-entity="' + escape(model.entity) + '" ' +
                 'data-direction="' + direction + '" ' +
                 'data-target="' + escape(model.targetTemperature) + '" ' +
@@ -101,14 +101,17 @@ var LegacyFocusRenderer = (function () {
                 'aria-label="' + escape(label) + '"' +
                 (enabled ? "" : ' disabled="disabled"') +
             '>' +
-                '<svg class="focus-step-icon" viewBox="0 0 24 24" aria-hidden="true">' +
-                    '<line x1="5" y1="12" x2="19" y2="12"></line>' +
-                    (
-                        plus
-                            ? '<line x1="12" y1="5" x2="12" y2="19"></line>'
-                            : ""
-                    ) +
-                '</svg>' +
+                LegacyControls.controlContent(
+                    '<svg class="focus-step-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+                        '<line x1="5" y1="12" x2="19" y2="12"></line>' +
+                        (
+                            plus
+                                ? '<line x1="12" y1="5" x2="12" y2="19"></line>'
+                                : ""
+                        ) +
+                    '</svg>',
+                    "dashboard-control-step-content"
+                ) +
             '</button>';
 
     }
@@ -177,9 +180,13 @@ var LegacyFocusRenderer = (function () {
         return wrapper(
             model,
             header(model, true) +
-            '<div class="focus-controls focus-light-controls">' +
-                powerButton(model, "focus-light-control") +
-            '</div>' +
+            LegacyControls.controlRow(
+                powerButton(model, "focus-light-control"),
+                {
+                    className: "focus-controls focus-light-controls",
+                    groupClassName: "focus-light-control-group"
+                }
+            ) +
             secondary(model)
         );
 
@@ -213,7 +220,7 @@ var LegacyFocusRenderer = (function () {
                         '<small>' + escape(model.unit) + '</small>' +
                     '</span>' +
                 '</div>' +
-                '<div class="focus-step-controls">' +
+                LegacyControls.controlRow(
                     stepButton(
                         model,
                         -1,
@@ -225,9 +232,23 @@ var LegacyFocusRenderer = (function () {
                         1,
                         model.canIncrease,
                         "Zieltemperatur erhöhen"
-                    ) +
-                '</div>' +
-                power +
+                    ),
+                    {
+                        className: "focus-temperature-control-row",
+                        groupClassName: "focus-step-controls"
+                    }
+                ) +
+                (
+                    power
+                        ? LegacyControls.controlRow(
+                            power,
+                            {
+                                className: "focus-power-control-row",
+                                groupClassName: "focus-power-control-group"
+                            }
+                        )
+                        : ""
+                ) +
             '</div>' +
             secondary(model)
         );

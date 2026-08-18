@@ -218,8 +218,11 @@ viewport; physical Safari acceptance remains part of the device rollout.
 
 Light and Climate use the same real Power button with a fixed-size inline SVG
 in Grid and Focus. Centering and rendering therefore do not depend on Unicode
-glyphs, font baselines or native Safari button padding; the independent Focus
-geometry remains unchanged.
+glyphs, font baselines or native Safari button padding. A shared control
+hierarchy separately centers the full control zone, its group, and the button
+content. Native buttons are no longer the Flexbox layout container, avoiding
+the unreliable internal button box in older Mobile Safari versions. The
+independent Focus geometry remains unchanged.
 
 ![Open focus card](docs/screenshots/dashboards/focus-card.png)
 

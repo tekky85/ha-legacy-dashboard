@@ -200,6 +200,7 @@ Bedeutung von „fest“:
 | 17.4 | Focus Overlay Layout Stabilization (Korrektursprint nach 21) | umgesetzt |
 | 17.5 | Native Focus Renderer & Mobile Safari Stabilization (Korrektursprint nach 17.4) | umgesetzt |
 | 17.6 | Power Control Alignment & Icon Stabilization (Korrektursprint nach 17.5) | umgesetzt |
+| 17.7 | Legacy Safari Control Alignment Hardening (Korrektursprint nach 17.6) | umgesetzt |
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
 | 21.2 | System Dashboard Filters, Column Views & Risk Severity | umgesetzt |
@@ -1088,6 +1089,32 @@ Umgesetzt nach Sprint 21.2.
   bleiben unverändert.
 - Die physische Abnahme auf macOS Safari, iPad Air 2 und iOS 9 bleibt nach dem
   produktiven Rollout ein manueller Gerätecheck.
+
+---
+
+# Sprint 17.7 – Legacy Safari Control Alignment Hardening
+
+## Status
+
+Umgesetzt nach Sprint 21.3.
+
+## Ergebnis
+
+- Grid-Light, Grid-Climate, Light Focus und Climate Focus besitzen eine
+  explizite Control-Hierarchie aus voller Row, zentrierter Group, echtem Button
+  und separat zentriertem Button-Content.
+- Native Buttons sind nicht mehr selbst Flex-Container. Das innere neutrale
+  Content-Element übernimmt die präfixierte Flex-Zentrierung und umgeht damit
+  die abweichende anonyme Button-Inhaltsbox älterer Mobile-Safari-Versionen.
+- Der spezifische Compact-Override `align-self: flex-end` wurde entfernt;
+  Minus/Plus liegen in einer vollbreiten, zentrierten Focus-Row.
+- `-webkit-appearance: none`, feste Touchziele, Inline-SVG und die vorhandenen
+  Flex-Präfixe bleiben gezielt erhalten. Es gibt keine Grid-, Gap-, Transform-
+  oder gerätespezifische Margin-Lösung.
+- Sprint-17.5-Focus/Grid-Trennung, Sprint-21.3-System-Dashboards und alle
+  Home-Assistant-Sicherheitsgrenzen bleiben unverändert.
+- Die physische Abnahme auf macOS Safari, iPad Air 2 und iOS 9 erfolgt nach dem
+  produktiven Rollout als manueller Gerätecheck.
 
 ---
 

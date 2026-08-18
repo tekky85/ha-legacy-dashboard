@@ -4,6 +4,36 @@
 
 var LegacyControls = (function () {
 
+    function controlContent(content, className) {
+
+        return "" +
+            '<span class="dashboard-control-content ' +
+                Legacy.html.escape(className || "") +
+            '">' +
+                content +
+            '</span>';
+
+    }
+
+
+    function controlRow(content, options) {
+
+        var settings = options || {};
+
+
+        return "" +
+            '<div class="dashboard-control-row ' +
+                Legacy.html.escape(settings.className || "") +
+            '">' +
+                '<div class="dashboard-control-group ' +
+                    Legacy.html.escape(settings.groupClassName || "") +
+                '">' +
+                    content +
+                '</div>' +
+            '</div>';
+
+    }
+
     function powerIcon() {
 
         return "" +
@@ -69,16 +99,21 @@ var LegacyControls = (function () {
                 '"' +
                 (disabled ? ' disabled="disabled"' : "") +
             '>' +
-                powerIcon() +
-                '<span class="dashboard-control-power-label dashboard-power-label">' +
-                    Legacy.html.escape(label) +
-                '</span>' +
+                controlContent(
+                    powerIcon() +
+                    '<span class="dashboard-control-power-label dashboard-power-label">' +
+                        Legacy.html.escape(label) +
+                    '</span>',
+                    "dashboard-control-power-content"
+                ) +
             '</button>';
 
     }
 
 
     return {
+        controlContent: controlContent,
+        controlRow: controlRow,
         powerIcon: powerIcon,
         powerButton: powerButton
     };
