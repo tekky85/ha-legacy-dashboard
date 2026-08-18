@@ -181,8 +181,8 @@ test("Device Group übernimmt Critical-Risiko, Counts und Child-State", function
     assert.equal(group.counts.critical, 1);
     assert.equal(group.counts.info, 1);
     assert.equal(group.counts.unknown, 2);
-    assert.equal(result.filters.critical, 1);
-    assert.equal(result.filters.unknown, 2);
+    assert.equal(result.filters.severity.critical, 1);
+    assert.equal(result.filters.state.unknown, 2);
     assert.equal(group.issues[0].state, "unknown");
     assert.equal(group.issues[0].riskClass, "security");
 });

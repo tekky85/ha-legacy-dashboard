@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 17. August 2026, Sprint 17.6 auf Basis von Sprint 21.2 implementiert;
+Stand: 18. August 2026, Sprint 21.3 auf Basis von Sprint 17.6 implementiert;
 physische Safari-Geräteabnahme nach Rollout ausstehend
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
@@ -9,6 +9,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-21.3-Ausgangscommit: `a490dcf`
 - Sprint-17.6-Ausgangscommit: `5a95f3d`
 - Sprint-21.2-Ausgangscommit: `7cacfb0`
 - Sprint-21.1-Ausgangscommit: `6ab4e93`
@@ -58,6 +59,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
 | 21.2 | System Dashboard Filters, Column Views & Risk Severity | umgesetzt |
+| 21.3 | Error Filtering & Critical Device Detection Modes | umgesetzt |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -186,7 +188,7 @@ Nach Recovery ersetzt ein frischer Snapshot die veralteten Daten.
 
 ## 6. Persistente Konfiguration
 
-Die Konfiguration verwendet Schema 6. Zusätzlich zu
+Die Konfiguration verwendet Schema 7. Zusätzlich zu
 `defaultDashboardId` und `dashboards` enthält sie:
 
 ```json
@@ -198,13 +200,15 @@ Die Konfiguration verwendet Schema 6. Zusätzlich zu
     },
     "errors": {
       "securityEntities": [],
-      "ignoredEntities": []
+      "ignoredEntities": [],
+      "criticalDetectionMode": "device_class",
+      "criticalLabelId": null
     }
   }
 }
 ```
 
-Schema 1 bis 5 werden automatisch und atomar auf Schema 6 migriert. Bei Schema
+Schema 1 bis 6 werden automatisch und atomar auf Schema 7 migriert. Bei Schema
 4 bleiben die 6/12-Spalten-Layouts unverändert. Bei Schema 5 bleiben Summary
 und Layouts unverändert und die leeren Error-Standardwerte werden ergänzt.
 Vollständige Validierung, atomarer
@@ -588,7 +592,7 @@ es wurde kein künstlich erzeugter Ersatz-Screenshot committed.
 
 ## 13. Roadmap-Abgleich und nächster Sprint
 
-Sprint 21, 21.1 und 21.2 entsprechen der Roadmap: Der REST-State-Collector bleibt bestehen,
+Sprint 21, 21.1, 21.2 und 21.3 entsprechen der Roadmap: Der REST-State-Collector bleibt bestehen,
 während fest codierte Backend-WebSocket-Adapter ausschließlich read-only
 Metadaten ergänzen. Die Error Engine wurde nur um sicheren Kontext und klar
 belegte Config-/Repair-Issues ergänzt; Device Cards liegen getrennt davon in
@@ -601,8 +605,9 @@ Empfohlener nächster Schritt ist Sprint 22 – Rules, Grace Periods & Device
 Aggregation. Voraussetzung sind reale Betriebsbeobachtungen zu kurzzeitigen
 Ausfällen, erwarteten Offline-Zuständen und sinnvollen Karenzzeiten; Sprint 21
 liefert dafür den stabilen Device-/Area-/Integrationskontext, Sprint 21.1 die
-davon getrennte Error-Präsentation und Sprint 21.2 die korrigierte Risk-
-Severity sowie die lokale Ansichtssteuerung.
+davon getrennte Error-Präsentation, Sprint 21.2 die korrigierte Risk-Severity
+und Sprint 21.3 die getrennten Filter sowie den auswählbaren
+Device-Class-/HA-Label-Modus.
 
 ## 14. Dokumentation und Screenshot-Baseline
 
@@ -748,7 +753,7 @@ Die Severity-Priorität ist im aktuell unterstützten Konfigurationsmodell:
 4. Fallback
 ```
 
-Ein allgemeiner Severity-Override ist im Schema 6 nicht vorhanden und wurde
+Ein allgemeiner Severity-Override ist im Schema 7 nicht vorhanden und wurde
 nicht neu eingeführt. Safety/Security `unknown` und `unavailable` sind
 Critical; normale `unknown` bleiben Info und normale `unavailable` Warning.
 Sprint-21.1-Gruppen übernehmen weiterhin die höchste Child-Severity, und nur
@@ -758,3 +763,47 @@ Filter, Spaltenansicht und Risk Class fügen keine Route, keine Home-Assistant-
 Abfrage, keine Serviceaktion und keine Write-Berechtigung hinzu. Climate- und
 Light-Allowlists sowie Admin-, Registry-, Repair- und Matter-Sicherheitsgrenzen
 bleiben unverändert.
+
+## 18. Sprint 21.3 – Error-Filter und Critical Detection
+
+Die Error-Präsentation liefert mit `presentationVersion: 2` getrennte Counts:
+
+```text
+filters.severity = all, critical, error, warning, info
+filters.state    = all, unavailable, unknown
+```
+
+Das ES5-Frontend hält beide Auswahlwerte nur für die aktuelle Seite; nach
+Reload gilt Alle/Alle. Ein Issue muss beide Bedingungen erfüllen. Device Cards
+bleiben über ihre echte `device_id` gruppiert, geöffnete Details rendern nur
+passende Children und die lokale 1-/2-/3-Spaltenpräferenz bleibt erhalten.
+Das Layout nutzt Flexbox mit `-webkit-`-Fallbacks, ohne CSS Grid oder `gap`.
+
+Das persistente Dashboard-Schema ist Version 7. Unter
+`systemDashboards.errors` liegen zusätzlich `criticalDetectionMode`
+(`device_class` oder `ha_label`) und `criticalLabelId`. Label-Modus ohne
+syntaktisch gültige stabile Label-ID wird abgewiesen; Schema 6 migriert
+automatisch auf Device-Class-Modus. Die Admin UI lädt eine reduzierte Liste
+über `GET /api/admin/labels`, zeigt aktuelle Labelnamen und warnt bei
+Unsupported, Ausfall, stale Daten oder gelöschter gespeicherter ID.
+
+Der feste read-only WebSocket-Adapter `config/label_registry/list` ergänzt die
+normalisierten Entity-/Device-Registry-Daten um Label-IDs. Er nutzt den
+60-Sekunden-Registry-Cache. Temporäre Fehler behalten das letzte erfolgreiche
+Ergebnis als stale; ein erster Fehler oder gelöschtes Label erzeugt einen
+sichtbaren `critical_detection`-Fehler. Area-Labels werden nicht vererbt. Es
+existieren keine Label-Writes, rohen Registry-Ausgaben oder generischen
+WebSocket-Schnittstellen.
+
+Im Device-Class-Modus klassifiziert die zentrale Policy die definierten
+Safety-/Security-Klassen einschließlich CO und die Cover-Klassen Door, Garage,
+Gate und Window. Shade, Shutter, Problem und Tamper werden nicht automatisch
+Critical. Im Label-Modus laufen Device Classes bewusst nicht parallel: Ein
+Device-Label gilt für seine Children, ein Entity-Label nur für diese Entity.
+Explizite `securityEntities` behalten höhere Priorität. Climate-/Light-
+Write-Allowlists und alle Home-Assistant-Schreibgrenzen sind unverändert.
+
+Alle Syntaxprüfungen der geänderten JavaScript-Dateien bestehen. Die komplette
+Suite umfasst 195 Tests und ist vollständig grün; darin enthalten sind ein
+lokaler Mock-HA-Gatewaylauf sowie der Sprint-21.3-Lastfall mit 3000 Entities,
+500 Devices, 100 Labels, 500 Zuweisungen und 200 aktiven Issues.

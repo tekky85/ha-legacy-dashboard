@@ -176,6 +176,7 @@ test("Presentation aggregiert ausschließlich echte Device-IDs", function () {
         error: 0,
         warning: 1,
         info: 1,
+        unavailable: 2,
         unknown: 1
     });
     assert.equal(secondDevice.issueCount, 1);
@@ -219,13 +220,20 @@ test("Config Entry, Repair und Matter bleiben Standalone und Filter zählen Issu
     });
 
     assert.deepEqual(result.filters, {
-        all: 8,
-        critical: 1,
-        error: 1,
-        warning: 4,
-        unknown: 2
+        severity: {
+            all: 8,
+            critical: 1,
+            error: 1,
+            warning: 4,
+            info: 2
+        },
+        state: {
+            all: 8,
+            unavailable: 3,
+            unknown: 2
+        }
     });
-    assert.equal(result.presentationVersion, 1);
+    assert.equal(result.presentationVersion, 2);
     assert.equal(JSON.stringify(result).includes("identifiers"), false);
     assert.equal(JSON.stringify(result).includes("connections"), false);
     assert.equal(JSON.stringify(result).includes("manufacturer"), false);
@@ -330,7 +338,7 @@ test("3000 Entities, 500 Devices und 200 aktive Issues werden linear aggregiert"
 
     assert.equal(detected.issues.length, 200);
     assert.equal(deviceGroups.length, 50);
-    assert.equal(result.filters.all, 200);
+    assert.equal(result.filters.severity.all, 200);
     assert.equal(Date.now() - started < 1500, true);
 });
 

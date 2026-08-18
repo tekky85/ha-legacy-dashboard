@@ -16,19 +16,27 @@
         info: {label: "Info", symbol: "i"}
     };
 
-    var FILTERS = [
+    var SEVERITY_FILTERS = [
         {name: "all", buttonId: "errorFilterAll", countId: "errorAllCount"},
         {name: "critical", buttonId: "errorFilterCritical", countId: "errorCriticalCount"},
         {name: "error", buttonId: "errorFilterError", countId: "errorErrorCount"},
         {name: "warning", buttonId: "errorFilterWarning", countId: "errorWarningCount"},
-        {name: "unknown", buttonId: "errorFilterUnknown", countId: "errorUnknownCount"}
+        {name: "info", buttonId: "errorFilterInfo", countId: "errorInfoCount"}
+    ];
+
+    var STATE_FILTERS = [
+        {name: "all", buttonId: "errorStateAll", countId: "errorStateAllCount"},
+        {name: "unavailable", buttonId: "errorStateUnavailable", countId: "errorUnavailableCount"},
+        {name: "unknown", buttonId: "errorStateUnknown", countId: "errorUnknownCount"}
     ];
 
     var MAX_RENDERED_ISSUES = 200;
-    var activeFilter = "all";
+    var activeSeverityFilter = "all";
+    var activeStateFilter = "all";
     var expandedGroups = {};
     var lastPayload = null;
-    var filterController = null;
+    var severityFilterController = null;
+    var stateFilterController = null;
 
 
     function createElement(tagName, className, text) {
@@ -88,30 +96,33 @@
     }
 
 
-    function issueMatches(issue, filterName) {
+    function issueMatches(issue) {
 
-        if (filterName === "all") {
-            return true;
-        }
-
-        if (filterName === "unknown") {
-            return issue.state === "unknown";
-        }
-
-        return issue.severity === filterName;
+        return (
+            activeSeverityFilter === "all" ||
+            issue.severity === activeSeverityFilter
+        ) && (
+            activeStateFilter === "all" ||
+            issue.state === activeStateFilter
+        );
 
     }
 
 
-    function groupMatches(group, filterName) {
+    function groupMatches(group) {
+        var index;
 
-        if (filterName === "all") {
-            return true;
+        if (!group.issues || group.issues.length === 0) {
+            return issueMatches(group);
         }
 
-        return Boolean(
-            group.counts && group.counts[filterName] > 0
-        );
+        for (index = 0; group.issues && index < group.issues.length; index++) {
+            if (issueMatches(group.issues[index])) {
+                return true;
+            }
+        }
+
+        return false;
 
     }
 
@@ -135,6 +146,7 @@
                     error: 0,
                     warning: 0,
                     info: 0,
+                    unavailable: issue.state === "unavailable" ? 1 : 0,
                     unknown: issue.state === "unknown" ? 1 : 0
                 };
 
@@ -191,23 +203,35 @@
             ? payload.summary
             : {};
 
-        return payload && payload.filters
-            ? payload.filters
-            : {
+        if (payload && payload.filters && payload.filters.severity) {
+            return payload.filters;
+        }
+
+        return {
+            severity: {
                 all: summary.total || 0,
                 critical: summary.critical || 0,
                 error: summary.error || 0,
                 warning: summary.warning || 0,
+                info: summary.info || 0
+            },
+            state: {
+                all: summary.total || 0,
+                unavailable: summary.unavailable || 0,
                 unknown: summary.unknown || 0
-            };
+            }
+        };
 
     }
 
 
     function updateFilterButtons(counts) {
 
-        if (filterController) {
-            filterController.update(counts);
+        if (severityFilterController) {
+            severityFilterController.update(counts.severity);
+        }
+        if (stateFilterController) {
+            stateFilterController.update(counts.state);
         }
 
     }
@@ -285,7 +309,7 @@
             index < group.issues.length && rendered < limit;
             index++
         ) {
-            if (!issueMatches(group.issues[index], activeFilter)) {
+            if (!issueMatches(group.issues[index])) {
                 continue;
             }
             list.appendChild(childIssueRow(group.issues[index]));
@@ -521,13 +545,21 @@
         var index;
 
         for (index = 0; index < groups.length; index++) {
-            if (!groupMatches(groups[index], activeFilter)) {
+            if (!groupMatches(groups[index])) {
                 continue;
             }
-
-            total += activeFilter === "all"
-                ? groups[index].issueCount || 1
-                : groups[index].counts[activeFilter] || 0;
+            for (
+                var issueIndex = 0;
+                groups[index].issues && issueIndex < groups[index].issues.length;
+                issueIndex++
+            ) {
+                if (issueMatches(groups[index].issues[issueIndex])) {
+                    total += 1;
+                }
+            }
+            if (!groups[index].issues || groups[index].issues.length === 0) {
+                total += 1;
+            }
         }
 
         return total;
@@ -553,12 +585,20 @@
 
         for (index = 0; index < groups.length; index++) {
             var group = groups[index];
-            var groupSize = activeFilter === "all"
-                ? group.issueCount || 1
-                : group.counts[activeFilter] || 0;
+            var groupSize = 0;
             var remaining = MAX_RENDERED_ISSUES - representedIssues;
+            var issueIndex;
 
-            if (!groupMatches(group, activeFilter) || remaining <= 0) {
+            for (issueIndex = 0; group.issues && issueIndex < group.issues.length; issueIndex++) {
+                if (issueMatches(group.issues[issueIndex])) {
+                    groupSize += 1;
+                }
+            }
+            if (!group.issues || group.issues.length === 0) {
+                groupSize = 1;
+            }
+
+            if (!groupMatches(group) || remaining <= 0) {
                 continue;
             }
 
@@ -590,9 +630,21 @@
     }
 
 
-    function selectFilter(filterName) {
+    function selectSeverityFilter(filterName) {
 
-        activeFilter = filterName;
+        activeSeverityFilter = filterName;
+
+        if (lastPayload) {
+            updateFilterButtons(filterCounts(lastPayload));
+            renderGroups(lastPayload);
+        }
+
+    }
+
+
+    function selectStateFilter(filterName) {
+
+        activeStateFilter = filterName;
 
         if (lastPayload) {
             updateFilterButtons(filterCounts(lastPayload));
@@ -638,9 +690,13 @@
             window.location.pathname || ""
         )
     ) {
-        filterController = SystemDashboard.createFilterController(
-            FILTERS,
-            selectFilter
+        severityFilterController = SystemDashboard.createFilterController(
+            SEVERITY_FILTERS,
+            selectSeverityFilter
+        );
+        stateFilterController = SystemDashboard.createFilterController(
+            STATE_FILTERS,
+            selectStateFilter
         );
         SystemDashboard.createColumnController(
             "errors",

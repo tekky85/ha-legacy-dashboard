@@ -580,7 +580,7 @@ test(
                 );
 
                 assert.equal(initial.status, 200);
-                assert.equal(initial.json.schemaVersion, 6);
+                assert.equal(initial.json.schemaVersion, 7);
                 assert.equal(
                     initial.json.dashboards[0].layouts.portrait.columns,
                     6
@@ -621,7 +621,9 @@ test(
                         "light.security_only",
                         "climate.security_only"
                     ],
-                    ignoredEntities: ["sensor.test_status"]
+                    ignoredEntities: ["sensor.test_status"],
+                    criticalDetectionMode: "device_class",
+                    criticalLabelId: null
                 };
 
                 const settingsSaved = await request(
@@ -780,7 +782,7 @@ test(
                 assert.equal(initialConfig.status, 200);
                 assert.equal(
                     initialConfig.json.schemaVersion,
-                    6
+                    7
                 );
                 assert.equal(
                     initialConfig.json.defaultDashboardId,

@@ -15,9 +15,9 @@
 
 <title>HA Legacy Dashboard – System</title>
 
-<script src="/js/core/theme.js?v=34"></script>
-<link rel="stylesheet" href="/css/style.css?v=34">
-<link rel="stylesheet" href="/css/system.css?v=34">
+<script src="/js/core/theme.js?v=35"></script>
+<link rel="stylesheet" href="/css/style.css?v=35">
+<link rel="stylesheet" href="/css/system.css?v=35">
 
 </head>
 
@@ -163,22 +163,25 @@
                 <strong id="errorOverallLabel">Wird geprüft</strong>
             </div>
 
-            <div class="system-filter-bar" role="toolbar" aria-label="Störungen filtern">
-                <button id="errorFilterAll" class="system-filter-button system-filter-button-active is-active" type="button" aria-pressed="true">
-                    <span>Alle</span><strong id="errorAllCount">0</strong>
-                </button>
-                <button id="errorFilterCritical" class="system-filter-button" type="button" aria-pressed="false">
-                    <span>Kritisch</span><strong id="errorCriticalCount">0</strong>
-                </button>
-                <button id="errorFilterError" class="system-filter-button" type="button" aria-pressed="false">
-                    <span>Fehler</span><strong id="errorErrorCount">0</strong>
-                </button>
-                <button id="errorFilterWarning" class="system-filter-button" type="button" aria-pressed="false">
-                    <span>Warnungen</span><strong id="errorWarningCount">0</strong>
-                </button>
-                <button id="errorFilterUnknown" class="system-filter-button" type="button" aria-pressed="false">
-                    <span>Unknown</span><strong id="errorUnknownCount">0</strong>
-                </button>
+            <div class="error-filter-dimensions">
+                <div class="error-filter-group">
+                    <strong class="error-filter-label">Kritikalität</strong>
+                    <div class="system-filter-bar" role="toolbar" aria-label="Störungen nach Kritikalität filtern">
+                        <button id="errorFilterAll" class="system-filter-button system-filter-button-active is-active" type="button" aria-pressed="true"><span>Alle</span><strong id="errorAllCount">0</strong></button>
+                        <button id="errorFilterCritical" class="system-filter-button" type="button" aria-pressed="false"><span>Kritisch</span><strong id="errorCriticalCount">0</strong></button>
+                        <button id="errorFilterError" class="system-filter-button" type="button" aria-pressed="false"><span>Fehler</span><strong id="errorErrorCount">0</strong></button>
+                        <button id="errorFilterWarning" class="system-filter-button" type="button" aria-pressed="false"><span>Warnung</span><strong id="errorWarningCount">0</strong></button>
+                        <button id="errorFilterInfo" class="system-filter-button" type="button" aria-pressed="false"><span>Info</span><strong id="errorInfoCount">0</strong></button>
+                    </div>
+                </div>
+                <div class="error-filter-group error-state-filter-group">
+                    <strong class="error-filter-label">Status</strong>
+                    <div class="system-filter-bar" role="toolbar" aria-label="Störungen nach Status filtern">
+                        <button id="errorStateAll" class="system-filter-button system-filter-button-active is-active" type="button" aria-pressed="true"><span>Alle</span><strong id="errorStateAllCount">0</strong></button>
+                        <button id="errorStateUnavailable" class="system-filter-button" type="button" aria-pressed="false"><span>Unavailable</span><strong id="errorUnavailableCount">0</strong></button>
+                        <button id="errorStateUnknown" class="system-filter-button" type="button" aria-pressed="false"><span>Unknown</span><strong id="errorUnknownCount">0</strong></button>
+                    </div>
+                </div>
             </div>
 
             <div class="system-column-control" role="toolbar" aria-label="Spaltenanzahl des Systemstatus">
@@ -216,10 +219,10 @@
 
 </div>
 
-<script src="/js/core/compat.js?v=34"></script>
-<script src="/js/system/common.js?v=34"></script>
-<script src="/js/system/summary.js?v=34"></script>
-<script src="/js/system/errors.js?v=34"></script>
+<script src="/js/core/compat.js?v=35"></script>
+<script src="/js/system/common.js?v=35"></script>
+<script src="/js/system/summary.js?v=35"></script>
+<script src="/js/system/errors.js?v=35"></script>
 
 </body>
 

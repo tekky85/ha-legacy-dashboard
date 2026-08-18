@@ -8,6 +8,7 @@ function emptyCounts() {
         error: 0,
         warning: 0,
         info: 0,
+        unavailable: 0,
         unknown: 0
     };
 
@@ -22,6 +23,9 @@ function incrementCounts(counts, issue) {
 
     if (issue.state === "unknown") {
         counts.unknown += 1;
+    }
+    if (issue.state === "unavailable") {
+        counts.unavailable += 1;
     }
 
 }
@@ -266,24 +270,32 @@ function createStandalone(issue, entity, registry) {
 
 function filterCounts(issues) {
 
-    const counts = {
+    const severity = {
         all: issues.length,
         critical: 0,
         error: 0,
         warning: 0,
+        info: 0
+    };
+    const state = {
+        all: issues.length,
+        unavailable: 0,
         unknown: 0
     };
 
     issues.forEach(function (issue) {
-        if (Object.prototype.hasOwnProperty.call(counts, issue.severity)) {
-            counts[issue.severity] += 1;
+        if (Object.prototype.hasOwnProperty.call(severity, issue.severity)) {
+            severity[issue.severity] += 1;
         }
-        if (issue.state === "unknown") {
-            counts.unknown += 1;
+        if (Object.prototype.hasOwnProperty.call(state, issue.state)) {
+            state[issue.state] += 1;
         }
     });
 
-    return counts;
+    return {
+        severity: severity,
+        state: state
+    };
 
 }
 
@@ -366,7 +378,7 @@ function build(snapshot, detected) {
     return Object.assign({}, detected, {
         groups: aggregate(snapshot || {}, issues),
         filters: filterCounts(issues),
-        presentationVersion: 1
+        presentationVersion: 2
     });
 
 }

@@ -12,6 +12,7 @@ const COMMANDS = Object.freeze({
     entityRegistry: "config/entity_registry/list",
     deviceRegistry: "config/device_registry/list",
     areaRegistry: "config/area_registry/list",
+    labelRegistry: "config/label_registry/list",
     configEntries: "config_entries/get",
     repairs: "repairs/list_issues"
 });
@@ -92,6 +93,12 @@ function createService(options) {
             Normalizers.areaRegistry,
             REGISTRY_TTL_MS
         ),
+        labelRegistry: source(
+            "registry_label",
+            COMMANDS.labelRegistry,
+            Normalizers.labelRegistry,
+            REGISTRY_TTL_MS
+        ),
         configEntries: source(
             "config_entries",
             COMMANDS.configEntries,
@@ -115,6 +122,7 @@ function createService(options) {
             sources.entityRegistry.get(),
             sources.deviceRegistry.get(),
             sources.areaRegistry.get(),
+            sources.labelRegistry.get(),
             sources.configEntries.get(),
             sources.repairs.get()
         ]);
@@ -123,8 +131,9 @@ function createService(options) {
             entityRegistry: values[0],
             deviceRegistry: values[1],
             areaRegistry: values[2],
-            configEntries: values[3],
-            repairs: values[4],
+            labelRegistry: values[3],
+            configEntries: values[4],
+            repairs: values[5],
             matter: matter
         };
 
@@ -142,21 +151,26 @@ function createService(options) {
                     values[2].data,
                     "areaId"
                 ),
-                configEntries: Normalizers.indexBy(
+                labels: Normalizers.indexBy(
                     values[3].data,
+                    "labelId"
+                ),
+                configEntries: Normalizers.indexBy(
+                    values[4].data,
                     "entryId"
                 )
             },
             diagnostics: {
-                repairs: values[4].data,
+                repairs: values[5].data,
                 matter: []
             },
             capabilities: {
                 entityRegistry: values[0].supported === true,
                 deviceRegistry: values[1].supported === true,
                 areaRegistry: values[2].supported === true,
-                configEntries: values[3].supported === true,
-                repairs: values[4].supported === true,
+                labelRegistry: values[3].supported === true,
+                configEntries: values[4].supported === true,
+                repairs: values[5].supported === true,
                 matterDiagnostics: false
             },
             sources: sourceValues

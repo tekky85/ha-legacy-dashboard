@@ -32,21 +32,30 @@ function entityLookup(entityIds) {
 }
 
 
-function createIssue(entity, settings, securityRelevant, nowMilliseconds) {
+function createIssue(
+    entity,
+    settings,
+    securityRelevant,
+    nowMilliseconds,
+    modeCriticalEligible
+) {
 
     const attributes = entity.attributes || {};
     const context = entity.context || {};
     const state = String(entity.state || "").toLowerCase();
-    const inferredRiskClass = Risk.classify(
-        attributes.deviceClass,
-        context.entityCategory,
-        entity.domain
-    );
-    const riskClass = securityRelevant
+    const criticalMode = settings.criticalDetectionMode || "device_class";
+    const inferredRiskClass = criticalMode === "ha_label"
+        ? Risk.classifyWithoutAutomaticCritical(context.entityCategory)
+        : Risk.classify(
+            attributes.deviceClass,
+            context.entityCategory,
+            entity.domain
+        );
+    const riskClass = securityRelevant || modeCriticalEligible
         ? "security"
         : inferredRiskClass;
     const effectiveSecurityRelevant =
-        securityRelevant || Risk.isCritical(riskClass);
+        securityRelevant || modeCriticalEligible || Risk.isCritical(riskClass);
     const severity = Severity.issueSeverity(
         state,
         effectiveSecurityRelevant,
@@ -83,12 +92,7 @@ function createIssue(entity, settings, securityRelevant, nowMilliseconds) {
         state: state,
         securityRelevant: effectiveSecurityRelevant,
         riskClass: riskClass,
-        potentiallySecurityRelevant:
-            Severity.potentiallySecurityRelevant(
-                attributes.deviceClass,
-                context.entityCategory,
-                entity.domain
-            ),
+        potentiallySecurityRelevant: effectiveSecurityRelevant,
         startedAt: entity.lastChanged,
         updatedAt: entity.lastUpdated,
         durationSeconds:
@@ -109,6 +113,103 @@ function createIssue(entity, settings, securityRelevant, nowMilliseconds) {
         }
     };
 
+}
+
+
+function containsLabel(item, labelId) {
+    return Boolean(
+        item &&
+        Array.isArray(item.labelIds) &&
+        item.labelIds.indexOf(labelId) !== -1
+    );
+}
+
+
+function criticalDetection(snapshot, settings) {
+    const mode = settings.criticalDetectionMode || "device_class";
+
+    if (mode !== "ha_label") {
+        return {
+            mode: "device_class",
+            status: "available",
+            labelId: null,
+            labelName: null,
+            eligibleEntities: Object.create(null)
+        };
+    }
+
+    const metadata = snapshot.metadata || {};
+    const labels = metadata.labels || {};
+    const entities = metadata.entities || {};
+    const devices = metadata.devices || {};
+    const source = snapshot.sources && snapshot.sources.labelRegistry;
+    const labelId = settings.criticalLabelId;
+    const eligibleDevices = Object.create(null);
+    const eligibleEntities = Object.create(null);
+    let status = source && source.stale
+        ? "stale"
+        : source && source.ok
+            ? "available"
+            : source && source.supported === false
+                ? "unsupported"
+                : "error";
+
+    if ((status === "available" || status === "stale") && !labels[labelId]) {
+        status = "missing";
+    }
+
+    if (status === "available" || status === "stale") {
+        Object.keys(devices).forEach(function (deviceId) {
+            if (containsLabel(devices[deviceId], labelId)) {
+                eligibleDevices[deviceId] = true;
+            }
+        });
+
+        Object.keys(entities).forEach(function (entityId) {
+            const registry = entities[entityId];
+            if (
+                containsLabel(registry, labelId) ||
+                Boolean(registry.deviceId && eligibleDevices[registry.deviceId])
+            ) {
+                eligibleEntities[entityId] = true;
+            }
+        });
+    }
+
+    return {
+        mode: "ha_label",
+        status: status,
+        labelId: labelId,
+        labelName: labels[labelId] ? labels[labelId].name : null,
+        eligibleEntities: eligibleEntities
+    };
+}
+
+
+function criticalDetectionIssue(detection) {
+    if (
+        detection.mode !== "ha_label" ||
+        detection.status === "available" ||
+        detection.status === "stale"
+    ) {
+        return null;
+    }
+
+    return {
+        id: "critical-detection-label-" + detection.status,
+        source: "critical_detection",
+        severity: "error",
+        status: "active",
+        title: "Critical-Label-Erkennung nicht verfügbar",
+        description: detection.status === "missing"
+            ? "Das konfigurierte Home-Assistant-Label existiert nicht mehr."
+            : "Home-Assistant-Label-Metadaten konnten noch nicht zuverlässig geladen werden.",
+        state: "diagnostic",
+        securityRelevant: false,
+        durationSeconds: null,
+        domain: null,
+        fixable: false
+    };
 }
 
 
@@ -328,6 +429,7 @@ function buildIssues(snapshot, configuration) {
         Date.parse(snapshot.collectedAt || "") || Date.now();
 
     const issues = [];
+    const detection = criticalDetection(snapshot, settings);
 
 
     (snapshot.entities || []).forEach(function (entity) {
@@ -340,7 +442,8 @@ function buildIssues(snapshot, configuration) {
             entity,
             settings,
             Boolean(securityEntities[entity.entityId]),
-            nowMilliseconds
+            nowMilliseconds,
+            Boolean(detection.eligibleEntities[entity.entityId])
         );
 
         if (issue) {
@@ -348,6 +451,11 @@ function buildIssues(snapshot, configuration) {
         }
 
     });
+
+    const detectionIssue = criticalDetectionIssue(detection);
+    if (detectionIssue) {
+        issues.push(detectionIssue);
+    }
 
     const configEntries = snapshot.metadata &&
         snapshot.metadata.configEntries
@@ -412,6 +520,12 @@ function buildIssues(snapshot, configuration) {
         summary: summary,
         groups: groupIssues(issues),
         issues: issues,
+        criticalDetection: {
+            mode: detection.mode,
+            status: detection.status,
+            labelId: detection.labelId,
+            labelName: detection.labelName
+        },
         meta: Snapshot.toPublicMeta(snapshot)
     };
 
@@ -422,6 +536,7 @@ module.exports = {
     buildIssues: buildIssues,
     configEntryIssue: configEntryIssue,
     configEntrySeverity: configEntrySeverity,
+    criticalDetection: criticalDetection,
     createIssue: createIssue,
     groupIssues: groupIssues,
     overallStatus: overallStatus,

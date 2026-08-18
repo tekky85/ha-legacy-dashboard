@@ -9,6 +9,7 @@
     let layoutDragState = null;
     let layoutResizeState = null;
     let previewRefreshTimer = null;
+    let criticalLabels = {labels: [], source: {status: "error"}};
 
     function byId(id) {
         return document.getElementById(id);
@@ -791,6 +792,53 @@
     function renderErrorSettings() {
         const settings = admin.SystemDashboards.getErrorSettings();
         const entities = admin.State.getEntities();
+        const labelMode = settings.criticalDetectionMode === "ha_label";
+
+        elements.criticalModeDeviceClass.checked = !labelMode;
+        elements.criticalModeLabel.checked = labelMode;
+        elements.criticalLabelControls.hidden = !labelMode;
+        elements.criticalLabelSelect.textContent = "";
+
+        const labelPlaceholder = createElement("option", "", "Label auswählen …");
+        labelPlaceholder.value = "";
+        elements.criticalLabelSelect.appendChild(labelPlaceholder);
+
+        (criticalLabels.labels || []).forEach(function (label) {
+            const option = createElement("option", "", label.name);
+            option.value = label.id;
+            option.selected = label.id === settings.criticalLabelId;
+            elements.criticalLabelSelect.appendChild(option);
+        });
+
+        const selectedExists = (criticalLabels.labels || []).some(function (label) {
+            return label.id === settings.criticalLabelId;
+        });
+        let warning = "";
+
+        if (labelMode && criticalLabels.source.status === "unsupported") {
+            warning = "Die Home-Assistant-Label-Registry wird nicht unterstützt.";
+        } else if (labelMode && criticalLabels.source.status === "error") {
+            warning = "Die Label-Registry ist derzeit nicht verfügbar.";
+        } else if (labelMode && criticalLabels.source.status === "stale") {
+            warning = "Es werden zuletzt erfolgreich geladene Labels angezeigt.";
+        } else if (labelMode && settings.criticalLabelId && !selectedExists) {
+            warning = "Das gespeicherte Label existiert nicht mehr.";
+            const missing = createElement(
+                "option",
+                "",
+                "Gelöschtes Label (" + settings.criticalLabelId + ")"
+            );
+            missing.value = settings.criticalLabelId;
+            missing.selected = true;
+            elements.criticalLabelSelect.appendChild(missing);
+        } else if (labelMode && !settings.criticalLabelId) {
+            warning = "Bitte vor dem Speichern ein Label auswählen.";
+        }
+
+        elements.criticalLabelWarning.textContent = warning;
+        elements.criticalLabelSelect.disabled =
+            criticalLabels.source.status === "unsupported" ||
+            criticalLabels.source.status === "error";
 
         renderEntityOptions(
             elements.errorSecurityEntitySelect,
@@ -991,6 +1039,7 @@
             ["entityRegistry", "Entity Registry"],
             ["deviceRegistry", "Device Registry"],
             ["areaRegistry", "Area Registry"],
+            ["labelRegistry", "Label Registry"],
             ["configEntries", "Config Entries"],
             ["repairs", "Repairs"],
             ["matter", "Matter Diagnostics"]
@@ -1033,12 +1082,21 @@
         }
     }
 
+    async function loadCriticalLabels() {
+        try {
+            criticalLabels = await admin.Api.getLabels();
+        } catch (error) {
+            criticalLabels = {labels: [], source: {status: "error"}};
+        }
+    }
+
     async function loadAdministration() {
         const configuration = await admin.Api.getConfiguration();
         admin.State.setConfiguration(configuration);
         showAdministration();
         renderAll();
         await loadEntities();
+        await loadCriticalLabels();
         await loadDiagnosticsStatus();
         renderSummarySettings();
         renderErrorSettings();
@@ -1533,7 +1591,10 @@
             "summaryIgnoredEntities", "errorSecurityEntitySelect",
             "errorSecurityAdd", "errorSecurityEntities",
             "errorIgnoreEntitySelect", "errorIgnoreAdd",
-            "errorIgnoredEntities", "diagnosticSourcesList"
+            "errorIgnoredEntities", "criticalModeDeviceClass",
+            "criticalModeLabel", "criticalLabelControls",
+            "criticalLabelSelect", "criticalLabelWarning",
+            "diagnosticSourcesList"
         ].forEach(function (id) {
             elements[id] = byId(id);
         });
@@ -1616,6 +1677,27 @@
                 renderErrorSettings();
                 updateDirtyState();
             }
+        });
+        elements.criticalModeDeviceClass.addEventListener("change", function () {
+            if (elements.criticalModeDeviceClass.checked) {
+                admin.SystemDashboards.setCriticalDetectionMode("device_class");
+                renderErrorSettings();
+                updateDirtyState();
+            }
+        });
+        elements.criticalModeLabel.addEventListener("change", function () {
+            if (elements.criticalModeLabel.checked) {
+                admin.SystemDashboards.setCriticalDetectionMode("ha_label");
+                renderErrorSettings();
+                updateDirtyState();
+            }
+        });
+        elements.criticalLabelSelect.addEventListener("change", function () {
+            admin.SystemDashboards.setCriticalLabelId(
+                elements.criticalLabelSelect.value
+            );
+            renderErrorSettings();
+            updateDirtyState();
         });
         elements.errorIgnoreAdd.addEventListener("click", function () {
             if (admin.SystemDashboards.addErrorIgnoredEntity(

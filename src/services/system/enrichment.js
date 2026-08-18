@@ -94,6 +94,7 @@ function attach(snapshot, diagnosticsSnapshot) {
         entities: emptyMap(),
         devices: emptyMap(),
         areas: emptyMap(),
+        labels: emptyMap(),
         configEntries: emptyMap()
     };
     const sources = diagnostic.sources || {};
@@ -108,6 +109,7 @@ function attach(snapshot, diagnosticsSnapshot) {
         entityRegistry: false,
         deviceRegistry: false,
         areaRegistry: false,
+        labelRegistry: false,
         configEntries: false,
         repairs: false,
         matterDiagnostics: false
@@ -132,6 +134,7 @@ function unavailable(errorCode) {
         "entityRegistry",
         "deviceRegistry",
         "areaRegistry",
+        "labelRegistry",
         "configEntries",
         "repairs"
     ];
@@ -160,6 +163,7 @@ function unavailable(errorCode) {
             entities: emptyMap(),
             devices: emptyMap(),
             areas: emptyMap(),
+            labels: emptyMap(),
             configEntries: emptyMap()
         },
         diagnostics: {
@@ -170,6 +174,7 @@ function unavailable(errorCode) {
             entityRegistry: false,
             deviceRegistry: false,
             areaRegistry: false,
+            labelRegistry: false,
             configEntries: false,
             repairs: false,
             matterDiagnostics: false

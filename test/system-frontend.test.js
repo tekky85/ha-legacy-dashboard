@@ -69,9 +69,9 @@ function createHarness(pathname, entryFile, options) {
         "summaryGroups", "summaryActiveCount", "errorsOverview",
         "errorOverall", "errorOverallSymbol", "errorOverallLabel",
         "errorAllCount", "errorCriticalCount", "errorErrorCount",
-        "errorWarningCount", "errorUnknownCount", "errorFilterAll",
+        "errorWarningCount", "errorInfoCount", "errorUnknownCount", "errorUnavailableCount", "errorFilterAll",
         "errorFilterCritical", "errorFilterError", "errorFilterWarning",
-        "errorFilterUnknown", "errorFilterEmpty", "errorGroups",
+        "errorFilterInfo", "errorStateAll", "errorStateUnavailable", "errorStateUnknown", "errorFilterEmpty", "errorGroups",
         "summaryFilterAll", "summaryFilterOpen", "summaryFilterPowered",
         "summaryFilterActive", "summaryFilterClimate", "summaryFilterMedia",
         "summaryFilterSecurity", "summaryAllCount", "summaryOpenCount",
@@ -555,7 +555,10 @@ test("Error-Filter und Device-Details arbeiten ohne Reload", function () {
     assert.equal(harness.elements.errorGroups.children.length, 1);
     assert.match(harness.elements.errorFilterWarning.className, /is-active/);
 
-    harness.elements.errorFilterUnknown.onclick();
+    harness.elements.errorStateUnknown.onclick();
+    assert.equal(harness.elements.errorGroups.children.length, 0);
+
+    harness.elements.errorFilterInfo.onclick();
     assert.equal(harness.elements.errorGroups.children.length, 1);
     assert.equal(
         harness.elements.errorGroups.children[0].children[3]
@@ -568,6 +571,7 @@ test("Error-Filter und Device-Details arbeiten ohne Reload", function () {
     assert.equal(harness.elements.errorFilterEmpty.hidden, false);
 
     harness.elements.errorFilterAll.onclick();
+    harness.elements.errorStateAll.onclick();
     assert.equal(harness.elements.errorGroups.children.length, 2);
     assert.equal(harness.elements.errorFilterEmpty.hidden, true);
 });
@@ -740,7 +744,7 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=34/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=35/);
     assert.match(html, /id="errorOverallLabel"/);
     assert.match(html, /id="errorFilterAll"/);
     assert.match(html, /id="errorUnknownCount"/);

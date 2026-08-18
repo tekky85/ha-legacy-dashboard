@@ -100,6 +100,26 @@
                                 Fehler öffnen
                             </a>
 
+                            <fieldset class="critical-detection-settings">
+                                <legend>Critical Device Detection</legend>
+                                <label class="radio-row" for="criticalModeDeviceClass">
+                                    <input id="criticalModeDeviceClass" name="criticalDetectionMode" type="radio" value="device_class">
+                                    <span>Home Assistant Device Classes</span>
+                                </label>
+                                <label class="radio-row" for="criticalModeLabel">
+                                    <input id="criticalModeLabel" name="criticalDetectionMode" type="radio" value="ha_label">
+                                    <span>Home Assistant Label</span>
+                                </label>
+                                <div id="criticalLabelControls">
+                                    <label for="criticalLabelSelect">Critical Label</label>
+                                    <select id="criticalLabelSelect">
+                                        <option value="">Label auswählen …</option>
+                                    </select>
+                                    <p id="criticalLabelWarning" class="form-warning" role="status"></p>
+                                    <small>Labels werden ausschließlich in Home Assistant verwaltet und hier nur gelesen.</small>
+                                </div>
+                            </fieldset>
+
                             <label for="errorSecurityEntitySelect">Sicherheitsrelevante Entity</label>
                             <div class="system-entity-controls">
                                 <select id="errorSecurityEntitySelect">
@@ -131,6 +151,7 @@
                                 <div><dt>Entity Registry</dt><dd>Wird geprüft …</dd></div>
                                 <div><dt>Device Registry</dt><dd>Wird geprüft …</dd></div>
                                 <div><dt>Area Registry</dt><dd>Wird geprüft …</dd></div>
+                                <div><dt>Label Registry</dt><dd>Wird geprüft …</dd></div>
                                 <div><dt>Config Entries</dt><dd>Wird geprüft …</dd></div>
                                 <div><dt>Repairs</dt><dd>Wird geprüft …</dd></div>
                                 <div><dt>Matter Diagnostics</dt><dd>Wird geprüft …</dd></div>

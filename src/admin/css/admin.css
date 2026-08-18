@@ -949,6 +949,44 @@ dialog::backdrop {
     font-size: 0.95rem;
 }
 
+.critical-detection-settings {
+    margin: 0.85rem 0 1rem;
+    padding: 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 0.65rem;
+}
+
+.critical-detection-settings legend {
+    padding: 0 0.3rem;
+    font-size: 0.86rem;
+    font-weight: 750;
+}
+
+.radio-row {
+    display: flex;
+    align-items: center;
+    margin: 0.35rem 0;
+}
+
+.radio-row input {
+    margin-right: 0.5rem;
+}
+
+#criticalLabelControls {
+    margin-top: 0.75rem;
+}
+
+#criticalLabelSelect {
+    width: 100%;
+}
+
+.form-warning {
+    margin: 0.45rem 0 0;
+    color: var(--warning);
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
 .diagnostic-sources-note {
     margin: 0 0 0.7rem;
     color: var(--muted);

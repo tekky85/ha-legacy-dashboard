@@ -873,4 +873,22 @@ router.get("/system-diagnostics/status", async function (req, res) {
 });
 
 
+router.get("/labels", async function (req, res) {
+
+    try {
+        return res.json(await System.getCriticalLabels());
+    } catch (error) {
+        logger.warn("admin_label_inventory_failed", {
+            error_code: error && error.code
+                ? error.code
+                : "label_inventory_unavailable"
+        });
+        return res.status(503).json({
+            error: "label_inventory_unavailable"
+        });
+    }
+
+});
+
+
 module.exports = router;

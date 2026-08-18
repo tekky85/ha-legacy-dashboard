@@ -921,13 +921,20 @@ test(
             assert.equal(errors.json.summary.unavailable, 1);
             assert.equal(errors.json.summary.unknown, 1);
             assert.equal(errors.json.overallStatus, "warning");
-            assert.equal(errors.json.presentationVersion, 1);
+            assert.equal(errors.json.presentationVersion, 2);
             assert.deepEqual(errors.json.filters, {
-                all: 2,
-                critical: 0,
-                error: 0,
-                warning: 1,
-                unknown: 1
+                severity: {
+                    all: 2,
+                    critical: 0,
+                    error: 0,
+                    warning: 1,
+                    info: 1
+                },
+                state: {
+                    all: 2,
+                    unavailable: 1,
+                    unknown: 1
+                }
             });
             assert.equal(errors.json.groups.length, 2);
             assert.equal(errors.json.groups[0].type, "standalone");

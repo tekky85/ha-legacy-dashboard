@@ -14,7 +14,8 @@ const Layout =
     require("../services/layout");
 
 
-const SCHEMA_VERSION = 6;
+const SCHEMA_VERSION = 7;
+const ERRORS_SCHEMA_VERSION = 6;
 const SUMMARY_SCHEMA_VERSION = 5;
 const LAYOUT_SCHEMA_VERSION = 4;
 const GRID_SCHEMA_VERSION = 3;
@@ -29,6 +30,9 @@ const WIDGET_ID_PATTERN =
 
 const ENTITY_ID_PATTERN =
     /^[a-z0-9_]+\.[a-z0-9_]+$/;
+
+const LABEL_ID_PATTERN =
+    /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
 
 const SUPPORTED_WIDGET_TYPES = [
     "sensor",
@@ -58,7 +62,9 @@ const DEFAULT_SYSTEM_DASHBOARDS = {
     },
     errors: {
         securityEntities: [],
-        ignoredEntities: []
+        ignoredEntities: [],
+        criticalDetectionMode: "device_class",
+        criticalLabelId: null
     }
 };
 
@@ -389,6 +395,7 @@ function validateConfigurationVersion(candidate, schemaVersion) {
     if (schemaVersion >= SUMMARY_SCHEMA_VERSION) {
         validateSystemDashboards(
             candidate.systemDashboards,
+            schemaVersion >= ERRORS_SCHEMA_VERSION,
             schemaVersion >= SCHEMA_VERSION
         );
     }
@@ -426,7 +433,11 @@ function validateEntityList(list, fieldName) {
 }
 
 
-function validateSystemDashboards(systemDashboards, requireErrors) {
+function validateSystemDashboards(
+    systemDashboards,
+    requireErrors,
+    requireCriticalDetection
+) {
 
     const summary =
         systemDashboards && systemDashboards.summary;
@@ -459,6 +470,36 @@ function validateSystemDashboards(systemDashboards, requireErrors) {
             errors.ignoredEntities,
             "Ignorierte Error-Entities"
         );
+
+        if (requireCriticalDetection) {
+            if (
+                errors.criticalDetectionMode !== "device_class" &&
+                errors.criticalDetectionMode !== "ha_label"
+            ) {
+                throw new Error("Critical-Detection-Modus ist ungültig");
+            }
+
+            if (
+                errors.criticalDetectionMode === "ha_label" &&
+                (
+                    typeof errors.criticalLabelId !== "string" ||
+                    !LABEL_ID_PATTERN.test(errors.criticalLabelId)
+                )
+            ) {
+                throw new Error("Critical Label fehlt oder ist ungültig");
+            }
+
+            if (
+                errors.criticalDetectionMode === "device_class" &&
+                errors.criticalLabelId !== null &&
+                (
+                    typeof errors.criticalLabelId !== "string" ||
+                    !LABEL_ID_PATTERN.test(errors.criticalLabelId)
+                )
+            ) {
+                throw new Error("Critical Label ist ungültig");
+            }
+        }
     }
 
 }
@@ -505,7 +546,8 @@ function migrateConfiguration(candidate) {
             candidate.schemaVersion !== SIZE_SCHEMA_VERSION &&
             candidate.schemaVersion !== GRID_SCHEMA_VERSION &&
             candidate.schemaVersion !== LAYOUT_SCHEMA_VERSION &&
-            candidate.schemaVersion !== SUMMARY_SCHEMA_VERSION
+            candidate.schemaVersion !== SUMMARY_SCHEMA_VERSION &&
+            candidate.schemaVersion !== ERRORS_SCHEMA_VERSION
         )
     ) {
         return {
@@ -604,7 +646,13 @@ function cloneSystemDashboards(systemDashboards) {
             securityEntities:
                 errors.securityEntities.slice(0),
             ignoredEntities:
-                errors.ignoredEntities.slice(0)
+                errors.ignoredEntities.slice(0),
+            criticalDetectionMode:
+                errors.criticalDetectionMode || "device_class",
+            criticalLabelId:
+                typeof errors.criticalLabelId === "string"
+                    ? errors.criticalLabelId
+                    : null
         }
     };
 

@@ -100,7 +100,8 @@ Shows, among other things:
 - severity levels
 - stale/offline conditions
 - last successful update time
-- clickable filters for All, Critical, Error, Warning, and Unknown
+- separate, combinable filters for severity (All, Critical, Error, Warning,
+  Info) and state (All, Unavailable, Unknown)
 - compact Device Cards for entity issues sharing the same real `device_id`
 - child-entity details collapsed by default
 - a separately persisted 1/2/3-column view with responsive fallback
@@ -110,24 +111,29 @@ Entities without a `device_id`, as well as Config Entry, Repair, and Matter
 notices, remain visible as standalone issues. Grouping is strictly a read-only
 presentation layer and changes neither severity rules nor write permissions.
 
-A central risk class uses only reliable domain, device-class, and registry
-metadata. `unknown` and `unavailable` are classified as `critical` for safety
-sensors such as smoke, CO, gas, or moisture and for security sensors such as
-doors, windows, openings, garage doors, and locks. Normal and diagnostic
-sensors retain the milder rules; name patterns alone never produce a critical
-classification. Explicit `securityEntities` continue to take precedence.
+The Admin UI can set critical detection to either `device_class` or
+`ha_label`. Device-class mode uses reliable metadata only: safety sensors such
+as smoke, CO, gas, or moisture, as well as security sensors and matching
+covers such as doors, windows, openings, garage doors, or gates, become
+`critical` for `unknown` and `unavailable`; `problem`, `tamper`, `shade`, and
+`shutter` do not do so automatically. Label mode stores the stable ID of an
+existing Home Assistant label. The gateway reads its device and entity
+assignments but never writes labels; area labels are not inherited. Explicit
+`securityEntities` retain priority, and device classes are not applied in
+parallel in label mode. Missing label metadata or a deleted label is surfaced
+as an error, while the last successful cache remains in use fail-safe.
 
 ### Registry and Diagnostic Enrichment
 
 The gateway enriches REST-based state data on the server with read-only
-metadata from the Entity, Device and Area Registries, Config Entries and,
+metadata from the Entity, Device, Area and Label Registries, Config Entries and,
 when supported, Home Assistant Repairs. A single authenticated Home Assistant
 WebSocket connection exists exclusively in the backend. The browser receives
 neither WebSocket access nor credentials or raw registry data.
 
 Sources are capability-driven and cached independently:
 
-- Entity, Device and Area Registries: 60 seconds
+- Entity, Device, Area and Label Registries: 60 seconds
 - Config Entries: 30 seconds
 - Repairs: 30 seconds
 - Matter diagnostics: 60 seconds or controlled `unsupported`

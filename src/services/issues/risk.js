@@ -7,6 +7,7 @@
 
 const SAFETY_DEVICE_CLASSES = [
     "smoke",
+    "co",
     "carbon_monoxide",
     "gas",
     "moisture",
@@ -25,6 +26,13 @@ const SECURITY_DEVICE_CLASSES = [
 const SECURITY_DOMAINS = [
     "lock",
     "alarm_control_panel"
+];
+
+const COVER_SECURITY_DEVICE_CLASSES = [
+    "door",
+    "garage",
+    "gate",
+    "window"
 ];
 
 
@@ -46,8 +54,15 @@ function classify(deviceClass, entityCategory, domain) {
     }
 
     if (
-        SECURITY_DEVICE_CLASSES.indexOf(normalizedDeviceClass) !== -1 ||
-        SECURITY_DOMAINS.indexOf(normalizedDomain) !== -1
+        SECURITY_DOMAINS.indexOf(normalizedDomain) !== -1 ||
+        (
+            normalizedDomain === "cover" &&
+            COVER_SECURITY_DEVICE_CLASSES.indexOf(normalizedDeviceClass) !== -1
+        ) ||
+        (
+            normalizedDomain !== "cover" &&
+            SECURITY_DEVICE_CLASSES.indexOf(normalizedDeviceClass) !== -1
+        )
     ) {
         return "security";
     }
@@ -61,6 +76,13 @@ function classify(deviceClass, entityCategory, domain) {
 }
 
 
+function classifyWithoutAutomaticCritical(entityCategory) {
+    return lower(entityCategory) === "diagnostic"
+        ? "diagnostic"
+        : "normal";
+}
+
+
 function isCritical(riskClass) {
     return riskClass === "safety" || riskClass === "security";
 }
@@ -68,8 +90,10 @@ function isCritical(riskClass) {
 
 module.exports = {
     SAFETY_DEVICE_CLASSES: SAFETY_DEVICE_CLASSES.slice(0),
+    COVER_SECURITY_DEVICE_CLASSES: COVER_SECURITY_DEVICE_CLASSES.slice(0),
     SECURITY_DEVICE_CLASSES: SECURITY_DEVICE_CLASSES.slice(0),
     SECURITY_DOMAINS: SECURITY_DOMAINS.slice(0),
     classify: classify,
+    classifyWithoutAutomaticCritical: classifyWithoutAutomaticCritical,
     isCritical: isCritical
 };

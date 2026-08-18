@@ -13,6 +13,23 @@ function identifier(value) {
 }
 
 
+function identifiers(values) {
+    const seen = Object.create(null);
+
+    if (!Array.isArray(values)) {
+        return [];
+    }
+
+    return values.map(identifier).filter(function (value) {
+        if (!value || seen[value]) {
+            return false;
+        }
+        seen[value] = true;
+        return true;
+    });
+}
+
+
 function timestamp(value) {
 
     if (typeof value === "number" && Number.isFinite(value)) {
@@ -102,6 +119,7 @@ function entityRegistry(entries) {
             disabledBy: text(raw.disabled_by, 80),
             hiddenBy: text(raw.hidden_by, 80),
             entityCategory: text(raw.entity_category, 40),
+            labelIds: identifiers(raw.labels),
             name: text(raw.name, 160),
             originalName: text(raw.original_name, 160),
             icon: text(raw.icon, 120)
@@ -135,11 +153,32 @@ function deviceRegistry(entries) {
             modelId: text(raw.model_id, 120),
             softwareVersion: text(raw.sw_version, 80),
             hardwareVersion: text(raw.hw_version, 80),
+            labelIds: identifiers(raw.labels),
             configEntryId: configEntryId,
             configSubentryId:
                 configSubentryFromDevice(raw, configEntryId),
             viaDeviceId: identifier(raw.via_device_id)
         };
+    }).filter(Boolean);
+
+}
+
+
+function labelRegistry(entries) {
+
+    if (!Array.isArray(entries)) {
+        return [];
+    }
+
+    return entries.map(function (raw) {
+        const labelId = raw && identifier(raw.label_id || raw.id);
+
+        return labelId
+            ? {
+                labelId: labelId,
+                name: text(raw.name, 160) || labelId
+            }
+            : null;
     }).filter(Boolean);
 
 }
@@ -261,5 +300,6 @@ module.exports = {
     deviceRegistry: deviceRegistry,
     entityRegistry: entityRegistry,
     indexBy: indexBy,
+    labelRegistry: labelRegistry,
     repairs: repairs
 };

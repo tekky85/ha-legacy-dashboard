@@ -203,6 +203,7 @@ Bedeutung von „fest“:
 | 21 | Registry & Diagnostic Enrichment | umgesetzt |
 | 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
 | 21.2 | System Dashboard Filters, Column Views & Risk Severity | umgesetzt |
+| 21.3 | Error Filtering & Critical Device Detection Modes | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
 | 23 | Automation Impact & Advanced Diagnostics | neu geplant |
 | 24 | Home Assistant App Packaging | verschoben |
@@ -1219,6 +1220,36 @@ Umgesetzt nach Sprint 21.1.
 
 ---
 
+# Sprint 21.3 – Error Filtering & Critical Device Detection Modes
+
+## Status
+
+Umgesetzt nach Sprint 21.2.
+
+## Ergebnis
+
+- Das Error Dashboard trennt Kritikalität und Zustand in zwei unabhängige,
+  kombinierbare ES5-Filter. Kritikalität bietet Alle, Kritisch, Fehler,
+  Warnung und Info; Zustand bietet Alle, Unavailable und Unknown.
+- Device Groups bleiben nach echter `device_id` aggregiert. Eine Gruppe wird
+  angezeigt, wenn mindestens ein Child beide aktiven Filter erfüllt; geöffnete
+  Details enthalten nur passende Children.
+- Schema 7 speichert `criticalDetectionMode` (`device_class` oder `ha_label`)
+  und optional eine stabile `criticalLabelId`.
+- Der Device-Class-Modus erweitert die dokumentierte Safety-/Security-Policy
+  um CO und definierte Cover-Klassen. Problem, Tamper, Shade und Shutter werden
+  nicht automatisch Critical.
+- Der Label-Modus liest die feste HA Label Registry sowie Device-/Entity-
+  Zuweisungen über den Backend-WebSocket-Client. Area-Labels werden nicht
+  vererbt; Label-Writes oder eine generische WebSocket-Route existieren nicht.
+- Label-Metadaten nutzen den 60-Sekunden-Registry-Cache. Ein Last-known-Snapshot
+  bleibt bei Fehlern stale erhalten; erster Ausfall, Unsupported und gelöschte
+  Labels werden sichtbar statt als Entwarnung behandelt.
+- Explizite `securityEntities` bleiben vorrangig. Im Label-Modus läuft die
+  Device-Class-Policy nicht parallel.
+
+---
+
 # Sprint 22 – Rules, Grace Periods & Device Aggregation
 
 ## Ziel
@@ -1689,15 +1720,16 @@ Ziel bleibt:
 
 # Nächster Sprint
 
-Nach Abschluss von Sprint 21.2:
+Nach Abschluss von Sprint 21.3:
 
 ```text
 Sprint 22 – Rules, Grace Periods & Device Aggregation
 ```
 
 Die Device-Aggregation des Error Dashboards bleibt die reine Präsentations-
-funktion aus Sprint 21.1; Sprint 21.2 ergänzt lokale Filter/Spaltenansichten
-und eine metadatenbasierte Risk Class. Sprint 22 ergänzt fachliche Karenz-,
+funktion aus Sprint 21.1; Sprint 21.2 ergänzt lokale Spaltenansichten und eine
+metadatenbasierte Risk Class, Sprint 21.3 die orthogonalen Filter sowie den
+auswählbaren Device-Class-/HA-Label-Modus. Sprint 22 ergänzt fachliche Karenz-,
 Flapping- und erwartete Offline-Regeln sowie die geplante semantische Geräte-
 aggregation im Summary Dashboard. Diese Regeln benötigen eine eigene
 Spezifikation und dürfen die bestehenden Write-Sicherheitsgrenzen nicht

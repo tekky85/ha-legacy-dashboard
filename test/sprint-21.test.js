@@ -236,6 +236,7 @@ test("Registry-Normalisierung √ºbernimmt nur ben√∂tigte Metadaten", function () 
         disabledBy: "user",
         hiddenBy: "integration",
         entityCategory: "diagnostic",
+        labelIds: [],
         name: "Status",
         originalName: "Alarm",
         icon: null
@@ -484,6 +485,7 @@ test("Capability-Probes verwenden nur feste Read-only-Commands und cachen unabh√
         "config/area_registry/list",
         "config/device_registry/list",
         "config/entity_registry/list",
+        "config/label_registry/list",
         "config_entries/get",
         "repairs/list_issues"
     ]);
@@ -495,7 +497,7 @@ test("Capability-Probes verwenden nur feste Read-only-Commands und cachen unabh√
     }), false);
 
     await service.getSnapshot();
-    assert.equal(calls.length, 5);
+    assert.equal(calls.length, 6);
     now += 31000;
     snapshot = await service.getSnapshot();
     assert.equal(calls.filter(function (type) {

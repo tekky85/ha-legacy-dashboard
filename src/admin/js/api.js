@@ -104,6 +104,9 @@
         },
         getDiagnosticsStatus: function () {
             return request("/system-diagnostics/status");
+        },
+        getLabels: function () {
+            return request("/labels");
         }
     };
 }(window.HALegacyAdmin = window.HALegacyAdmin || {}));

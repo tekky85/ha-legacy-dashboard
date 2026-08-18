@@ -101,7 +101,8 @@ Zeigt unter anderem:
 - Schweregrade
 - Stale-/Offline-Zustände
 - letzten erfolgreichen Aktualisierungszeitpunkt
-- klickbare Filter für Alle, Kritisch, Fehler, Warnungen und Unknown
+- getrennte, kombinierbare Filter für Kritikalität (Alle, Kritisch, Fehler,
+  Warnung, Info) und Status (Alle, Unavailable, Unknown)
 - kompakte Device Cards für Entity-Issues mit derselben echten `device_id`
 - standardmäßig eingeklappte Child-Entity-Details
 - getrennt persistierte 1-/2-/3-Spaltenansicht mit responsivem Fallback
@@ -112,25 +113,31 @@ bleiben als eigenständige Issues sichtbar. Die Gruppierung ist ausschließlich
 eine read-only Präsentationsschicht und verändert weder Severity-Regeln noch
 Schreibrechte.
 
-Eine zentrale Risk-Class nutzt ausschließlich verlässliche Domain-, Device-
-Class- und Registry-Metadaten. `unknown` und `unavailable` werden für Safety-
-Sensoren wie Rauch, CO, Gas oder Feuchtigkeit sowie für Security-Sensoren wie
-Tür, Fenster, Öffnung, Garagentor und Schloss als `critical` bewertet. Normale
-und diagnostische Sensoren behalten die milderen Regeln; reine Namensmuster
-erzeugen keine kritische Einstufung. Explizite `securityEntities` bleiben
-vorrangig.
+Im Admin ist die Critical-Erkennung wahlweise auf `device_class` oder
+`ha_label` gestellt. Der Device-Class-Modus nutzt ausschließlich verlässliche
+Metadaten: Safety-Sensoren wie Rauch, CO, Gas oder Feuchtigkeit sowie
+Security-Sensoren und passende Covers wie Tür, Fenster, Öffnung, Garagentor
+oder Tor werden bei `unknown` und `unavailable` als `critical` bewertet;
+`problem`, `tamper`, `shade` und `shutter` nicht pauschal. Im Label-Modus wird
+eine stabile ID eines vorhandenen Home-Assistant-Labels gespeichert. Das
+Gateway liest dessen Zuweisung an Devices und Entities, schreibt aber niemals
+Labels; Area-Labels werden nicht vererbt. Explizite `securityEntities` bleiben
+vorrangig, und Device Classes werden im Label-Modus nicht parallel angewandt.
+Fehlende Label-Metadaten oder ein gelöschtes Label werden sichtbar als Fehler
+behandelt, während ein letzter erfolgreicher Cache fail-safe weiterverwendet
+wird.
 
 ### Registry- und Diagnoseanreicherung
 
 Das Gateway ergänzt die REST-basierten State-Daten serverseitig um
-read-only Metadaten aus Entity-, Device- und Area Registry, Config Entries
+read-only Metadaten aus Entity-, Device-, Area- und Label Registry, Config Entries
 und – sofern unterstützt – Home Assistant Repairs. Dafür existiert genau im
 Backend eine authentifizierte Home-Assistant-WebSocket-Verbindung. Der Browser
 erhält weder WebSocket-Zugriff noch Zugangsdaten oder rohe Registry-Daten.
 
 Die Quellen werden capability-gesteuert abgefragt und getrennt gecacht:
 
-- Entity, Device und Area Registry: 60 Sekunden
+- Entity, Device, Area und Label Registry: 60 Sekunden
 - Config Entries: 30 Sekunden
 - Repairs: 30 Sekunden
 - Matter-Diagnostik: 60 Sekunden beziehungsweise kontrolliert `unsupported`

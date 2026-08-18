@@ -28,8 +28,15 @@
         if (!draft.systemDashboards.errors) {
             draft.systemDashboards.errors = {
                 securityEntities: [],
-                ignoredEntities: []
+                ignoredEntities: [],
+                criticalDetectionMode: "device_class",
+                criticalLabelId: null
             };
+        }
+
+        if (!draft.systemDashboards.errors.criticalDetectionMode) {
+            draft.systemDashboards.errors.criticalDetectionMode = "device_class";
+            draft.systemDashboards.errors.criticalLabelId = null;
         }
 
         return draft.systemDashboards.errors;
@@ -110,6 +117,16 @@
         },
         removeErrorIgnoredEntity: function (entityId) {
             return removeEntity("ignoredEntities", entityId);
+        },
+        setCriticalDetectionMode: function (mode) {
+            errorSettings().criticalDetectionMode = mode === "ha_label"
+                ? "ha_label"
+                : "device_class";
+            admin.State.markDirty();
+        },
+        setCriticalLabelId: function (labelId) {
+            errorSettings().criticalLabelId = labelId || null;
+            admin.State.markDirty();
         }
     };
 }(window.HALegacyAdmin = window.HALegacyAdmin || {}));

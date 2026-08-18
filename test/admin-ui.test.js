@@ -47,7 +47,7 @@ function createHarness() {
                 status: 200,
                 text: async function () {
                     return JSON.stringify({
-                        schemaVersion: 6,
+                        schemaVersion: 7,
                         defaultDashboardId: "default",
                         systemDashboards: {
                             summary: {
@@ -668,7 +668,9 @@ test("Admin-Entwurf verwaltet Error-Security- und Ignorierlisten", function () {
         admin.State.getDraft().systemDashboards.errors,
         {
             securityEntities: ["binary_sensor.rauch"],
-            ignoredEntities: ["sensor.test"]
+            ignoredEntities: ["sensor.test"],
+            criticalDetectionMode: "device_class",
+            criticalLabelId: null
         }
     );
     assert.equal(
