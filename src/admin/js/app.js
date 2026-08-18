@@ -10,6 +10,9 @@
     let layoutResizeState = null;
     let previewRefreshTimer = null;
     let criticalLabels = {labels: [], source: {status: "error"}};
+    let entityRuleIndex = [];
+    let entityRuleLoadError = "";
+    let entityRulesConfiguredOnly = false;
 
     function byId(id) {
         return document.getElementById(id);
@@ -110,15 +113,32 @@
     }
 
     function updateDirtyState() {
-        elements.saveBar.hidden = !admin.State.isDirty();
+        const dirty = admin.State.isDirty();
+
+        elements.saveBar.hidden = !dirty;
+        elements.entityRulesDirtyState.textContent = dirty
+            ? "Ungespeicherte Änderungen"
+            : "Keine ungespeicherten Änderungen.";
+        elements.entityRulesDirtyState.className = dirty
+            ? "entity-rules-dirty is-dirty"
+            : "entity-rules-dirty";
+        elements.entityRulesDiscardButton.disabled = !dirty;
+        elements.entityRulesSaveButton.disabled = !dirty;
     }
 
     function setSaving(saving) {
         elements.saveButton.disabled = saving;
         elements.discardButton.disabled = saving;
+        elements.entityRulesDiscardButton.disabled =
+            saving || !admin.State.isDirty();
+        elements.entityRulesSaveButton.disabled =
+            saving || !admin.State.isDirty();
         elements.saveButton.textContent = saving
             ? "Speichert …"
             : "Änderungen speichern";
+        elements.entityRulesSaveButton.textContent = saving
+            ? "Speichert …"
+            : "Speichern";
     }
 
     function showLogin(message) {
@@ -658,140 +678,19 @@
         renderDashboardList();
         renderSummarySettings();
         renderErrorSettings();
+        renderEntityRules();
         renderEditor();
         updateDirtyState();
     }
 
     function renderSummarySettings() {
         const settings = admin.SystemDashboards.getSummarySettings();
-        const entities = admin.State.getEntities();
-        const ignored = settings.ignoredEntities;
 
         elements.summaryShowMediaTitles.checked = settings.showMediaTitles;
-        elements.summaryIgnoreEntitySelect.textContent = "";
-
-        const placeholder = createElement("option", "", "Entity auswählen …");
-        placeholder.value = "";
-        elements.summaryIgnoreEntitySelect.appendChild(placeholder);
-
-        entities.forEach(function (entity) {
-            if (ignored.indexOf(entity.entity_id) !== -1) {
-                return;
-            }
-
-            const option = createElement(
-                "option",
-                "",
-                (entity.friendly_name || entity.entity_id) +
-                    " (" + entity.entity_id + ")"
-            );
-            option.value = entity.entity_id;
-            elements.summaryIgnoreEntitySelect.appendChild(option);
-        });
-
-        elements.summaryIgnoredEntities.textContent = "";
-
-        if (ignored.length === 0) {
-            elements.summaryIgnoredEntities.appendChild(createElement(
-                "p",
-                "muted summary-ignore-empty",
-                "Keine Entity wird ignoriert."
-            ));
-            return;
-        }
-
-        ignored.forEach(function (entityId) {
-            const entity = entities.find(function (item) {
-                return item.entity_id === entityId;
-            });
-            const row = createElement("div", "summary-ignored-item");
-            const label = createElement(
-                "span",
-                "summary-ignored-label",
-                entity && entity.friendly_name
-                    ? entity.friendly_name + " · " + entityId
-                    : entityId
-            );
-            const remove = createButton(
-                "Entfernen",
-                "summary-ignore-remove",
-                entityId,
-                "button secondary compact"
-            );
-
-            row.appendChild(label);
-            row.appendChild(remove);
-            elements.summaryIgnoredEntities.appendChild(row);
-        });
-    }
-
-    function entityById(entities, entityId) {
-        return entities.find(function (item) {
-            return item.entity_id === entityId;
-        });
-    }
-
-    function renderEntityOptions(select, entities, selected) {
-        select.textContent = "";
-
-        const placeholder = createElement("option", "", "Entity auswählen …");
-        placeholder.value = "";
-        select.appendChild(placeholder);
-
-        entities.forEach(function (entity) {
-            if (selected.indexOf(entity.entity_id) !== -1) {
-                return;
-            }
-
-            const option = createElement(
-                "option",
-                "",
-                (entity.friendly_name || entity.entity_id) +
-                    " (" + entity.entity_id + ")"
-            );
-            option.value = entity.entity_id;
-            select.appendChild(option);
-        });
-    }
-
-    function renderEntitySettingList(container, entities, selected, action, emptyText) {
-        container.textContent = "";
-
-        if (selected.length === 0) {
-            container.appendChild(createElement(
-                "p",
-                "muted summary-ignore-empty",
-                emptyText
-            ));
-            return;
-        }
-
-        selected.forEach(function (entityId) {
-            const entity = entityById(entities, entityId);
-            const row = createElement("div", "system-entity-item");
-            const label = createElement(
-                "span",
-                "system-entity-label",
-                entity && entity.friendly_name
-                    ? entity.friendly_name + " · " + entityId
-                    : entityId
-            );
-            const remove = createButton(
-                "Entfernen",
-                action,
-                entityId,
-                "button secondary compact"
-            );
-
-            row.appendChild(label);
-            row.appendChild(remove);
-            container.appendChild(row);
-        });
     }
 
     function renderErrorSettings() {
         const settings = admin.SystemDashboards.getErrorSettings();
-        const entities = admin.State.getEntities();
         const labelMode = settings.criticalDetectionMode === "ha_label";
 
         elements.criticalModeDeviceClass.checked = !labelMode;
@@ -839,31 +738,236 @@
         elements.criticalLabelSelect.disabled =
             criticalLabels.source.status === "unsupported" ||
             criticalLabels.source.status === "error";
+    }
 
-        renderEntityOptions(
-            elements.errorSecurityEntitySelect,
-            entities,
-            settings.securityEntities
+    function entityRuleSettings() {
+        const summary = admin.SystemDashboards.getSummarySettings();
+        const errors = admin.SystemDashboards.getErrorSettings();
+
+        return {
+            summaryIgnoredEntities: summary.ignoredEntities,
+            securityEntities: errors.securityEntities,
+            errorIgnoredEntities: errors.ignoredEntities
+        };
+    }
+
+    function rebuildEntityRuleIndex(entities) {
+        const inventory = (entities || []).slice();
+        const known = Object.create(null);
+        const configured = entityRuleSettings();
+
+        inventory.forEach(function (entity) {
+            known[entity.entity_id] = true;
+        });
+
+        [
+            configured.summaryIgnoredEntities,
+            configured.securityEntities,
+            configured.errorIgnoredEntities
+        ].forEach(function (entityIds) {
+            entityIds.forEach(function (entityId) {
+                if (!known[entityId]) {
+                    inventory.push({
+                        entity_id: entityId,
+                        domain: entityId.split(".")[0],
+                        friendly_name: entityId,
+                        area_name: null,
+                        device_name: null,
+                        inventory_missing: true
+                    });
+                    known[entityId] = true;
+                }
+            });
+        });
+
+        entityRuleIndex = admin.EntityRules.createIndex(inventory);
+    }
+
+    function configuredEntityCount() {
+        const lookup = admin.EntityRules.createLookup(entityRuleSettings());
+        const configured = Object.create(null);
+
+        [lookup.summaryIgnore, lookup.securityRelevant, lookup.errorIgnore]
+            .forEach(function (rules) {
+                Object.keys(rules).forEach(function (entityId) {
+                    configured[entityId] = true;
+                });
+            });
+
+        return Object.keys(configured).length;
+    }
+
+    function renderEntityRuleSummary() {
+        const count = configuredEntityCount();
+
+        elements.entityRulesConfiguredCount.textContent = count === 0
+            ? "Keine Entity konfiguriert."
+            : count === 1
+                ? "1 Entity mit mindestens einer Regel."
+                : count + " Entities mit mindestens einer Regel.";
+    }
+
+    function populateEntityRuleFilter(select, values, emptyLabel) {
+        const selected = select.value;
+        select.textContent = "";
+
+        const empty = createElement("option", "", emptyLabel);
+        empty.value = "";
+        select.appendChild(empty);
+
+        values.forEach(function (value) {
+            const option = createElement("option", "", value);
+            option.value = value;
+            select.appendChild(option);
+        });
+
+        select.value = values.indexOf(selected) !== -1 ? selected : "";
+    }
+
+    function populateEntityRuleFilters() {
+        populateEntityRuleFilter(
+            elements.entityRuleAreaFilter,
+            admin.EntityRules.options(entityRuleIndex, "area"),
+            "Alle Bereiche"
         );
-        renderEntityOptions(
-            elements.errorIgnoreEntitySelect,
-            entities,
-            settings.ignoredEntities
+        populateEntityRuleFilter(
+            elements.entityRuleDomainFilter,
+            admin.EntityRules.options(entityRuleIndex, "domain"),
+            "Alle Domains"
         );
-        renderEntitySettingList(
-            elements.errorSecurityEntities,
-            entities,
-            settings.securityEntities,
-            "error-security-remove",
-            "Keine Entity ist als sicherheitsrelevant markiert."
+    }
+
+    function createEntityRuleOption(entity, ruleName, label, checked) {
+        const wrapper = createElement("label", "entity-rule-option");
+        const input = createElement("input");
+
+        input.type = "checkbox";
+        input.checked = checked;
+        input.dataset.entityRule = ruleName;
+        input.dataset.entityId = entity.entity_id;
+        wrapper.appendChild(input);
+        wrapper.appendChild(createElement("span", "", label));
+        return wrapper;
+    }
+
+    function createEntityRuleCard(entity) {
+        const card = createElement("article", "entity-rule-card");
+        const identity = createElement("div", "entity-rule-identity");
+        const rules = createElement("div", "entity-rule-options");
+        const current = admin.SystemDashboards.getEntityRules(entity.entity_id);
+        const context = [];
+
+        identity.appendChild(createElement(
+            "strong",
+            "entity-rule-name",
+            entity.friendly_name || entity.entity_id
+        ));
+        identity.appendChild(createElement(
+            "code",
+            "entity-rule-id",
+            entity.entity_id
+        ));
+
+        if (entity.area_name) {
+            context.push(entity.area_name);
+        }
+        if (entity.device_name) {
+            context.push(entity.device_name);
+        }
+        identity.appendChild(createElement(
+            "span",
+            "entity-rule-context",
+            context.length > 0
+                ? context.join(" · ")
+                : "Kein Bereich/Gerät zugeordnet"
+        ));
+        identity.appendChild(createElement(
+            "span",
+            "entity-rule-domain",
+            entity.domain
+        ));
+
+        rules.appendChild(createEntityRuleOption(
+            entity,
+            "summaryIgnore",
+            "In Summary ignorieren",
+            current.summaryIgnore
+        ));
+        rules.appendChild(createEntityRuleOption(
+            entity,
+            "securityRelevant",
+            "Sicherheitsrelevant",
+            current.securityRelevant
+        ));
+        rules.appendChild(createEntityRuleOption(
+            entity,
+            "errorIgnore",
+            "In Errors ignorieren",
+            current.errorIgnore
+        ));
+
+        card.appendChild(identity);
+        card.appendChild(rules);
+        return card;
+    }
+
+    function renderEntityRules() {
+        const result = admin.EntityRules.filter(
+            entityRuleIndex,
+            entityRuleSettings(),
+            {
+                query: elements.entityRuleSearch.value,
+                area: elements.entityRuleAreaFilter.value,
+                domain: elements.entityRuleDomainFilter.value,
+                device: elements.entityRuleDeviceFilter.value,
+                configuredOnly: entityRulesConfiguredOnly
+            }
         );
-        renderEntitySettingList(
-            elements.errorIgnoredEntities,
-            entities,
-            settings.ignoredEntities,
-            "error-ignore-remove",
-            "Keine Entity wird in Fehlern ignoriert."
+
+        elements.entityRuleList.textContent = "";
+        elements.entityRulesShowAll.classList.toggle(
+            "is-active",
+            !entityRulesConfiguredOnly
         );
+        elements.entityRulesShowAll.setAttribute(
+            "aria-pressed",
+            entityRulesConfiguredOnly ? "false" : "true"
+        );
+        elements.entityRulesShowConfigured.classList.toggle(
+            "is-active",
+            entityRulesConfiguredOnly
+        );
+        elements.entityRulesShowConfigured.setAttribute(
+            "aria-pressed",
+            entityRulesConfiguredOnly ? "true" : "false"
+        );
+
+        if (entityRuleLoadError) {
+            elements.entityRuleStatus.textContent = entityRuleLoadError;
+        } else if (result.limited) {
+            elements.entityRuleStatus.textContent =
+                result.entities.length + " von " + result.total +
+                " Treffern angezeigt. Suche oder Filter weiter eingrenzen.";
+        } else {
+            elements.entityRuleStatus.textContent = result.total === 1
+                ? "1 Entity gefunden."
+                : result.total + " Entities gefunden.";
+        }
+
+        if (result.entities.length === 0) {
+            elements.entityRuleList.appendChild(createElement(
+                "p",
+                "entity-rule-empty",
+                entityRuleLoadError || "Keine passende Entity gefunden."
+            ));
+        } else {
+            result.entities.forEach(function (entity) {
+                elements.entityRuleList.appendChild(createEntityRuleCard(entity));
+            });
+        }
+
+        renderEntityRuleSummary();
+        updateDirtyState();
     }
 
     function openDashboardForm(mode) {
@@ -1011,12 +1115,32 @@
             });
     }
 
-    async function loadEntities() {
+    async function loadEntityInventory() {
+        entityRuleLoadError = "";
+
+        try {
+            const result = await admin.Api.getEntities();
+            const entities = result.entities || [];
+
+            admin.State.setEntities(entities);
+            rebuildEntityRuleIndex(entities);
+            populateEntityRuleFilters();
+        } catch (error) {
+            if (error.status === 401 || error.status === 403) {
+                throw error;
+            }
+            entityRuleLoadError = errorMessage(error);
+            admin.State.setEntities([]);
+            rebuildEntityRuleIndex([]);
+            populateEntityRuleFilters();
+        }
+    }
+
+    async function loadPreviewEntities() {
         entityLoadError = "";
 
         try {
             const result = await admin.Api.getPreview();
-            admin.State.setEntities(result.entities || []);
             admin.State.setPreviewEntities(result.entities || []);
         } catch (error) {
             if (error.status === 401 || error.status === 403) {
@@ -1029,9 +1153,13 @@
                 return;
             }
             entityLoadError = errorMessage(error);
-            admin.State.setEntities([]);
             admin.State.setPreviewEntities([]);
         }
+    }
+
+    async function loadEntities() {
+        await loadEntityInventory();
+        await loadPreviewEntities();
     }
 
     function renderDiagnosticsStatus(payload) {
@@ -1100,6 +1228,7 @@
         await loadDiagnosticsStatus();
         renderSummarySettings();
         renderErrorSettings();
+        renderEntityRules();
         refreshVisiblePreviews();
 
         if (previewRefreshTimer !== null) {
@@ -1108,7 +1237,7 @@
 
         previewRefreshTimer = window.setInterval(
             async function () {
-                await loadEntities();
+                await loadPreviewEntities();
                 refreshVisiblePreviews();
             },
             15000
@@ -1145,6 +1274,7 @@
                 admin.State.clone(admin.State.getDraft())
             );
             admin.State.setConfiguration(saved);
+            rebuildEntityRuleIndex(admin.State.getEntities());
             renderAll();
             showNotice("Änderungen wurden gespeichert.", false);
         } catch (error) {
@@ -1156,6 +1286,13 @@
         } finally {
             setSaving(false);
         }
+    }
+
+    function discardConfiguration() {
+        admin.State.discard();
+        rebuildEntityRuleIndex(admin.State.getEntities());
+        hideNotice();
+        renderAll();
     }
 
     function handleEditorInput(event) {
@@ -1587,11 +1724,14 @@
             "widgetUnitInput", "widgetOrderInput", "widgetSizeInput",
             "widgetVisibleInput",
             "widgetFormError", "summaryShowMediaTitles",
-            "summaryIgnoreEntitySelect", "summaryIgnoreAdd",
-            "summaryIgnoredEntities", "errorSecurityEntitySelect",
-            "errorSecurityAdd", "errorSecurityEntities",
-            "errorIgnoreEntitySelect", "errorIgnoreAdd",
-            "errorIgnoredEntities", "criticalModeDeviceClass",
+            "entityRulesConfiguredCount", "openEntityRulesButton",
+            "entityRulesDialog", "entityRuleSearch",
+            "entityRuleAreaFilter", "entityRuleDomainFilter",
+            "entityRuleDeviceFilter", "entityRulesShowAll",
+            "entityRulesShowConfigured", "entityRuleStatus",
+            "entityRuleList", "entityRulesDirtyState",
+            "entityRulesDiscardButton", "entityRulesSaveButton",
+            "criticalModeDeviceClass",
             "criticalModeLabel", "criticalLabelControls",
             "criticalLabelSelect", "criticalLabelWarning",
             "diagnosticSourcesList"
@@ -1609,6 +1749,8 @@
             }
             admin.Auth.clearToken();
             admin.State.clear();
+            entityRuleIndex = [];
+            entityRuleLoadError = "";
             hideNotice();
             showLogin("");
         });
@@ -1649,33 +1791,41 @@
             );
             updateDirtyState();
         });
-        elements.summaryIgnoreAdd.addEventListener("click", function () {
-            if (admin.SystemDashboards.addIgnoredEntity(
-                elements.summaryIgnoreEntitySelect.value
-            )) {
-                renderSummarySettings();
-                updateDirtyState();
-            }
+        elements.openEntityRulesButton.addEventListener("click", function () {
+            renderEntityRules();
+            openDialog(elements.entityRulesDialog);
+            elements.entityRuleSearch.focus();
         });
-        elements.summaryIgnoredEntities.addEventListener("click", function (event) {
-            const button = event.target.closest(
-                "button[data-action='summary-ignore-remove']"
-            );
+        elements.entityRuleSearch.addEventListener("input", renderEntityRules);
+        elements.entityRuleAreaFilter.addEventListener("change", renderEntityRules);
+        elements.entityRuleDomainFilter.addEventListener("change", renderEntityRules);
+        elements.entityRuleDeviceFilter.addEventListener("input", renderEntityRules);
+        elements.entityRulesShowAll.addEventListener("click", function () {
+            entityRulesConfiguredOnly = false;
+            renderEntityRules();
+        });
+        elements.entityRulesShowConfigured.addEventListener("click", function () {
+            entityRulesConfiguredOnly = true;
+            renderEntityRules();
+        });
+        elements.entityRuleList.addEventListener("change", function (event) {
+            const input = event.target;
 
-            if (
-                button &&
-                admin.SystemDashboards.removeIgnoredEntity(button.dataset.id)
-            ) {
-                renderSummarySettings();
-                updateDirtyState();
+            if (!input.dataset || !input.dataset.entityRule) {
+                return;
             }
-        });
-        elements.errorSecurityAdd.addEventListener("click", function () {
-            if (admin.SystemDashboards.addSecurityEntity(
-                elements.errorSecurityEntitySelect.value
+
+            if (admin.SystemDashboards.setEntityRule(
+                input.dataset.entityId,
+                input.dataset.entityRule,
+                input.checked
             )) {
-                renderErrorSettings();
-                updateDirtyState();
+                if (entityRulesConfiguredOnly) {
+                    renderEntityRules();
+                } else {
+                    renderEntityRuleSummary();
+                    updateDirtyState();
+                }
             }
         });
         elements.criticalModeDeviceClass.addEventListener("change", function () {
@@ -1699,47 +1849,14 @@
             renderErrorSettings();
             updateDirtyState();
         });
-        elements.errorIgnoreAdd.addEventListener("click", function () {
-            if (admin.SystemDashboards.addErrorIgnoredEntity(
-                elements.errorIgnoreEntitySelect.value
-            )) {
-                renderErrorSettings();
-                updateDirtyState();
-            }
-        });
-        elements.errorSecurityEntities.addEventListener("click", function (event) {
-            const button = event.target.closest(
-                "button[data-action='error-security-remove']"
-            );
-
-            if (
-                button &&
-                admin.SystemDashboards.removeSecurityEntity(button.dataset.id)
-            ) {
-                renderErrorSettings();
-                updateDirtyState();
-            }
-        });
-        elements.errorIgnoredEntities.addEventListener("click", function (event) {
-            const button = event.target.closest(
-                "button[data-action='error-ignore-remove']"
-            );
-
-            if (
-                button &&
-                admin.SystemDashboards.removeErrorIgnoredEntity(button.dataset.id)
-            ) {
-                renderErrorSettings();
-                updateDirtyState();
-            }
-        });
         elements.widgetForm.addEventListener("submit", handleWidgetForm);
         elements.saveButton.addEventListener("click", saveConfiguration);
-        elements.discardButton.addEventListener("click", function () {
-            admin.State.discard();
-            hideNotice();
-            renderAll();
-        });
+        elements.entityRulesSaveButton.addEventListener("click", saveConfiguration);
+        elements.discardButton.addEventListener("click", discardConfiguration);
+        elements.entityRulesDiscardButton.addEventListener(
+            "click",
+            discardConfiguration
+        );
         document.querySelectorAll("[data-close-dialog]").forEach(function (button) {
             button.addEventListener("click", function () {
                 closeDialog(byId(button.dataset.closeDialog));

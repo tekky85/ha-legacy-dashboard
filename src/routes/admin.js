@@ -271,6 +271,48 @@ function sanitizeEntity(state) {
 }
 
 
+function sanitizeSystemEntity(entity) {
+
+    const attributes =
+        entity && entity.attributes
+            ? entity.attributes
+            : {};
+
+    const context =
+        entity && entity.context
+            ? entity.context
+            : {};
+
+    return {
+        entity_id: entity.entityId,
+        domain: entity.domain,
+        friendly_name:
+            typeof attributes.friendlyName === "string"
+                ? attributes.friendlyName
+                : null,
+        device_class:
+            typeof attributes.deviceClass === "string"
+                ? attributes.deviceClass
+                : null,
+        unit_of_measurement:
+            typeof attributes.unitOfMeasurement === "string"
+                ? attributes.unitOfMeasurement
+                : null,
+        area_name:
+            typeof context.areaName === "string"
+                ? context.areaName
+                : null,
+        device_name:
+            typeof context.deviceName === "string" &&
+            context.deviceName !== entity.entityId &&
+            context.deviceName !== attributes.friendlyName
+                ? context.deviceName
+                : null
+    };
+
+}
+
+
 function finiteOrNull(value) {
 
     if (
@@ -758,20 +800,20 @@ router.delete(
 router.get("/entities", async function (req, res) {
 
     try {
-        const states =
-            await ha.getAllEntities();
+        const snapshot =
+            await System.getSnapshot();
 
-        const entities = states
-            .filter(function (state) {
-                return Boolean(
-                    state &&
-                    typeof state.entity_id === "string" &&
-                    dashboardConfig.ENTITY_ID_PATTERN.test(
-                        state.entity_id
-                    )
-                );
-            })
-            .map(sanitizeEntity)
+        if (
+            !snapshot ||
+            !snapshot.homeAssistant ||
+            snapshot.homeAssistant.reachable !== true ||
+            !Array.isArray(snapshot.entities)
+        ) {
+            throw new Error("entity_inventory_unavailable");
+        }
+
+        const entities = snapshot.entities
+            .map(sanitizeSystemEntity)
             .sort(function (first, second) {
                 return first.entity_id.localeCompare(
                     second.entity_id

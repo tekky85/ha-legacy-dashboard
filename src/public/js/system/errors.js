@@ -17,7 +17,7 @@
     };
 
     var SEVERITY_FILTERS = [
-        {name: "all", buttonId: "errorFilterAll", countId: "errorAllCount"},
+        {name: "all", buttonId: "errorFilterAll", countId: null},
         {name: "critical", buttonId: "errorFilterCritical", countId: "errorCriticalCount"},
         {name: "error", buttonId: "errorFilterError", countId: "errorErrorCount"},
         {name: "warning", buttonId: "errorFilterWarning", countId: "errorWarningCount"},
@@ -25,7 +25,7 @@
     ];
 
     var STATE_FILTERS = [
-        {name: "all", buttonId: "errorStateAll", countId: "errorStateAllCount"},
+        {name: "all", buttonId: "errorStateAll", countId: null},
         {name: "unavailable", buttonId: "errorStateUnavailable", countId: "errorUnavailableCount"},
         {name: "unknown", buttonId: "errorStateUnknown", countId: "errorUnknownCount"}
     ];
@@ -657,6 +657,10 @@
     function render(payload, connectionState) {
 
         var overview = SystemDashboard.byId("errorsOverview");
+        var counts = filterCounts(payload);
+        var total = counts.severity && typeof counts.severity.all === "number"
+            ? counts.severity.all
+            : 0;
 
         if (!overview) {
             return;
@@ -665,20 +669,30 @@
         lastPayload = payload;
         overview.hidden = false;
 
+        SystemDashboard.setText(
+            "systemDashboardTotal",
+            connectionState === "offline"
+                ? ""
+                : total === 1
+                    ? " · 1 Problem"
+                    : " · " + total + " Probleme"
+        );
+
         renderOverall(payload.overallStatus || "unknown");
-        updateFilterButtons(filterCounts(payload));
+        updateFilterButtons(counts);
         renderGroups(payload);
 
-        if (
-            connectionState === "online" ||
-            connectionState === "recovered"
-        ) {
+        if (connectionState === "recovered") {
             SystemDashboard.setMessage(
-                (connectionState === "recovered"
-                    ? "Verbindung wiederhergestellt. "
-                    : "") +
-                    (payload.message || "Systemstatus aktualisiert."),
-                connectionState === "recovered" ? "recovered" : ""
+                "Verbindung wiederhergestellt.",
+                "recovered"
+            );
+        } else if (connectionState === "online") {
+            SystemDashboard.setMessage(
+                total === 0
+                    ? (payload.message || "Keine aktuellen Probleme.")
+                    : "",
+                ""
             );
         }
 
@@ -705,7 +719,7 @@
         );
         SystemDashboard.start({
             kind: "errors",
-            title: "Systemstatus",
+            title: "Errors",
             endpoint: "/api/system-dashboards/errors",
             emptyMessage: "Systemstatus wird aktualisiert.",
             render: render

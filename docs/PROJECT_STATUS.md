@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 18. August 2026, Sprint 17.7 auf Basis von Sprint 21.3 implementiert;
+Stand: 18. August 2026, Sprint 21.4 auf Basis von Sprint 21.3 implementiert;
 physische Safari-Geräteabnahme nach Rollout ausstehend
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
@@ -862,3 +862,73 @@ Entity- oder IP-Namen sichtbar. `admin/system-diagnostics.png` stammt von der
 unveränderten Anwendung gegen eine isolierte localhost-Demo mit Fake-Token und
 zeigt die neue Label-Registry-Zeile. Die breite Browserabnahme ist erfolgt;
 die physische iPad-Portrait-/Landscape-Abnahme bleibt durch den Benutzer offen.
+
+## 19. Sprint 21.4 – Entity Rule Manager und eindeutige Header-Counts
+
+Ausgangspunkt war Commit `a24e32b`. Die drei persistierten Listen unter
+`systemDashboards.summary.ignoredEntities`,
+`systemDashboards.errors.securityEntities` und
+`systemDashboards.errors.ignoredEntities` bleiben unverändert; Schema 7 und
+die atomare Speicherung aus Sprint 14 werden weiterverwendet.
+
+Die drei bisherigen vollständigen Entity-Dropdowns wurden durch einen
+gemeinsamen Entity Rule Manager ersetzt. Jede Entity erscheint genau einmal
+und bietet direkt die Regeln „In Summary ignorieren“, „Sicherheitsrelevant“
+und „In Errors ignorieren“. Ein vorberechneter Suchindex berücksichtigt
+Friendly Name, Entity-ID, Area, Device und Domain. Area- und Domain-Werte
+werden nur aus tatsächlich vorhandenen Metadaten aufgebaut; für Devices wird
+bewusst ein Suchfeld statt eines weiteren großen Dropdowns verwendet. Die
+Filter sind kombinierbar, und „Nur konfigurierte“ verwendet Lookup-Maps über
+alle drei Listen. Bereits konfigurierte IDs bleiben als reduzierte
+Fallback-Zeile entfernbar, wenn sie im aktuellen Inventar fehlen.
+
+Checkbox-Änderungen markieren ausschließlich den vorhandenen lokalen
+Admin-Entwurf als dirty. Speichern überträgt die vollständige validierte
+Konfiguration in einem Request, Verwerfen stellt den letzten gespeicherten
+Stand wieder her. Suche und Filter erzeugen keine Backend- oder HA-Anfrage.
+Für große Installationen werden maximal 100 vollständige Cards gerendert; der
+Lasttest umfasst 3000 Entities, 500 Devices und 50 Areas.
+
+`GET /api/admin/entities` bezieht den vorhandenen serverseitigen
+System-Snapshot ein und ergänzt nur `area_name` und `device_name` zu den schon
+vorhandenen reduzierten Inventarfeldern. Raw Registry-Daten, IDs sensibler
+Gerätekennungen, Tokens oder Schreibmöglichkeiten werden nicht ausgegeben.
+Der Backend-WebSocket bleibt allein im Gateway und verwendet weiterhin nur
+die festen read-only Commands aus Sprint 21.
+
+Summary und Errors verwenden nun die gemeinsamen CSS-/DOM-Primitiven
+`system-dashboard-header`, `system-dashboard-title`,
+`system-dashboard-total`, `system-dashboard-filter-section` und
+`system-dashboard-column-switch`. Der Total-Count erscheint genau einmal im
+Titel. Summary-, Severity- und State-`Alle` wiederholen ihn nicht; alle
+Teilfilter-Counts, getrennte Severity-/State-Auswahl, Device Groups,
+1-/2-/3-Spaltenpräferenzen sowie Stale-/Offline- und Empty-State-Semantik
+bleiben erhalten. Online-Statuszeilen mit derselben Gesamtinformation werden
+ausgeblendet, Recovery-, Stale- und Offline-Hinweise bleiben sichtbar.
+
+Relevante Dateien sind `src/admin/index.html`, `src/admin/css/admin.css`,
+`src/admin/js/entity-rules.js`, `src/admin/js/system-dashboards.js`,
+`src/admin/js/app.js`, `src/routes/admin.js`, `src/public/system.html`,
+`src/public/css/system.css` sowie die drei ES5-Systemskripte unter
+`src/public/js/system/`. Die Wall-Assets verwenden Cache-Version 37.
+
+Die vollständige Testsuite umfasst 206 Tests. Darin enthalten sind die
+Sprint-21.4-Suche, kombinierte Filter, alle drei Regeln, Dirty/Save/Discard,
+ein einzelner Batch-Request, die 100-Card-Grenze, der 3000/500/50-Lastfall,
+eindeutige Header-Counts sowie alle bisherigen Admin-, Summary-, Error-,
+Device-Group-, Label-, Risk-, Focus-, Light-/Climate- und Security-
+Regressionen. Alle geänderten JavaScript-Dateien bestehen `node --check`.
+
+Die Browserabnahme gegen eine kontrollierte Instanz der echten Anwendung mit
+lokalem Mock und Fake-Credentials bestätigt Suche, Registry-Kontext,
+Checkboxen, Dirty State, Discard, Batch Save sowie je genau eine sichtbare
+Spaltensteuerung. `docs/screenshots/admin/entity-rules.png`,
+`docs/screenshots/system/summary.png` und `docs/screenshots/system/errors.png`
+wurden aus dieser Instanz aktualisiert und enthalten keine Produktionsdaten.
+Die physische iPad-Abnahme bleibt nach dem LXC-Rollout durch den Benutzer
+offen.
+
+Empfohlener nächster Sprint bleibt Sprint 22. Er kann Grace Periods, Flapping
+und erwartete Offline-Zustände spezifizieren, ohne die in Sprint 21.4
+bereinigte Konfigurations- und Header-Struktur oder bestehende
+Write-Sicherheitsgrenzen zu verändern.

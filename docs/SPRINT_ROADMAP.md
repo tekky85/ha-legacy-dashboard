@@ -205,6 +205,7 @@ Bedeutung von „fest“:
 | 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
 | 21.2 | System Dashboard Filters, Column Views & Risk Severity | umgesetzt |
 | 21.3 | Error Filtering & Critical Device Detection Modes | umgesetzt |
+| 21.4 | System Dashboard Configuration & Header Simplification | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
 | 23 | Automation Impact & Advanced Diagnostics | neu geplant |
 | 24 | Home Assistant App Packaging | verschoben |
@@ -1277,6 +1278,38 @@ Umgesetzt nach Sprint 21.2.
 
 ---
 
+# Sprint 21.4 – System Dashboard Configuration & Header Simplification
+
+## Status
+
+Umgesetzt nach Sprint 21.3.
+
+## Ergebnis
+
+- Die drei bisherigen Massendropdowns für Summary-Ignore,
+  Sicherheitsrelevanz und Error-Ignore sind durch einen gemeinsamen Entity
+  Rule Manager ersetzt.
+- Der Manager durchsucht Friendly Name, Entity-ID, Area, Device und Domain
+  clientseitig. Bereich und Domain sind kleine Auswahllisten; Devices werden
+  über ein Suchfeld gefiltert. Alle Filter sind kombinierbar.
+- `Nur konfigurierte` zeigt Entities mit mindestens einer aktiven Regel.
+  Bestehende konfigurierte IDs bleiben auch dann entfernbar, wenn sie nicht
+  mehr im aktuellen HA-Inventar vorkommen.
+- Regeländerungen bleiben im vorhandenen Admin-Konfigurationsentwurf und
+  werden gemeinsam gespeichert oder verworfen. Ein Checkbox-Klick löst keine
+  einzelne API- oder HA-Anfrage aus.
+- Der Suchindex verarbeitet 3000 Entities, 500 Devices und 50 Areas linear;
+  maximal 100 vollständige Cards werden gleichzeitig gerendert.
+- Summary und Errors nutzen eine gemeinsame Header-Struktur mit Titel,
+  genau einer dominanten Gesamtsumme und integrierter 1-/2-/3-Spaltenwahl.
+  Die `Alle`-Filter wiederholen den Total-Count nicht; Teilfilter-Counts,
+  Stale-/Offline-Zustände und Empty States bleiben erhalten.
+- Das Admin-Inventar ergänzt ausschließlich reduzierte `area_name`- und
+  `device_name`-Metadaten aus dem bestehenden Backend-Snapshot. Raw Registries,
+  Tokens und neue Schreibrechte bleiben ausgeschlossen.
+
+---
+
 # Sprint 22 – Rules, Grace Periods & Device Aggregation
 
 ## Ziel
@@ -1718,6 +1751,8 @@ nächste Planung
 21  Registry & Diagnostic Enrichment
 21.1 Error Dashboard Device Aggregation & Navigation
 21.2 System Dashboard Filters, Column Views & Risk Severity
+21.3 Error Filtering & Critical Device Detection Modes
+21.4 System Dashboard Configuration & Header Simplification
 22  Rules, Grace Periods & Device Aggregation
 23  Automation Impact & Advanced Diagnostics
 24  Home Assistant App Packaging
@@ -1747,7 +1782,7 @@ Ziel bleibt:
 
 # Nächster Sprint
 
-Nach Abschluss von Sprint 21.3:
+Nach Abschluss von Sprint 21.4:
 
 ```text
 Sprint 22 – Rules, Grace Periods & Device Aggregation
@@ -1756,7 +1791,8 @@ Sprint 22 – Rules, Grace Periods & Device Aggregation
 Die Device-Aggregation des Error Dashboards bleibt die reine Präsentations-
 funktion aus Sprint 21.1; Sprint 21.2 ergänzt lokale Spaltenansichten und eine
 metadatenbasierte Risk Class, Sprint 21.3 die orthogonalen Filter sowie den
-auswählbaren Device-Class-/HA-Label-Modus. Sprint 22 ergänzt fachliche Karenz-,
+auswählbaren Device-Class-/HA-Label-Modus und Sprint 21.4 die skalierbare
+Entity-Regelpflege sowie eindeutige Header-Counts. Sprint 22 ergänzt fachliche Karenz-,
 Flapping- und erwartete Offline-Regeln sowie die geplante semantische Geräte-
 aggregation im Summary Dashboard. Diese Regeln benötigen eine eigene
 Spezifikation und dürfen die bestehenden Write-Sicherheitsgrenzen nicht

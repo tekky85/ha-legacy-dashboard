@@ -86,7 +86,8 @@ function createHarness() {
         "js/dashboards.js",
         "js/widgets.js",
         "js/entities.js",
-        "js/system-dashboards.js"
+        "js/system-dashboards.js",
+        "js/entity-rules.js"
     ].forEach(function (relativePath) {
         vm.runInContext(
             readAdminFile(relativePath),
@@ -561,11 +562,15 @@ test("Admin-Dateien leaken keine Secrets und das Wall-Display bleibt ES5", funct
     assert.match(html, /id="dashboardList"/);
     assert.match(html, /id="entitySearch"/);
     assert.match(html, /id="summaryShowMediaTitles"/);
-    assert.match(html, /id="summaryIgnoredEntities"/);
-    assert.match(html, /id="errorSecurityEntitySelect"/);
-    assert.match(html, /id="errorSecurityEntities"/);
-    assert.match(html, /id="errorIgnoreEntitySelect"/);
-    assert.match(html, /id="errorIgnoredEntities"/);
+    assert.match(html, /id="entityRulesDialog"/);
+    assert.match(html, /id="entityRuleSearch"/);
+    assert.match(html, /id="entityRuleAreaFilter"/);
+    assert.match(html, /id="entityRuleDomainFilter"/);
+    assert.match(html, /id="entityRuleDeviceFilter"/);
+    assert.match(html, /id="entityRulesShowConfigured"/);
+    assert.doesNotMatch(html, /id="summaryIgnoreEntitySelect"/);
+    assert.doesNotMatch(html, /id="errorSecurityEntitySelect"/);
+    assert.doesNotMatch(html, /id="errorIgnoreEntitySelect"/);
     assert.doesNotMatch(html, /Bearer\s+[A-Za-z0-9_-]{8,}/);
     assert.doesNotMatch(html, /HA_TOKEN|ADMIN_TOKEN=/);
 

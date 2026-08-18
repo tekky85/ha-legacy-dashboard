@@ -63,6 +63,11 @@ Dazu gehören unter anderem:
 - Portrait-/Landscape-Layouts
 - Live-Card-Vorschau
 - Light-/Dark-Vorschau
+- durchsuchbarer Entity Rule Manager für Summary-Ignore,
+  Sicherheitsrelevanz und Error-Ignore
+- kombinierbare Bereichs-, Domain- und Gerätesuche sowie Filter auf nur
+  konfigurierte Entities
+- lokaler Änderungspuffer mit gemeinsamem Speichern oder Verwerfen
 - read-only Status der diagnostischen Home-Assistant-Quellen
 
 ### Summary Dashboard
@@ -85,7 +90,8 @@ Die vorhandenen normalisierten Kategorien lassen sich direkt nach Alle,
 Offen, Licht & Strom, Aktiv, Klima, Medien und Sicherheit filtern. Filter und
 Ansicht wechseln ohne neue Home-Assistant-Abfrage. Für Summary kann eine
 eigene 1-/2-/3-Spaltenansicht sicher im Browser gespeichert werden; auf zu
-schmalen Viewports fällt sie kontrolliert zurück.
+schmalen Viewports fällt sie kontrolliert zurück. Die Gesamtsumme steht genau
+einmal im gemeinsamen Header; der Filter `Alle` wiederholt sie nicht.
 
 ### Fehler-/Systemstatus-Dashboard
 
@@ -106,6 +112,10 @@ Zeigt unter anderem:
 - kompakte Device Cards für Entity-Issues mit derselben echten `device_id`
 - standardmäßig eingeklappte Child-Entity-Details
 - getrennt persistierte 1-/2-/3-Spaltenansicht mit responsivem Fallback
+
+Auch hier erscheint die Gesamtzahl nur einmal im Header. Die Filter `Alle`
+wiederholen sie nicht; die Teilmengen für Kritikalität sowie `Unavailable` und
+`Unknown` behalten ihre eigenen Counts.
 
 `unknown` und `unavailable` werden bewusst getrennt behandelt.
 Entities ohne `device_id` sowie Config-Entry-, Repair- und Matter-Hinweise
@@ -251,6 +261,10 @@ davon unberührt.
 #### Diagnostische Quellen
 
 ![Read-only Status der diagnostischen Home-Assistant-Quellen](docs/screenshots/admin/system-diagnostics.png)
+
+#### Entity Rule Manager
+
+![Durchsuchbarer Entity Rule Manager mit Batch-Speichern](docs/screenshots/admin/entity-rules.png)
 
 ### System-Dashboards
 

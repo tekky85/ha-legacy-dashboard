@@ -118,6 +118,8 @@ var SystemDashboard = (function () {
             "system-message" +
             (state ? " is-" + state : "");
 
+        element.hidden = !message;
+
         element.innerHTML =
             Legacy.html.escape(message);
 
@@ -553,6 +555,11 @@ var SystemDashboard = (function () {
                 ? "summaryNavigation"
                 : "errorsNavigation"
         );
+        var columnControl = byId(
+            settings.kind === "summary"
+                ? "summaryColumnControl"
+                : "errorColumnControl"
+        );
 
 
         Theme.load();
@@ -566,6 +573,10 @@ var SystemDashboard = (function () {
         if (activeNavigation) {
             activeNavigation.className = "is-active";
             activeNavigation.setAttribute("aria-current", "page");
+        }
+
+        if (columnControl) {
+            columnControl.hidden = false;
         }
 
         setText("systemTitle", settings.title);

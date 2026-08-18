@@ -13,7 +13,7 @@
     };
 
     var FILTERS = [
-        {name: "all", buttonId: "summaryFilterAll", countId: "summaryAllCount"},
+        {name: "all", buttonId: "summaryFilterAll", countId: null},
         {name: "open", buttonId: "summaryFilterOpen", countId: "summaryOpenCount"},
         {name: "powered", buttonId: "summaryFilterPowered", countId: "summaryPoweredCount"},
         {name: "active", buttonId: "summaryFilterActive", countId: "summaryActiveFilterCount"},
@@ -315,28 +315,33 @@
         }
 
         if (connectionState === "offline") {
+            SystemDashboard.setText("systemDashboardTotal", "");
             overview.hidden = true;
             return;
         }
 
         lastPayload = payload;
         overview.hidden = false;
-        SystemDashboard.setText("summaryActiveCount", String(count));
+        SystemDashboard.setText(
+            "systemDashboardTotal",
+            count === 1
+                ? " · 1 aktiver Zustand"
+                : " · " + count + " aktive Zustände"
+        );
         if (filterController) {
             filterController.update(filterCounts(payload));
         }
         renderGroups(payload);
 
-        if (connectionState === "online" || connectionState === "recovered") {
+        if (connectionState === "recovered") {
             SystemDashboard.setMessage(
-                (connectionState === "recovered"
-                    ? "Verbindung wiederhergestellt. "
-                    : "") +
-                    (payload.message ||
-                        (count === 0
-                            ? "Keine aktiven Zustände."
-                            : count + " aktive Zustände.")),
-                connectionState === "recovered" ? "recovered" : ""
+                "Verbindung wiederhergestellt.",
+                "recovered"
+            );
+        } else if (connectionState === "online") {
+            SystemDashboard.setMessage(
+                count === 0 ? "Keine aktiven Zustände." : "",
+                ""
             );
         }
 

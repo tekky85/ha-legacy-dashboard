@@ -66,7 +66,8 @@ function createHarness(pathname, entryFile, options) {
         "networkBanner", "summaryNavigation", "systemCardTitle",
         "systemMessage", "systemTitle", "themeButton", "themeButtonLabel",
         "updated", "wallClock", "wallDate", "summaryOverview",
-        "summaryGroups", "summaryActiveCount", "errorsOverview",
+        "summaryGroups", "systemDashboardTotal", "summaryColumnControl",
+        "errorColumnControl", "errorsOverview",
         "errorOverall", "errorOverallSymbol", "errorOverallLabel",
         "errorAllCount", "errorCriticalCount", "errorErrorCount",
         "errorWarningCount", "errorInfoCount", "errorUnknownCount", "errorUnavailableCount", "errorFilterAll",
@@ -386,7 +387,8 @@ test("Error-Shell zeigt Status, Severity-Gruppen, States und Recovery", function
     assert.equal(harness.elements.errorsOverview.hidden, false);
     assert.match(harness.elements.errorOverall.className, /is-critical/);
     assert.equal(harness.elements.errorOverallLabel.innerHTML, "Kritisch");
-    assert.equal(harness.elements.errorAllCount.innerHTML, "2");
+    assert.equal(harness.elements.systemDashboardTotal.innerHTML, " · 2 Probleme");
+    assert.equal(harness.elements.systemMessage.hidden, true);
     assert.equal(harness.elements.errorCriticalCount.innerHTML, "1");
     assert.equal(harness.elements.errorUnknownCount.innerHTML, "1");
     assert.equal(harness.elements.errorGroups.children.length, 2);
@@ -622,7 +624,11 @@ test("Summary-Filter nutzen Serverkategorien ohne Reload und mit eigenem Empty S
     });
 
     assert.equal(harness.elements.summaryGroups.children.length, 2);
-    assert.equal(harness.elements.summaryAllCount.innerHTML, "2");
+    assert.equal(
+        harness.elements.systemDashboardTotal.innerHTML,
+        " · 2 aktive Zustände"
+    );
+    assert.equal(harness.elements.systemMessage.hidden, true);
     assert.equal(harness.elements.summaryOpenCount.innerHTML, "1");
 
     harness.elements.summaryFilterOpen.onclick();
@@ -744,7 +750,7 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=35/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=37/);
     assert.match(html, /id="errorOverallLabel"/);
     assert.match(html, /id="errorFilterAll"/);
     assert.match(html, /id="errorUnknownCount"/);

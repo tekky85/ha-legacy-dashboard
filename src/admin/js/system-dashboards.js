@@ -100,6 +100,50 @@
         return true;
     }
 
+    function entityRuleList(ruleName) {
+        if (ruleName === "summaryIgnore") {
+            return summarySettings().ignoredEntities;
+        }
+        if (ruleName === "securityRelevant") {
+            return errorSettings().securityEntities;
+        }
+        if (ruleName === "errorIgnore") {
+            return errorSettings().ignoredEntities;
+        }
+        throw new Error("Unbekannte Entity-Regel.");
+    }
+
+    function setEntityRule(entityId, ruleName, enabled) {
+        const list = entityRuleList(ruleName);
+        const index = list.indexOf(entityId);
+        const shouldEnable = Boolean(enabled);
+
+        if (!entityId || (shouldEnable && index !== -1) || (!shouldEnable && index === -1)) {
+            return false;
+        }
+
+        if (shouldEnable) {
+            list.push(entityId);
+            list.sort();
+        } else {
+            list.splice(index, 1);
+        }
+
+        admin.State.markDirty();
+        return true;
+    }
+
+    function getEntityRules(entityId) {
+        return {
+            summaryIgnore:
+                summarySettings().ignoredEntities.indexOf(entityId) !== -1,
+            securityRelevant:
+                errorSettings().securityEntities.indexOf(entityId) !== -1,
+            errorIgnore:
+                errorSettings().ignoredEntities.indexOf(entityId) !== -1
+        };
+    }
+
     admin.SystemDashboards = {
         getSummarySettings: summarySettings,
         getErrorSettings: errorSettings,
@@ -118,6 +162,8 @@
         removeErrorIgnoredEntity: function (entityId) {
             return removeEntity("ignoredEntities", entityId);
         },
+        getEntityRules: getEntityRules,
+        setEntityRule: setEntityRule,
         setCriticalDetectionMode: function (mode) {
             errorSettings().criticalDetectionMode = mode === "ha_label"
                 ? "ha_label"

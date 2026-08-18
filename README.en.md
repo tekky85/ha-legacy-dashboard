@@ -63,6 +63,11 @@ Features include:
 - portrait / landscape layouts
 - live card preview
 - light / dark preview
+- searchable Entity Rule Manager for Summary ignore, security relevance, and
+  Errors ignore
+- combinable area, domain, and device search plus a configured-entities-only
+  filter
+- local change buffer with shared Save and Discard actions
 - read-only status of diagnostic Home Assistant sources
 
 ### Summary Dashboard
@@ -85,6 +90,8 @@ The existing normalized categories can be filtered directly by All, Open,
 Light & Power, Active, Climate, Media, and Security. Filters and views switch
 without another Home Assistant request. Summary has its own safely persisted
 1/2/3-column view and falls back in a controlled manner on narrow viewports.
+The total appears exactly once in the shared header; the All filter does not
+repeat it.
 
 ### Errors / System Status Dashboard
 
@@ -105,6 +112,10 @@ Shows, among other things:
 - compact Device Cards for entity issues sharing the same real `device_id`
 - child-entity details collapsed by default
 - a separately persisted 1/2/3-column view with responsive fallback
+
+The total likewise appears only once in the header. The All filters do not
+repeat it, while the severity subsets and the `Unavailable` and `Unknown`
+states retain their own counts.
 
 `unknown` and `unavailable` are intentionally treated as distinct states.
 Entities without a `device_id`, as well as Config Entry, Repair, and Matter
@@ -243,6 +254,10 @@ independent Focus geometry remains unchanged.
 #### Diagnostic Sources
 
 ![Read-only status of diagnostic Home Assistant sources](docs/screenshots/admin/system-diagnostics.png)
+
+#### Entity Rule Manager
+
+![Searchable Entity Rule Manager with batch save](docs/screenshots/admin/entity-rules.png)
 
 ### System Dashboards
 

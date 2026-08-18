@@ -167,9 +167,11 @@ test(
 
         const mockServer = http.createServer(function (req, res) {
 
-            mockAuthorizationHeaders.push(
-                req.headers.authorization
-            );
+            if (req.url === "/api/states") {
+                mockAuthorizationHeaders.push(
+                    req.headers.authorization
+                );
+            }
 
             res.setHeader(
                 "Content-Type",
@@ -1049,7 +1051,9 @@ test(
                         inventory.json.entities[0]
                     ).sort(),
                     [
+                        "area_name",
                         "device_class",
+                        "device_name",
                         "domain",
                         "entity_id",
                         "friendly_name",

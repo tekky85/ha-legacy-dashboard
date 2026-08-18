@@ -84,16 +84,13 @@
                         </label>
                         <small>Standardmäßig bleiben abgespielte Titel verborgen.</small>
 
-                        <label for="summaryIgnoreEntitySelect">Entity in Summary ignorieren</label>
-                        <div class="summary-ignore-controls">
-                            <select id="summaryIgnoreEntitySelect">
-                                <option value="">Entity auswählen …</option>
-                            </select>
-                            <button id="summaryIgnoreAdd" class="button secondary compact" type="button">
-                                Ignorieren
+                        <div class="entity-rule-launcher">
+                            <strong>Entity Rules</strong>
+                            <p id="entityRulesConfiguredCount" class="muted">Keine Entity konfiguriert.</p>
+                            <button id="openEntityRulesButton" class="button secondary" type="button">
+                                Entity-Regeln verwalten
                             </button>
                         </div>
-                        <div id="summaryIgnoredEntities" class="summary-ignored-list"></div>
 
                         <div class="system-settings-subsection">
                             <a class="system-dashboard-link" href="/system/errors" target="_blank" rel="noopener">
@@ -120,27 +117,6 @@
                                 </div>
                             </fieldset>
 
-                            <label for="errorSecurityEntitySelect">Sicherheitsrelevante Entity</label>
-                            <div class="system-entity-controls">
-                                <select id="errorSecurityEntitySelect">
-                                    <option value="">Entity auswählen …</option>
-                                </select>
-                                <button id="errorSecurityAdd" class="button secondary compact" type="button">
-                                    Markieren
-                                </button>
-                            </div>
-                            <div id="errorSecurityEntities" class="system-entity-list"></div>
-
-                            <label for="errorIgnoreEntitySelect">Entity in Fehlern ignorieren</label>
-                            <div class="system-entity-controls">
-                                <select id="errorIgnoreEntitySelect">
-                                    <option value="">Entity auswählen …</option>
-                                </select>
-                                <button id="errorIgnoreAdd" class="button secondary compact" type="button">
-                                    Ignorieren
-                                </button>
-                            </div>
-                            <div id="errorIgnoredEntities" class="system-entity-list"></div>
                             <small>Security-Markierungen erteilen keine Schreibrechte. Karenzzeiten folgen erst in Sprint 22.</small>
                         </div>
 
@@ -215,6 +191,58 @@
                 <button class="button primary" type="submit">Übernehmen</button>
             </div>
         </form>
+    </dialog>
+
+    <dialog id="entityRulesDialog" class="entity-rules-dialog" aria-labelledby="entityRulesDialogTitle">
+        <div class="dialog-form entity-rules-form">
+            <div class="dialog-heading">
+                <div>
+                    <p class="eyebrow">System-Dashboards</p>
+                    <h2 id="entityRulesDialogTitle">Entity Rule Manager</h2>
+                    <p class="muted entity-rules-intro">Alle drei Regeln werden gemeinsam im lokalen Konfigurationsentwurf bearbeitet.</p>
+                </div>
+                <button class="icon-button" type="button" data-close-dialog="entityRulesDialog" aria-label="Dialog schließen">×</button>
+            </div>
+
+            <div class="entity-rule-tools">
+                <div class="entity-rule-search-field">
+                    <label for="entityRuleSearch">Entity suchen</label>
+                    <input id="entityRuleSearch" type="search" placeholder="Name, Entity-ID, Gerät, Bereich oder Domain">
+                </div>
+                <div>
+                    <label for="entityRuleAreaFilter">Bereich</label>
+                    <select id="entityRuleAreaFilter">
+                        <option value="">Alle Bereiche</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="entityRuleDomainFilter">Domain</label>
+                    <select id="entityRuleDomainFilter">
+                        <option value="">Alle Domains</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="entityRuleDeviceFilter">Gerät suchen</label>
+                    <input id="entityRuleDeviceFilter" type="search" placeholder="Gerätename">
+                </div>
+            </div>
+
+            <div class="entity-rule-view-controls" role="toolbar" aria-label="Entity-Anzeige filtern">
+                <button id="entityRulesShowAll" class="button secondary compact is-active" type="button" aria-pressed="true">Alle</button>
+                <button id="entityRulesShowConfigured" class="button secondary compact" type="button" aria-pressed="false">Nur konfigurierte</button>
+            </div>
+
+            <p id="entityRuleStatus" class="muted entity-rule-status" role="status"></p>
+            <div id="entityRuleList" class="entity-rule-list"></div>
+
+            <div class="entity-rule-actions">
+                <p id="entityRulesDirtyState" class="entity-rules-dirty" role="status">Keine ungespeicherten Änderungen.</p>
+                <div class="button-row">
+                    <button id="entityRulesDiscardButton" class="button secondary" type="button">Änderungen verwerfen</button>
+                    <button id="entityRulesSaveButton" class="button primary" type="button">Speichern</button>
+                </div>
+            </div>
+        </div>
     </dialog>
 
     <dialog id="entityDialog" class="wide-dialog" aria-labelledby="entityDialogTitle">
@@ -325,6 +353,7 @@
     <script src="/admin/js/widgets.js" defer></script>
     <script src="/admin/js/entities.js" defer></script>
     <script src="/admin/js/system-dashboards.js" defer></script>
+    <script src="/admin/js/entity-rules.js" defer></script>
     <script src="/js/core/icons.js?v=29" defer></script>
     <script src="/js/core/presentation.js?v=29" defer></script>
     <script src="/admin/js/app.js" defer></script>

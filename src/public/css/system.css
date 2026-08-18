@@ -67,11 +67,55 @@
     line-height: 1.15;
 }
 
+.system-dashboard-header {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    align-items: flex-start;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin: 0 -5px 8px;
+}
+
+.system-dashboard-heading,
+.system-dashboard-toolbar {
+    min-width: 0;
+    margin: 0 5px;
+}
+
+.system-dashboard-title {
+    word-wrap: break-word;
+}
+
+.system-dashboard-total {
+    color: #475569;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.system-dashboard-toolbar {
+    margin-left: auto;
+}
+
+.system-dashboard-filter-section {
+    width: 100%;
+}
+
 .system-message {
     margin: 18px 0 24px;
     color: #475569;
     font-size: 20px;
     line-height: 1.5;
+}
+
+.system-message[hidden] {
+    display: none;
 }
 
 .system-message.is-stale,
@@ -426,7 +470,17 @@
     -webkit-box-align: center;
     -webkit-align-items: center;
     align-items: center;
-    margin: 0 -3px 15px;
+    margin: 0 -3px 8px;
+}
+
+.system-dashboard-column-switch {
+    -webkit-box-pack: end;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+}
+
+.system-dashboard-column-switch[hidden] {
+    display: none;
 }
 
 .system-column-label {
@@ -925,6 +979,10 @@ body.theme-dark .system-meta dd {
     color: #f1f5f9;
 }
 
+body.theme-dark .system-dashboard-total {
+    color: #aab8ca;
+}
+
 body.theme-dark .system-eyebrow,
 body.theme-dark .system-message,
 body.theme-dark .system-meta dt {
@@ -1099,6 +1157,29 @@ body.theme-dark .network-banner.is-success {
 }
 
 @media (max-width: 700px) {
+    .system-dashboard-header,
+    .system-dashboard-toolbar,
+    .system-dashboard-column-switch {
+        width: 100%;
+    }
+
+    .system-dashboard-toolbar {
+        margin-top: 12px;
+        margin-left: 5px;
+    }
+
+    .system-dashboard-column-switch {
+        -webkit-box-pack: start;
+        -webkit-justify-content: flex-start;
+        justify-content: flex-start;
+    }
+
+    .system-dashboard-total {
+        display: block;
+        margin-top: 3px;
+        font-size: 18px;
+    }
+
     .error-filter-group,
     .error-state-filter-group {
         width: 100%;
