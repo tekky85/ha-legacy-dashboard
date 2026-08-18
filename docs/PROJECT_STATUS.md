@@ -807,3 +807,11 @@ Alle Syntaxprüfungen der geänderten JavaScript-Dateien bestehen. Die komplette
 Suite umfasst 195 Tests und ist vollständig grün; darin enthalten sind ein
 lokaler Mock-HA-Gatewaylauf sowie der Sprint-21.3-Lastfall mit 3000 Entities,
 500 Devices, 100 Labels, 500 Zuweisungen und 200 aktiven Issues.
+
+Die D1-Screenshots wurden geprüft und aktualisiert. `system/errors.png` stammt
+von der real ausgerollten Anwendung mit der datenschutzsicheren leeren
+Kombination Kritisch + Unavailable; dadurch sind keine Geräte-, Personen-,
+Entity- oder IP-Namen sichtbar. `admin/system-diagnostics.png` stammt von der
+unveränderten Anwendung gegen eine isolierte localhost-Demo mit Fake-Token und
+zeigt die neue Label-Registry-Zeile. Die breite Browserabnahme ist erfolgt;
+die physische iPad-Portrait-/Landscape-Abnahme bleibt durch den Benutzer offen.
