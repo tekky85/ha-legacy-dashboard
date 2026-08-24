@@ -78,8 +78,9 @@ Features include:
 - portrait / landscape layouts
 - live card preview
 - light / dark preview
-- searchable Entity Rule Manager for Summary ignore, security relevance, and
-  Errors ignore
+- searchable Entity Rule Manager for Summary ignore, security relevance,
+  Errors ignore, Expected Offline, and entity/device grace, flapping, and
+  recovery rules
 - combinable area, domain, and device search plus a configured-entities-only
   filter
 - local change buffer with shared Save and Discard actions
@@ -150,6 +151,35 @@ assignments but never writes labels; area labels are not inherited. Explicit
 `securityEntities` retain priority, and device classes are not applied in
 parallel in label mode. Missing label metadata or a deleted label is surfaced
 as an error, while the last successful cache remains in use fail-safe.
+
+### Grace Periods, Flapping, and Recovery
+
+Issue evaluation is centralized in the backend. `unknown` and `unavailable`
+have separate grace periods: the defaults are 15/30 seconds for normal and
+30/60 seconds for diagnostic entities. Safety reports both states without a
+grace period; Security reports `unknown` immediately and `unavailable` after
+5 seconds. This suppresses short radio or integration interruptions without
+hiding safety/security sensors behind long delays.
+
+The binding priority is entity, device, explicit security marking, critical
+detection mode, risk class, domain, and global default. Entity and device
+rules can override grace periods, the default 10-second recovery delay, and
+the flapping threshold/window. Four transitions within ten minutes are
+flapping by default; at most 16 transitions per entity are held transiently
+in memory. Home Assistant history is never queried, and this history may be
+lost when the gateway restarts.
+
+`Expected Offline` suppresses only an expected `unavailable`; `unknown`
+remains eligible for evaluation. `Ignore`, by contrast, removes the entity
+from Errors evaluation completely. Safety/security entities require a second,
+explicit confirmation before Expected Offline can suppress them. Neither
+setting grants Home Assistant write permission.
+
+Device Cards count unavailable, unknown, flapping, and pending recovery. If
+at least two entities and at least 70 percent of all enabled entities sharing
+a real `device_id` are unavailable, the UI shows only the conservative hint
+that several entities of the device cannot be reached; it does not claim a
+confirmed physical device outage.
 
 ### Registry and Diagnostic Enrichment
 

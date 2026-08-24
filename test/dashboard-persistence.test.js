@@ -74,19 +74,11 @@ test("fehlende Persistenz wird aus Sprint 13 migriert", function (t) {
         fs.readFileSync(configPath, "utf8")
     );
 
-    assert.equal(persisted.schemaVersion, 7);
-    assert.deepEqual(persisted.systemDashboards, {
-        summary: {
-            ignoredEntities: [],
-            showMediaTitles: false
-        },
-        errors: {
-            securityEntities: [],
-            ignoredEntities: [],
-            criticalDetectionMode: "device_class",
-            criticalLabelId: null
-        }
-    });
+    assert.equal(persisted.schemaVersion, 8);
+    assert.deepEqual(
+        persisted.systemDashboards,
+        dashboardConfig.DEFAULT_CONFIGURATION.systemDashboards
+    );
     assert.equal(
         persisted.defaultDashboardId,
         "default"
@@ -120,7 +112,7 @@ test("fehlende Persistenz wird aus Sprint 13 migriert", function (t) {
 });
 
 
-test("Schema 1 wird ohne fachliche Änderungen auf Schema 7 migriert", function (t) {
+test("Schema 1 wird ohne fachliche Änderungen auf Schema 8 migriert", function (t) {
 
     const configPath =
         createTemporaryConfigPath(t);
@@ -164,7 +156,7 @@ test("Schema 1 wird ohne fachliche Änderungen auf Schema 7 migriert", function 
 
     assert.equal(result.migrated, true);
     assert.equal(result.recovered, false);
-    assert.equal(persisted.schemaVersion, 7);
+    assert.equal(persisted.schemaVersion, 8);
     assert.deepEqual(
         persisted.dashboards.map(function (dashboard) {
             return {
@@ -202,7 +194,7 @@ test("Schema 1 wird ohne fachliche Änderungen auf Schema 7 migriert", function 
 });
 
 
-test("Sprint-16-Schema 2 wird atomar auf Schema 7 migriert", function (t) {
+test("Sprint-16-Schema 2 wird atomar auf Schema 8 migriert", function (t) {
 
     const configPath = createTemporaryConfigPath(t);
     const sprint16 = dashboardConfig.cloneConfiguration(
@@ -237,7 +229,7 @@ test("Sprint-16-Schema 2 wird atomar auf Schema 7 migriert", function (t) {
     const backup = JSON.parse(fs.readFileSync(configPath + ".bak", "utf8"));
 
     assert.equal(result.migrated, true);
-    assert.equal(persisted.schemaVersion, 7);
+    assert.equal(persisted.schemaVersion, 8);
     assert.equal(backup.schemaVersion, 2);
     assert.equal(
         Object.prototype.hasOwnProperty.call(
@@ -267,7 +259,7 @@ test("Sprint-16-Schema 2 wird atomar auf Schema 7 migriert", function (t) {
 });
 
 
-test("Sprint-17-Schema 3 wird atomar genau einmal auf Schema 7 skaliert", function (t) {
+test("Sprint-17-Schema 3 wird atomar genau einmal auf Schema 8 skaliert", function (t) {
 
     const configPath = createTemporaryConfigPath(t);
     const sprint17 = dashboardConfig.cloneConfiguration(
@@ -310,7 +302,7 @@ test("Sprint-17-Schema 3 wird atomar genau einmal auf Schema 7 skaliert", functi
 
     assert.equal(first.migrated, true);
     assert.equal(backup.schemaVersion, 3);
-    assert.equal(persisted.schemaVersion, 7);
+    assert.equal(persisted.schemaVersion, 8);
     assert.deepEqual(
         persisted.dashboards[0].layouts.portrait.items[widgetId],
         {x: 2, y: 7, w: 2, h: 2}
@@ -341,19 +333,11 @@ test("Sprint-17.1-Schema 4 ergänzt persistente System-Dashboard-Einstellungen",
     const persisted = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
     assert.equal(result.migrated, true);
-    assert.equal(persisted.schemaVersion, 7);
-    assert.deepEqual(persisted.systemDashboards, {
-        summary: {
-            ignoredEntities: [],
-            showMediaTitles: false
-        },
-        errors: {
-            securityEntities: [],
-            ignoredEntities: [],
-            criticalDetectionMode: "device_class",
-            criticalLabelId: null
-        }
-    });
+    assert.equal(persisted.schemaVersion, 8);
+    assert.deepEqual(
+        persisted.systemDashboards,
+        dashboardConfig.DEFAULT_CONFIGURATION.systemDashboards
+    );
     dashboardConfig.validateConfiguration(persisted);
 
 });
@@ -382,17 +366,15 @@ test("Sprint-19-Schema 5 behält Summary und Layouts und ergänzt Error-Einstell
     const persisted = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
     assert.equal(result.migrated, true);
-    assert.equal(persisted.schemaVersion, 7);
+    assert.equal(persisted.schemaVersion, 8);
     assert.deepEqual(persisted.systemDashboards.summary, {
         ignoredEntities: ["switch.technik"],
         showMediaTitles: true
     });
-    assert.deepEqual(persisted.systemDashboards.errors, {
-        securityEntities: [],
-        ignoredEntities: [],
-        criticalDetectionMode: "device_class",
-        criticalLabelId: null
-    });
+    assert.deepEqual(
+        persisted.systemDashboards.errors,
+        dashboardConfig.DEFAULT_CONFIGURATION.systemDashboards.errors
+    );
     assert.deepEqual(
         persisted.dashboards[0].layouts.portrait.items[widgetId],
         {x: 2, y: 9, w: 2, h: 1}

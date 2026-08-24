@@ -1,6 +1,26 @@
 (function (admin) {
     "use strict";
 
+    const DEFAULT_RULES = {
+        defaults: {
+            unknownGraceMs: 15000,
+            unavailableGraceMs: 30000,
+            recoveryGraceMs: 10000,
+            flapThreshold: 4,
+            flapWindowMs: 600000,
+            expectedOffline: false
+        },
+        riskClasses: {
+            safety: {unknownGraceMs: 0, unavailableGraceMs: 0, recoveryGraceMs: 10000, flapThreshold: 4, flapWindowMs: 600000},
+            security: {unknownGraceMs: 0, unavailableGraceMs: 5000, recoveryGraceMs: 10000, flapThreshold: 4, flapWindowMs: 600000},
+            normal: {unknownGraceMs: 15000, unavailableGraceMs: 30000, recoveryGraceMs: 10000, flapThreshold: 4, flapWindowMs: 600000},
+            diagnostic: {unknownGraceMs: 30000, unavailableGraceMs: 60000, recoveryGraceMs: 10000, flapThreshold: 4, flapWindowMs: 600000}
+        },
+        domains: {},
+        devices: {},
+        entities: {}
+    };
+
     function summarySettings() {
         const draft = admin.State.getDraft();
 
@@ -30,13 +50,18 @@
                 securityEntities: [],
                 ignoredEntities: [],
                 criticalDetectionMode: "device_class",
-                criticalLabelId: null
+                criticalLabelId: null,
+                rules: admin.State.clone(DEFAULT_RULES)
             };
         }
 
         if (!draft.systemDashboards.errors.criticalDetectionMode) {
             draft.systemDashboards.errors.criticalDetectionMode = "device_class";
             draft.systemDashboards.errors.criticalLabelId = null;
+        }
+
+        if (!draft.systemDashboards.errors.rules) {
+            draft.systemDashboards.errors.rules = admin.State.clone(DEFAULT_RULES);
         }
 
         return draft.systemDashboards.errors;
@@ -134,14 +159,69 @@
     }
 
     function getEntityRules(entityId) {
+        const override = errorSettings().rules.entities[entityId] || {};
+
         return {
             summaryIgnore:
                 summarySettings().ignoredEntities.indexOf(entityId) !== -1,
             securityRelevant:
                 errorSettings().securityEntities.indexOf(entityId) !== -1,
             errorIgnore:
-                errorSettings().ignoredEntities.indexOf(entityId) !== -1
+                errorSettings().ignoredEntities.indexOf(entityId) !== -1,
+            expectedOffline: override.expectedOffline === true,
+            allowCriticalExpectedOffline:
+                override.allowCriticalExpectedOffline === true,
+            override: admin.State.clone(override)
         };
+    }
+
+    function scopedRules(scope) {
+        const rules = errorSettings().rules;
+
+        if (scope !== "entities" && scope !== "devices") {
+            throw new Error("Unbekannter Regelbereich.");
+        }
+
+        return rules[scope];
+    }
+
+    function getScopedRule(scope, identifier) {
+        const rule = scopedRules(scope)[identifier];
+
+        return rule ? admin.State.clone(rule) : {};
+    }
+
+    function isEmptyRule(rule) {
+        return Object.keys(rule).length === 0;
+    }
+
+    function setScopedRule(scope, identifier, fieldName, value) {
+        const rules = scopedRules(scope);
+        const rule = rules[identifier] || {};
+        const remove = value === null || typeof value === "undefined" || value === "";
+
+        if (!identifier) {
+            return false;
+        }
+
+        if (remove) {
+            delete rule[fieldName];
+        } else {
+            rule[fieldName] = value;
+        }
+
+        if (fieldName === "expectedOffline" && value !== true) {
+            delete rule.allowCriticalExpectedOffline;
+        }
+
+        if (isEmptyRule(rule)) {
+            delete rules[identifier];
+        } else {
+            rules[identifier] = rule;
+        }
+
+        admin.State.markDirty();
+        return true;
     }
 
     admin.SystemDashboards = {
@@ -163,6 +243,11 @@
             return removeEntity("ignoredEntities", entityId);
         },
         getEntityRules: getEntityRules,
+        getScopedRule: getScopedRule,
+        setScopedRule: setScopedRule,
+        getRuleConfiguration: function () {
+            return errorSettings().rules;
+        },
         setEntityRule: setEntityRule,
         setCriticalDetectionMode: function (mode) {
             errorSettings().criticalDetectionMode = mode === "ha_label"

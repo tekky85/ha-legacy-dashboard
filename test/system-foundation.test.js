@@ -295,7 +295,10 @@ test("Summary und Issue-Engine werten denselben reduzierten Snapshot aus", funct
     const snapshot = Snapshot.createSuccessful(
         [
             rawState("light.private", "on", {friendly_name: "Privat"}),
-            rawState("sensor.problem", "unavailable", {friendly_name: "Problem"})
+            Object.assign(
+                rawState("sensor.problem", "unavailable", {friendly_name: "Problem"}),
+                {last_changed: "2026-08-11T17:59:00Z"}
+            )
         ],
         "2026-08-11T18:00:00.000Z"
     );

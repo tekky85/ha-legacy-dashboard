@@ -80,7 +80,8 @@ Dazu gehören unter anderem:
 - Live-Card-Vorschau
 - Light-/Dark-Vorschau
 - durchsuchbarer Entity Rule Manager für Summary-Ignore,
-  Sicherheitsrelevanz und Error-Ignore
+  Sicherheitsrelevanz, Error-Ignore, Expected Offline sowie Entity-/Geräte-
+  Karenz-, Flapping- und Recovery-Regeln
 - kombinierbare Bereichs-, Domain- und Gerätesuche sowie Filter auf nur
   konfigurierte Entities
 - lokaler Änderungspuffer mit gemeinsamem Speichern oder Verwerfen
@@ -155,6 +156,36 @@ vorrangig, und Device Classes werden im Label-Modus nicht parallel angewandt.
 Fehlende Label-Metadaten oder ein gelöschtes Label werden sichtbar als Fehler
 behandelt, während ein letzter erfolgreicher Cache fail-safe weiterverwendet
 wird.
+
+### Grace Periods, Flapping und Recovery
+
+Die Fehlerbewertung läuft zentral im Backend. `unknown` und `unavailable`
+besitzen getrennte Karenzzeiten; als Standard gelten 15/30 Sekunden für
+normale und 30/60 Sekunden für diagnostische Entities. Safety meldet beide
+Zustände ohne Karenz, Security meldet `unknown` sofort und `unavailable` nach
+5 Sekunden. Damit werden kurze Funk- oder Integrationsaussetzer gedämpft,
+ohne Safety-/Security-Sensoren hinter langen Zeiten zu verbergen.
+
+Die verbindliche Priorität ist Entity, Gerät, explizite Security-Markierung,
+Critical-Detection-Modus, Risk Class, Domain und globaler Default. Entity- und
+Geräteregeln können Karenzzeiten, den Recovery Delay von standardmäßig
+10 Sekunden sowie Flapping-Schwelle und -Fenster überschreiben. Vier Wechsel
+innerhalb von zehn Minuten gelten standardmäßig als Flapping; pro Entity
+bleiben höchstens 16 Transitionen flüchtig im Speicher. Es gibt keine
+Home-Assistant-History-Abfrage und die Historie darf bei einem Gateway-Neustart
+verloren gehen.
+
+`Expected Offline` unterdrückt nur ein erwartetes `unavailable`; `unknown`
+bleibt auswertbar. `Ignore` entfernt dagegen die Entity vollständig aus der
+Error-Auswertung. Für Safety-/Security-Entities ist bei Expected Offline eine
+zusätzliche bewusste Freigabe erforderlich. Beides erteilt keine HA-
+Schreibberechtigung.
+
+Device Cards zählen unavailable, unknown, Flapping und ausstehende Recovery.
+Sind mindestens zwei Entities und mindestens 70 Prozent aller aktiven Entities
+eines echten `device_id` unavailable, erscheint lediglich der konservative
+Hinweis, dass mehrere Entities des Geräts nicht erreichbar sind; ein sicherer
+physischer Geräteausfall wird nicht behauptet.
 
 ### Registry- und Diagnoseanreicherung
 

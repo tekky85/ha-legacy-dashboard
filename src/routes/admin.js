@@ -307,6 +307,11 @@ function sanitizeSystemEntity(entity) {
             context.deviceName !== entity.entityId &&
             context.deviceName !== attributes.friendlyName
                 ? context.deviceName
+                : null,
+        device_id:
+            typeof context.deviceId === "string" &&
+            dashboardConfig.DEVICE_ID_PATTERN.test(context.deviceId)
+                ? context.deviceId
                 : null
     };
 

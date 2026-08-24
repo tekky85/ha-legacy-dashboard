@@ -9,7 +9,9 @@ function emptyCounts() {
         warning: 0,
         info: 0,
         unavailable: 0,
-        unknown: 0
+        unknown: 0,
+        flapping: 0,
+        recoveryPending: 0
     };
 
 }
@@ -26,6 +28,12 @@ function incrementCounts(counts, issue) {
     }
     if (issue.state === "unavailable") {
         counts.unavailable += 1;
+    }
+    if (issue.flapping === true) {
+        counts.flapping += 1;
+    }
+    if (issue.recoveryPending === true) {
+        counts.recoveryPending += 1;
     }
 
 }
@@ -110,7 +118,15 @@ function publicChild(issue, entity, registry) {
         riskClass: issue.riskClass || "normal",
         description: issue.description || null,
         source: issue.source || null,
-        fixable: issue.fixable === true
+        fixable: issue.fixable === true,
+        currentState: issue.currentState || issue.state || null,
+        flapping: issue.flapping === true,
+        recoveryPending: issue.recoveryPending === true,
+        gracePeriodMs:
+            typeof issue.gracePeriodMs === "number"
+                ? issue.gracePeriodMs
+                : null,
+        ruleSource: issue.ruleSource || null
     };
 
 }
@@ -187,6 +203,13 @@ function createDeviceGroup(deviceId, issue, entity, metadata) {
                 ? issue.durationSeconds
                 : null,
         counts: counts,
+        unavailableCount: counts.unavailable,
+        unknownCount: counts.unknown,
+        flappingCount: counts.flapping,
+        recoveryPendingCount: counts.recoveryPending,
+        deviceEntityCount: null,
+        deviceUnreachable: false,
+        deviceFailureHint: null,
         issues: [publicChild(issue, entity, registry)]
     };
 
@@ -206,6 +229,10 @@ function addToDeviceGroup(group, issue, entity, registry, metadata) {
     group.issues.push(publicChild(issue, entity, registry));
     group.issueCount += 1;
     incrementCounts(group.counts, issue);
+    group.unavailableCount = group.counts.unavailable;
+    group.unknownCount = group.counts.unknown;
+    group.flappingCount = group.counts.flapping;
+    group.recoveryPendingCount = group.counts.recoveryPending;
 
     if (severity !== -1 && severity < currentSeverity) {
         group.severity = issue.severity;
@@ -262,6 +289,9 @@ function createStandalone(issue, entity, registry) {
         durationSeconds: child.durationSeconds,
         counts: counts,
         fixable: issue.fixable === true,
+        flapping: issue.flapping === true,
+        recoveryPending: issue.recoveryPending === true,
+        ruleSource: issue.ruleSource || null,
         issues: [child]
     };
 
@@ -308,6 +338,19 @@ function aggregate(snapshot, issues) {
     const issuesByDeviceId = Object.create(null);
     const deviceGroups = [];
     const standaloneIssues = [];
+    const deviceEntityCounts = Object.create(null);
+
+    (snapshot.entities || []).forEach(function (entity) {
+        const context = entity.context || {};
+
+        if (
+            context.deviceId &&
+            !context.disabledBy
+        ) {
+            deviceEntityCounts[context.deviceId] =
+                (deviceEntityCounts[context.deviceId] || 0) + 1;
+        }
+    });
 
     issues.forEach(function (issue) {
 
@@ -360,6 +403,22 @@ function aggregate(snapshot, issues) {
             metadata
         );
 
+    });
+
+    deviceGroups.forEach(function (group) {
+        const entityCount = deviceEntityCounts[group.deviceId] || 0;
+        const unavailableRatio = entityCount > 0
+            ? group.unavailableCount / entityCount
+            : 0;
+
+        group.deviceEntityCount = entityCount;
+        group.deviceUnreachable = Boolean(
+            group.unavailableCount >= 2 &&
+            unavailableRatio >= 0.7
+        );
+        group.deviceFailureHint = group.deviceUnreachable
+            ? "Mehrere Entitäten dieses Geräts sind nicht erreichbar."
+            : null;
     });
 
     return deviceGroups

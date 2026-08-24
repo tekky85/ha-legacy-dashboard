@@ -13,8 +13,11 @@ const DashboardConfigStore =
 const Layout =
     require("../services/layout");
 
+const IssueRules =
+    require("../services/issues/rule-engine");
 
-const SCHEMA_VERSION = 7;
+const SCHEMA_VERSION = 8;
+const CRITICAL_DETECTION_SCHEMA_VERSION = 7;
 const ERRORS_SCHEMA_VERSION = 6;
 const SUMMARY_SCHEMA_VERSION = 5;
 const LAYOUT_SCHEMA_VERSION = 4;
@@ -33,6 +36,27 @@ const ENTITY_ID_PATTERN =
 
 const LABEL_ID_PATTERN =
     /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
+
+const DEVICE_ID_PATTERN =
+    /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
+
+const DOMAIN_PATTERN =
+    /^[a-z0-9_]+$/;
+
+const RISK_CLASSES = [
+    "safety",
+    "security",
+    "normal",
+    "diagnostic"
+];
+
+const RULE_NUMBER_LIMITS = {
+    unknownGraceMs: [0, 86400000],
+    unavailableGraceMs: [0, 86400000],
+    recoveryGraceMs: [0, 86400000],
+    flapThreshold: [2, IssueRules.MAX_TRANSITIONS],
+    flapWindowMs: [1000, 86400000]
+};
 
 const SUPPORTED_WIDGET_TYPES = [
     "sensor",
@@ -64,7 +88,8 @@ const DEFAULT_SYSTEM_DASHBOARDS = {
         securityEntities: [],
         ignoredEntities: [],
         criticalDetectionMode: "device_class",
-        criticalLabelId: null
+        criticalLabelId: null,
+        rules: IssueRules.cloneRules(IssueRules.DEFAULT_RULES)
     }
 };
 
@@ -396,6 +421,7 @@ function validateConfigurationVersion(candidate, schemaVersion) {
         validateSystemDashboards(
             candidate.systemDashboards,
             schemaVersion >= ERRORS_SCHEMA_VERSION,
+            schemaVersion >= CRITICAL_DETECTION_SCHEMA_VERSION,
             schemaVersion >= SCHEMA_VERSION
         );
     }
@@ -436,7 +462,8 @@ function validateEntityList(list, fieldName) {
 function validateSystemDashboards(
     systemDashboards,
     requireErrors,
-    requireCriticalDetection
+    requireCriticalDetection,
+    requireRules
 ) {
 
     const summary =
@@ -500,7 +527,191 @@ function validateSystemDashboards(
                 throw new Error("Critical Label ist ungültig");
             }
         }
+
+        if (requireRules) {
+            validateErrorRules(errors.rules);
+        }
     }
+
+}
+
+
+function validateRule(
+    rule,
+    fieldName,
+    completeNumbers,
+    requireExpectedOffline,
+    allowCriticalOverride
+) {
+
+    if (!rule || typeof rule !== "object" || Array.isArray(rule)) {
+        throw new Error(fieldName + " ist ungültig");
+    }
+
+    const allowedFields = Object.keys(RULE_NUMBER_LIMITS)
+        .concat(["expectedOffline", "riskClass"]);
+
+    if (allowCriticalOverride) {
+        allowedFields.push("allowCriticalExpectedOffline");
+    }
+
+    Object.keys(rule).forEach(function (ruleField) {
+        if (allowedFields.indexOf(ruleField) === -1) {
+            throw new Error(fieldName + " enthält ein unbekanntes Feld");
+        }
+    });
+
+    Object.keys(RULE_NUMBER_LIMITS).forEach(function (ruleField) {
+        const limits = RULE_NUMBER_LIMITS[ruleField];
+
+        if (
+            completeNumbers &&
+            !Object.prototype.hasOwnProperty.call(rule, ruleField)
+        ) {
+            throw new Error(fieldName + " ist unvollständig");
+        }
+
+        if (
+            Object.prototype.hasOwnProperty.call(rule, ruleField) &&
+            (
+                typeof rule[ruleField] !== "number" ||
+                !Number.isFinite(rule[ruleField]) ||
+                !Number.isInteger(rule[ruleField]) ||
+                rule[ruleField] < limits[0] ||
+                rule[ruleField] > limits[1]
+            )
+        ) {
+            throw new Error(fieldName + " enthält einen ungültigen Wert: " + ruleField);
+        }
+    });
+
+    if (
+        requireExpectedOffline &&
+        typeof rule.expectedOffline !== "boolean"
+    ) {
+        throw new Error(fieldName + " enthält keine Expected-Offline-Einstellung");
+    }
+
+    if (
+        Object.prototype.hasOwnProperty.call(rule, "expectedOffline") &&
+        typeof rule.expectedOffline !== "boolean"
+    ) {
+        throw new Error(fieldName + " enthält eine ungültige Expected-Offline-Einstellung");
+    }
+
+    if (
+        Object.prototype.hasOwnProperty.call(rule, "riskClass") &&
+        RISK_CLASSES.indexOf(rule.riskClass) === -1
+    ) {
+        throw new Error(fieldName + " enthält eine ungültige Risk Class");
+    }
+
+    if (
+        Object.prototype.hasOwnProperty.call(
+            rule,
+            "allowCriticalExpectedOffline"
+        ) &&
+        typeof rule.allowCriticalExpectedOffline !== "boolean"
+    ) {
+        throw new Error(fieldName + " enthält einen ungültigen Critical-Offline-Override");
+    }
+
+    if (
+        rule.allowCriticalExpectedOffline === true &&
+        rule.expectedOffline !== true
+    ) {
+        throw new Error(fieldName + " erlaubt Critical Offline ohne Expected Offline");
+    }
+
+}
+
+
+function validateRuleMap(map, fieldName, pattern, allowCriticalOverride) {
+
+    if (!map || typeof map !== "object" || Array.isArray(map)) {
+        throw new Error(fieldName + " sind ungültig");
+    }
+
+    Object.keys(map).forEach(function (identifier) {
+        if (!pattern.test(identifier)) {
+            throw new Error(fieldName + " enthalten eine ungültige ID");
+        }
+
+        validateRule(
+            map[identifier],
+            fieldName + " " + identifier,
+            false,
+            false,
+            allowCriticalOverride
+        );
+    });
+
+}
+
+
+function validateErrorRules(rules) {
+
+    if (!rules || typeof rules !== "object" || Array.isArray(rules)) {
+        throw new Error("Error-Regelkonfiguration fehlt");
+    }
+
+    const expectedCollections = [
+        "defaults",
+        "riskClasses",
+        "domains",
+        "devices",
+        "entities"
+    ];
+
+    Object.keys(rules).forEach(function (fieldName) {
+        if (expectedCollections.indexOf(fieldName) === -1) {
+            throw new Error("Error-Regelkonfiguration enthält ein unbekanntes Feld");
+        }
+    });
+
+    expectedCollections.forEach(function (fieldName) {
+        if (!Object.prototype.hasOwnProperty.call(rules, fieldName)) {
+            throw new Error("Error-Regelkonfiguration ist unvollständig");
+        }
+    });
+
+    validateRule(
+        rules.defaults,
+        "Globale Error-Regel",
+        true,
+        true,
+        false
+    );
+
+    if (
+        !rules.riskClasses ||
+        typeof rules.riskClasses !== "object" ||
+        Array.isArray(rules.riskClasses)
+    ) {
+        throw new Error("Risk-Class-Regeln sind ungültig");
+    }
+
+    if (
+        Object.keys(rules.riskClasses).some(function (riskClass) {
+            return RISK_CLASSES.indexOf(riskClass) === -1;
+        })
+    ) {
+        throw new Error("Risk-Class-Regeln enthalten eine unbekannte Risk Class");
+    }
+
+    RISK_CLASSES.forEach(function (riskClass) {
+        validateRule(
+            rules.riskClasses[riskClass],
+            "Risk-Class-Regel " + riskClass,
+            true,
+            false,
+            false
+        );
+    });
+
+    validateRuleMap(rules.domains, "Domain-Regeln", DOMAIN_PATTERN, false);
+    validateRuleMap(rules.devices, "Device-Regeln", DEVICE_ID_PATTERN, true);
+    validateRuleMap(rules.entities, "Entity-Regeln", ENTITY_ID_PATTERN, true);
 
 }
 
@@ -547,7 +758,8 @@ function migrateConfiguration(candidate) {
             candidate.schemaVersion !== GRID_SCHEMA_VERSION &&
             candidate.schemaVersion !== LAYOUT_SCHEMA_VERSION &&
             candidate.schemaVersion !== SUMMARY_SCHEMA_VERSION &&
-            candidate.schemaVersion !== ERRORS_SCHEMA_VERSION
+            candidate.schemaVersion !== ERRORS_SCHEMA_VERSION &&
+            candidate.schemaVersion !== CRITICAL_DETECTION_SCHEMA_VERSION
         )
     ) {
         return {
@@ -652,7 +864,10 @@ function cloneSystemDashboards(systemDashboards) {
             criticalLabelId:
                 typeof errors.criticalLabelId === "string"
                     ? errors.criticalLabelId
-                    : null
+                    : null,
+            rules: IssueRules.cloneRules(
+                errors.rules || IssueRules.DEFAULT_RULES
+            )
         }
     };
 
@@ -981,6 +1196,9 @@ module.exports = {
     DASHBOARD_ID_PATTERN: DASHBOARD_ID_PATTERN,
     WIDGET_ID_PATTERN: WIDGET_ID_PATTERN,
     ENTITY_ID_PATTERN: ENTITY_ID_PATTERN,
+    DEVICE_ID_PATTERN: DEVICE_ID_PATTERN,
+    DOMAIN_PATTERN: DOMAIN_PATTERN,
+    RISK_CLASSES: RISK_CLASSES.slice(0),
     SUPPORTED_WIDGET_TYPES:
         SUPPORTED_WIDGET_TYPES.slice(0),
     SUPPORTED_WIDGET_SIZES:

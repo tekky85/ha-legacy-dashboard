@@ -670,13 +670,16 @@ test("Admin-Entwurf verwaltet Error-Security- und Ignorierlisten", function () {
         true
     );
     assert.deepEqual(
-        admin.State.getDraft().systemDashboards.errors,
-        {
-            securityEntities: ["binary_sensor.rauch"],
-            ignoredEntities: ["sensor.test"],
-            criticalDetectionMode: "device_class",
-            criticalLabelId: null
-        }
+        admin.State.getDraft().systemDashboards.errors.securityEntities,
+        ["binary_sensor.rauch"]
+    );
+    assert.deepEqual(
+        admin.State.getDraft().systemDashboards.errors.ignoredEntities,
+        ["sensor.test"]
+    );
+    assert.equal(
+        admin.State.getDraft().systemDashboards.errors.rules.defaults.unavailableGraceMs,
+        30000
     );
     assert.equal(
         admin.SystemDashboards.removeSecurityEntity("binary_sensor.rauch"),
@@ -687,4 +690,64 @@ test("Admin-Entwurf verwaltet Error-Security- und Ignorierlisten", function () {
         true
     );
     assert.equal(admin.State.isDirty(), true);
+});
+
+
+test("Admin-Entwurf verwaltet Entity- und Device-Regeln mit Discard", function () {
+    const harness = createHarness();
+    const admin = harness.admin;
+
+    admin.State.setConfiguration(freshConfiguration());
+
+    assert.equal(admin.SystemDashboards.setScopedRule(
+        "entities",
+        "sensor.mobile",
+        "expectedOffline",
+        true
+    ), true);
+    admin.SystemDashboards.setScopedRule(
+        "entities",
+        "sensor.mobile",
+        "unavailableGraceMs",
+        45000
+    );
+    admin.SystemDashboards.setScopedRule(
+        "devices",
+        "device_mobile",
+        "recoveryGraceMs",
+        12000
+    );
+
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(admin.SystemDashboards.getScopedRule(
+            "entities",
+            "sensor.mobile"
+        ))),
+        {expectedOffline: true, unavailableGraceMs: 45000}
+    );
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(admin.SystemDashboards.getScopedRule(
+            "devices",
+            "device_mobile"
+        ))),
+        {recoveryGraceMs: 12000}
+    );
+    assert.equal(admin.State.isDirty(), true);
+
+    admin.State.discard();
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(admin.SystemDashboards.getScopedRule(
+            "entities",
+            "sensor.mobile"
+        ))),
+        {}
+    );
+    assert.deepEqual(
+        JSON.parse(JSON.stringify(admin.SystemDashboards.getScopedRule(
+            "devices",
+            "device_mobile"
+        ))),
+        {}
+    );
+    assert.equal(admin.State.isDirty(), false);
 });

@@ -750,9 +750,9 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=38/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=39/);
     assert.match(html, /id="dashboardReturnNavigation"/);
-    assert.match(html, /\/js\/core\/system-navigation\.js\?v=38/);
+    assert.match(html, /\/js\/core\/system-navigation\.js\?v=39/);
     assert.match(html, /id="errorOverallLabel"/);
     assert.match(html, /id="errorFilterAll"/);
     assert.match(html, /id="errorUnknownCount"/);

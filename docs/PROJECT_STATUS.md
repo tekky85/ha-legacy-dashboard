@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 18. August 2026, Sprint 21.4 auf Basis von Sprint 21.3 implementiert;
+Stand: 24. August 2026, Sprint 22 auf Basis von Sprint 21.5 implementiert;
 physische Safari-Geräteabnahme nach Rollout ausstehend
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
@@ -9,6 +9,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-22-Ausgangscommit: `ca95e21`
 - Sprint-17.7-Ausgangscommit: `ff71d23`
 - Sprint-21.3-Ausgangscommit: `a490dcf`
 - Sprint-17.6-Ausgangscommit: `5a95f3d`
@@ -62,6 +63,9 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 21.1 | Error Dashboard Device Aggregation & Navigation | umgesetzt |
 | 21.2 | System Dashboard Filters, Column Views & Risk Severity | umgesetzt |
 | 21.3 | Error Filtering & Critical Device Detection Modes | umgesetzt |
+| 21.4 | Entity Rule Manager und eindeutige Header-Counts | umgesetzt |
+| 21.5 | Globale Systemnavigation und Health-Indikator | umgesetzt |
+| 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -190,7 +194,7 @@ Nach Recovery ersetzt ein frischer Snapshot die veralteten Daten.
 
 ## 6. Persistente Konfiguration
 
-Die Konfiguration verwendet Schema 7. Zusätzlich zu
+Die Konfiguration verwendet Schema 8. Zusätzlich zu
 `defaultDashboardId` und `dashboards` enthält sie:
 
 ```json
@@ -204,13 +208,20 @@ Die Konfiguration verwendet Schema 7. Zusätzlich zu
       "securityEntities": [],
       "ignoredEntities": [],
       "criticalDetectionMode": "device_class",
-      "criticalLabelId": null
+      "criticalLabelId": null,
+      "rules": {
+        "defaults": {},
+        "riskClasses": {},
+        "domains": {},
+        "devices": {},
+        "entities": {}
+      }
     }
   }
 }
 ```
 
-Schema 1 bis 6 werden automatisch und atomar auf Schema 7 migriert. Bei Schema
+Schema 1 bis 7 werden automatisch und atomar auf Schema 8 migriert. Bei Schema
 4 bleiben die 6/12-Spalten-Layouts unverändert. Bei Schema 5 bleiben Summary
 und Layouts unverändert und die leeren Error-Standardwerte werden ergänzt.
 Vollständige Validierung, atomarer
@@ -223,8 +234,11 @@ letzte gültige Datei zu ersetzen.
 Die moderne, Bearer-geschützte Admin UI besitzt einen eigenen Bereich
 „System-Dashboards“. Dort können Summary und Fehler geöffnet, Entities aus dem
 bereits sanitisierten Admin-Inventar als sicherheitsrelevant markiert oder für
-Errors beziehungsweise Summary ignoriert und die Anzeige von Medientiteln
-ausdrücklich aktiviert werden. Die Änderungen laufen wie alle
+Errors beziehungsweise Summary ignoriert werden. Der gemeinsame Entity Rule
+Manager verwaltet außerdem Expected Offline und Entity-/Geräteregeln für
+Grace, Recovery und Flapping; Safety-/Security-Ausnahmen verlangen eine
+zweite bewusste Bestätigung. Die Anzeige von Medientiteln kann ausdrücklich
+aktiviert werden. Die Änderungen laufen wie alle
 anderen Konfigurationsänderungen über Entwurf, Speichern, Schema-Validierung,
 Rate Limit und atomare Persistenz.
 
@@ -278,7 +292,7 @@ werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion des Wall-Displays ist 36.
+Assetversion des Wall-Displays ist 39.
 
 ## 8a. Sprint 17.3 – Preview, Controls und Focus
 
@@ -480,7 +494,7 @@ Systemansichten ausgeliefert oder geloggt.
 
 | Bereich | Dateien |
 |---|---|
-| Regeln und Engines | `src/services/summary/rules.js`, `src/services/summary/engine.js`, `src/services/issues/engine.js`, `src/services/issues/severity.js`, `src/services/issues/presentation.js` |
+| Regeln und Engines | `src/services/summary/rules.js`, `src/services/summary/engine.js`, `src/services/issues/rule-engine.js`, `src/services/issues/engine.js`, `src/services/issues/severity.js`, `src/services/issues/presentation.js` |
 | Snapshot und Cache | `src/services/system/snapshot.js`, `src/services/system/cache.js`, `src/services/system/index.js` |
 | System-API | `src/routes/system-dashboards.js` |
 | Schema/Persistenz | `src/config/dashboard.js`, `src/services/dashboard-config-store.js` |
@@ -493,7 +507,7 @@ Systemansichten ausgeliefert oder geloggt.
 | Admin Live Preview | `src/routes/admin.js`, `src/admin/js/api.js`, `src/admin/js/state.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
 | Theme | `src/public/js/core/theme.js`, `src/public/index.html`, `src/public/system.html` |
 | Admin-Einstellungen | `src/admin/index.html`, `src/admin/js/system-dashboards.js`, `src/admin/js/app.js`, `src/admin/css/admin.css` |
-| Tests | `test/sprint-17-7.test.js`, `test/sprint-17-6.test.js`, `test/sprint-21-3.test.js`, `test/sprint-21-2.test.js`, `test/sprint-21-1.test.js`, `test/sprint-21.test.js`, `test/sprint-17-5.test.js`, `test/sprint-17-4.test.js`, `test/sprint-17-3.test.js`, `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
+| Tests | `test/sprint-22.test.js`, `test/sprint-17-7.test.js`, `test/sprint-17-6.test.js`, `test/sprint-21-3.test.js`, `test/sprint-21-2.test.js`, `test/sprint-21-1.test.js`, `test/sprint-21.test.js`, `test/sprint-17-5.test.js`, `test/sprint-17-4.test.js`, `test/sprint-17-3.test.js`, `test/issues.test.js`, `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/summary.test.js`, `test/system-frontend.test.js`, `test/gateway.test.js`, `test/dashboard-persistence.test.js`, `test/admin-api.test.js`, `test/admin-ui.test.js` |
 
 ## 11. Tests
 
@@ -621,10 +635,10 @@ mini, iPad Air 2 und macOS Safari bleibt nach dem Rollout erforderlich.
 
 - Matter besitzt aktuell keine belastbar belegte generische Read-only-
   Diagnose-API und wird daher ohne Command-Probe als `unsupported` gemeldet.
-- Grace Periods, erwartete Offlinezustände und Flapping folgen Sprint 22;
-  kurze Ausfälle erscheinen im MVP daher sofort. Die Error-Präsentation ist
-  bereits nach echter Device-ID aggregiert; semantische Summary-Aggregation
-  bleibt für Sprint 22 geplant.
+- Flapping-Historie bleibt bewusst prozesslokal, auf 16 Transitionen je Entity
+  begrenzt und geht bei einem Gateway-Neustart verloren.
+- Summary-Aktivitätsregeln, Mindestdauer, Nachlaufzeit und semantische
+  Geräteaggregation sind ausdrücklich nicht Teil von Sprint 22.
 - Es gibt noch keine Issue-Historie oder Acknowledgements.
 - Switch-Ausschlüsse sind absichtlich explizit statt heuristisch; die
   Ersteinrichtung kann daher eine kurze Admin-Auswahl erfordern.
@@ -639,22 +653,19 @@ mini, iPad Air 2 und macOS Safari bleibt nach dem Rollout erforderlich.
 
 ## 13. Roadmap-Abgleich und nächster Sprint
 
-Sprint 21, 21.1, 21.2 und 21.3 entsprechen der Roadmap: Der REST-State-Collector bleibt bestehen,
-während fest codierte Backend-WebSocket-Adapter ausschließlich read-only
-Metadaten ergänzen. Die Error Engine wurde nur um sicheren Kontext und klar
-belegte Config-/Repair-Issues ergänzt; Device Cards liegen getrennt davon in
-der Presentation-Schicht. Summary-Filterkategorien entstehen serverseitig;
-Filter- und Spaltenwechsel bleiben rein lokal. Nicht vorgezogen wurden Grace
-Periods, Flapping, fachliche Summary-Aggregation, Historie,
-weitere Schreibdomänen oder freie System-Dashboard-Layouts.
+Sprint 21 bis 22 entsprechen der spezifizierten Folge: Der REST-State-
+Collector bleibt bestehen, während fest codierte Backend-WebSocket-Adapter
+ausschließlich read-only Metadaten ergänzen. Device Cards liegen weiterhin in
+der Presentation-Schicht. Filter- und Spaltenwechsel bleiben rein lokal;
+Sprint 22 ergänzt ausschließlich die serverseitige Error-Regelbewertung und
+die vorhandene Device-Präsentation. Nicht vorgezogen wurden fachliche Summary-
+Aggregation, persistente Historie, weitere Schreibdomänen oder freie System-
+Dashboard-Layouts.
 
-Empfohlener nächster Schritt ist Sprint 22 – Rules, Grace Periods & Device
-Aggregation. Voraussetzung sind reale Betriebsbeobachtungen zu kurzzeitigen
-Ausfällen, erwarteten Offline-Zuständen und sinnvollen Karenzzeiten; Sprint 21
-liefert dafür den stabilen Device-/Area-/Integrationskontext, Sprint 21.1 die
-davon getrennte Error-Präsentation, Sprint 21.2 die korrigierte Risk-Severity
-und Sprint 21.3 die getrennten Filter sowie den auswählbaren
-Device-Class-/HA-Label-Modus.
+Empfohlener nächster Schritt ist Sprint 23 – Automation Impact & Advanced
+Diagnostics. Er kann auf den stabilisierten Sprint-22-Issues aufbauen, darf
+aber bestehende Sicherheitsgrenzen oder die read-only Diagnosepfade nicht
+implizit erweitern.
 
 ## 14. Dokumentation und Screenshot-Baseline
 
@@ -1000,3 +1011,90 @@ Control-Zentrierung sind durch die vollständige Regression unverändert. Es
 wurden keine neuen Write-Routen, HA-Serviceaufrufe, Browser-WebSockets oder
 Schreibberechtigungen ergänzt. Empfohlener nächster Sprint bleibt Sprint 22 –
 Rules, Grace Periods & Device Aggregation.
+
+## 21. Sprint 22 – Rules, Grace Periods & Device Aggregation
+
+Ausgangspunkt ist Commit `ca95e21`. Die neue zentrale Engine
+`src/services/issues/rule-engine.js` sitzt zwischen normalisiertem Snapshot,
+Risk Classification und der bestehenden Issue-/Presentation-Pipeline. Sie
+wertet ausschließlich bereits geladene, reduzierte Entity-Daten aus. Es gibt
+weder eine HA-History-Abfrage noch einen zusätzlichen Poll oder Browserzugriff
+auf Home Assistant.
+
+Schema 8 speichert `systemDashboards.errors.rules` in fünf Ebenen. Die
+verbindliche Priorität lautet: Entity, Device, explizite `securityEntities`,
+Critical Detection aus Device Class oder HA Label, Risk Class, Domain,
+globaler Default. Die Standardwerte sind:
+
+| Risk Class | Unknown Grace | Unavailable Grace |
+|---|---:|---:|
+| Safety | 0 ms | 0 ms |
+| Security | 0 ms | 5.000 ms |
+| Normal | 15.000 ms | 30.000 ms |
+| Diagnostic | 30.000 ms | 60.000 ms |
+
+Recovery dauert standardmäßig 10.000 ms. Vier Transitionen innerhalb von
+600.000 ms gelten als Flapping. Die Historie ist pro Prozess auf 16
+Transitionen je Entity und insgesamt 10.000 verfolgte Entities begrenzt;
+veraltete Einträge werden entfernt. Ein Neustart darf diese Historie verlieren,
+verwendet für eine laufende Grace Period aber weiterhin zuverlässiges HA-
+`last_changed`, sodass ein bereits lange bestehender Ausfall nicht erneut
+unsichtbar wird.
+
+Expected Offline kann für Entity oder echtes Device gesetzt werden und
+unterdrückt ausschließlich `unavailable`. `unknown` bleibt auswertbar. Ignore
+überspringt dagegen die Entity vollständig. Safety-/Security-Ausfälle werden
+nur nach einer zusätzlichen expliziten `allowCriticalExpectedOffline`-
+Bestätigung unterdrückt. Die Admin UI warnt davor und hält sämtliche
+Änderungen im bestehenden Batch-Entwurf; Save und Discard bleiben unverändert.
+
+Device Cards liefern zusätzlich unavailable-, unknown-, Flapping- und
+Recovery-Counts. Sind mindestens zwei Entities und mindestens 70 Prozent der
+aktivierten Entities derselben echten `device_id` unavailable, zeigt die UI
+den konservativen Hinweis „Mehrere Entitäten dieses Geräts sind nicht
+erreichbar.“ Sie behauptet keinen sicher bestätigten physischen Geräteausfall.
+Grace und Expected Offline erzeugen kein aktives Issue und damit keinen Health-
+Alarm. Recovery Pending hält einen vorhandenen Alarm stabil sichtbar;
+Stale-/Offline-Semantik bleibt vorrangig.
+
+Die erweiterten Config-Werte werden vollständig auf Typ, Ganzzahligkeit und
+sinnvolle Grenzen validiert: Grace/Recovery 0 bis 86.400.000 ms,
+Flap Threshold 2 bis 16 und Flap Window 1.000 bis 86.400.000 ms. Schema 1 bis
+7 migrieren atomar auf Schema 8; letzte gültige Konfiguration und Backup-
+Verhalten bleiben erhalten. Das Admin-Inventar ergänzt ausschließlich eine
+validierte `device_id`, keine Rohregistry und keine Zugangsdaten.
+
+Die neue Testsuite prüft Grace-Grenzen, Risk Classes, Restart-Zeitbasis,
+Expected Offline/Ignore, Critical-Schutz, Priorität, Ringbuffer, Flapping,
+Recovery, Health-Status, Device-Hinweis, Schema-Migration/-Validierung,
+read-only Sicherheitsgrenzen sowie einen Lastfall mit 3.000 Entities,
+500 Devices, 200 aktiven Issues, 100 flapping Entities und 500 Overrides.
+Summary-Fachlogik, Severity-/State-Filter, Spaltenansichten, Device Groups,
+Critical-Modi, globale Navigation, Focus und bestehende Light-/Climate-
+Allowlists bleiben durch die vollständige Regression abgedeckt.
+
+Die Legacy-Systemansicht bleibt ECMAScript 5, Flexbox-basiert und ohne CSS
+Grid oder Flexbox `gap`; die gemeinsame Asset-Cache-Version ist 39. Die Admin
+UI darf weiterhin moderne Browser voraussetzen. Physische Tests auf Safari
+iOS 9 und iPadOS bleiben nach dem LXC-Rollout manuell erforderlich.
+
+Die vollständige lokale Suite besteht mit 226 von 226 Tests; alle JavaScript-
+Dateien unter `src/` und `test/` bestehen `node --check`. Der Sprint-22-
+Lastfall mit 3.000 Entities, 500 Devices, 200 aktiven Issues, 100 Flapping-
+Entities und 500 Overrides benötigte im abschließenden Gesamtlauf rund
+1,18 Sekunden. Die Browser-Abnahme verwendete die echte Anwendung mit einem
+kontrollierten localhost-HA-Mock und Fake-Credentials. Der Rule Manager blieb
+bei 1280×720 und 768×1024 ohne horizontalen Überlauf; Expected Offline,
+Critical-Freigabe, Dirty State und Discard wurden interaktiv bestätigt. Das
+Error Dashboard blieb bei 768×1024 und 1024×768 ohne horizontalen Überlauf,
+die Browserkonsole ohne Warnungen oder Fehler.
+
+`docs/screenshots/admin/entity-rules.png` wurde aus dieser kontrollierten
+Instanz aktualisiert und enthält nur generische Demo-Daten. Der vorhandene
+echte Demo-Screenshot `docs/screenshots/system/errors.png` wurde geprüft und
+bleibt repräsentativ, weil die neuen Flapping-, Recovery- und Device-Hinweise
+nur bedingt eingeblendet werden und das Grundlayout nicht verändern.
+
+Als nächster fachlicher Schritt ist Sprint 23 vorgesehen. Sprint 22 führt
+bewusst weder persistente Issue-Historie, Automationsanalyse, automatische
+Reparaturen noch neue Home-Assistant-Schreibaktionen ein.

@@ -1,7 +1,9 @@
 const Snapshot = require("../system/snapshot");
-const Risk = require("./risk");
+const Rules = require("./rule-engine");
 const Severity = require("./severity");
 
+
+const ruleEngine = new Rules.RuleEngine();
 
 function durationSeconds(startedAt, nowMilliseconds) {
 
@@ -35,32 +37,16 @@ function entityLookup(entityIds) {
 function createIssue(
     entity,
     settings,
-    securityRelevant,
-    nowMilliseconds,
-    modeCriticalEligible
+    evaluation,
+    nowMilliseconds
 ) {
 
     const attributes = entity.attributes || {};
     const context = entity.context || {};
-    const state = String(entity.state || "").toLowerCase();
-    const criticalMode = settings.criticalDetectionMode || "device_class";
-    const inferredRiskClass = criticalMode === "ha_label"
-        ? Risk.classifyWithoutAutomaticCritical(context.entityCategory)
-        : Risk.classify(
-            attributes.deviceClass,
-            context.entityCategory,
-            entity.domain
-        );
-    const riskClass = securityRelevant || modeCriticalEligible
-        ? "security"
-        : inferredRiskClass;
+    const state = evaluation.displayState;
     const effectiveSecurityRelevant =
-        securityRelevant || modeCriticalEligible || Risk.isCritical(riskClass);
-    const severity = Severity.issueSeverity(
-        state,
-        effectiveSecurityRelevant,
-        riskClass
-    );
+        evaluation.riskClass === "safety" ||
+        evaluation.riskClass === "security";
     const configuredTitle =
         settings.entityTitles &&
         settings.entityTitles[entity.entityId];
@@ -71,33 +57,45 @@ function createIssue(
         entity.entityId;
 
 
-    if (!severity || context.disabledBy) {
+    if (!evaluation.eligible || !evaluation.severity || context.disabledBy) {
         return null;
+    }
+
+    let title;
+    let description;
+
+    if (evaluation.recoveryPending) {
+        title = baseTitle + ": Wiederherstellung wird geprüft";
+        description = "Die Entity meldet wieder einen gültigen Zustand. Die stabile Wiederherstellung wird noch geprüft.";
+    } else if (evaluation.flapping) {
+        title = baseTitle + ": Verbindung instabil";
+        description = "Die Verfügbarkeit der Entity wechselte innerhalb kurzer Zeit wiederholt.";
+    } else if (state === "unavailable") {
+        title = baseTitle + " nicht erreichbar";
+        description = "Die Entity ist derzeit nicht verfügbar.";
+    } else {
+        title = baseTitle + ": Zustand unbekannt";
+        description = "Der aktuelle Zustand der Entity ist unbekannt.";
     }
 
     return {
         id: "entity-" + state + "-" + entity.entityId,
         source: "entity_state",
-        severity: severity,
+        severity: evaluation.severity,
         status: "active",
-        title:
-            state === "unavailable"
-                ? baseTitle + " nicht erreichbar"
-                : baseTitle + ": Zustand unbekannt",
-        description:
-            state === "unavailable"
-                ? "Die Entity ist derzeit nicht verfügbar."
-                : "Der aktuelle Zustand der Entity ist unbekannt.",
+        title: title,
+        description: description,
         entityId: entity.entityId,
         state: state,
+        currentState: evaluation.currentState,
         securityRelevant: effectiveSecurityRelevant,
-        riskClass: riskClass,
+        riskClass: evaluation.riskClass,
         potentiallySecurityRelevant: effectiveSecurityRelevant,
-        startedAt: entity.lastChanged,
+        startedAt: evaluation.problemStartedAt || entity.lastChanged,
         updatedAt: entity.lastUpdated,
         durationSeconds:
             durationSeconds(
-                entity.lastChanged,
+                evaluation.problemStartedAt || entity.lastChanged,
                 nowMilliseconds
             ),
         domain: entity.domain,
@@ -108,8 +106,16 @@ function createIssue(
         platform: context.platform || null,
         entityCategory: context.entityCategory || null,
         disabledBy: context.disabledBy || null,
+        gracePeriodMs: evaluation.gracePeriodMs,
+        graceActive: evaluation.graceActive,
+        expectedOffline: evaluation.expectedOffline,
+        flapping: evaluation.flapping,
+        recoveryPending: evaluation.recoveryPending,
+        ruleSource: evaluation.ruleSource,
+        transitionCount: evaluation.transitionCount,
         metadata: {
-            state: state
+            state: state,
+            currentState: evaluation.currentState
         }
     };
 
@@ -426,24 +432,61 @@ function buildIssues(snapshot, configuration) {
     );
 
     const nowMilliseconds =
-        Date.parse(snapshot.collectedAt || "") || Date.now();
+        Date.parse(
+            snapshot.stale
+                ? snapshot.lastSuccessfulCollectionAt || snapshot.collectedAt || ""
+                : snapshot.collectedAt || ""
+        ) || Date.now();
 
     const issues = [];
     const detection = criticalDetection(snapshot, settings);
+    const ruleEvaluation = {
+        graceActive: 0,
+        expectedOffline: 0,
+        flapping: 0,
+        recoveryPending: 0
+    };
 
 
     (snapshot.entities || []).forEach(function (entity) {
 
-        if (ignoredEntities[entity.entityId]) {
+        if (
+            ignoredEntities[entity.entityId] ||
+            entity.context && entity.context.disabledBy
+        ) {
             return;
+        }
+
+        const evaluation = ruleEngine.evaluate(
+            entity,
+            settings,
+            {
+                nowMilliseconds: nowMilliseconds,
+                securityRelevant: Boolean(securityEntities[entity.entityId]),
+                modeCriticalEligible: Boolean(
+                    detection.eligibleEntities[entity.entityId]
+                )
+            }
+        );
+
+        if (evaluation.graceActive) {
+            ruleEvaluation.graceActive += 1;
+        }
+        if (evaluation.expectedOffline) {
+            ruleEvaluation.expectedOffline += 1;
+        }
+        if (evaluation.flapping && evaluation.eligible) {
+            ruleEvaluation.flapping += 1;
+        }
+        if (evaluation.recoveryPending && evaluation.eligible) {
+            ruleEvaluation.recoveryPending += 1;
         }
 
         const issue = createIssue(
             entity,
             settings,
-            Boolean(securityEntities[entity.entityId]),
-            nowMilliseconds,
-            Boolean(detection.eligibleEntities[entity.entityId])
+            evaluation,
+            nowMilliseconds
         );
 
         if (issue) {
@@ -526,6 +569,7 @@ function buildIssues(snapshot, configuration) {
             labelId: detection.labelId,
             labelName: detection.labelName
         },
+        ruleEvaluation: ruleEvaluation,
         meta: Snapshot.toPublicMeta(snapshot)
     };
 
@@ -538,8 +582,14 @@ module.exports = {
     configEntrySeverity: configEntrySeverity,
     criticalDetection: criticalDetection,
     createIssue: createIssue,
+    createRuleEngine: function (options) {
+        return new Rules.RuleEngine(options);
+    },
     groupIssues: groupIssues,
     overallStatus: overallStatus,
     repairIssue: repairIssue,
+    resetRuleEngine: function () {
+        ruleEngine.reset();
+    },
     summarize: summarize
 };

@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 
 const Issues = require("../src/services/issues/engine");
+const RuleEngine = require("../src/services/issues/rule-engine");
 const Severity = require("../src/services/issues/severity");
 const Snapshot = require("../src/services/system/snapshot");
 
@@ -18,12 +19,21 @@ function rawState(entityId, state, attributes, lastChanged) {
 
 
 function settings(securityEntities, ignoredEntities) {
+    const rules = RuleEngine.cloneRules(RuleEngine.DEFAULT_RULES);
+
+    Object.keys(rules.riskClasses).forEach(function (riskClass) {
+        rules.riskClasses[riskClass].unknownGraceMs = 0;
+        rules.riskClasses[riskClass].unavailableGraceMs = 0;
+        rules.riskClasses[riskClass].recoveryGraceMs = 0;
+    });
+
     return {
         securityEntities: securityEntities || [],
         ignoredEntities: ignoredEntities || [],
         entityTitles: {
             "sensor.configured": "Konfigurierter Titel"
-        }
+        },
+        rules: rules
     };
 }
 
@@ -147,7 +157,7 @@ test("Severity-Sortierung ist vollständig und deterministisch", function () {
 });
 
 
-test("Dauer nutzt nur last_changed und wird niemals negativ", function () {
+test("Dauer nutzt last_changed mit sicherer Gateway-Beobachtungszeit", function () {
     const result = build([
         rawState("sensor.known", "unavailable", {}, "2026-08-11T17:58:30Z"),
         rawState("sensor.future", "unknown", {}, "2026-08-11T19:00:00Z"),
@@ -161,7 +171,7 @@ test("Dauer nutzt nur last_changed und wird niemals negativ", function () {
 
     assert.equal(byId["sensor.known"].durationSeconds, 90);
     assert.equal(byId["sensor.future"].durationSeconds, 0);
-    assert.equal(byId["sensor.missing"].durationSeconds, null);
+    assert.equal(byId["sensor.missing"].durationSeconds, 0);
     assert.equal(byId["sensor.known"].startedAt, "2026-08-11T17:58:30.000Z");
 });
 

@@ -582,7 +582,7 @@ test(
                 );
 
                 assert.equal(initial.status, 200);
-                assert.equal(initial.json.schemaVersion, 7);
+                assert.equal(initial.json.schemaVersion, 8);
                 assert.equal(
                     initial.json.dashboards[0].layouts.portrait.columns,
                     6
@@ -618,7 +618,10 @@ test(
                     {x: 2, y: 3, w: 2, h: 2}
                 );
 
-                saved.json.systemDashboards.errors = {
+                saved.json.systemDashboards.errors = Object.assign(
+                    {},
+                    saved.json.systemDashboards.errors,
+                    {
                     securityEntities: [
                         "light.security_only",
                         "climate.security_only"
@@ -626,7 +629,8 @@ test(
                     ignoredEntities: ["sensor.test_status"],
                     criticalDetectionMode: "device_class",
                     criticalLabelId: null
-                };
+                    }
+                );
 
                 const settingsSaved = await request(
                     gateway.port,
@@ -784,7 +788,7 @@ test(
                 assert.equal(initialConfig.status, 200);
                 assert.equal(
                     initialConfig.json.schemaVersion,
-                    7
+                    8
                 );
                 assert.equal(
                     initialConfig.json.defaultDashboardId,
@@ -1053,6 +1057,7 @@ test(
                     [
                         "area_name",
                         "device_class",
+                        "device_id",
                         "device_name",
                         "domain",
                         "entity_id",

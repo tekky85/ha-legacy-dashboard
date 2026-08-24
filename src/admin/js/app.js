@@ -747,7 +747,9 @@
         return {
             summaryIgnoredEntities: summary.ignoredEntities,
             securityEntities: errors.securityEntities,
-            errorIgnoredEntities: errors.ignoredEntities
+            errorIgnoredEntities: errors.ignoredEntities,
+            entityRuleOverrides: errors.rules.entities,
+            deviceRuleOverrides: errors.rules.devices
         };
     }
 
@@ -763,7 +765,8 @@
         [
             configured.summaryIgnoredEntities,
             configured.securityEntities,
-            configured.errorIgnoredEntities
+            configured.errorIgnoredEntities,
+            Object.keys(configured.entityRuleOverrides)
         ].forEach(function (entityIds) {
             entityIds.forEach(function (entityId) {
                 if (!known[entityId]) {
@@ -787,24 +790,39 @@
         const lookup = admin.EntityRules.createLookup(entityRuleSettings());
         const configured = Object.create(null);
 
-        [lookup.summaryIgnore, lookup.securityRelevant, lookup.errorIgnore]
+        [
+            lookup.summaryIgnore,
+            lookup.securityRelevant,
+            lookup.errorIgnore,
+            lookup.entityOverrides
+        ]
             .forEach(function (rules) {
                 Object.keys(rules).forEach(function (entityId) {
                     configured[entityId] = true;
                 });
             });
 
-        return Object.keys(configured).length;
+        return {
+            entities: Object.keys(configured).length,
+            devices: Object.keys(lookup.deviceOverrides).length
+        };
     }
 
     function renderEntityRuleSummary() {
         const count = configuredEntityCount();
+        const entityText = count.entities === 0
+            ? "Keine Entity"
+            : count.entities === 1
+                ? "1 Entity"
+                : count.entities + " Entities";
+        const deviceText = count.devices === 0
+            ? "kein Gerät"
+            : count.devices === 1
+                ? "1 Gerät"
+                : count.devices + " Geräte";
 
-        elements.entityRulesConfiguredCount.textContent = count === 0
-            ? "Keine Entity konfiguriert."
-            : count === 1
-                ? "1 Entity mit mindestens einer Regel."
-                : count + " Entities mit mindestens einer Regel.";
+        elements.entityRulesConfiguredCount.textContent =
+            entityText + " und " + deviceText + " mit Regeln.";
     }
 
     function populateEntityRuleFilter(select, values, emptyLabel) {
@@ -850,11 +868,108 @@
         return wrapper;
     }
 
+    function createScopedBooleanOption(
+        scope,
+        identifier,
+        fieldName,
+        label,
+        checked,
+        disabled
+    ) {
+        const wrapper = createElement("label", "entity-rule-option");
+        const input = createElement("input");
+
+        input.type = "checkbox";
+        input.checked = checked;
+        input.disabled = disabled === true;
+        input.dataset.ruleScope = scope;
+        input.dataset.ruleId = identifier;
+        input.dataset.ruleField = fieldName;
+        input.dataset.ruleType = "boolean";
+        wrapper.appendChild(input);
+        wrapper.appendChild(createElement("span", "", label));
+        return wrapper;
+    }
+
+    function createScopedNumberInput(
+        scope,
+        identifier,
+        fieldName,
+        label,
+        value,
+        minimum,
+        maximum
+    ) {
+        const wrapper = createElement("label", "entity-rule-number");
+        const input = createElement("input");
+
+        wrapper.appendChild(createElement("span", "", label));
+        input.type = "number";
+        input.min = String(minimum);
+        input.max = String(maximum);
+        input.step = "1";
+        input.placeholder = "geerbt";
+        input.value = typeof value === "number" ? String(value) : "";
+        input.dataset.ruleScope = scope;
+        input.dataset.ruleId = identifier;
+        input.dataset.ruleField = fieldName;
+        input.dataset.ruleType = "number";
+        wrapper.appendChild(input);
+        return wrapper;
+    }
+
+    function createAdvancedRules(scope, identifier, rule) {
+        const details = createElement("details", "entity-rule-advanced");
+        const summary = createElement("summary", "", "Erweiterte Regeln");
+        const fields = createElement("div", "entity-rule-number-grid");
+
+        details.appendChild(summary);
+        fields.appendChild(createScopedNumberInput(
+            scope, identifier, "unknownGraceMs", "Unknown Grace (ms)",
+            rule.unknownGraceMs, 0, 86400000
+        ));
+        fields.appendChild(createScopedNumberInput(
+            scope, identifier, "unavailableGraceMs", "Unavailable Grace (ms)",
+            rule.unavailableGraceMs, 0, 86400000
+        ));
+        fields.appendChild(createScopedNumberInput(
+            scope, identifier, "recoveryGraceMs", "Recovery Delay (ms)",
+            rule.recoveryGraceMs, 0, 86400000
+        ));
+        fields.appendChild(createScopedNumberInput(
+            scope, identifier, "flapThreshold", "Flap Threshold",
+            rule.flapThreshold, 2, 16
+        ));
+        fields.appendChild(createScopedNumberInput(
+            scope, identifier, "flapWindowMs", "Flap Window (ms)",
+            rule.flapWindowMs, 1000, 86400000
+        ));
+        details.appendChild(fields);
+        details.appendChild(createScopedBooleanOption(
+            scope,
+            identifier,
+            "allowCriticalExpectedOffline",
+            "Safety/Security bewusst als Expected Offline zulassen",
+            rule.allowCriticalExpectedOffline === true,
+            rule.expectedOffline !== true
+        ));
+        details.appendChild(createElement(
+            "small",
+            "entity-rule-warning",
+            "Ohne diese bewusste Freigabe unterdrückt Expected Offline keine Safety-/Security-Störung."
+        ));
+        return details;
+    }
+
     function createEntityRuleCard(entity) {
         const card = createElement("article", "entity-rule-card");
         const identity = createElement("div", "entity-rule-identity");
         const rules = createElement("div", "entity-rule-options");
         const current = admin.SystemDashboards.getEntityRules(entity.entity_id);
+        const entityOverride = admin.SystemDashboards.getScopedRule(
+            "entities",
+            entity.entity_id
+        );
         const context = [];
 
         identity.appendChild(createElement(
@@ -905,9 +1020,50 @@
             "In Errors ignorieren",
             current.errorIgnore
         ));
+        rules.appendChild(createScopedBooleanOption(
+            "entities",
+            entity.entity_id,
+            "expectedOffline",
+            "Expected Offline",
+            entityOverride.expectedOffline === true
+        ));
+
+        const advanced = createElement("div", "entity-rule-advanced-group");
+        advanced.appendChild(createAdvancedRules(
+            "entities",
+            entity.entity_id,
+            entityOverride
+        ));
+
+        if (entity.device_id) {
+            const deviceRule = admin.SystemDashboards.getScopedRule(
+                "devices",
+                entity.device_id
+            );
+            const device = createElement("section", "entity-device-rule");
+            device.appendChild(createElement(
+                "strong",
+                "entity-device-rule-title",
+                "Geräteregel: " + (entity.device_name || entity.device_id)
+            ));
+            device.appendChild(createScopedBooleanOption(
+                "devices",
+                entity.device_id,
+                "expectedOffline",
+                "Gesamtes Gerät: Expected Offline",
+                deviceRule.expectedOffline === true
+            ));
+            device.appendChild(createAdvancedRules(
+                "devices",
+                entity.device_id,
+                deviceRule
+            ));
+            advanced.appendChild(device);
+        }
 
         card.appendChild(identity);
         card.appendChild(rules);
+        card.appendChild(advanced);
         return card;
     }
 
@@ -1811,16 +1967,50 @@
         elements.entityRuleList.addEventListener("change", function (event) {
             const input = event.target;
 
-            if (!input.dataset || !input.dataset.entityRule) {
+            if (!input.dataset) {
                 return;
             }
 
-            if (admin.SystemDashboards.setEntityRule(
+            if (input.dataset.entityRule && admin.SystemDashboards.setEntityRule(
                 input.dataset.entityId,
                 input.dataset.entityRule,
                 input.checked
             )) {
                 if (entityRulesConfiguredOnly) {
+                    renderEntityRules();
+                } else {
+                    renderEntityRuleSummary();
+                    updateDirtyState();
+                }
+                return;
+            }
+
+            if (input.dataset.ruleScope) {
+                let value;
+
+                if (input.dataset.ruleType === "boolean") {
+                    value = input.checked;
+                } else if (input.value === "") {
+                    value = null;
+                } else {
+                    value = Number(input.value);
+                    if (!Number.isInteger(value)) {
+                        showNotice("Regelwerte müssen ganze Zahlen sein.", true);
+                        return;
+                    }
+                }
+
+                admin.SystemDashboards.setScopedRule(
+                    input.dataset.ruleScope,
+                    input.dataset.ruleId,
+                    input.dataset.ruleField,
+                    value
+                );
+
+                if (
+                    input.dataset.ruleType === "boolean" ||
+                    entityRulesConfiguredOnly
+                ) {
                     renderEntityRules();
                 } else {
                     renderEntityRuleSummary();

@@ -290,6 +290,26 @@
             );
         }
 
+        if (issue.flapping) {
+            details.appendChild(
+                createElement(
+                    "span",
+                    "error-flapping",
+                    "Verbindung instabil"
+                )
+            );
+        }
+
+        if (issue.recoveryPending) {
+            details.appendChild(
+                createElement(
+                    "span",
+                    "error-recovery-pending",
+                    "Wiederherstellung wird geprüft"
+                )
+            );
+        }
+
         row.appendChild(details);
         return row;
 
@@ -398,6 +418,35 @@
                     "span",
                     "error-security",
                     "Sicherheitsrelevant"
+                )
+            );
+        }
+        if (group.deviceFailureHint) {
+            summary.appendChild(
+                createElement(
+                    "span",
+                    "error-device-failure-hint",
+                    group.deviceFailureHint
+                )
+            );
+        }
+        if (group.flappingCount > 0) {
+            summary.appendChild(
+                createElement(
+                    "span",
+                    "error-flapping",
+                    group.flappingCount === 1
+                        ? "1 instabile Verbindung"
+                        : group.flappingCount + " instabile Verbindungen"
+                )
+            );
+        }
+        if (group.recoveryPendingCount > 0) {
+            summary.appendChild(
+                createElement(
+                    "span",
+                    "error-recovery-pending",
+                    "Wiederherstellung wird geprüft"
                 )
             );
         }
@@ -529,6 +578,20 @@
                     "span",
                     "error-security",
                     "Sicherheitsrelevant"
+                )
+            );
+        }
+        if (group.flapping) {
+            details.appendChild(
+                createElement("span", "error-flapping", "Verbindung instabil")
+            );
+        }
+        if (group.recoveryPending) {
+            details.appendChild(
+                createElement(
+                    "span",
+                    "error-recovery-pending",
+                    "Wiederherstellung wird geprüft"
                 )
             );
         }

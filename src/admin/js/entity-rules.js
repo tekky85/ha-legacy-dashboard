@@ -18,6 +18,7 @@
                 area: areaName,
                 domain: entity.domain || "",
                 device: deviceName,
+                deviceId: entity.device_id || "",
                 search: normalize([
                     friendlyName,
                     entity.entity_id,
@@ -36,7 +37,9 @@
         const lookup = {
             summaryIgnore: Object.create(null),
             securityRelevant: Object.create(null),
-            errorIgnore: Object.create(null)
+            errorIgnore: Object.create(null),
+            entityOverrides: Object.create(null),
+            deviceOverrides: Object.create(null)
         };
 
         function add(values, target) {
@@ -48,14 +51,25 @@
         add(settings.summaryIgnoredEntities, lookup.summaryIgnore);
         add(settings.securityEntities, lookup.securityRelevant);
         add(settings.errorIgnoredEntities, lookup.errorIgnore);
+        Object.keys(settings.entityRuleOverrides || {}).forEach(function (entityId) {
+            lookup.entityOverrides[entityId] = true;
+        });
+        Object.keys(settings.deviceRuleOverrides || {}).forEach(function (deviceId) {
+            lookup.deviceOverrides[deviceId] = true;
+        });
         return lookup;
     }
 
-    function configured(lookup, entityId) {
+    function configured(lookup, entityOrId) {
+        const entity = typeof entityOrId === "object" ? entityOrId : null;
+        const entityId = entity ? entity.entity_id : entityOrId;
+
         return Boolean(
             lookup.summaryIgnore[entityId] ||
             lookup.securityRelevant[entityId] ||
-            lookup.errorIgnore[entityId]
+            lookup.errorIgnore[entityId] ||
+            lookup.entityOverrides[entityId] ||
+            entity && entity.device_id && lookup.deviceOverrides[entity.device_id]
         );
     }
 
@@ -89,7 +103,7 @@
             if (query && entry.search.indexOf(query) === -1) {
                 continue;
             }
-            if (configuredOnly && !configured(lookup, entityId)) {
+            if (configuredOnly && !configured(lookup, entry.entity)) {
                 continue;
             }
 

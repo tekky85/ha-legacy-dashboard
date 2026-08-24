@@ -967,7 +967,7 @@ dialog.entity-rules-dialog {
 
 .entity-rule-options {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.45rem;
 }
 
@@ -993,6 +993,66 @@ dialog.entity-rules-dialog {
 .entity-rule-option span {
     font-size: 0.8rem;
     line-height: 1.25;
+}
+
+.entity-rule-advanced-group {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.entity-rule-advanced,
+.entity-device-rule {
+    padding: 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 0.55rem;
+    background: #ffffff;
+}
+
+.entity-rule-advanced summary {
+    min-height: 32px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 750;
+}
+
+.entity-rule-number-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 0.6rem 0;
+}
+
+.entity-rule-number {
+    margin: 0;
+    font-size: 0.75rem;
+}
+
+.entity-rule-number span {
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.entity-rule-number input {
+    width: 100%;
+}
+
+.entity-device-rule-title {
+    display: block;
+    margin-bottom: 0.45rem;
+    font-size: 0.82rem;
+}
+
+.entity-device-rule > .entity-rule-option {
+    margin-bottom: 0.45rem;
+}
+
+.entity-rule-warning {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--warning);
+    line-height: 1.35;
 }
 
 .entity-rule-empty {
@@ -1255,7 +1315,9 @@ dialog::backdrop {
 
     .entity-rule-tools,
     .entity-rule-card,
-    .entity-rule-options {
+    .entity-rule-options,
+    .entity-rule-advanced-group,
+    .entity-rule-number-grid {
         grid-template-columns: 1fr;
     }
 

@@ -1347,59 +1347,34 @@ Umgesetzt nach Sprint 21.4.
 
 # Sprint 22 – Rules, Grace Periods & Device Aggregation
 
-## Ziel
+## Status
 
-Fehlalarme reduzieren und Summary-Einträge semantisch verbessern.
+Implementiert auf Basis von Sprint 21.5.
 
-## Fehler-Dashboard
+## Ergebnis
 
-Einführen:
+- zentrale serverseitige Error Rule Engine
+- getrennte `unknown`-/`unavailable`-Karenzzeiten für Safety, Security,
+  Normal und Diagnostic
+- Entity-, Device-, Risk-Class-, Domain- und Default-Regeln mit verbindlicher
+  Priorität
+- Expected Offline getrennt von Ignore und mit zusätzlicher bewusster
+  Safety-/Security-Freigabe
+- bounded In-Memory-Flapping-Historie mit maximal 16 Transitionen je Entity
+- Stable Recovery mit standardmäßig zehn Sekunden Verzögerung
+- erweiterte echte Device-ID-Aggregation mit Zustands-, Flapping- und
+  Recovery-Counts
+- konservativer Device-Hinweis ab zwei unavailable Entities und mindestens
+  70 Prozent unavailable-Anteil
+- Integration in Entity Rule Manager und globalen Health-Indikator
 
-- globale Karenzzeit
-- sicherheitskritische Karenzzeit
-- Entity-spezifische Karenzzeit
-- Ignorierliste
-- erwarteter Offlinezustand
-- Flapping-Erkennung
-- automatische Rücknahme nach Wiederherstellung
+Die Rule Engine nutzt nur den normalisierten Snapshot und zuverlässiges
+`last_changed` mit Gateway-Beobachtungszeit als Fallback. Sie fragt keine
+Home-Assistant-History ab und ergänzt weder HA-Polls noch Write-Aktionen.
 
-Beispiel:
-
-```text
-normal: 120 Sekunden
-security critical: 15 Sekunden
-```
-
-## Summary-Dashboard
-
-Einführen:
-
-- Mindestdauer
-- Nachlaufzeit
-- Entprellung
-- explizite Include-/Exclude-Regeln
-- benutzerdefinierte Aktivitätsregeln
-- Leistungs-Schwellwerte
-
-Beispiel:
-
-```text
-Waschmaschine Leistung > 8 W
-Mindestdauer 30 s
-Nachlauf 60 s
-```
-
-## Geräteaggregation
-
-Mehrere Entities eines Geräts werden zu einem verständlichen Summary-Eintrag
-zusammengeführt.
-
-Beispiel:
-
-```text
-Waschmaschine läuft
-Baumwolle · noch ca. 24 Minuten
-```
+Die früher hier grob skizzierten erweiterten Summary-Aktivitätsregeln,
+Mindestdauer, Nachlaufzeit und semantische Summary-Geräteaggregation sind
+nicht Teil der verbindlichen Sprint-22-Spezifikation und bleiben offen.
 
 ---
 

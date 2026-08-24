@@ -177,7 +177,9 @@ test("Presentation aggregiert ausschließlich echte Device-IDs", function () {
         warning: 1,
         info: 1,
         unavailable: 2,
-        unknown: 1
+        unknown: 1,
+        flapping: 0,
+        recoveryPending: 0
     });
     assert.equal(secondDevice.issueCount, 1);
     assert.equal(standaloneEntity.type, "standalone");

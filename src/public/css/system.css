@@ -645,6 +645,21 @@
     font-weight: 850;
 }
 
+.error-device-summary .error-device-failure-hint,
+.error-device-summary .error-flapping,
+.error-standalone-details .error-flapping,
+.error-child-details .error-flapping {
+    color: #9a3412;
+    font-weight: 800;
+}
+
+.error-device-summary .error-recovery-pending,
+.error-standalone-details .error-recovery-pending,
+.error-child-details .error-recovery-pending {
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
 .error-details-toggle {
     min-height: 44px;
     margin: 8px 0 0;
