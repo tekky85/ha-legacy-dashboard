@@ -2,10 +2,16 @@
 
 A lightweight external Home Assistant dashboard for legacy browsers and wall displays.
 
+It can run either as a standalone Node.js/LXC gateway or as a local
+Home Assistant App. Both modes keep Home Assistant credentials exclusively in
+the backend and provide direct LAN access for legacy iPads.
+
 ## Documentation / Dokumentation
 
 - 🇩🇪 [Deutsch](./README.de.md)
 - 🇬🇧 [English](./README.en.md)
+- [Home Assistant App documentation](./ha_legacy_dashboard/DOCS.md)
+- [Standalone and App deployment](./docs/DEPLOYMENT.md)
 
 ## Screenshots
 

@@ -5,3 +5,4 @@ npm-debug.log
 data/dashboards.json
 data/dashboards.json.bak
 data/.dashboards.json.*.tmp
+.app-build/

@@ -8,6 +8,14 @@ PROJECT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$PROJECT_DIR"
 
 
+echo "Prüfe Shell-Syntax ..."
+
+find deploy ha_legacy_dashboard \
+    -type f \
+    -name '*.sh' \
+    -exec sh -n '{}' ';'
+
+
 if [ "${SKIP_ENV_CHECK:-0}" != "1" ]; then
 
     if [ ! -r .env ]; then

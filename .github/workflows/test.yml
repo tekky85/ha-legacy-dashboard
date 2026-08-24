@@ -27,5 +27,8 @@ jobs:
       - name: JavaScript-Syntax prüfen
         run: find src test -type f -name '*.js' -exec node --check '{}' ';'
 
+      - name: Shell-Syntax prüfen
+        run: find deploy ha_legacy_dashboard -type f -name '*.sh' -exec sh -n '{}' ';'
+
       - name: Mock- und Integrationstests
         run: npm test

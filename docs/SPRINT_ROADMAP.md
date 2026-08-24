@@ -1429,6 +1429,10 @@ Besonders berücksichtigen:
 
 # Sprint 24 – Home Assistant App Packaging
 
+## Status
+
+Umgesetzt.
+
 ## Ziel
 
 HA Legacy Dashboard zusätzlich als Home-Assistant-App betreibbar machen.
@@ -1460,6 +1464,22 @@ Standalone-Betrieb bleibt erhalten.
 
 Keine Abhängigkeit davon, dass das Legacy-iPad die moderne HA-Oberfläche
 anzeigen kann.
+
+## Ergebnis
+
+Das zusätzliche lokale App-Paket liegt unter `ha_legacy_dashboard/` und nutzt
+denselben Anwendungscode wie der Standalone-Betrieb. Ein zentraler Runtime-
+Adapter löst entweder `HA_URL`/`HA_TOKEN` oder die festen Supervisor-Core-
+Proxy-Endpunkte mit backend-only `SUPERVISOR_TOKEN` auf. Das App-Paket fordert
+nur `homeassistant_api: true`, unterstützt `amd64` und `aarch64`, stellt einen
+konfigurierbaren direkten LAN-Port bereit und persistiert die vollständige
+serverseitige Konfiguration unter `/data`.
+
+`GET /health` prüft nur den lokalen Prozess. App-Start, HA-Ausfall und sauberes
+SIGTERM sind unabhängig voneinander getestet. Ingress, Home-Assistant-
+Konfigurationsmounts, Host-/Docker-/Supervisor-API-Rechte und neue Write-
+Fähigkeiten wurden nicht ergänzt. Die öffentliche Multi-Arch-Veröffentlichung
+bleibt Sprint 25 vorbehalten.
 
 ---
 

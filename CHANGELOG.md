@@ -50,3 +50,8 @@ release tags have been assigned.
   deterministic priority/category grouping, compact legacy rendering,
   persistent ignored entities, and privacy-safe media-title opt-in without
   extending Home Assistant write permissions.
+- Sprint 24 Home Assistant App Packaging: added a local amd64/aarch64 App
+  package, central Standalone/Supervisor connection resolution, backend-only
+  `SUPERVISOR_TOKEN` handling, `/data` persistence, a direct LAN port, process
+  healthcheck, and graceful container shutdown while preserving the existing
+  LXC deployment and write allowlists.

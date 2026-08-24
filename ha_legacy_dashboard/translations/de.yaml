@@ -1,0 +1,9 @@
+configuration:
+  admin_api_enabled:
+    name: Admin-API aktivieren
+    description: Aktiviert die separat geschützte Konfigurations-API und Admin-Oberfläche.
+  admin_token:
+    name: Admin-Token
+    description: Eigenständiges Bearer-Token für den Admin-Zugriff. Keine Home-Assistant-Zugangsdaten verwenden.
+network:
+  3000/tcp: Direkter LAN-Port für Legacy-Wall-Displays

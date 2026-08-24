@@ -26,7 +26,8 @@ test("Deployment-Skripte sind ausführbar und nicht destruktiv", function () {
         "deploy/check.sh",
         "deploy/deploy.sh",
         "deploy/health-check.sh",
-        "deploy/rollback.sh"
+        "deploy/rollback.sh",
+        "deploy/prepare-home-assistant-app.sh"
     ];
 
 

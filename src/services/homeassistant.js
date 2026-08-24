@@ -1,162 +1,168 @@
 const axios = require("axios");
 
-const HA_URL = (process.env.HA_URL || "").replace(/\/$/, "");
-const HA_TOKEN = process.env.HA_TOKEN || "";
+const Runtime = require("../config/runtime");
+
 const HA_REQUEST_TIMEOUT_MS = 10000;
 
-if (!HA_URL || !HA_TOKEN) {
-    throw new Error(
-        "HA_URL oder HA_TOKEN fehlt in der .env-Datei"
-    );
-}
 
-const client = axios.create({
+function createService(options) {
 
-    baseURL: HA_URL,
+    const settings = options || {};
+    const connection = settings.connection ||
+        Runtime.resolveHomeAssistantConnection();
 
-    timeout: HA_REQUEST_TIMEOUT_MS,
+    const client = settings.client || axios.create({
+        baseURL: connection.restBaseUrl,
+        timeout:
+            settings.requestTimeoutMs ||
+            HA_REQUEST_TIMEOUT_MS,
+        headers: {
+            Authorization:
+                "Bearer " + connection.token,
+            "Content-Type": "application/json"
+        }
+    });
 
-    headers: {
 
-        Authorization:
-            "Bearer " + HA_TOKEN,
+    async function getEntity(entityId) {
 
-        "Content-Type":
-            "application/json"
+        const response = await client.get(
+            "/states/" +
+            encodeURIComponent(entityId)
+        );
+
+        return response.data;
+    }
+
+
+    async function checkConnection() {
+
+        try {
+            await client.get("/");
+
+            return {
+                status: "online"
+            };
+        } catch (error) {
+            return {
+                status: "offline",
+                http_status:
+                    error.response &&
+                    error.response.status
+                        ? error.response.status
+                        : null
+            };
+        }
 
     }
 
-});
 
+    async function getEntities(entityIds) {
 
-async function getEntity(entityId) {
+        const result = {};
 
-    const response = await client.get(
-
-        "/api/states/" +
-        encodeURIComponent(entityId)
-
-    );
-
-    return response.data;
-
-}
-
-
-async function checkConnection() {
-
-    try {
-
-        await client.get("/api/");
-
-        return {
-            status: "online"
-        };
-
-    } catch (error) {
-
-        return {
-            status: "offline",
-            http_status:
-                error.response &&
-                error.response.status
-
-                    ? error.response.status
-
-                    : null
-        };
-
-    }
-
-}
-
-
-async function getEntities(entityIds) {
-
-    const result = {};
-
-    await Promise.all(
-
-        entityIds.map(
-
-            async function (entityId) {
-
-                try {
-
-                    result[entityId] =
-                        await getEntity(entityId);
-
-                } catch (error) {
-
-                    result[entityId] = {
-
-                        entity_id: entityId,
-
-                        state: "unavailable",
-
-                        attributes: {},
-
-                        gateway_error: true
-
-                    };
-
+        await Promise.all(
+            entityIds.map(
+                async function (entityId) {
+                    try {
+                        result[entityId] =
+                            await getEntity(entityId);
+                    } catch (error) {
+                        result[entityId] = {
+                            entity_id: entityId,
+                            state: "unavailable",
+                            attributes: {},
+                            gateway_error: true
+                        };
+                    }
                 }
+            )
+        );
 
-            }
+        return result;
+    }
 
-        )
 
-    );
+    async function getAllEntities() {
 
-    return result;
+        const response =
+            await client.get("/states");
 
+        return Array.isArray(response.data)
+            ? response.data
+            : [];
+    }
+
+
+    async function callService(
+        domain,
+        service,
+        serviceData
+    ) {
+        const response = await client.post(
+            "/services/" +
+            encodeURIComponent(domain) +
+            "/" +
+            encodeURIComponent(service),
+            serviceData || {}
+        );
+
+        return response.data;
+    }
+
+
+    return {
+        checkConnection: checkConnection,
+        getEntity: getEntity,
+        getEntities: getEntities,
+        getAllEntities: getAllEntities,
+        callService: callService
+    };
 }
 
 
-async function getAllEntities() {
-
-    const response =
-        await client.get("/api/states");
-
-    return Array.isArray(response.data)
-        ? response.data
-        : [];
-
-}
+let defaultService = null;
 
 
-async function callService(
-    domain,
-    service,
-    serviceData
-) {
+function getDefaultService() {
 
-    const response = await client.post(
+    if (!defaultService) {
+        defaultService = createService();
+    }
 
-        "/api/services/" +
-        encodeURIComponent(domain) +
-        "/" +
-        encodeURIComponent(service),
-
-        serviceData || {}
-
-    );
-
-    return response.data;
-
+    return defaultService;
 }
 
 
 module.exports = {
-
-    checkConnection: checkConnection,
-
-    getEntity: getEntity,
-
-    getEntities: getEntities,
-
-    getAllEntities: getAllEntities,
-
-    callService: callService
-
+    HA_REQUEST_TIMEOUT_MS: HA_REQUEST_TIMEOUT_MS,
+    createService: createService,
+    checkConnection: function () {
+        return getDefaultService()
+            .checkConnection();
+    },
+    getEntity: function (entityId) {
+        return getDefaultService()
+            .getEntity(entityId);
+    },
+    getEntities: function (entityIds) {
+        return getDefaultService()
+            .getEntities(entityIds);
+    },
+    getAllEntities: function () {
+        return getDefaultService()
+            .getAllEntities();
+    },
+    callService: function (
+        domain,
+        service,
+        serviceData
+    ) {
+        return getDefaultService()
+            .callService(
+                domain,
+                service,
+                serviceData
+            );
+    }
 };

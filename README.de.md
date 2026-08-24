@@ -4,7 +4,8 @@ Eine leichtgewichtige, externe Dashboard-Anwendung für Home Assistant – mit b
 
 ## Überblick
 
-`ha-legacy-dashboard` läuft als eigenständiges Node.js-/Express-Gateway außerhalb von Home Assistant.
+`ha-legacy-dashboard` verwendet in beiden Betriebsarten dasselbe
+Node.js-/Express-Gateway:
 
 ```text
 Legacy-Browser / Wall-Tablet
@@ -18,6 +19,13 @@ Node.js + Express
         v
 Home Assistant
 ```
+
+- **Home Assistant App:** Home Assistant OS startet den Container. Das Backend
+  verwendet ausschließlich den Supervisor-Core-REST-/WebSocket-Proxy und den
+  serverseitigen `SUPERVISOR_TOKEN`; ein Long-Lived Access Token muss nicht
+  manuell konfiguriert werden.
+- **Standalone:** Node.js, LXC, VM oder Docker verwendet weiterhin `HA_URL`
+  und den ausschließlich im Backend gespeicherten `HA_TOKEN`.
 
 Das Projekt ist **kein Lovelace-Dashboard**, kein Custom Panel und kein internes Home-Assistant-Frontend. Der Home-Assistant-Token bleibt ausschließlich im Backend.
 
@@ -241,6 +249,7 @@ Bearbeiten von Automationen bleiben ausdrücklich unmöglich.
 Verbindlich:
 
 - Home-Assistant-Token nur im Backend
+- im App-Modus `SUPERVISOR_TOKEN` nur im Backend
 - keine direkte Browser-Verbindung zu Home Assistant
 - keine generische HA-Service-API
 - Schreibzugriffe nur über explizite Backend-Endpunkte
@@ -423,9 +432,30 @@ Produktionscredentials dürfen niemals für lokale Integrationstests verwendet w
 
 ## Deployment
 
+### Installation A – Home Assistant App
+
+Das lokale App-Paket liegt unter `ha_legacy_dashboard/` und unterstützt
+`amd64` sowie `aarch64`. Es verlangt nur `homeassistant_api: true`, nutzt weder
+Ingress noch Host-/Docker-/Supervisor-API-Rechte und stellt Port `3000/tcp`
+konfigurierbar für direkten LAN-Zugriff bereit. Die persistente Konfiguration
+liegt unter `/data/dashboards.json` und wird über den normalen Home-Assistant-
+App-Backupmechanismus gesichert.
+
+Sprint 24 ist eine lokale Development-/Test-Verpackung; die öffentliche
+Repository-/Image-Veröffentlichung folgt in Sprint 25. Eine kontrollierte
+lokale Installation wird in `ha_legacy_dashboard/DOCS.md` beschrieben.
+
+Wichtig: Die Home Assistant App besitzt einen eigenen Datenbereich. Eine
+bestehende Standalone-/LXC-Konfiguration wird nicht automatisch übernommen.
+
+### Installation B – Standalone
+
 Der Standalone-Betrieb setzt Node.js 22 oder neuer voraus und unterstützt
-Debian-basierte LXC-/VM-Systeme mit systemd. Die Architektur bleibt zusätzlich
-für eine spätere Home-Assistant-App-Verpackung geeignet.
+Debian-basierte LXC-/VM-Systeme mit systemd. `HA_URL` und `HA_TOKEN` bleiben in
+der serverseitigen `.env`; der bestehende Standardpfad
+`data/dashboards.json` bleibt unverändert.
+
+Vollständige Anleitungen: `docs/DEPLOYMENT.md`.
 
 ## Projektstatus und Roadmap
 

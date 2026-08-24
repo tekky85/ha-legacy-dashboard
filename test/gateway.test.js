@@ -577,6 +577,24 @@ test(
             false
         );
 
+        await t.test("Lokaler Prozess-Healthcheck bleibt von HA getrennt", async function () {
+
+            const health = await request(
+                gatewayPort,
+                "GET",
+                "/health"
+            );
+
+            assert.equal(health.status, 200);
+            assert.deepEqual(health.json, {
+                status: "ok"
+            });
+            assert.equal(
+                Object.keys(health.json).length,
+                1
+            );
+        });
+
         await t.test("Standalone-Dateien und Cache-Header", async function () {
 
             const index = await request(

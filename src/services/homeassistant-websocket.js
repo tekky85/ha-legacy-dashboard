@@ -1,4 +1,5 @@
 const logger = require("./logger");
+const Runtime = require("../config/runtime");
 
 const DEFAULT_CONNECT_TIMEOUT_MS = 10000;
 const DEFAULT_REQUEST_TIMEOUT_MS = 8000;
@@ -8,20 +9,16 @@ const DEFAULT_MAX_RECONNECT_DELAY_MS = 10000;
 
 function websocketUrl(httpUrl) {
 
-    const base = String(httpUrl || "").replace(/\/$/, "");
-
-    if (/^https:\/\//i.test(base)) {
-        return "wss://" + base.slice(8) + "/api/websocket";
+    try {
+        return Runtime.standaloneWebSocketUrl(
+            httpUrl
+        );
+    } catch (error) {
+        throw createError(
+            "ha_websocket_unavailable",
+            "Ungültige Home-Assistant-URL"
+        );
     }
-
-    if (/^http:\/\//i.test(base)) {
-        return "ws://" + base.slice(7) + "/api/websocket";
-    }
-
-    throw createError(
-        "ha_websocket_unavailable",
-        "Ungültige Home-Assistant-URL"
-    );
 
 }
 
@@ -69,10 +66,26 @@ function createClient(options) {
 
     const settings = options || {};
     const log = settings.logger || logger;
-    const token = settings.token || process.env.HA_TOKEN || "";
-    const url = settings.url || websocketUrl(
-        settings.homeAssistantUrl || process.env.HA_URL || ""
-    );
+    let connection = settings.connection || null;
+
+    if (
+        !connection &&
+        !settings.url &&
+        !settings.homeAssistantUrl
+    ) {
+        connection =
+            Runtime.resolveHomeAssistantConnection();
+    }
+
+    const token = settings.token ||
+        (connection ? connection.token : "");
+
+    const url = settings.url ||
+        (settings.homeAssistantUrl
+            ? websocketUrl(settings.homeAssistantUrl)
+            : connection
+                ? connection.websocketUrl
+                : "");
     const WebSocketImplementation =
         settings.WebSocketImplementation || global.WebSocket;
     const connectTimeoutMs =

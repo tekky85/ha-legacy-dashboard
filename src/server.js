@@ -6,6 +6,24 @@ const dashboardConfig = require("./config/dashboard");
 const dashboardReturnTarget =
     require("./services/dashboard-return-target");
 const logger = require("./services/logger");
+const Runtime = require("./config/runtime");
+
+
+let runtimeMode;
+
+try {
+    runtimeMode =
+        Runtime.resolveHomeAssistantConnection()
+            .mode;
+} catch (error) {
+    logger.error(
+        "home_assistant_connection_invalid",
+        {
+            error_type: error.name
+        }
+    );
+    process.exit(1);
+}
 
 
 try {
@@ -44,6 +62,8 @@ const apiRoutes = require("./routes/api");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+const BIND_ADDRESS =
+    process.env.BIND_ADDRESS || "0.0.0.0";
 const PUBLIC_PATH = path.join(__dirname, "public");
 const ADMIN_PATH = path.join(__dirname, "admin");
 const SYSTEM_PAGE_PATH = path.join(PUBLIC_PATH, "system.html");
@@ -142,6 +162,11 @@ app.use(express.json({
     limit: "16kb",
     strict: true
 }));
+app.get("/health", function (req, res) {
+    return res.json({
+        status: "ok"
+    });
+});
 app.use("/api", setApiHeaders, apiRoutes);
 app.use("/api", function (req, res) {
 
@@ -282,10 +307,54 @@ app.use(function (error, req, res, next) {
 });
 
 
-app.listen(PORT, function () {
+const server = app.listen(
+    PORT,
+    BIND_ADDRESS,
+    function () {
 
-    logger.info("server_started", {
-        port: Number(PORT)
+        logger.info("server_started", {
+            port: Number(PORT),
+            runtime_mode: runtimeMode
+        });
+
+    }
+);
+
+
+let shuttingDown = false;
+
+
+function shutdown(signal) {
+
+    if (shuttingDown) {
+        return;
+    }
+
+    shuttingDown = true;
+
+    logger.info("server_stopping", {
+        signal: signal
     });
 
+    const forceTimer = setTimeout(function () {
+        logger.error("server_shutdown_timeout", {});
+        process.exit(1);
+    }, 10000);
+
+    forceTimer.unref();
+
+    server.close(function () {
+        clearTimeout(forceTimer);
+        logger.info("server_stopped", {});
+        process.exit(0);
+    });
+}
+
+
+process.once("SIGTERM", function () {
+    shutdown("SIGTERM");
+});
+
+process.once("SIGINT", function () {
+    shutdown("SIGINT");
 });

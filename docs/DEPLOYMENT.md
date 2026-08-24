@@ -1,5 +1,101 @@
 # Deployment und Betrieb
 
+HA Legacy Dashboard unterstützt zwei voneinander unabhängige Betriebsarten.
+Beide verwenden dieselben Gateway-Routen und dieselbe Anwendung; nur die
+serverseitige Home-Assistant-Verbindung und der persistente Datenpfad werden
+vom zentralen Runtime-Modus aufgelöst.
+
+## Home Assistant App – lokale Installation
+
+Sprint 24 stellt ein lokales Development-/Test-Paket unter
+`ha_legacy_dashboard/` bereit. Die öffentliche App-Repository- und
+Container-Veröffentlichung folgt erst in Sprint 25.
+
+Das App-Paket wird ohne zweite Quellcodekopie gepflegt. Für die lokale
+Supervisor-Installation erzeugt das Vorbereitungsskript einen in sich
+geschlossenen Build-Kontext:
+
+```bash
+./deploy/prepare-home-assistant-app.sh \
+  /path/to/home-assistant-config/addons/ha_legacy_dashboard
+```
+
+Danach in Home Assistant OS unter `Settings > Apps` das lokale Repository neu
+laden, **HA Legacy Dashboard** installieren und den Host-Port im Bereich
+Network bei Bedarf anpassen. Die direkte Wall-Display-URL lautet anschließend
+beispielsweise:
+
+```text
+http://homeassistant.local:3000/
+```
+
+Der konkrete Port ist der in der App-Netzwerkkonfiguration gewählte Host-Port.
+Ingress ist nicht aktiviert und für den iPad-Zugriff nicht erforderlich.
+
+Lokaler Container-Build aus einem sicheren temporären Kontext:
+
+```bash
+app_build_dir="$(mktemp -d)"
+./deploy/prepare-home-assistant-app.sh "$app_build_dir"
+docker build \
+  --build-arg BUILD_ARCH=amd64 \
+  --build-arg BUILD_VERSION=1.0.0 \
+  -t ha-legacy-dashboard-app:local \
+  "$app_build_dir"
+```
+
+Für einen `aarch64`-Build wird auf einem entsprechend konfigurierten
+Buildx-System `--platform linux/arm64` verwendet. Die Veröffentlichung eines
+Multi-Arch-Manifests ist Sprint 25 vorbehalten.
+
+### App-Verbindung und Berechtigungen
+
+Der App-Modus setzt intern `HA_RUNTIME_MODE=home_assistant_app`. REST-Zugriffe
+laufen ausschließlich über `http://supervisor/core/api`, WebSocket-Zugriffe
+über `ws://supervisor/core/websocket`. Beide verwenden den nur im Backend
+verfügbaren `SUPERVISOR_TOKEN`. `HA_TOKEN` ist keine App-Option.
+
+Das Paket verlangt ausschließlich `homeassistant_api: true`. Es aktiviert
+weder `hassio_api` noch Docker-/Host-/Geräte-/Privileged-Zugriff und mountet
+das Home-Assistant-Konfigurationsverzeichnis nicht. AppArmor bleibt aktiv.
+
+### App-Persistenz und Backup
+
+Die versionierte Konfiguration liegt unter:
+
+```text
+/data/dashboards.json
+/data/dashboards.json.bak
+```
+
+Sie enthält Dashboards, Widgets, Layouts, Entity Rules, Critical Detection und
+die Sprint-22-Regeln. `/data` ist der persistente App-Datenbereich und Teil von
+Home-Assistant-Backups; `backup: cold` sorgt für einen konsistenten Snapshot.
+Registry-, Trace- und Flapping-Caches bleiben absichtlich im Arbeitsspeicher.
+Die Theme-Auswahl bleibt wie bisher browserlokal in `localStorage`.
+
+Eine Standalone-Konfiguration wird nicht automatisch importiert. Eine spätere
+Migration muss als bewusstes, manuell validiertes Kopieren erfolgen.
+
+### App-Admin-Zugriff
+
+Die Admin API bleibt standardmäßig deaktiviert. Wird `admin_api_enabled`
+aktiviert, ist ein starkes, separates `admin_token` erforderlich. Es darf
+weder mit einem Home-Assistant-Token noch dem `SUPERVISOR_TOKEN`
+übereinstimmen. Der direkte LAN-Port wird nicht durch Ingress-Authentifizierung
+geschützt; die bestehende Admin-Bearer-Authentifizierung bleibt daher immer
+maßgeblich.
+
+### App-Abnahme
+
+Eine reale Installation auf Home Assistant OS erfolgt nur kontrolliert durch
+den Betreiber. Danach sind insbesondere Start, `/health`, direkte LAN-WebUI,
+REST-/WebSocket-Metadaten, Admin-Schutz, Neustart-Persistenz und die direkte
+iPad-URL zu prüfen. Produktionszugangsdaten dürfen nicht in Testprotokollen
+oder Screenshots erscheinen.
+
+## Standalone/LXC
+
 ## Ziel
 
 Der Produktionsstand liegt im LXC unter:

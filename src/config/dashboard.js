@@ -7,6 +7,8 @@
 
 const path = require("path");
 
+const Runtime = require("./runtime");
+
 const DashboardConfigStore =
     require("../services/dashboard-config-store");
 
@@ -877,10 +879,7 @@ function cloneSystemDashboards(systemDashboards) {
 function getDefaultConfigPath() {
 
     return path.join(
-        __dirname,
-        "..",
-        "..",
-        "data",
+        Runtime.resolveDataDirectory(),
         "dashboards.json"
     );
 

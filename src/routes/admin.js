@@ -68,6 +68,10 @@ function requireAdmin(req, res, next) {
         tokensEqual(
             adminToken,
             process.env.HA_TOKEN || ""
+        ) ||
+        tokensEqual(
+            adminToken,
+            process.env.SUPERVISOR_TOKEN || ""
         )
     ) {
         return res.status(503).json({

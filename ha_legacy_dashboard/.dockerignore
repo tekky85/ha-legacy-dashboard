@@ -1,0 +1,12 @@
+.git
+.github
+.env
+.env.*
+node_modules
+coverage
+test
+test-results
+docs
+data
+*.log
+.DS_Store

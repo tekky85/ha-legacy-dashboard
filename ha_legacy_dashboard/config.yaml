@@ -1,0 +1,25 @@
+name: HA Legacy Dashboard
+version: "1.0.0"
+slug: ha_legacy_dashboard
+description: Lightweight Home Assistant dashboard for legacy wall displays
+url: https://github.com/tekky85/ha-legacy-dashboard
+arch:
+  - amd64
+  - aarch64
+startup: application
+boot: auto
+stage: experimental
+homeassistant_api: true
+apparmor: true
+ports:
+  "3000/tcp": 3000
+ports_description:
+  "3000/tcp": Direct LAN access for legacy wall displays
+webui: http://[HOST]:[PORT:3000]/
+watchdog: http://[HOST]:[PORT:3000]/health
+backup: cold
+options:
+  admin_api_enabled: false
+schema:
+  admin_api_enabled: bool
+  admin_token: str?

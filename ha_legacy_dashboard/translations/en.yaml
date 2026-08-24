@@ -1,0 +1,9 @@
+configuration:
+  admin_api_enabled:
+    name: Enable Admin API
+    description: Enables the separately protected configuration API and Admin UI.
+  admin_token:
+    name: Admin token
+    description: Dedicated Bearer token for Admin access. Never use a Home Assistant credential.
+network:
+  3000/tcp: Direct LAN port for legacy wall displays

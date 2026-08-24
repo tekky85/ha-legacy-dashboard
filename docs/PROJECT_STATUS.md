@@ -1,7 +1,7 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 24. August 2026, Sprint 23 auf Basis von Sprint 22 implementiert;
-physische Safari-Geräteabnahme nach Rollout ausstehend
+Stand: 24. August 2026, Sprint 24 auf Basis von Sprint 23 implementiert;
+lokale HA-App-Verpackung geprüft, HA-OS- und physische Safari-Abnahme offen
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -10,6 +10,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 
 - Branch: `main`
 - Sprint-23-Ausgangscommit: `e692eed`
+- Sprint-24-Ausgangscommit: `0c968b4`
 - Sprint-22-Ausgangscommit: `ca95e21`
 - Sprint-17.7-Ausgangscommit: `ff71d23`
 - Sprint-21.3-Ausgangscommit: `a490dcf`
@@ -68,6 +69,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 21.5 | Globale Systemnavigation und Health-Indikator | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
+| 24 | Home Assistant App Packaging | umgesetzt |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -1161,7 +1163,86 @@ wurden dabei interaktiv und erst nach dem Öffnen geladen. Die Screenshots
 Fake-Credentials und generischen Demo-Daten aktualisiert. Die physische
 iPad-Abnahme bleibt nach dem LXC-Rollout offen.
 
-Als nächster fachlicher Schritt ist Sprint 24 – Home Assistant App Packaging
-vorgesehen. Das Packaging darf die bestehende Standalone-Installation nicht
-ersetzen und muss Backend-only HA-Zugang, Admin-Token-Trennung, read-only
-Automationsdiagnose und explizite Write-Allowlists unverändert bewahren.
+Die bis Sprint 23 festgelegten Grenzen für das zusätzliche App-Paket bleiben
+auch nach Sprint 24 erfüllt: Standalone-Betrieb, Backend-only HA-Zugang,
+Admin-Token-Trennung, read-only Automationsdiagnose und explizite Write-
+Allowlists wurden unverändert bewahrt.
+
+## 18. Sprint 24 – Home Assistant App Packaging
+
+Sprint 24 ergänzt den Standalone-/LXC-Betrieb um ein lokales Home-Assistant-
+App-Paket. Ausgangspunkt ist Commit `0c968b4`; Branch und Upstream waren zu
+Beginn identisch und der Arbeitsbaum war sauber. Der bestehende
+`deploy/systemd/ha-legacy-dashboard.service` sowie `.env`-basierte Betrieb
+bleiben unverändert erhalten.
+
+Die zentrale Runtime-Auflösung liegt in `src/config/runtime.js`. Im Modus
+`standalone` verwendet sie weiterhin `HA_URL`, den backend-only `HA_TOKEN`,
+`<HA_URL>/api` und `<HA_URL>/api/websocket`. Im Modus
+`home_assistant_app` verwendet sie fest:
+
+```text
+REST       http://supervisor/core/api
+WebSocket  ws://supervisor/core/websocket
+Bearer     SUPERVISOR_TOKEN
+```
+
+Ein vorhandener `SUPERVISOR_TOKEN` erkennt den App-Modus automatisch; der
+App-Wrapper setzt den Modus zusätzlich explizit. `HA_TOKEN` ist keine
+App-Option und wird dort nicht benötigt. REST und WebSocket nutzen dieselbe
+Auflösung, während sämtliche Browser-Routen und Payloads unverändert bleiben.
+Der Admin-Token wird nun auch gegen den `SUPERVISOR_TOKEN` abgegrenzt.
+
+Das Paket liegt direkt unter `ha_legacy_dashboard/` und enthält
+`config.yaml`, `build.yaml`, `Dockerfile`, `run.sh`, README, DOCS, Changelog,
+Übersetzungen und echte bestehende Projekt-Icons. `repository.yaml` liegt am
+Repository-Root. Der Quellcode wird nicht dupliziert; für lokale HA-OS-Tests
+erzeugt `deploy/prepare-home-assistant-app.sh` einen selbständigen, nicht
+versionierten Build-Kontext.
+
+`config.yaml` deklariert `amd64` und `aarch64`, einen konfigurierbaren
+`3000/tcp`-Host-Port, direkte `webui`, Prozess-Watchdog, Cold Backup,
+AppArmor und ausschließlich `homeassistant_api: true`. Nicht vorhanden sind
+Ingress, `hassio_api`, privilegierte Rechte, Host-Netz/PID/DBus, Docker API,
+Gerätemounts oder ein Home-Assistant-Konfigurationsmount. Der direkte LAN-Port
+bleibt damit unabhängig von der modernen Home-Assistant-Oberfläche für alte
+iPads nutzbar; die bestehenden Gateway- und Admin-Sicherheitsgrenzen gelten
+auch dort.
+
+Im App-Modus ist `/data` der zentrale persistente Datenpfad und
+`/data/dashboards.json` die Dashboard-Konfiguration. Die atomare Primärdatei
+und `.bak` enthalten Dashboards, Layouts, Widgets, Entity Rules, Critical-
+Detection- und Sprint-22-Regeln. Home Assistant nimmt den App-Datenbereich in
+Backups auf; `backup: cold` liefert einen konsistenten Snapshot. Theme-Wahl
+bleibt absichtlich im browserlokalen `localStorage`. Registry-, Trace- und
+Flapping-Caches bleiben begrenzt im Arbeitsspeicher und dürfen nach einem
+Neustart neu aufgebaut werden. Eine vorhandene LXC-Konfiguration wird nicht
+automatisch in den getrennten App-Datenbereich übernommen.
+
+`GET /health` liefert ausschließlich `{ "status": "ok" }` und prüft den
+lokalen Node-Prozess, nicht die momentane HA-Erreichbarkeit. Der Server bindet
+im Container an `0.0.0.0`, verarbeitet SIGTERM/SIGINT kontrolliert und beendet
+nach dem Schließen des HTTP-Servers mit Status 0. Der Startup-Wrapper liest
+App-Optionen ohne Secret-Ausgabe, trennt Admin- und Supervisor-Token und
+startet Node mit `exec`.
+
+Die Sprint-24-Tests verwenden nur `test-token` und lokale Mocks. Sie prüfen
+beide Runtime-Modi, den Supervisor-REST-Pfad, WebSocket-Authentifizierung und
+Registry-Metadaten, Start ohne `HA_TOKEN`, HA-Ausfall bei weiterhin gesundem
+Prozess, sauberes SIGTERM, `/data`-Persistenz, App-Metadaten, minimale Rechte,
+Frontend-/Log-Secret-Grenzen und fehlende Quellcode-Duplikation. Die gesamte
+Regression umfasst 250 grüne Tests; alle JavaScript-Dateien unter `src/` und
+`test/` bestehen `node --check`, beide Shell-Skripte `sh -n`, und die YAML-
+Metadaten wurden lokal geparst. Der sichere vorbereitete App-Buildkontext ist
+vollständig. Ein tatsächlicher Container-Build sowie eine reale HA-OS-
+Installation konnten mangels Docker-/HA-OS-Testumgebung nicht ausgeführt
+werden; eine Produktionsinstanz wurde bewusst nicht kontaktiert.
+
+Die sichtbare Anwendung wurde nicht geändert. Daher waren gemäß Sprint D1
+keine neuen Produkt-Screenshots oder Asset-Cache-Versionen erforderlich.
+Physische iOS-9-/iPad-Abnahme und reale App-Abnahme bleiben offen.
+
+Sprint 25 soll den reproduzierbaren amd64/aarch64-Build in CI, ein generisches
+GHCR-Multi-Arch-Image, Release-Tags/-Notes, Signierung, Upgrade/Rollback und die
+öffentliche App-Repository-Installation ergänzen. Erst dann soll `image:` in
+`config.yaml` auf das veröffentlichte generische Image zeigen.
