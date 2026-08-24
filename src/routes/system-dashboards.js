@@ -5,6 +5,7 @@ const Issues = require("../services/issues/engine");
 const IssuePresentation = require("../services/issues/presentation");
 const Snapshot = require("../services/system/snapshot");
 const System = require("../services/system");
+const SystemStatus = require("../services/system/status");
 const Summary = require("../services/summary/engine");
 const logger = require("../services/logger");
 
@@ -49,6 +50,12 @@ router.get("/status", async function (req, res) {
             const meta =
                 Snapshot.toPublicMeta(snapshot);
 
+            const errors =
+                SystemStatus.build(
+                    snapshot,
+                    DashboardConfig.getErrorsConfiguration()
+                );
+
             return {
                 status:
                     meta.home_assistant.reachable
@@ -56,6 +63,7 @@ router.get("/status", async function (req, res) {
                         : "offline",
                 cache_ttl_ms:
                     System.CACHE_TTL_MS,
+                errors: errors,
                 meta: meta
             };
 

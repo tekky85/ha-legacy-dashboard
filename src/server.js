@@ -3,6 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const dashboardConfig = require("./config/dashboard");
+const dashboardReturnTarget =
+    require("./services/dashboard-return-target");
 const logger = require("./services/logger");
 
 
@@ -172,6 +174,29 @@ app.get("/d/:dashboardId", function (req, res) {
 app.get(
     ["/system/summary", "/system/errors"],
     function (req, res) {
+
+        const requestedReturnTarget =
+            req.query.returnTo;
+
+        const validReturnTarget =
+            dashboardReturnTarget.resolve(
+                requestedReturnTarget,
+                function (dashboardId) {
+                    return Boolean(
+                        dashboardConfig.getDashboardById(
+                            dashboardId
+                        )
+                    );
+                }
+            );
+
+
+        if (
+            typeof requestedReturnTarget !== "undefined" &&
+            validReturnTarget === null
+        ) {
+            return res.redirect(302, req.path);
+        }
 
         setStaticHeaders(res, SYSTEM_PAGE_PATH);
 

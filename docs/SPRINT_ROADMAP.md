@@ -1310,6 +1310,41 @@ Umgesetzt nach Sprint 21.3.
 
 ---
 
+# Sprint 21.5 – System Dashboard Navigation & Global Health Indicator
+
+## Status
+
+Umgesetzt nach Sprint 21.4.
+
+## Ergebnis
+
+- Jedes Default- und Custom-Dashboard nutzt denselben globalen Header-Bereich
+  mit immer sichtbarer neutraler Summary-Navigation und konditionalem
+  Error-/Health-Indikator.
+- Der Indikator bleibt nur dann verborgen, wenn der Systemstatus fresh ist und
+  keine `warning`-, `error`- oder `critical`-Issues enthält. Reine
+  `info`-Issues lösen keinen Alarm aus; stale, unknown und ein letzter
+  bekannter Alarm bleiben sichtbar.
+- `GET /api/system-dashboards/status` ergänzt ausschließlich reduzierte
+  Severity-Zähler und die höchste Severity. Der Browser lädt weder die
+  vollständige Error- noch die Summary-Liste für den Header.
+- Der kleine Statusabruf hängt am bestehenden Dashboard-Refresh, besitzt
+  keinen eigenen Polling-Timer, verhindert überlappende Requests und nutzt
+  denselben serverseitigen Snapshot-Cache wie die System-Dashboards.
+- Summary und Errors erhalten ein explizites `returnTo` für `/` oder den
+  exakten Custom-Pfad. Das Ziel wird browserseitig syntaktisch und serverseitig
+  gegen tatsächlich konfigurierte Dashboards validiert. Ungültige Ziele
+  werden auf die querylose Systemroute bereinigt und führen sicher zu `/`.
+- Summary-/Error-Wechsel tragen das Return-Ziel weiter; `← Zurück` funktioniert
+  nach Reload und für Default sowie Custom Dashboards.
+- Die gemeinsame Navigation bleibt ES5-/Safari-iOS-9-kompatibel, verwendet
+  Flexbox ohne `gap`/CSS Grid und Touchziele von mindestens 44 Pixeln.
+- Device Groups, Severity-/State-Filter, Critical-Modi, Entity Rule Manager,
+  Spaltenansichten, Focus/Grid-Geometrie und alle Write-Allowlists bleiben
+  unverändert.
+
+---
+
 # Sprint 22 – Rules, Grace Periods & Device Aggregation
 
 ## Ziel
@@ -1782,7 +1817,7 @@ Ziel bleibt:
 
 # Nächster Sprint
 
-Nach Abschluss von Sprint 21.4:
+Nach Abschluss von Sprint 21.5:
 
 ```text
 Sprint 22 – Rules, Grace Periods & Device Aggregation
@@ -1791,8 +1826,9 @@ Sprint 22 – Rules, Grace Periods & Device Aggregation
 Die Device-Aggregation des Error Dashboards bleibt die reine Präsentations-
 funktion aus Sprint 21.1; Sprint 21.2 ergänzt lokale Spaltenansichten und eine
 metadatenbasierte Risk Class, Sprint 21.3 die orthogonalen Filter sowie den
-auswählbaren Device-Class-/HA-Label-Modus und Sprint 21.4 die skalierbare
-Entity-Regelpflege sowie eindeutige Header-Counts. Sprint 22 ergänzt fachliche Karenz-,
+auswählbaren Device-Class-/HA-Label-Modus, Sprint 21.4 die skalierbare
+Entity-Regelpflege sowie eindeutige Header-Counts und Sprint 21.5 die sichere
+globale Systemnavigation samt reduziertem Health-Indikator. Sprint 22 ergänzt fachliche Karenz-,
 Flapping- und erwartete Offline-Regeln sowie die geplante semantische Geräte-
 aggregation im Summary Dashboard. Diese Regeln benötigen eine eigene
 Spezifikation und dürfen die bestehenden Write-Sicherheitsgrenzen nicht

@@ -562,6 +562,11 @@ var SystemDashboard = (function () {
         );
 
 
+        if (typeof SystemNavigation !== "undefined") {
+            SystemNavigation.initializeSystemPage();
+        }
+
+
         Theme.load();
 
         if (themeButton) {

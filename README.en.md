@@ -47,6 +47,21 @@ The legacy frontend remains framework-free and uses the existing `Legacy.http` /
 - Light/Dark mode
 - stale-data and reconnect behavior
 
+Every default and custom dashboard has a neutral, always-visible Summary
+navigation control in its header. A compact Errors / Health indicator appears
+beside it only for `warning`, `error`, or `critical`. `info` notices alone do
+not trigger the alarm indicator. Stale or not-yet-known health remains visible,
+so an absent indicator means “all clear” only when the data is fresh and
+reliable.
+
+Summary and System Status carry the exact internal source path as a validated
+return target. They therefore return reliably to both the default dashboard
+and `/d/<dashboard-id>`. External, protocol-relative, unknown, or otherwise
+invalid targets are rejected in both the server and browser and safely fall
+back to `/`. The indicator uses only `GET /api/system-dashboards/status` and
+its reduced severity overview; complete Summary or Errors payloads are not
+loaded for header navigation.
+
 ### Admin Area
 
 Dashboards and widgets are managed under `/admin`.
@@ -92,6 +107,7 @@ without another Home Assistant request. Summary has its own safely persisted
 1/2/3-column view and falls back in a controlled manner on narrow viewports.
 The total appears exactly once in the shared header; the All filter does not
 repeat it.
+The `← Back` navigation item returns to the validated source dashboard.
 
 ### Errors / System Status Dashboard
 
@@ -116,6 +132,7 @@ Shows, among other things:
 The total likewise appears only once in the header. The All filters do not
 repeat it, while the severity subsets and the `Unavailable` and `Unknown`
 states retain their own counts.
+The `← Back` navigation item uses the same safe return target as Summary.
 
 `unknown` and `unavailable` are intentionally treated as distinct states.
 Entities without a `device_id`, as well as Config Entry, Repair, and Matter
@@ -267,7 +284,7 @@ independent Focus geometry remains unchanged.
 
 #### System Status
 
-![Error Dashboard with unavailable and unknown states](docs/screenshots/system/errors.png)
+![Error Dashboard with a warning state](docs/screenshots/system/errors.png)
 
 ## Screenshot Maintenance
 

@@ -19,41 +19,41 @@
 HA Legacy Dashboard
 </title>
 
-<link rel="manifest" href="/manifest.json?v=36">
+<link rel="manifest" href="/manifest.json?v=38">
 
 <link
     rel="apple-touch-icon"
     sizes="76x76"
-    href="/icons/app-icon-76.png?v=36"
+    href="/icons/app-icon-76.png?v=38"
 >
 
 <link
     rel="apple-touch-icon"
     sizes="120x120"
-    href="/icons/app-icon-120.png?v=36"
+    href="/icons/app-icon-120.png?v=38"
 >
 
 <link
     rel="apple-touch-icon"
     sizes="152x152"
-    href="/icons/app-icon-152.png?v=36"
+    href="/icons/app-icon-152.png?v=38"
 >
 
 <link
     rel="apple-touch-icon"
     sizes="180x180"
-    href="/icons/app-icon-180.png?v=36"
+    href="/icons/app-icon-180.png?v=38"
 >
 
 <link
     rel="icon"
     type="image/png"
     sizes="192x192"
-    href="/icons/app-icon-192.png?v=36"
+    href="/icons/app-icon-192.png?v=38"
 >
 
-<script src="/js/core/theme.js?v=36"></script>
-<link rel="stylesheet" href="/css/style.css?v=36">
+<script src="/js/core/theme.js?v=38"></script>
+<link rel="stylesheet" href="/css/style.css?v=38">
 
 </head>
 
@@ -77,6 +77,37 @@ HA Legacy Dashboard
             <time id="wallClock" class="wall-clock-time">--:--</time>
             <span id="wallDate" class="wall-clock-date">Wird geladen …</span>
         </div>
+
+        <nav
+            class="dashboard-system-navigation"
+            aria-label="System-Dashboards"
+        >
+            <a
+                id="systemSummaryLink"
+                class="system-summary-link"
+                href="/system/summary?returnTo=%2F"
+            >Summary</a>
+
+            <a
+                id="systemHealthLink"
+                class="system-health-link is-unknown"
+                href="/system/errors?returnTo=%2F"
+                aria-label="Systemstatus unbekannt öffnen"
+                title="Systemstatus unbekannt öffnen"
+            >
+                <span
+                    id="systemHealthSymbol"
+                    class="system-health-symbol"
+                    aria-hidden="true"
+                >?</span>
+                <span
+                    id="systemHealthFreshness"
+                    class="system-health-freshness"
+                    aria-hidden="true"
+                    hidden
+                >?</span>
+            </a>
+        </nav>
 
         <div
             id="connectionBadge"
@@ -174,23 +205,24 @@ HA Legacy Dashboard
 
 </div>
 
-<script src="/js/core/compat.js?v=36"></script>
-<script src="/js/core/icons.js?v=36"></script>
-<script src="/js/core/presentation.js?v=36"></script>
-<script src="/js/core/widget.js?v=36"></script>
-<script src="/js/controls/power.js?v=36"></script>
+<script src="/js/core/compat.js?v=38"></script>
+<script src="/js/core/icons.js?v=38"></script>
+<script src="/js/core/presentation.js?v=38"></script>
+<script src="/js/core/widget.js?v=38"></script>
+<script src="/js/controls/power.js?v=38"></script>
 
-<script src="/js/widgets/sensor.js?v=36"></script>
-<script src="/js/widgets/binary.js?v=36"></script>
-<script src="/js/widgets/light.js?v=36"></script>
-<script src="/js/widgets/climate.js?v=36"></script>
+<script src="/js/widgets/sensor.js?v=38"></script>
+<script src="/js/widgets/binary.js?v=38"></script>
+<script src="/js/widgets/light.js?v=38"></script>
+<script src="/js/widgets/climate.js?v=38"></script>
 
-<script src="/js/core/layout.js?v=36"></script>
-<script src="/js/core/dashboard.js?v=36"></script>
-<script src="/js/focus/view-model.js?v=36"></script>
-<script src="/js/focus/renderer.js?v=36"></script>
-<script src="/js/focus/focus.js?v=36"></script>
-<script src="/js/app.js?v=36"></script>
+<script src="/js/core/layout.js?v=38"></script>
+<script src="/js/core/dashboard.js?v=38"></script>
+<script src="/js/focus/view-model.js?v=38"></script>
+<script src="/js/focus/renderer.js?v=38"></script>
+<script src="/js/focus/focus.js?v=38"></script>
+<script src="/js/core/system-navigation.js?v=38"></script>
+<script src="/js/app.js?v=38"></script>
 
 </body>
 

@@ -932,3 +932,71 @@ Empfohlener nächster Sprint bleibt Sprint 22. Er kann Grace Periods, Flapping
 und erwartete Offline-Zustände spezifizieren, ohne die in Sprint 21.4
 bereinigte Konfigurations- und Header-Struktur oder bestehende
 Write-Sicherheitsgrenzen zu verändern.
+
+## 20. Sprint 21.5 – Globale Systemnavigation und Health-Indikator
+
+Ausgangspunkt war Commit `65bcf39`. Default und Custom Dashboards verwenden
+nun denselben ES5-Headerbaustein aus
+`src/public/js/core/system-navigation.js`. Der neutrale Summary-Link ist immer
+sichtbar. Der danebenliegende Health-Link besitzt eine etwa 44 × 44 Pixel
+große Touchfläche, ein sichtbares `!` beziehungsweise `?` sowie `title` und
+`aria-label`; die Bedeutung hängt daher nicht allein von Farbe ab.
+
+Der Health-Indikator wird nur bei einem frischen Snapshot ohne `warning`,
+`error` oder `critical` verborgen. Reine `info`-Issues bleiben im Error
+Dashboard verfügbar, erzeugen aber keinen Alarm im normalen Dashboard-Header.
+Warning, Error und Critical wählen deterministisch die höchste vorhandene
+Severity. Stale oder noch unbekannte Daten bleiben sichtbar. Bei einem
+Abruffehler wird ein letzter bekannter Alarm nicht gelöscht, sondern mit einer
+zusätzlichen Stale-Markierung dargestellt.
+
+Der bestehende Endpoint `GET /api/system-dashboards/status` liefert zusätzlich
+nur `total`, `critical`, `error`, `warning`, `info`, `relevant` und
+`highest_severity`. Er gibt keine Issue-Liste, Summary-Liste, Entity-Zustände
+oder Registry-Rohdaten aus. Die Berechnung verwendet die bestehende
+Issue-Engine und denselben `System.getSnapshot()`-Cache. Im Browser wird der
+Statusabruf an `loadDashboard()` gekoppelt, gegen Überlappung geschützt und
+ohne eigenen Timer ausgeführt. Für die Navigation werden weder
+`/api/system-dashboards/errors` noch `/api/system-dashboards/summary` geladen.
+
+Der aktuelle Dashboard-Pfad wird als URL-kodiertes `returnTo` an Summary oder
+Errors übertragen und beim Wechsel zwischen beiden Systemseiten beibehalten.
+Erlaubt sind ausschließlich `/` und der exakte Pfad `/d/<id>` mit optionalem
+abschließendem Slash. `src/services/dashboard-return-target.js` prüft Custom-
+IDs serverseitig zusätzlich gegen die persistierte Dashboard-Konfiguration.
+Externe URLs, `//`-Ziele, `javascript:`, `data:`, unbekannte Dashboards und
+sonstige Pfade werden abgewiesen; die Systemroute wird ohne ungültigen Query-
+Wert neu geladen und `← Zurück` fällt auf `/` zurück. Ein gleichoriginiger,
+syntaktisch sicherer History-Pfad dient nur als Fallback, nicht als primäre
+Quelle.
+
+Die Browserabnahme gegen die echte Anwendung mit lokalem Mock und
+Fake-Credentials bestätigte Default- und Custom-Navigation,
+`/d/esszimmer → Summary/Errors → Zurück → /d/esszimmer`, Warning-Anzeige,
+Light/Dark Mode sowie 768 × 1024, 1024 × 768 und 1280 × 720. Echte Safari-
+Laufzeiten auf iPad mini, iPad Air 2 und macOS stehen in der automatisierten
+Umgebung nicht zur Verfügung und bleiben Teil der Geräteabnahme nach dem
+Rollout.
+
+Die vier sichtbar betroffenen D1-Aufnahmen
+`docs/screenshots/dashboards/main-light.png`,
+`docs/screenshots/dashboards/main-dark.png`,
+`docs/screenshots/system/summary.png` und
+`docs/screenshots/system/errors.png` wurden als 1280 × 720 PNGs aus dieser
+kontrollierten Instanz aktualisiert. Sie enthalten nur generische Demo-Daten,
+keine Tokens, privaten Namen, internen Adressen oder Standortdaten.
+
+Die vollständige Suite umfasst 214 grüne Tests. Sie prüft zusätzlich Healthy,
+Info-only, Warning, Error, Critical, stale, unknown, Last-known Critical,
+Default-/Custom-Return, Reload-stabile Query-Weitergabe, History-Fallback,
+Open-Redirect-Abwehr, kompakten Status-Payload, Cache-Wiederverwendung und den
+fehlenden zweiten Polling-Loop. Alle JavaScript-Dateien bestehen `node --check`;
+die Wall-Skripte bleiben ES5, CSS Grid und Flexbox `gap` bleiben ausgeschlossen.
+Die Asset-Cache-Version ist 38.
+
+Sprint 21.1 Device Groups, Sprint 21.2 Spaltenansichten, Sprint 21.3 Filter und
+Critical-Modi, Sprint 21.4 Entity Rule Manager/Header-Counts sowie Sprint 17.7
+Control-Zentrierung sind durch die vollständige Regression unverändert. Es
+wurden keine neuen Write-Routen, HA-Serviceaufrufe, Browser-WebSockets oder
+Schreibberechtigungen ergänzt. Empfohlener nächster Sprint bleibt Sprint 22 –
+Rules, Grace Periods & Device Aggregation.

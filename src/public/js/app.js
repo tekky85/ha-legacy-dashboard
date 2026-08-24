@@ -88,6 +88,11 @@ var dashboardStateUrl =
         : "/api/dashboard";
 
 
+if (typeof SystemNavigation !== "undefined") {
+    SystemNavigation.initializeDashboard();
+}
+
+
 /* =========================================================
    HELPERS
    ========================================================= */
@@ -2068,6 +2073,11 @@ function loadDashboard() {
     }
 
 
+    if (typeof SystemNavigation !== "undefined") {
+        SystemNavigation.refreshHealth();
+    }
+
+
     /*
      * Während und kurz nach einem Steuerbefehl
      * darf der automatische Refresh die Buttons
@@ -2347,6 +2357,10 @@ window.ononline =
 window.onoffline =
 
     function () {
+
+        if (typeof SystemNavigation !== "undefined") {
+            SystemNavigation.markUnavailable();
+        }
 
         disableDashboardControls();
 

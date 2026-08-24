@@ -612,7 +612,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=36"/
+                /src="\/js\/app\.js\?v=38"/
             );
 
             const manifest = await request(
@@ -631,7 +631,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=36"
+                "/js/app.js?v=38"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -730,6 +730,24 @@ test(
                 "/system/does-not-exist"
             );
 
+            const customReturnPage = await request(
+                gatewayPort,
+                "GET",
+                "/system/errors?returnTo=%2Fd%2Fesszimmer"
+            );
+
+            const invalidReturnPage = await request(
+                gatewayPort,
+                "GET",
+                "/system/summary?returnTo=https%3A%2F%2Fexternal.example"
+            );
+
+            const unknownReturnPage = await request(
+                gatewayPort,
+                "GET",
+                "/system/errors?returnTo=%2Fd%2Funbekannt"
+            );
+
             const rootPage = await request(
                 gatewayPort,
                 "GET",
@@ -739,6 +757,11 @@ test(
             assert.equal(summaryPage.status, 200);
             assert.equal(errorsPage.status, 200);
             assert.equal(unknownPage.status, 404);
+            assert.equal(customReturnPage.status, 200);
+            assert.equal(invalidReturnPage.status, 302);
+            assert.equal(invalidReturnPage.headers.location, "/system/summary");
+            assert.equal(unknownReturnPage.status, 302);
+            assert.equal(unknownReturnPage.headers.location, "/system/errors");
             assert.equal(rootPage.status, 200);
             assert.equal(
                 summaryPage.headers["cache-control"],
@@ -942,6 +965,20 @@ test(
             assert.equal(errors.json.meta.entity_count, 3);
             assert.equal(status.json.cache_ttl_ms, 3000);
             assert.equal(status.json.status, "online");
+            assert.deepEqual(status.json.errors, {
+                total: 2,
+                critical: 0,
+                error: 0,
+                warning: 1,
+                info: 1,
+                relevant: 1,
+                highest_severity: "warning"
+            });
+            assert.equal(
+                JSON.stringify(status.json).includes("system_unavailable"),
+                false
+            );
+            assert.ok(JSON.stringify(status.json).length < 5000);
             assert.equal(mock.systemStateRequests, 1);
             assert.equal(summary.headers["cache-control"], "no-store");
             assert.equal(errors.headers["cache-control"], "no-store");

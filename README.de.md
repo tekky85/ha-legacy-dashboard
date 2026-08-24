@@ -47,6 +47,22 @@ Das Legacy-Frontend bleibt frameworkfrei und verwendet die vorhandene `Legacy.ht
 - Light/Dark Mode
 - Stale-Data- und Reconnect-Verhalten
 
+Jedes Standard- und Custom-Dashboard besitzt im Header eine neutrale, immer
+sichtbare Summary-Navigation. Daneben erscheint ein kompakter
+Error-/Health-Indikator nur bei `warning`, `error` oder `critical`. Reine
+`info`-Hinweise lösen keinen Alarmindikator aus. Ein veralteter oder noch
+unbekannter Health-Status bleibt dagegen sichtbar, damit ein fehlender Punkt
+nur bei frischen, verlässlich unauffälligen Daten „alles in Ordnung“ bedeutet.
+
+Summary und Systemstatus übernehmen den exakten internen Ausgangspfad als
+validiertes Return-Ziel. Dadurch führen sie sowohl vom Standard-Dashboard als
+auch von `/d/<dashboard-id>` zuverlässig zurück. Externe, protokollrelative,
+unbekannte oder anderweitig ungültige Ziele werden server- und browserseitig
+abgewiesen und fallen sicher auf `/` zurück. Der Indikator verwendet nur
+`GET /api/system-dashboards/status` und dessen reduzierten Severity-Überblick;
+vollständige Summary-/Error-Payloads werden für die Header-Navigation nicht
+geladen.
+
 ### Admin-Bereich
 
 Unter `/admin` werden Dashboards und Widgets verwaltet.
@@ -92,6 +108,7 @@ Ansicht wechseln ohne neue Home-Assistant-Abfrage. Für Summary kann eine
 eigene 1-/2-/3-Spaltenansicht sicher im Browser gespeichert werden; auf zu
 schmalen Viewports fällt sie kontrolliert zurück. Die Gesamtsumme steht genau
 einmal im gemeinsamen Header; der Filter `Alle` wiederholt sie nicht.
+Der Navigationspunkt `← Zurück` führt zum validierten aufrufenden Dashboard.
 
 ### Fehler-/Systemstatus-Dashboard
 
@@ -116,6 +133,8 @@ Zeigt unter anderem:
 Auch hier erscheint die Gesamtzahl nur einmal im Header. Die Filter `Alle`
 wiederholen sie nicht; die Teilmengen für Kritikalität sowie `Unavailable` und
 `Unknown` behalten ihre eigenen Counts.
+Der Navigationspunkt `← Zurück` verwendet dasselbe sichere Return-Ziel wie
+Summary.
 
 `unknown` und `unavailable` werden bewusst getrennt behandelt.
 Entities ohne `device_id` sowie Config-Entry-, Repair- und Matter-Hinweise
@@ -274,7 +293,7 @@ davon unberührt.
 
 #### Systemstatus
 
-![Error Dashboard mit unavailable- und unknown-Zuständen](docs/screenshots/system/errors.png)
+![Error Dashboard mit einem Warnungszustand](docs/screenshots/system/errors.png)
 
 ## Screenshot-Pflege
 
