@@ -37,7 +37,10 @@ function createCollector(options) {
                     try {
                         snapshot = Enrichment.attach(
                             snapshot,
-                            await diagnostics.getSnapshot()
+                            await diagnostics.getSnapshot(
+                                snapshot.entities,
+                                false
+                            )
                         );
                     } catch (diagnosticError) {
                         snapshot = Enrichment.attach(

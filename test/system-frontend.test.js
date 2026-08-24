@@ -79,7 +79,13 @@ function createHarness(pathname, entryFile, options) {
         "summaryPoweredCount", "summaryActiveFilterCount",
         "summaryClimateCount", "summaryMediaCount", "summarySecurityCount",
         "summaryFilterEmpty", "summaryColumn1", "summaryColumn2",
-        "summaryColumn3", "errorColumn1", "errorColumn2", "errorColumn3"
+        "summaryColumn3", "errorColumn1", "errorColumn2", "errorColumn3",
+        "advancedDiagnostics", "advancedDiagnosticsToggle",
+        "advancedDiagnosticsTitle", "advancedDiagnosticsSummary",
+        "advancedDiagnosticsDetails", "advancedAutomationInventory",
+        "advancedAutomationConfig", "advancedAutomationTrace",
+        "advancedAutomationDynamic", "advancedRegistryStatus",
+        "advancedRepairsStatus", "advancedDiagnosticsNote"
     ].forEach(function (id) {
         elements[id] = createElement();
     });
@@ -726,6 +732,78 @@ test("Summary und Errors speichern Spalten getrennt und fallen responsiv zurück
 });
 
 
+test("Advanced Diagnostics lädt Trace Summaries ausschließlich on-demand", function () {
+
+    const harness = createHarness(
+        "/system/errors",
+        "errors.js"
+    );
+
+    assert.equal(harness.requests.length, 1);
+    assert.equal(
+        harness.requests[0].url,
+        "/api/system-dashboards/errors"
+    );
+
+    harness.requests[0].success({
+        overallStatus: "warning",
+        summary: {total: 1, warning: 1},
+        filters: {
+            severity: {all: 1, critical: 0, error: 0, warning: 1, info: 0},
+            state: {all: 1, unavailable: 1, unknown: 0}
+        },
+        groups: [{
+            id: "standalone-one",
+            type: "standalone",
+            title: "Demo",
+            severity: "warning",
+            issueCount: 1,
+            affectedAutomationCount: 1,
+            affectedAutomations: [{
+                entityId: "automation.demo",
+                name: "Demo Automation",
+                state: "on",
+                available: true,
+                confidence: "direct",
+                reasons: ["entity"]
+            }],
+            issues: [{
+                id: "issue-one",
+                severity: "warning",
+                state: "unavailable"
+            }]
+        }],
+        automationAnalysis: {
+            inventoryCount: 1,
+            dynamicCount: 0,
+            configStatus: "available"
+        },
+        meta: meta(true, false, "2026-08-11T18:00:00.000Z")
+    });
+
+    assert.equal(harness.requests.length, 1);
+    harness.elements.advancedDiagnosticsToggle.onclick();
+    assert.equal(harness.requests.length, 2);
+    assert.equal(
+        harness.requests[1].url,
+        "/api/system-dashboards/errors/automation-traces"
+    );
+
+    harness.requests[1].success({
+        source: {status: "available"},
+        automations: [{
+            entityId: "automation.demo",
+            errorCount: 0,
+            summaries: []
+        }]
+    });
+    assert.equal(
+        harness.elements.advancedAutomationTrace.innerHTML,
+        "Verfügbar"
+    );
+});
+
+
 test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
 
     const html = fs.readFileSync(
@@ -750,9 +828,9 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=39/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=42/);
     assert.match(html, /id="dashboardReturnNavigation"/);
-    assert.match(html, /\/js\/core\/system-navigation\.js\?v=39/);
+    assert.match(html, /\/js\/core\/system-navigation\.js\?v=42/);
     assert.match(html, /id="errorOverallLabel"/);
     assert.match(html, /id="errorFilterAll"/);
     assert.match(html, /id="errorUnknownCount"/);

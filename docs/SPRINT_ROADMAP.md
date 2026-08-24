@@ -206,8 +206,8 @@ Bedeutung von „fest“:
 | 21.2 | System Dashboard Filters, Column Views & Risk Severity | umgesetzt |
 | 21.3 | Error Filtering & Critical Device Detection Modes | umgesetzt |
 | 21.4 | System Dashboard Configuration & Header Simplification | umgesetzt |
-| 22 | Rules, Grace Periods & Device Aggregation | neu geplant |
-| 23 | Automation Impact & Advanced Diagnostics | neu geplant |
+| 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
+| 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | verschoben |
 | 25 | Release & Distribution | geplant |
 

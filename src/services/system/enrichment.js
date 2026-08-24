@@ -105,6 +105,17 @@ function attach(snapshot, diagnosticsSnapshot) {
         repairs: [],
         matter: []
     };
+    snapshot.automations = diagnostic.automations || {
+        inventory: [],
+        indexes: {
+            automationsByEntityId: emptyMap(),
+            automationsByDeviceId: emptyMap(),
+            automationsByAreaId: emptyMap(),
+            automationsByLabelId: emptyMap(),
+            inventoryByEntityId: emptyMap(),
+            dynamicAutomationEntityIds: []
+        }
+    };
     snapshot.capabilities = diagnostic.capabilities || {
         entityRegistry: false,
         deviceRegistry: false,
@@ -112,7 +123,10 @@ function attach(snapshot, diagnosticsSnapshot) {
         labelRegistry: false,
         configEntries: false,
         repairs: false,
-        matterDiagnostics: false
+        matterDiagnostics: false,
+        automationInventory: false,
+        automationConfigRead: false,
+        automationTraceRead: false
     };
 
     Object.keys(sources).forEach(function (name) {
@@ -136,7 +150,10 @@ function unavailable(errorCode) {
         "areaRegistry",
         "labelRegistry",
         "configEntries",
-        "repairs"
+        "repairs",
+        "automationInventory",
+        "automationConfig",
+        "automationTrace"
     ];
     const sources = {};
 
@@ -170,6 +187,17 @@ function unavailable(errorCode) {
             repairs: [],
             matter: []
         },
+        automations: {
+            inventory: [],
+            indexes: {
+                automationsByEntityId: emptyMap(),
+                automationsByDeviceId: emptyMap(),
+                automationsByAreaId: emptyMap(),
+                automationsByLabelId: emptyMap(),
+                inventoryByEntityId: emptyMap(),
+                dynamicAutomationEntityIds: []
+            }
+        },
         capabilities: {
             entityRegistry: false,
             deviceRegistry: false,
@@ -177,7 +205,10 @@ function unavailable(errorCode) {
             labelRegistry: false,
             configEntries: false,
             repairs: false,
-            matterDiagnostics: false
+            matterDiagnostics: false,
+            automationInventory: false,
+            automationConfigRead: false,
+            automationTraceRead: false
         },
         sources: sources
     };

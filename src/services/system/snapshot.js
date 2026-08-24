@@ -15,12 +15,17 @@ const TEXT_ATTRIBUTES = [
     ["icon", "icon", 120],
     ["hvac_action", "hvacAction", 80],
     ["media_title", "mediaTitle", 256],
-    ["media_content_type", "mediaContentType", 80]
+    ["media_content_type", "mediaContentType", 80],
+    ["id", "automationId", 128],
+    ["mode", "mode", 32],
+    ["last_triggered", "lastTriggered", 64]
 ];
 
 const NUMBER_ATTRIBUTES = [
     ["current_position", "currentPosition"],
-    ["battery_level", "batteryLevel"]
+    ["battery_level", "batteryLevel"],
+    ["current", "currentRuns"],
+    ["max", "maxRuns"]
 ];
 
 
@@ -276,6 +281,10 @@ function createStale(lastSuccessful, collectedAt, errorCode) {
         capabilities:
             lastSuccessful && lastSuccessful.capabilities
                 ? lastSuccessful.capabilities
+                : undefined,
+        automations:
+            lastSuccessful && lastSuccessful.automations
+                ? lastSuccessful.automations
                 : undefined
     };
 

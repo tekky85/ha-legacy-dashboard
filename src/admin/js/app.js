@@ -1326,13 +1326,17 @@
             ["labelRegistry", "Label Registry"],
             ["configEntries", "Config Entries"],
             ["repairs", "Repairs"],
-            ["matter", "Matter Diagnostics"]
+            ["matter", "Matter Diagnostics"],
+            ["automationInventory", "Automation Inventory"],
+            ["automationConfig", "Automation Config Read"],
+            ["automationTrace", "Automation Trace Read"]
         ];
         const labels = {
             available: "Verfügbar",
             unsupported: "Nicht unterstützt",
             stale: "Veraltet",
-            error: "Fehler"
+            error: "Fehler",
+            unknown: "Noch nicht geprüft"
         };
         const sources = payload && payload.sources
             ? payload.sources

@@ -1,4 +1,5 @@
 const Severity = require("./severity");
+const AutomationImpact = require("../automations/impact");
 
 
 function emptyCounts() {
@@ -93,7 +94,7 @@ function entityIndex(snapshot) {
 }
 
 
-function publicChild(issue, entity, registry) {
+function publicChild(issue, entity, registry, automationImpact) {
 
     const attributes = entity && entity.attributes
         ? entity.attributes
@@ -126,7 +127,10 @@ function publicChild(issue, entity, registry) {
             typeof issue.gracePeriodMs === "number"
                 ? issue.gracePeriodMs
                 : null,
-        ruleSource: issue.ruleSource || null
+        ruleSource: issue.ruleSource || null,
+        affectedAutomations: automationImpact || [],
+        affectedAutomationCount:
+            automationImpact ? automationImpact.length : 0
     };
 
 }
@@ -176,7 +180,13 @@ function deviceContext(device, entity, metadata) {
 }
 
 
-function createDeviceGroup(deviceId, issue, entity, metadata) {
+function createDeviceGroup(
+    deviceId,
+    issue,
+    entity,
+    metadata,
+    automationImpact
+) {
 
     const devices = metadata.devices || {};
     const entities = metadata.entities || {};
@@ -210,13 +220,28 @@ function createDeviceGroup(deviceId, issue, entity, metadata) {
         deviceEntityCount: null,
         deviceUnreachable: false,
         deviceFailureHint: null,
-        issues: [publicChild(issue, entity, registry)]
+        affectedAutomations: automationImpact || [],
+        affectedAutomationCount:
+            automationImpact ? automationImpact.length : 0,
+        issues: [publicChild(
+            issue,
+            entity,
+            registry,
+            automationImpact
+        )]
     };
 
 }
 
 
-function addToDeviceGroup(group, issue, entity, registry, metadata) {
+function addToDeviceGroup(
+    group,
+    issue,
+    entity,
+    registry,
+    metadata,
+    automationImpact
+) {
 
     const severity = Severity.LEVELS.indexOf(issue.severity);
     const currentSeverity = Severity.LEVELS.indexOf(group.severity);
@@ -226,7 +251,17 @@ function addToDeviceGroup(group, issue, entity, registry, metadata) {
         metadata
     );
 
-    group.issues.push(publicChild(issue, entity, registry));
+    group.issues.push(publicChild(
+        issue,
+        entity,
+        registry,
+        automationImpact
+    ));
+    group.affectedAutomations = AutomationImpact.merge(
+        group.affectedAutomations,
+        automationImpact
+    );
+    group.affectedAutomationCount = group.affectedAutomations.length;
     group.issueCount += 1;
     incrementCounts(group.counts, issue);
     group.unavailableCount = group.counts.unavailable;
@@ -264,10 +299,15 @@ function addToDeviceGroup(group, issue, entity, registry, metadata) {
 }
 
 
-function createStandalone(issue, entity, registry) {
+function createStandalone(issue, entity, registry, automationImpact) {
 
     const counts = emptyCounts();
-    const child = publicChild(issue, entity, registry);
+    const child = publicChild(
+        issue,
+        entity,
+        registry,
+        automationImpact
+    );
 
     incrementCounts(counts, issue);
 
@@ -292,6 +332,9 @@ function createStandalone(issue, entity, registry) {
         flapping: issue.flapping === true,
         recoveryPending: issue.recoveryPending === true,
         ruleSource: issue.ruleSource || null,
+        affectedAutomations: automationImpact || [],
+        affectedAutomationCount:
+            automationImpact ? automationImpact.length : 0,
         issues: [child]
     };
 
@@ -365,6 +408,11 @@ function aggregate(snapshot, issues) {
         const registry = issue.entityId
             ? registryEntities[issue.entityId] || null
             : null;
+        const automationImpact = AutomationImpact.forIssue(
+            snapshot,
+            issue,
+            entity
+        );
 
         const deviceId =
             issue.source === "entity_state" &&
@@ -378,7 +426,8 @@ function aggregate(snapshot, issues) {
                 createStandalone(
                     issue,
                     entity,
-                    registry
+                    registry,
+                    automationImpact
                 )
             );
             return;
@@ -389,7 +438,8 @@ function aggregate(snapshot, issues) {
                 deviceId,
                 issue,
                 entity,
-                metadata
+                metadata,
+                automationImpact
             );
             deviceGroups.push(issuesByDeviceId[deviceId]);
             return;
@@ -400,7 +450,8 @@ function aggregate(snapshot, issues) {
             issue,
             entity,
             registry,
-            metadata
+            metadata,
+            automationImpact
         );
 
     });
@@ -437,7 +488,8 @@ function build(snapshot, detected) {
     return Object.assign({}, detected, {
         groups: aggregate(snapshot || {}, issues),
         filters: filterCounts(issues),
-        presentationVersion: 2
+        presentationVersion: 3,
+        automationAnalysis: AutomationImpact.analysis(snapshot || {})
     });
 
 }

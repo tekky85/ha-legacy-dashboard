@@ -944,7 +944,7 @@ test(
             assert.equal(errors.json.summary.unavailable, 1);
             assert.equal(errors.json.summary.unknown, 1);
             assert.equal(errors.json.overallStatus, "warning");
-            assert.equal(errors.json.presentationVersion, 2);
+            assert.equal(errors.json.presentationVersion, 3);
             assert.deepEqual(errors.json.filters, {
                 severity: {
                     all: 2,

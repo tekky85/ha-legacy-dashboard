@@ -12,8 +12,9 @@ const cache = Cache.createSnapshotCache({
 
 module.exports = {
     CACHE_TTL_MS: Cache.DEFAULT_TTL_MS,
-    getDiagnosticsStatus: function () {
-        return Diagnostics.getPublicStatus();
+    getDiagnosticsStatus: async function () {
+        const snapshot = await cache.getSnapshot();
+        return Diagnostics.getPublicStatus(snapshot.entities);
     },
     getCriticalLabels: async function () {
         const snapshot = await Diagnostics.getSnapshot();
@@ -44,5 +45,27 @@ module.exports = {
     },
     getSnapshot: function () {
         return cache.getSnapshot();
+    },
+    getErrorSnapshot: async function () {
+        const snapshot = await cache.getSnapshot();
+        const diagnostic = await Diagnostics.getSnapshot(
+            snapshot.entities,
+            true
+        );
+
+        return require("./enrichment").attach(
+            snapshot,
+            diagnostic
+        );
+    },
+    getAutomationTraceSummaries: function (snapshot, entityIds) {
+        const automation = snapshot && snapshot.automations
+            ? snapshot.automations
+            : {inventory: []};
+
+        return Diagnostics.getTraceSummaries(
+            automation.inventory,
+            entityIds
+        );
     }
 };

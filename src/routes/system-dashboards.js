@@ -90,18 +90,63 @@ router.get("/summary", async function (req, res) {
 
 router.get("/errors", async function (req, res) {
 
-    return loadSnapshot(
-        res,
-        function (snapshot) {
-            return IssuePresentation.build(
+    try {
+        const snapshot = await System.getErrorSnapshot();
+
+        return res.json(IssuePresentation.build(
+            snapshot,
+            Issues.buildIssues(
                 snapshot,
-                Issues.buildIssues(
-                    snapshot,
-                    DashboardConfig.getErrorsConfiguration()
-                )
-            );
-        }
-    );
+                DashboardConfig.getErrorsConfiguration()
+            )
+        ));
+    } catch (error) {
+        logger.error("system_dashboard_request_failed", {
+            error_type: error && error.name ? error.name : "unknown"
+        });
+        return res.status(503).json({
+            error: "system_snapshot_unavailable"
+        });
+    }
+
+});
+
+
+router.get("/errors/automation-traces", async function (req, res) {
+
+    try {
+        const snapshot = await System.getErrorSnapshot();
+        const presentation = IssuePresentation.build(
+            snapshot,
+            Issues.buildIssues(
+                snapshot,
+                DashboardConfig.getErrorsConfiguration()
+            )
+        );
+        const entityIds = [];
+
+        (presentation.groups || []).forEach(function (group) {
+            (group.affectedAutomations || []).forEach(function (automation) {
+                if (entityIds.indexOf(automation.entityId) === -1) {
+                    entityIds.push(automation.entityId);
+                }
+            });
+        });
+
+        return res.json(await System.getAutomationTraceSummaries(
+            snapshot,
+            entityIds
+        ));
+    } catch (error) {
+        logger.warn("automation_trace_summary_failed", {
+            error_code: error && error.code
+                ? error.code
+                : "automation_trace_failed"
+        });
+        return res.status(503).json({
+            error: "automation_trace_summary_unavailable"
+        });
+    }
 
 });
 

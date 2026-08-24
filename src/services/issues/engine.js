@@ -70,6 +70,9 @@ function createIssue(
     } else if (evaluation.flapping) {
         title = baseTitle + ": Verbindung instabil";
         description = "Die Verfügbarkeit der Entity wechselte innerhalb kurzer Zeit wiederholt.";
+    } else if (state === "unavailable" && entity.domain === "automation") {
+        title = baseTitle + " nicht verfügbar";
+        description = "Home Assistant meldet die Automation derzeit als nicht verfügbar.";
     } else if (state === "unavailable") {
         title = baseTitle + " nicht erreichbar";
         description = "Die Entity ist derzeit nicht verfügbar.";
@@ -80,7 +83,9 @@ function createIssue(
 
     return {
         id: "entity-" + state + "-" + entity.entityId,
-        source: "entity_state",
+        source: entity.domain === "automation" && state === "unavailable"
+            ? "automation_unavailable"
+            : "entity_state",
         severity: evaluation.severity,
         status: "active",
         title: title,

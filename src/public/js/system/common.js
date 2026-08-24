@@ -166,6 +166,8 @@ var SystemDashboard = (function () {
             if (
                 Object.prototype.hasOwnProperty.call(sources, sourceName) &&
                 sourceName !== "states" &&
+                sourceName !== "automationConfig" &&
+                sourceName !== "automationTrace" &&
                 sources[sourceName] &&
                 sources[sourceName].supported !== false &&
                 sources[sourceName].ok !== true

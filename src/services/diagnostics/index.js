@@ -2,6 +2,7 @@ const HomeAssistantWebSocket = require("../homeassistant-websocket");
 const logger = require("../logger");
 const Normalizers = require("./normalizers");
 const SourceCache = require("./source-cache");
+const AutomationService = require("../automations/service");
 
 const REGISTRY_TTL_MS = 60000;
 const CONFIG_ENTRY_TTL_MS = 30000;
@@ -35,6 +36,9 @@ function statusName(source) {
     if (source.ok) {
         return "available";
     }
+    if (source.supported === null) {
+        return "unknown";
+    }
     return "error";
 }
 
@@ -61,6 +65,13 @@ function createService(options) {
         homeAssistantUrl: settings.homeAssistantUrl,
         token: settings.token,
         WebSocketImplementation: settings.WebSocketImplementation
+    });
+    const automations = AutomationService.createService({
+        client: client,
+        logger: log,
+        clock: clock,
+        configTtlMs: settings.automationConfigTtlMs,
+        traceTtlMs: settings.automationTraceTtlMs
     });
 
     function source(name, command, normalize, ttlMs) {
@@ -116,7 +127,7 @@ function createService(options) {
     const matter = SourceCache.unsupportedResult();
 
 
-    async function getSnapshot() {
+    async function getSnapshot(entities, includeAutomationConfiguration) {
 
         const values = await Promise.all([
             sources.entityRegistry.get(),
@@ -136,6 +147,18 @@ function createService(options) {
             repairs: values[5],
             matter: matter
         };
+
+        const automationMetadata = await automations.getMetadata(
+            entities || [],
+            includeAutomationConfiguration === true
+        );
+        const automationTrace = automations.getTraceSource();
+
+        sourceValues.automationInventory =
+            automationMetadata.inventorySource;
+        sourceValues.automationConfig =
+            automationMetadata.configSource;
+        sourceValues.automationTrace = automationTrace;
 
         return {
             metadata: {
@@ -164,6 +187,10 @@ function createService(options) {
                 repairs: values[5].data,
                 matter: []
             },
+            automations: {
+                inventory: automationMetadata.inventory,
+                indexes: automationMetadata.indexes
+            },
             capabilities: {
                 entityRegistry: values[0].supported === true,
                 deviceRegistry: values[1].supported === true,
@@ -171,7 +198,12 @@ function createService(options) {
                 labelRegistry: values[3].supported === true,
                 configEntries: values[4].supported === true,
                 repairs: values[5].supported === true,
-                matterDiagnostics: false
+                matterDiagnostics: false,
+                automationInventory: true,
+                automationConfigRead:
+                    automationMetadata.configSource.supported === true,
+                automationTraceRead:
+                    automationTrace.supported === true
             },
             sources: sourceValues
         };
@@ -179,13 +211,19 @@ function createService(options) {
     }
 
 
-    async function getPublicStatus() {
-        const snapshot = await getSnapshot();
+    async function getPublicStatus(entities) {
+        const snapshot = await getSnapshot(entities || [], true);
+        const traceStatus = await automations.probeTrace(
+            snapshot.automations.inventory
+        );
         const result = {};
 
         Object.keys(snapshot.sources).forEach(function (name) {
             result[name] = publicSource(snapshot.sources[name]);
         });
+        result.automationTrace = traceStatus;
+        snapshot.capabilities.automationTraceRead =
+            traceStatus.supported === true;
 
         return {
             capabilities: snapshot.capabilities,
@@ -194,7 +232,11 @@ function createService(options) {
                 registries: REGISTRY_TTL_MS,
                 config_entries: CONFIG_ENTRY_TTL_MS,
                 repairs: REPAIRS_TTL_MS,
-                matter: MATTER_TTL_MS
+                matter: MATTER_TTL_MS,
+                automation_config:
+                    AutomationService.CONFIG_TTL_MS,
+                automation_trace:
+                    AutomationService.TRACE_TTL_MS
             }
         };
     }
@@ -203,6 +245,9 @@ function createService(options) {
     return {
         getPublicStatus: getPublicStatus,
         getSnapshot: getSnapshot,
+        getTraceSummaries: function (inventory, entityIds) {
+            return automations.getTraceSummaries(inventory, entityIds);
+        },
         close: function () {
             client.close();
         },
@@ -230,10 +275,16 @@ module.exports = {
     REGISTRY_TTL_MS: REGISTRY_TTL_MS,
     REPAIRS_TTL_MS: REPAIRS_TTL_MS,
     createService: createService,
-    getPublicStatus: function () {
-        return getSingleton().getPublicStatus();
+    getPublicStatus: function (entities) {
+        return getSingleton().getPublicStatus(entities);
     },
-    getSnapshot: function () {
-        return getSingleton().getSnapshot();
+    getSnapshot: function (entities, includeAutomationConfiguration) {
+        return getSingleton().getSnapshot(
+            entities,
+            includeAutomationConfiguration
+        );
+    },
+    getTraceSummaries: function (inventory, entityIds) {
+        return getSingleton().getTraceSummaries(inventory, entityIds);
     }
 };

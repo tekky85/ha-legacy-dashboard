@@ -15,9 +15,9 @@
 
 <title>HA Legacy Dashboard – System</title>
 
-<script src="/js/core/theme.js?v=39"></script>
-<link rel="stylesheet" href="/css/style.css?v=39">
-<link rel="stylesheet" href="/css/system.css?v=39">
+<script src="/js/core/theme.js?v=42"></script>
+<link rel="stylesheet" href="/css/style.css?v=42">
+<link rel="stylesheet" href="/css/system.css?v=42">
 
 </head>
 
@@ -196,6 +196,24 @@
 
             <p id="errorFilterEmpty" class="system-filter-empty" hidden>Keine Störungen in dieser Kategorie.</p>
             <div id="errorGroups" class="error-groups"></div>
+
+            <section id="advancedDiagnostics" class="advanced-diagnostics" aria-labelledby="advancedDiagnosticsTitle">
+                <button id="advancedDiagnosticsToggle" class="advanced-diagnostics-toggle" type="button" aria-expanded="false">
+                    <span id="advancedDiagnosticsTitle">Advanced Diagnostics</span>
+                    <span id="advancedDiagnosticsSummary">Wird vorbereitet …</span>
+                </button>
+                <div id="advancedDiagnosticsDetails" class="advanced-diagnostics-details" aria-hidden="true">
+                    <dl class="advanced-diagnostics-list">
+                        <div><dt>Automation Inventory</dt><dd id="advancedAutomationInventory">–</dd></div>
+                        <div><dt>Automation Config Read</dt><dd id="advancedAutomationConfig">–</dd></div>
+                        <div><dt>Automation Trace Read</dt><dd id="advancedAutomationTrace">Noch nicht geladen</dd></div>
+                        <div><dt>Dynamische Referenzen</dt><dd id="advancedAutomationDynamic">–</dd></div>
+                        <div><dt>Registry</dt><dd id="advancedRegistryStatus">–</dd></div>
+                        <div><dt>Repairs</dt><dd id="advancedRepairsStatus">–</dd></div>
+                    </dl>
+                    <p id="advancedDiagnosticsNote" class="advanced-diagnostics-note"></p>
+                </div>
+            </section>
         </div>
 
         <dl class="system-meta">
@@ -222,11 +240,11 @@
 
 </div>
 
-<script src="/js/core/compat.js?v=39"></script>
-<script src="/js/core/system-navigation.js?v=39"></script>
-<script src="/js/system/common.js?v=39"></script>
-<script src="/js/system/summary.js?v=39"></script>
-<script src="/js/system/errors.js?v=39"></script>
+<script src="/js/core/compat.js?v=42"></script>
+<script src="/js/core/system-navigation.js?v=42"></script>
+<script src="/js/system/common.js?v=42"></script>
+<script src="/js/system/summary.js?v=42"></script>
+<script src="/js/system/errors.js?v=42"></script>
 
 </body>
 

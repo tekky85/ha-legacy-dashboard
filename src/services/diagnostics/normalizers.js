@@ -196,7 +196,8 @@ function areaRegistry(entries) {
         return areaId
             ? {
                 areaId: areaId,
-                name: text(raw.name, 160)
+                name: text(raw.name, 160),
+                labelIds: identifiers(raw.labels)
             }
             : null;
     }).filter(Boolean);

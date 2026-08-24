@@ -34,6 +34,12 @@
     var activeSeverityFilter = "all";
     var activeStateFilter = "all";
     var expandedGroups = {};
+    var expandedAutomationImpacts = {};
+    var traceSummaries = {};
+    var traceSourceStatus = "unknown";
+    var traceLoading = false;
+    var traceLoaded = false;
+    var advancedExpanded = false;
     var lastPayload = null;
     var severityFilterController = null;
     var stateFilterController = null;
@@ -77,6 +83,196 @@
         }
 
         return "seit " + Math.floor(seconds / 86400) + " Tagen";
+
+    }
+
+
+    function formatAge(value) {
+
+        var parsed = Date.parse(value || "");
+        var seconds;
+
+        if (isNaN(parsed)) {
+            return "Noch nie ausgelöst";
+        }
+
+        seconds = Math.max(0, Math.floor((new Date().getTime() - parsed) / 1000));
+
+        if (seconds < 60) {
+            return "Letzter Trigger: vor weniger als 1 Min.";
+        }
+        if (seconds < 3600) {
+            return "Letzter Trigger: vor " + Math.floor(seconds / 60) + " Min.";
+        }
+        if (seconds < 86400) {
+            return "Letzter Trigger: vor " + Math.floor(seconds / 3600) + " Std.";
+        }
+
+        return "Letzter Trigger: vor " + Math.floor(seconds / 86400) + " Tagen";
+
+    }
+
+
+    function impactConfidence(impact) {
+
+        if (impact.confidence === "direct") {
+            if (impact.reasons && impact.reasons.indexOf("device") !== -1) {
+                return "Gerät direkt referenziert";
+            }
+            return "Entity direkt referenziert";
+        }
+
+        if (impact.confidence === "indirect") {
+            if (impact.reasons && impact.reasons.indexOf("label") !== -1) {
+                return "Über Label referenziert";
+            }
+            return "Über Area referenziert";
+        }
+
+        return "Dynamische Referenz – Analyse unvollständig";
+
+    }
+
+
+    function traceDescription(automationEntityId) {
+
+        var trace = traceSummaries[automationEntityId];
+        var latest;
+
+        if (!trace) {
+            return null;
+        }
+
+        latest = trace.summaries && trace.summaries[0];
+
+        if (latest && latest.hasError) {
+            return "Letzter Trace mit Ausführungsfehler";
+        }
+        if (trace.errorCount > 0) {
+            return trace.errorCount + " der letzten " +
+                trace.summaries.length + " Traces mit Fehler";
+        }
+        if (latest) {
+            return latest.result === "condition_false"
+                ? "Letzter Trace: Bedingung nicht erfüllt (normal)"
+                : latest.result === "not_triggered"
+                    ? "Letzter Trace: nicht ausgelöst (normal)"
+                    : "Letzter Trace: " + latest.result;
+        }
+
+        return "Keine Trace Summary vorhanden";
+
+    }
+
+
+    function automationImpactItem(impact) {
+
+        var item = createElement("li", "automation-impact-item");
+        var title = createElement(
+            "strong",
+            "automation-impact-name",
+            impact.name || impact.entityId
+        );
+        var confidence = createElement(
+            "span",
+            "automation-impact-confidence is-" + impact.confidence,
+            impactConfidence(impact)
+        );
+        var traceText = traceDescription(impact.entityId);
+
+        item.appendChild(title);
+        item.appendChild(confidence);
+        item.appendChild(
+            createElement(
+                "span",
+                "automation-impact-triggered",
+                formatAge(impact.lastTriggered)
+            )
+        );
+
+        if (impact.disabled) {
+            item.appendChild(
+                createElement(
+                    "span",
+                    "automation-impact-disabled",
+                    "Automation ist deaktiviert"
+                )
+            );
+        } else if (!impact.available) {
+            item.appendChild(
+                createElement(
+                    "span",
+                    "automation-impact-unavailable",
+                    "Automation ist nicht verfügbar"
+                )
+            );
+        }
+
+        if (impact.dynamicReferences) {
+            item.appendChild(
+                createElement(
+                    "span",
+                    "automation-impact-dynamic",
+                    "Zusätzliche dynamische Referenzen – Analyse möglicherweise unvollständig"
+                )
+            );
+        }
+
+        if (traceText) {
+            item.appendChild(
+                createElement("span", "automation-impact-trace", traceText)
+            );
+        }
+
+        return item;
+
+    }
+
+
+    function automationImpactSection(group) {
+
+        var impacts = group.affectedAutomations || [];
+        var expanded = expandedAutomationImpacts[group.id] === true;
+        var section;
+        var button;
+        var details;
+        var list;
+        var index;
+
+        if (impacts.length === 0) {
+            return null;
+        }
+
+        section = createElement("section", "automation-impact");
+        button = createElement(
+            "button",
+            "automation-impact-toggle",
+            expanded ? "Automation Impact ausblenden" : "Automation Impact anzeigen"
+        );
+        details = createElement("div", "automation-impact-details");
+
+        button.setAttribute("type", "button");
+        button.setAttribute("aria-expanded", expanded ? "true" : "false");
+        details.setAttribute("aria-hidden", expanded ? "false" : "true");
+
+        if (expanded) {
+            list = createElement("ul", "automation-impact-list");
+            for (index = 0; index < impacts.length; index++) {
+                list.appendChild(automationImpactItem(impacts[index]));
+            }
+            details.appendChild(list);
+        }
+
+        button.onclick = function () {
+            expandedAutomationImpacts[group.id] = !expanded;
+            if (lastPayload) {
+                renderGroups(lastPayload);
+            }
+        };
+
+        section.appendChild(button);
+        section.appendChild(details);
+        return section;
 
     }
 
@@ -338,6 +534,11 @@
 
         container.appendChild(list);
 
+        var impact = automationImpactSection(group);
+        if (impact) {
+            container.appendChild(impact);
+        }
+
     }
 
 
@@ -447,6 +648,18 @@
                     "span",
                     "error-recovery-pending",
                     "Wiederherstellung wird geprüft"
+                )
+            );
+        }
+        if (group.affectedAutomationCount > 0) {
+            summary.appendChild(
+                createElement(
+                    "span",
+                    "automation-impact-count",
+                    group.affectedAutomationCount === 1
+                        ? "1 Automation möglicherweise betroffen"
+                        : group.affectedAutomationCount +
+                            " Automationen möglicherweise betroffen"
                 )
             );
         }
@@ -596,7 +809,24 @@
             );
         }
 
+        if (group.affectedAutomationCount > 0) {
+            details.appendChild(
+                createElement(
+                    "span",
+                    "automation-impact-count",
+                    group.affectedAutomationCount === 1
+                        ? "1 Automation möglicherweise betroffen"
+                        : group.affectedAutomationCount +
+                            " Automationen möglicherweise betroffen"
+                )
+            );
+        }
+
         card.appendChild(details);
+        var impact = automationImpactSection(group);
+        if (impact) {
+            card.appendChild(impact);
+        }
         return card;
 
     }
@@ -693,6 +923,223 @@
     }
 
 
+    function sourceLabel(source) {
+
+        if (!source) {
+            return "Unbekannt";
+        }
+        if (source.supported === false) {
+            return "Nicht unterstützt";
+        }
+        if (source.stale) {
+            return "Veraltet";
+        }
+        if (source.ok) {
+            return "Verfügbar";
+        }
+
+        return "Fehler";
+
+    }
+
+
+    function traceSourceLabel() {
+
+        if (traceLoading) {
+            return "Wird geladen …";
+        }
+        if (traceSourceStatus === "available") {
+            return "Verfügbar";
+        }
+        if (traceSourceStatus === "unsupported") {
+            return "Nicht unterstützt";
+        }
+        if (traceSourceStatus === "stale") {
+            return "Veraltet";
+        }
+        if (traceSourceStatus === "error") {
+            return "Fehler";
+        }
+
+        return "Noch nicht geladen";
+
+    }
+
+
+    function affectedAutomationCount(payload) {
+
+        var seen = {};
+        var groups = presentationGroups(payload);
+        var groupIndex;
+        var automationIndex;
+
+        for (groupIndex = 0; groupIndex < groups.length; groupIndex++) {
+            for (
+                automationIndex = 0;
+                groups[groupIndex].affectedAutomations &&
+                    automationIndex < groups[groupIndex].affectedAutomations.length;
+                automationIndex++
+            ) {
+                seen[groups[groupIndex].affectedAutomations[automationIndex].entityId] = true;
+            }
+        }
+
+        return Object.keys(seen).length;
+
+    }
+
+
+    function renderAdvancedDiagnostics(payload) {
+
+        var details = SystemDashboard.byId("advancedDiagnosticsDetails");
+        var toggle = SystemDashboard.byId("advancedDiagnosticsToggle");
+        var analysis = payload && payload.automationAnalysis
+            ? payload.automationAnalysis
+            : {};
+        var meta = payload && payload.meta ? payload.meta : {};
+        var sources = meta.sources || {};
+        var affected = affectedAutomationCount(payload);
+
+        SystemDashboard.setText(
+            "advancedDiagnosticsSummary",
+            affected === 1
+                ? "1 möglicherweise betroffene Automation"
+                : affected + " möglicherweise betroffene Automationen"
+        );
+        SystemDashboard.setText(
+            "advancedAutomationInventory",
+            typeof analysis.inventoryCount === "number"
+                ? analysis.inventoryCount + " Automationen"
+                : "Unbekannt"
+        );
+        SystemDashboard.setText(
+            "advancedAutomationConfig",
+            analysis.configStatus === "available"
+                ? "Verfügbar"
+                : analysis.configStatus === "unsupported"
+                    ? "Nicht unterstützt"
+                    : analysis.configStatus === "stale"
+                        ? "Veraltet"
+                        : analysis.configStatus === "unknown"
+                            ? "Noch nicht geprüft"
+                            : "Teilweise/Fehler"
+        );
+        SystemDashboard.setText(
+            "advancedAutomationTrace",
+            traceSourceLabel()
+        );
+        SystemDashboard.setText(
+            "advancedAutomationDynamic",
+            analysis.dynamicCount > 0
+                ? analysis.dynamicCount === 1
+                    ? "1 Automation – Analyse möglicherweise unvollständig"
+                    : analysis.dynamicCount +
+                        " Automationen – Analyse möglicherweise unvollständig"
+                : "Keine erkannt"
+        );
+        SystemDashboard.setText(
+            "advancedRegistryStatus",
+            sourceLabel(sources.entityRegistry)
+        );
+        SystemDashboard.setText(
+            "advancedRepairsStatus",
+            sourceLabel(sources.repairs)
+        );
+        SystemDashboard.setText(
+            "advancedDiagnosticsNote",
+            "Read-only Diagnose. Referenzen beschreiben möglichen Impact, keine Fehlerursache."
+        );
+
+        if (details) {
+            details.setAttribute(
+                "aria-hidden",
+                advancedExpanded ? "false" : "true"
+            );
+        }
+        if (toggle) {
+            toggle.setAttribute(
+                "aria-expanded",
+                advancedExpanded ? "true" : "false"
+            );
+        }
+
+    }
+
+
+    function loadTraceSummaries() {
+
+        if (traceLoading || traceLoaded || !lastPayload) {
+            return;
+        }
+
+        if (affectedAutomationCount(lastPayload) === 0) {
+            traceLoaded = true;
+            return;
+        }
+
+        traceLoading = true;
+        renderAdvancedDiagnostics(lastPayload);
+
+        Legacy.http.get(
+            "/api/system-dashboards/errors/automation-traces",
+            function (payload) {
+                var items = payload && payload.automations
+                    ? payload.automations
+                    : [];
+                var index;
+
+                traceSummaries = {};
+                for (index = 0; index < items.length; index++) {
+                    traceSummaries[items[index].entityId] = items[index];
+                }
+                traceSourceStatus = payload && payload.source
+                    ? payload.source.status
+                    : "error";
+                traceLoading = false;
+                traceLoaded = true;
+                renderGroups(lastPayload);
+                renderAdvancedDiagnostics(lastPayload);
+            },
+            function () {
+                traceSourceStatus = "error";
+                traceLoading = false;
+                renderAdvancedDiagnostics(lastPayload);
+            }
+        );
+
+    }
+
+
+    function initializeAdvancedDiagnostics() {
+
+        var toggle = SystemDashboard.byId("advancedDiagnosticsToggle");
+        var details = SystemDashboard.byId("advancedDiagnosticsDetails");
+
+        if (!toggle || !details) {
+            return;
+        }
+
+        toggle.onclick = function () {
+            advancedExpanded = !advancedExpanded;
+            details.className = "advanced-diagnostics-details" +
+                (advancedExpanded ? " is-expanded" : "");
+            toggle.setAttribute(
+                "aria-expanded",
+                advancedExpanded ? "true" : "false"
+            );
+            details.setAttribute(
+                "aria-hidden",
+                advancedExpanded ? "false" : "true"
+            );
+
+            if (advancedExpanded) {
+                loadTraceSummaries();
+            }
+        };
+
+    }
+
+
     function selectSeverityFilter(filterName) {
 
         activeSeverityFilter = filterName;
@@ -744,6 +1191,7 @@
         renderOverall(payload.overallStatus || "unknown");
         updateFilterButtons(counts);
         renderGroups(payload);
+        renderAdvancedDiagnostics(payload);
 
         if (connectionState === "recovered") {
             SystemDashboard.setMessage(
@@ -767,6 +1215,7 @@
             window.location.pathname || ""
         )
     ) {
+        initializeAdvancedDiagnostics();
         severityFilterController = SystemDashboard.createFilterController(
             SEVERITY_FILTERS,
             selectSeverityFilter

@@ -235,7 +235,7 @@ test("Config Entry, Repair und Matter bleiben Standalone und Filter zählen Issu
             unknown: 2
         }
     });
-    assert.equal(result.presentationVersion, 2);
+    assert.equal(result.presentationVersion, 3);
     assert.equal(JSON.stringify(result).includes("identifiers"), false);
     assert.equal(JSON.stringify(result).includes("connections"), false);
     assert.equal(JSON.stringify(result).includes("manufacturer"), false);

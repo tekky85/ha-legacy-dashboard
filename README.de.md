@@ -212,6 +212,30 @@ State werden nicht pauschal als verwaist klassifiziert. Config-Entry-Probleme
 und Repairs erscheinen ausschließlich als Hinweise – ohne Reload-, Reauth-,
 Repair- oder Matter-Aktionen.
 
+### Automation Impact und Advanced Diagnostics
+
+Der Systemstatus analysiert Automationen vollständig read-only. Das Inventory
+stammt aus dem vorhandenen State-Snapshot; explizite `entity_id`-, `device_id`-,
+`area_id`- und `label_id`-Referenzen werden aus der per Capability geprüften
+Automation-Konfiguration in serverseitige Indizes übernommen. Direkte Entity-
+oder Device-Referenzen und indirekte Area-/Label-Referenzen werden klar
+unterschieden. Dynamische Templates und Blueprints werden nicht interpretiert,
+sondern als unvollständig beziehungsweise unbekannt gekennzeichnet.
+
+Device Cards und einzelne Entity-Issues zeigen nur, welche Automationen die
+betroffene Entity oder das Gerät möglicherweise referenzieren; sie behaupten
+keine Fehlerursache. Eine ausgeschaltete Automation ist lediglich deaktiviert
+und kein Fehler. `unavailable` kann nach den bestehenden Grace-/Risk-Regeln als
+Diagnose erscheinen. `last_triggered` erzeugt allein keine Severity.
+
+Kurze Trace Summaries werden nur beim Öffnen von „Advanced Diagnostics“
+geladen, separat 30 Sekunden gecacht und capability-gesteuert als verfügbar
+oder nicht unterstützt ausgewiesen. Condition-false und Not-triggered gelten
+als normale Ablaufentscheidungen. Weder rohe Automation-Konfigurationen noch
+Trace-Variablen, Action-/Service-Daten oder vollständige Trace-Payloads werden
+an den Browser übertragen. Triggern, Aktivieren, Deaktivieren, Reload und
+Bearbeiten von Automationen bleiben ausdrücklich unmöglich.
+
 ## Sicherheitsmodell
 
 Verbindlich:
@@ -326,6 +350,10 @@ davon unberührt.
 
 ![Error Dashboard mit einem Warnungszustand](docs/screenshots/system/errors.png)
 
+#### Automation Impact und Advanced Diagnostics
+
+![Ausgeklappte Automation-Auswirkungen und normalisierte Diagnoseinformationen](docs/screenshots/system/errors-automation-impact.png)
+
 ## Screenshot-Pflege
 
 Bei jedem Sprint mit sichtbaren UI-Änderungen muss geprüft werden:
@@ -364,6 +392,7 @@ docs/
     system/
       summary.png
       errors.png
+      errors-automation-impact.png
 ```
 
 ## Entwicklung

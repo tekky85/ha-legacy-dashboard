@@ -722,6 +722,180 @@
     word-break: break-word;
 }
 
+.automation-impact-count {
+    color: #475569 !important;
+    font-weight: 800;
+}
+
+.automation-impact {
+    margin-top: 9px;
+    padding-top: 9px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.automation-impact-toggle,
+.advanced-diagnostics-toggle {
+    min-height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #334155;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.automation-impact-toggle {
+    width: 100%;
+    padding: 9px 12px;
+    text-align: left;
+}
+
+.automation-impact-details {
+    margin-top: 8px;
+}
+
+.automation-impact-details[aria-hidden="true"] {
+    display: none;
+}
+
+.automation-impact-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.automation-impact-item {
+    margin: 0 0 7px;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    background: #f8fafc;
+}
+
+.automation-impact-item strong,
+.automation-impact-item span {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 11px;
+    line-height: 16px;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.automation-impact-item .automation-impact-name {
+    color: #334155;
+    font-size: 12px;
+}
+
+.automation-impact-confidence {
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.automation-impact-disabled,
+.automation-impact-triggered {
+    color: #64748b;
+}
+
+.automation-impact-unavailable,
+.automation-impact-dynamic,
+.automation-impact-trace {
+    color: #9a3412;
+    font-weight: 750;
+}
+
+.advanced-diagnostics {
+    margin: 18px 1% 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 13px;
+    background: #f8fafc;
+}
+
+.advanced-diagnostics-toggle {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+}
+
+.advanced-diagnostics-toggle span:first-child {
+    padding-right: 12px;
+    color: #0f172a;
+    font-size: 14px;
+}
+
+.advanced-diagnostics-toggle span:last-child {
+    color: #64748b;
+    font-size: 11px;
+    text-align: right;
+}
+
+.advanced-diagnostics-details {
+    display: none;
+    padding: 0 12px 12px;
+}
+
+.advanced-diagnostics-details.is-expanded {
+    display: block;
+}
+
+.advanced-diagnostics-list {
+    margin: 0 -5px;
+}
+
+.advanced-diagnostics-list:after {
+    display: table;
+    clear: both;
+    content: "";
+}
+
+.advanced-diagnostics-list div {
+    float: left;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 50%;
+    min-height: 55px;
+    padding: 6px;
+}
+
+.advanced-diagnostics-list dt,
+.advanced-diagnostics-list dd {
+    margin: 0;
+    word-wrap: break-word;
+}
+
+.advanced-diagnostics-list dt {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.advanced-diagnostics-list dd {
+    color: #334155;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 17px;
+}
+
+.advanced-diagnostics-note {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 16px;
+}
+
 .error-groups .error-more {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -1159,6 +1333,42 @@ body.theme-dark .error-child {
     color: #dbe7f4;
 }
 
+body.theme-dark .automation-impact,
+body.theme-dark .automation-impact-item,
+body.theme-dark .advanced-diagnostics {
+    border-color: #475569;
+}
+
+body.theme-dark .automation-impact-item,
+body.theme-dark .advanced-diagnostics {
+    background: #1f2b3d;
+}
+
+body.theme-dark .automation-impact-toggle,
+body.theme-dark .advanced-diagnostics-toggle {
+    border-color: #475569;
+    background: #172131;
+    color: #dbe7f4;
+}
+
+body.theme-dark .advanced-diagnostics-toggle {
+    background: transparent;
+}
+
+body.theme-dark .automation-impact-name,
+body.theme-dark .advanced-diagnostics-toggle span:first-child,
+body.theme-dark .advanced-diagnostics-list dd {
+    color: #f1f5f9;
+}
+
+body.theme-dark .automation-impact-disabled,
+body.theme-dark .automation-impact-triggered,
+body.theme-dark .advanced-diagnostics-toggle span:last-child,
+body.theme-dark .advanced-diagnostics-list dt,
+body.theme-dark .advanced-diagnostics-note {
+    color: #aebdd0;
+}
+
 body.theme-dark .network-banner.is-warning {
     border-color: #684b28;
     background: #39291b;
@@ -1246,6 +1456,26 @@ body.theme-dark .network-banner.is-success {
         width: 100%;
         margin-right: 0;
         margin-left: 0;
+    }
+
+    .advanced-diagnostics {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .advanced-diagnostics-toggle {
+        display: block;
+    }
+
+    .advanced-diagnostics-toggle span {
+        display: block;
+        text-align: left !important;
+    }
+
+    .advanced-diagnostics-list div {
+        float: none;
+        width: 100%;
+        min-height: 0;
     }
 
     .error-groups.system-columns-1 .error-card,

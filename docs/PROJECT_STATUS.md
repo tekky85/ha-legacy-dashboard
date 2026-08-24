@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 24. August 2026, Sprint 22 auf Basis von Sprint 21.5 implementiert;
+Stand: 24. August 2026, Sprint 23 auf Basis von Sprint 22 implementiert;
 physische Safari-Geräteabnahme nach Rollout ausstehend
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
@@ -9,6 +9,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-23-Ausgangscommit: `e692eed`
 - Sprint-22-Ausgangscommit: `ca95e21`
 - Sprint-17.7-Ausgangscommit: `ff71d23`
 - Sprint-21.3-Ausgangscommit: `a490dcf`
@@ -66,6 +67,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 21.4 | Entity Rule Manager und eindeutige Header-Counts | umgesetzt |
 | 21.5 | Globale Systemnavigation und Health-Indikator | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
+| 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -662,10 +664,10 @@ die vorhandene Device-Präsentation. Nicht vorgezogen wurden fachliche Summary-
 Aggregation, persistente Historie, weitere Schreibdomänen oder freie System-
 Dashboard-Layouts.
 
-Empfohlener nächster Schritt ist Sprint 23 – Automation Impact & Advanced
-Diagnostics. Er kann auf den stabilisierten Sprint-22-Issues aufbauen, darf
-aber bestehende Sicherheitsgrenzen oder die read-only Diagnosepfade nicht
-implizit erweitern.
+Empfohlener nächster Schritt ist Sprint 24 – Home Assistant App Packaging.
+Dabei müssen die bestehenden Standalone-/systemd-Pfade, die getrennten Tokens,
+die read-only Automationsdiagnose und alle expliziten Write-Allowlists erhalten
+bleiben.
 
 ## 14. Dokumentation und Screenshot-Baseline
 
@@ -1095,6 +1097,71 @@ echte Demo-Screenshot `docs/screenshots/system/errors.png` wurde geprüft und
 bleibt repräsentativ, weil die neuen Flapping-, Recovery- und Device-Hinweise
 nur bedingt eingeblendet werden und das Grundlayout nicht verändern.
 
-Als nächster fachlicher Schritt ist Sprint 23 vorgesehen. Sprint 22 führt
-bewusst weder persistente Issue-Historie, Automationsanalyse, automatische
-Reparaturen noch neue Home-Assistant-Schreibaktionen ein.
+## 17. Sprint 23 – Automation Impact & Advanced Diagnostics
+
+Sprint 23 verwendet die vorhandenen `automation.*`-States als normalisiertes
+Inventory. Zustand, Friendly Name, `last_triggered`, Modus und Laufzähler
+werden bereits beim System-Snapshot reduziert; unbekannte Attribute werden
+nicht übernommen. `off` ist ausschließlich Deaktivierungs-Kontext.
+`unavailable` durchläuft weiterhin die Sprint-22-Regelengine und erscheint
+nach der wirksamen Grace Period als Warning vom Typ
+`automation_unavailable`; `unknown` behält die bestehende Rule-/Severity-
+Semantik. Alter oder Fehlen von `last_triggered` erzeugt keine Severity.
+
+Der feste read-only WebSocket-Adapter `automation/config` wird nur für Error-
+Dashboard und Admin-Diagnose capability-geprüft aufgerufen. Ein begrenzter
+Worker-Pool liest die Automationen, verwirft anschließend die Rohkonfiguration
+und behält ausschließlich deduplizierte explizite Referenzen aus Triggern,
+Bedingungen und Actions/Targets. Vier Maps indexieren Automation-Entity-IDs
+nach `entity_id`, `device_id`, `area_id` und `label_id`. Jinja-/Template-
+Ausdrücke und Blueprints werden nicht ausgewertet und setzen stattdessen
+`dynamicReferences`; die globale Analyse weist diese Unsicherheit als
+`unknown` und möglicherweise unvollständig aus, ohne sie einer beliebigen
+Störung zuzuordnen. Namen werden nie als Referenzheuristik verwendet.
+
+Erst nachdem Sprint 22 Grace, Expected Offline, Flapping, Recovery und Severity
+ausgewertet hat, ergänzt die Presentation-Schicht aktive Device Groups oder
+Standalone Entity Issues. Entity-/Device-Treffer sind `direct`, Area-/Label-
+Treffer `indirect`. Die Oberfläche formuliert ausschließlich „möglicherweise
+betroffen“ und behauptet keine Kausalität. Automation Impact ist in den
+Kartendetails separat einklappbar; deaktivierte Automationen bleiben sichtbar,
+aber diagnostisch neutral.
+
+`trace/list` wird über einen zweiten festen read-only Adapter ausschließlich
+on-demand geladen, wenn im Error Dashboard „Advanced Diagnostics“ geöffnet
+wird und tatsächlich betroffene Automationen vorhanden sind. Der Browser
+erhält höchstens drei normalisierte Summaries je Automation mit Run-ID,
+Zeitstempeln, Dauer, Ergebnis, generischem Fehlerindikator und kurzer Trigger-
+Beschreibung. Raw Config, Raw Trace, Variables, Actions, Services und interne
+States werden weder übertragen noch geloggt. `failed_conditions` und
+`not_triggered` gelten als normale Ablaufentscheidungen. Config-Metadaten
+werden 60 Sekunden, Traces 30 Sekunden gecacht; beide Pfade deduplizieren
+laufende Requests und behalten bei Teilfehlern verwendbare Daten.
+
+Admin Diagnostic Sources zeigen Automation Inventory, Automation Config Read
+und Automation Trace Read getrennt als verfügbar, nicht unterstützt, veraltet
+oder fehlerhaft. Es existieren weiterhin keine Trigger-, Enable-/Disable-,
+Reload-, Edit-, YAML-, Registry-, Label-, Repair- oder generischen WebSocket-
+Write-Endpunkte. Der normale Systemstatus-Header fragt keine Traces ab und
+Automation-Impact-Kontext verändert den globalen Health-Indikator nicht.
+
+Die Sprint-23-Lasttests decken 3.000 Entities, 500 Devices, 500 Automationen,
+200 aktive Zuordnungsprüfungen, 2.000 explizite Referenzen und 100 Trace
+Summaries ab. Der gezielte Sprint-21/22/23-Systemsatz besteht mit 80 von 80
+Tests; der vollständige Deployment-Check besteht mit 240 von 240 Tests und
+alle JavaScript-Dateien unter `src/` und `test/` bestehen `node --check`.
+Die Legacy-Systemansicht bleibt ES5- und Flexbox-basiert, ohne
+CSS Grid oder Flexbox `gap`; die System-Assetversion ist 42. Die kontrollierte
+Browserabnahme der echten Anwendung bei 768×1024 und 1280×720 zeigte keinen
+horizontalen Überlauf und keine Konsolenfehler. Automation-Details und Traces
+wurden dabei interaktiv und erst nach dem Öffnen geladen. Die Screenshots
+`docs/screenshots/system/errors.png`,
+`docs/screenshots/system/errors-automation-impact.png` und
+`docs/screenshots/admin/system-diagnostics.png` wurden aus dieser Instanz mit
+Fake-Credentials und generischen Demo-Daten aktualisiert. Die physische
+iPad-Abnahme bleibt nach dem LXC-Rollout offen.
+
+Als nächster fachlicher Schritt ist Sprint 24 – Home Assistant App Packaging
+vorgesehen. Das Packaging darf die bestehende Standalone-Installation nicht
+ersetzen und muss Backend-only HA-Zugang, Admin-Token-Trennung, read-only
+Automationsdiagnose und explizite Write-Allowlists unverändert bewahren.

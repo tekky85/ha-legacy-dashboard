@@ -286,7 +286,7 @@ test("Presentation trennt Severity- und State-Counts", function () {
         severity: {all: 3, critical: 1, error: 0, warning: 1, info: 1},
         state: {all: 3, unavailable: 1, unknown: 2}
     });
-    assert.equal(result.presentationVersion, 2);
+    assert.equal(result.presentationVersion, 3);
 });
 
 

@@ -204,6 +204,30 @@ Status exclusively through their real `device_id`. Disabled entities are not tre
 classified as orphaned. Config Entry problems and Repairs remain notices only,
 without reload, reauthentication, repair or Matter actions.
 
+### Automation Impact and Advanced Diagnostics
+
+System Status analyses automations entirely read-only. The inventory comes
+from the existing state snapshot; explicit `entity_id`, `device_id`, `area_id`,
+and `label_id` references are read from capability-probed automation
+configuration and placed into server-side indexes. Direct entity/device
+references and indirect area/label references are clearly distinguished.
+Dynamic templates and blueprints are not interpreted and are marked as
+incomplete or unknown.
+
+Device Cards and standalone entity issues only show which automations may
+reference the affected entity or device; they never claim causation. An
+automation in the `off` state is merely disabled and is not an error.
+`unavailable` may become a diagnostic issue after the existing grace/risk
+rules. The age or absence of `last_triggered` never creates severity by itself.
+
+Small Trace Summaries are loaded only when “Advanced Diagnostics” is opened,
+cached independently for 30 seconds, and reported as available or unsupported
+through capability detection. Condition-false and not-triggered are normal
+control flow. Raw automation configuration, trace variables, action/service
+data, and complete trace payloads are never sent to the browser. Triggering,
+enabling, disabling, reloading, or editing automations remains explicitly
+impossible.
+
 ## Security Model
 
 Mandatory rules:
@@ -316,6 +340,10 @@ independent Focus geometry remains unchanged.
 
 ![Error Dashboard with a warning state](docs/screenshots/system/errors.png)
 
+#### Automation Impact and Advanced Diagnostics
+
+![Expanded automation impact and normalized diagnostic information](docs/screenshots/system/errors-automation-impact.png)
+
 ## Screenshot Maintenance
 
 For every sprint that visibly changes the UI, check:
@@ -354,6 +382,7 @@ docs/
     system/
       summary.png
       errors.png
+      errors-automation-impact.png
 ```
 
 ## Development
