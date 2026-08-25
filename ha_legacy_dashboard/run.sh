@@ -70,7 +70,7 @@ export PORT=3000
 
 echo "HA Legacy Dashboard starting"
 echo "Runtime mode: Home Assistant App"
-echo "Version: ${APP_VERSION:-1.0.0}"
+echo "Version: ${APP_VERSION:-development}"
 echo "Port: 3000"
 echo "Home Assistant API: Supervisor proxy"
 

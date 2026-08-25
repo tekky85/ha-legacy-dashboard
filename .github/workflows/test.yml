@@ -8,27 +8,63 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  quality:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repository auschecken
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Node.js einrichten
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      - name: Abhängigkeiten installieren
+      - name: Install locked dependencies
         run: npm ci
 
-      - name: JavaScript-Syntax prüfen
-        run: find src test -type f -name '*.js' -exec node --check '{}' ';'
+      - name: Run release test gate
+        run: ./release/test-gate.sh
 
-      - name: Shell-Syntax prüfen
-        run: find deploy ha_legacy_dashboard -type f -name '*.sh' -exec sh -n '{}' ';'
+      - name: Check production dependency audit
+        run: npm audit --omit=dev --audit-level=high
 
-      - name: Mock- und Integrationstests
-        run: npm test
+      - name: Build reproducible standalone bundle
+        env:
+          SOURCE_DATE_EPOCH: "0"
+        run: node release/create-standalone-bundle.js dist
+
+      - name: Verify standalone checksum
+        working-directory: dist
+        run: sha256sum --check SHA256SUMS
+
+  container-build:
+    needs: quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate amd64 and aarch64 BuildKit build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ha_legacy_dashboard/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: false
+          outputs: type=oci,dest=/tmp/ha-legacy-dashboard.oci.tar
+          build-args: |
+            APP_SOURCE_PATH=ha_legacy_dashboard
+            BUILD_VERSION=0.0.0-ci
+            BUILD_REVISION=${{ github.sha }}
+            BUILD_DATE=1970-01-01T00:00:00Z
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

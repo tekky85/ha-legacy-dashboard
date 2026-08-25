@@ -27,7 +27,9 @@ test("Deployment-Skripte sind ausführbar und nicht destruktiv", function () {
         "deploy/deploy.sh",
         "deploy/health-check.sh",
         "deploy/rollback.sh",
-        "deploy/prepare-home-assistant-app.sh"
+        "deploy/prepare-home-assistant-app.sh",
+        "release/test-gate.sh",
+        "release/smoke-container.sh"
     ];
 
 
@@ -115,7 +117,7 @@ test("GitHub-CI verwendet keine produktiven Credentials", function () {
 
 
     assert.match(workflow, /npm ci/);
-    assert.match(workflow, /npm test/);
+    assert.match(workflow, /\.\/release\/test-gate\.sh/);
     assert.doesNotMatch(workflow, /HA_TOKEN/);
     assert.doesNotMatch(workflow, /secrets\./);
 

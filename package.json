@@ -1,14 +1,15 @@
 {
   "name": "ha-legacy-dashboard",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.0-rc.1",
+  "description": "Lightweight Home Assistant dashboard for legacy browsers and wall displays",
   "main": "src/server.js",
   "scripts": {
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "start": "node src/server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "tky <mbp@tky.cloud>",
+  "license": "ISC",
   "private": true,
   "engines": {
     "node": ">=22"

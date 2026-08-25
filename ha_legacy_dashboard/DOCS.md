@@ -2,24 +2,33 @@
 
 ## Scope
 
-This package is the local/development Home Assistant App variant. Public App
-repository distribution and published multi-architecture images are planned
-for Sprint 25.
+This package is distributed through the HA Legacy Dashboard Custom Home
+Assistant App Repository. It is not an official Home Assistant App. The App
+uses the generic multi-architecture image
+`ghcr.io/tekky85/ha-legacy-dashboard` for amd64 and aarch64.
 
-## Installation for local testing
+## Installation
 
-1. Check out the repository on a development machine.
-2. Run `./deploy/prepare-home-assistant-app.sh /path/to/config/addons/ha_legacy_dashboard`.
-3. In Home Assistant OS, refresh the local Apps repository under
-   `Settings > Apps`.
-4. Install **HA Legacy Dashboard**, configure the host port if port 3000 is
+1. Add `https://github.com/tekky85/ha-legacy-dashboard` under
+   `Settings > Apps > App store > Repositories` or use the documented My Home
+   Assistant repository link.
+2. Refresh the App store and select **HA Legacy Dashboard**.
+3. Install the App, configure the host port if port 3000 is
    already occupied, and start the App.
+4. Check the App log and open the Web UI.
 5. Open `http://HOME_ASSISTANT_HOST:CONFIGURED_PORT/` directly from the wall
    display.
 
-The prepared directory is self-contained for Supervisor's local App build.
-Do not install or test it on a production Home Assistant system without an
-explicit maintenance window and backup.
+Create a Home Assistant backup before installing a release candidate or
+upgrading an existing App.
+
+## Upgrade and rollback
+
+App configuration remains under `/data` when the App image changes. Before an
+upgrade, create a backup that includes the App. Verify the Web UI, Home
+Assistant connection, Admin protection, and persisted dashboards after the
+update. Use a previously tested backup to restore an older state; no
+unverified Supervisor rollback mechanism is assumed.
 
 ## Configuration
 

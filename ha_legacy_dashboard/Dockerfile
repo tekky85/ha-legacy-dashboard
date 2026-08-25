@@ -11,14 +11,21 @@ ARG BUILD_FROM=node:22-alpine
 FROM ${BUILD_FROM}
 
 ARG BUILD_ARCH=amd64
-ARG BUILD_VERSION=1.0.0
+ARG BUILD_VERSION=0.0.0-dev
+ARG BUILD_REVISION=unknown
+ARG BUILD_DATE=unknown
 ARG APP_SOURCE_PATH=.
 
 LABEL io.hass.version="${BUILD_VERSION}" \
       io.hass.type="app" \
       io.hass.arch="${BUILD_ARCH}" \
       org.opencontainers.image.source="https://github.com/tekky85/ha-legacy-dashboard" \
-      org.opencontainers.image.title="HA Legacy Dashboard"
+      org.opencontainers.image.title="HA Legacy Dashboard" \
+      org.opencontainers.image.description="Lightweight Home Assistant dashboard for legacy wall displays" \
+      org.opencontainers.image.version="${BUILD_VERSION}" \
+      org.opencontainers.image.revision="${BUILD_REVISION}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.licenses="ISC"
 
 ENV NODE_ENV=production \
     APP_VERSION=${BUILD_VERSION} \
@@ -32,6 +39,7 @@ WORKDIR /app
 
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY package.json ./
+COPY LICENSE ./LICENSE
 COPY src ./src
 COPY ${APP_SOURCE_PATH}/run.sh /run.sh
 

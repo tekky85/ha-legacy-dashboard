@@ -208,8 +208,8 @@ Bedeutung von „fest“:
 | 21.4 | System Dashboard Configuration & Header Simplification | umgesetzt |
 | 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
-| 24 | Home Assistant App Packaging | verschoben |
-| 25 | Release & Distribution | geplant |
+| 24 | Home Assistant App Packaging | umgesetzt |
+| 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung nach Review offen |
 
 ---
 
@@ -1479,11 +1479,17 @@ serverseitige Konfiguration unter `/data`.
 SIGTERM sind unabhängig voneinander getestet. Ingress, Home-Assistant-
 Konfigurationsmounts, Host-/Docker-/Supervisor-API-Rechte und neue Write-
 Fähigkeiten wurden nicht ergänzt. Die öffentliche Multi-Arch-Veröffentlichung
-bleibt Sprint 25 vorbehalten.
+wird durch die anschließend implementierte Sprint-25-Release-Pipeline erst
+nach einem geprüften Versionstag ausgeführt.
 
 ---
 
 # Sprint 25 – Release & Distribution
+
+## Status
+
+Umgesetzt; die erste öffentliche RC-Veröffentlichung bleibt eine bewusste
+manuelle Freigabe nach Review und realer Geräteabnahme.
 
 ## Ziel
 
@@ -1506,6 +1512,23 @@ Nachvollziehbare veröffentlichbare Version.
 - bekannte Einschränkungen
 - unterstützte HA-/Node-Versionen
 - Lizenzstatus final klären
+
+## Ergebnis
+
+Die Version `1.0.0-rc.1` ist als erster Release Candidate vorbereitet. Ein
+strikter Konsistenzcheck verbindet Git-Tag, npm-Paket, Lockfile, App-Version,
+Release-Metadaten und Changelogs. CI prüft Tests, Syntax, Security, das
+reproduzierbare Standalone-Archiv und einen BuildKit-Multi-Arch-Build. Der
+Tag-Workflow veröffentlicht getrennte amd64/aarch64-Images, erzeugt erst nach
+beiden Erfolgen das generische GHCR-Manifest, validiert es und startet das
+Image gegen einen lokalen Mock. GitHub Release und bei Stable `latest`
+entstehen erst nach diesem Gate. `build.yaml` ist entfallen; der Dockerfile ist
+die einzige Container-Buildquelle.
+
+Fresh Install, Upgrade, Backup/Rollback, RC-/Stable-Ablauf sowie Legacy-Safari-
+und HA-App-Gates sind in `docs/RELEASING.md` dokumentiert. Die tatsächliche
+öffentliche Veröffentlichung und reale HAOS-/iOS-9-Abnahme sind kein
+automatischer Teil der Implementierung.
 
 ---
 
@@ -1810,21 +1833,11 @@ Ziel bleibt:
 
 ---
 
-# Nächster Sprint
+# Nächster Schritt
 
-Nach Abschluss von Sprint 21.5:
-
-```text
-Sprint 22 – Rules, Grace Periods & Device Aggregation
-```
-
-Die Device-Aggregation des Error Dashboards bleibt die reine Präsentations-
-funktion aus Sprint 21.1; Sprint 21.2 ergänzt lokale Spaltenansichten und eine
-metadatenbasierte Risk Class, Sprint 21.3 die orthogonalen Filter sowie den
-auswählbaren Device-Class-/HA-Label-Modus, Sprint 21.4 die skalierbare
-Entity-Regelpflege sowie eindeutige Header-Counts und Sprint 21.5 die sichere
-globale Systemnavigation samt reduziertem Health-Indikator. Sprint 22 ergänzt fachliche Karenz-,
-Flapping- und erwartete Offline-Regeln sowie die geplante semantische Geräte-
-aggregation im Summary Dashboard. Diese Regeln benötigen eine eigene
-Spezifikation und dürfen die bestehenden Write-Sicherheitsgrenzen nicht
-verändern.
+Die aktuelle Roadmap ist implementiert. Vor dem ersten Stable Release folgt
+die dokumentierte RC-Abnahme von `v1.0.0-rc.1`: GitHub-/GHCR-Pipeline,
+Custom-App-Installation auf Test-HAOS, Update mit erhaltener `/data`-
+Konfiguration und physische Safari-iOS-9-Prüfung. Ergebnisse oder Fehler aus
+dieser Abnahme bestimmen den nächsten Korrektursprint; es wird keine neue
+Produktfunktion vorgezogen.

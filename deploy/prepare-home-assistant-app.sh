@@ -21,7 +21,6 @@ esac
 mkdir -p "$target_path/translations" "$target_path/src"
 
 cp "$source_path/config.yaml" "$target_path/config.yaml"
-cp "$source_path/build.yaml" "$target_path/build.yaml"
 cp "$source_path/Dockerfile" "$target_path/Dockerfile"
 cp "$source_path/.dockerignore" "$target_path/.dockerignore"
 cp "$source_path/run.sh" "$target_path/run.sh"
@@ -34,6 +33,7 @@ cp "$source_path/translations/en.yaml" "$target_path/translations/en.yaml"
 cp "$source_path/translations/de.yaml" "$target_path/translations/de.yaml"
 cp "$project_path/package.json" "$target_path/package.json"
 cp "$project_path/package-lock.json" "$target_path/package-lock.json"
+cp "$project_path/LICENSE" "$target_path/LICENSE"
 cp -R "$project_path/src/." "$target_path/src/"
 
 chmod 0755 "$target_path/run.sh"

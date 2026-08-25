@@ -1036,7 +1036,10 @@ test(
 
             assert.equal(status.status, 200);
             assert.equal(status.json.status, "online");
-            assert.equal(status.json.version, "1.0.0");
+            assert.equal(
+                status.json.version,
+                require("../package.json").version
+            );
             assert.equal(
                 status.json.home_assistant.status,
                 "online"

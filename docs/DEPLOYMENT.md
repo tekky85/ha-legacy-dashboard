@@ -5,11 +5,27 @@ Beide verwenden dieselben Gateway-Routen und dieselbe Anwendung; nur die
 serverseitige Home-Assistant-Verbindung und der persistente Datenpfad werden
 vom zentralen Runtime-Modus aufgelöst.
 
-## Home Assistant App – lokale Installation
+## Home Assistant App – Custom App Repository
 
-Sprint 24 stellt ein lokales Development-/Test-Paket unter
-`ha_legacy_dashboard/` bereit. Die öffentliche App-Repository- und
-Container-Veröffentlichung folgt erst in Sprint 25.
+Das Repository kann als benutzerdefiniertes Home-Assistant-App-Repository
+hinzugefügt werden:
+
+[Repository zu Home Assistant hinzufügen](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Ftekky85%2Fha-legacy-dashboard)
+
+Alternativ unter `Settings > Apps > App store > Repositories` die URL
+`https://github.com/tekky85/ha-legacy-dashboard` eintragen. Danach App Store
+aktualisieren, **HA Legacy Dashboard** installieren, Host-Port prüfen, starten,
+Logs kontrollieren und die direkte LAN-WebUI öffnen. Es handelt sich um ein
+Custom App Repository und nicht um eine offizielle Home-Assistant-App.
+
+Das generische Image `ghcr.io/tekky85/ha-legacy-dashboard:<version>` enthält
+ein Multi-Arch-Manifest für amd64 und aarch64. Vor Installation eines Release
+Candidates oder einem Upgrade ist ein Home-Assistant-Backup anzulegen.
+
+### Lokaler Development-Build
+
+Das Paket unter `ha_legacy_dashboard/` kann weiterhin für kontrollierte lokale
+Development-Tests vorbereitet werden.
 
 Das App-Paket wird ohne zweite Quellcodekopie gepflegt. Für die lokale
 Supervisor-Installation erzeugt das Vorbereitungsskript einen in sich
@@ -39,14 +55,15 @@ app_build_dir="$(mktemp -d)"
 ./deploy/prepare-home-assistant-app.sh "$app_build_dir"
 docker build \
   --build-arg BUILD_ARCH=amd64 \
-  --build-arg BUILD_VERSION=1.0.0 \
+  --build-arg BUILD_VERSION=1.0.0-rc.1 \
   -t ha-legacy-dashboard-app:local \
   "$app_build_dir"
 ```
 
 Für einen `aarch64`-Build wird auf einem entsprechend konfigurierten
-Buildx-System `--platform linux/arm64` verwendet. Die Veröffentlichung eines
-Multi-Arch-Manifests ist Sprint 25 vorbehalten.
+Buildx-System `--platform linux/arm64` verwendet. Öffentliche Releases werden
+ausschließlich durch `.github/workflows/release.yml` aus einem geprüften Tag
+gebaut.
 
 ### App-Verbindung und Berechtigungen
 
@@ -256,6 +273,9 @@ git push origin vX.Y.Z
 ```
 
 Ein veröffentlichter Tag wird nicht nachträglich verschoben oder erzwungen.
+
+Release-Archiv-, App-Upgrade- und Backup-/Rollback-Abläufe sind ausführlich in
+`docs/RELEASING.md` beschrieben.
 
 ## GitHub-CI
 

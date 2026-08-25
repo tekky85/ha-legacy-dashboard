@@ -415,9 +415,6 @@ test("App-Metadaten sind minimal, direkt erreichbar und multi-arch vorbereitet",
     const config = readProjectFile(
         "ha_legacy_dashboard/config.yaml"
     );
-    const build = readProjectFile(
-        "ha_legacy_dashboard/build.yaml"
-    );
     const packageConfiguration = JSON.parse(
         readProjectFile("package.json")
     );
@@ -444,6 +441,10 @@ test("App-Metadaten sind minimal, direkt erreichbar und multi-arch vorbereitet",
         /^webui: http:\/\/\[HOST\]:\[PORT:3000\]\/$/m
     );
     assert.match(config, /^stage: experimental$/m);
+    assert.match(
+        config,
+        /^image: "ghcr\.io\/tekky85\/ha-legacy-dashboard"$/m
+    );
     assert.match(config, /^backup: cold$/m);
     assert.match(
         config,
@@ -471,8 +472,12 @@ test("App-Metadaten sind minimal, direkt erreichbar und multi-arch vorbereitet",
     });
 
     assert.doesNotMatch(config, /HA_TOKEN/);
-    assert.match(build, /^  amd64: node:22-alpine$/m);
-    assert.match(build, /^  aarch64: node:22-alpine$/m);
+    assert.equal(
+        fs.existsSync(
+            path.join(APP_PATH, "build.yaml")
+        ),
+        false
+    );
 
     const repository =
         readProjectFile("repository.yaml");

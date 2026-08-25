@@ -29,6 +29,15 @@ Home Assistant
 
 The project is **not a Lovelace dashboard**, not a Custom Panel, and not an internal Home Assistant frontend. The Home Assistant token remains exclusively in the backend.
 
+## Choose an Installation
+
+- **Home Assistant OS:** install it as a custom Home Assistant App using the
+  [Custom App Repository link](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Ftekky85%2Fha-legacy-dashboard).
+- **LXC, VM, or your own Linux server:** use the versioned standalone bundle
+  from [GitHub Releases](https://github.com/tekky85/ha-legacy-dashboard/releases).
+
+This project is a Custom App Repository, not an official Home Assistant App.
+
 ## Target Platform
 
 - Apple iPad mini 1
@@ -424,27 +433,46 @@ Production credentials must never be used for local integration tests.
 
 ### Installation A – Home Assistant App
 
-The local App package lives in `ha_legacy_dashboard/` and supports `amd64` and
-`aarch64`. It requests only `homeassistant_api: true`, uses neither Ingress nor
-host/Docker/Supervisor API privileges, and exposes configurable `3000/tcp` for
-direct LAN access. Persistent configuration is stored at
-`/data/dashboards.json` and is covered by the standard Home Assistant App
-backup mechanism.
+The App package under `ha_legacy_dashboard/` uses the generic multi-architecture
+image `ghcr.io/tekky85/ha-legacy-dashboard` for `amd64` and `aarch64`. Add the
+repository, refresh the App store, install **HA Legacy Dashboard**, check the
+network port, start it, and inspect its logs. Port `3000/tcp` remains
+configurable for direct LAN access.
 
-Sprint 24 provides local development/test packaging; public repository and
-image distribution follows in Sprint 25. Controlled local installation is
-documented in `ha_legacy_dashboard/DOCS.md`.
+The App requests only `homeassistant_api: true` and uses neither Ingress nor
+host, Docker, or Supervisor API privileges. Persistent configuration is stored
+at `/data/dashboards.json` and is covered by Home Assistant backups. Create a
+backup before installing a release candidate and before every upgrade.
 
 Important: the Home Assistant App has its own data area. Existing
 standalone/LXC configuration is not imported automatically.
 
 ### Installation B – Standalone
 
-Standalone operation requires Node.js 22 or newer and supports Debian-based
-LXC/VM systems with systemd. `HA_URL` and `HA_TOKEN` remain in the server-side
-`.env`, and the existing default `data/dashboards.json` path is unchanged.
+Standalone operation requires Node.js 22 or newer. Download the release bundle
+and `SHA256SUMS`, verify the checksum, extract it, configure `.env.example` as
+a server-side `.env`, and run `npm ci --omit=dev`. Debian-based LXC/VM systems
+can use the included systemd unit. `HA_URL` and `HA_TOKEN` remain in the
+protected `.env`, and `data/dashboards.json` remains unchanged during upgrades.
 
-Complete instructions: `docs/DEPLOYMENT.md`.
+Back up `.env` and `data` before an upgrade. Prefer extracting new releases
+into a new directory and retire the old runtime only after a successful health
+check. For rollback, activate the old release and matching configuration
+backup.
+
+Complete instructions: `docs/DEPLOYMENT.md` and `docs/RELEASING.md`.
+
+## Releases, Support, and License
+
+Release candidates and stable releases use SemVer tags. Every release contains
+a versioned standalone archive and `SHA256SUMS`; containers are available as
+`ghcr.io/tekky85/ha-legacy-dashboard:<version>`. RC versions never update
+`latest`. Report bugs through
+[GitHub Issues](https://github.com/tekky85/ha-legacy-dashboard/issues).
+
+The source code is available under the [ISC License](LICENSE). Home Assistant
+and Supervisor credentials remain backend-only in every distribution mode.
+The project contains no telemetry or analytics.
 
 ## Project Status and Roadmap
 

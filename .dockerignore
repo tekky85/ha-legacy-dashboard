@@ -2,12 +2,14 @@
 .github
 .env
 .env.*
+!.env.example
 node_modules
 coverage
 test
 test-results
-docs
+dist
 data
+docs/screenshots
 *.log
 *.pem
 *.key

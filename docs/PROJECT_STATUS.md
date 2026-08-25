@@ -1,7 +1,8 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 24. August 2026, Sprint 24 auf Basis von Sprint 23 implementiert;
-lokale HA-App-Verpackung geprüft, HA-OS- und physische Safari-Abnahme offen
+Stand: 25. August 2026, Sprint 25 auf Basis von Sprint 24 implementiert;
+Release Candidate 1.0.0-rc.1 lokal geprüft, Veröffentlichung sowie reale
+HAOS-/Multi-Arch- und physische Safari-Abnahme offen
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -9,6 +10,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-25-Ausgangscommit: `95f6603`
 - Sprint-23-Ausgangscommit: `e692eed`
 - Sprint-24-Ausgangscommit: `0c968b4`
 - Sprint-22-Ausgangscommit: `ca95e21`
@@ -70,6 +72,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
+| 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -1242,7 +1245,85 @@ Die sichtbare Anwendung wurde nicht geändert. Daher waren gemäß Sprint D1
 keine neuen Produkt-Screenshots oder Asset-Cache-Versionen erforderlich.
 Physische iOS-9-/iPad-Abnahme und reale App-Abnahme bleiben offen.
 
-Sprint 25 soll den reproduzierbaren amd64/aarch64-Build in CI, ein generisches
-GHCR-Multi-Arch-Image, Release-Tags/-Notes, Signierung, Upgrade/Rollback und die
-öffentliche App-Repository-Installation ergänzen. Erst dann soll `image:` in
-`config.yaml` auf das veröffentlichte generische Image zeigen.
+Die daran anschließende Sprint-25-Implementierung ergänzt den reproduzierbaren
+amd64/aarch64-Build in CI, das generische GHCR-Multi-Arch-Image, Release-Tags
+und -Notes, Upgrade/Rollback sowie die Custom-App-Repository-Installation.
+
+## 19. Sprint 25 – Release & Distribution
+
+Sprint 25 startet auf dem sauberen `main`-Commit `95f6603`. Die tatsächliche
+Versionshistorie enthält seit dem ersten Projektcommit `1.0.0` in
+`package.json`, aber keinen Git-Tag und kein veröffentlichtes Release. Deshalb
+wird die bestehende Hauptversion nicht zurückgesetzt; der erste extern zu
+prüfende Stand ist konsistent als `1.0.0-rc.1` vorbereitet.
+
+`release/check-version.js` validiert SemVer, optionalen Git-Tag, beide npm-
+Versionsfelder, Home-Assistant-App-Version, generische Image-Referenz,
+`release/metadata.json`, beide Changelogs und die versionierte Release-Notes-
+Datei. Jede Abweichung bricht das Release ab. Root- und App-Changelog sind nun
+nutzungsorientiert und die zuvor implizite ISC-Lizenz ist wieder eindeutig in
+`LICENSE` und `package.json` festgelegt.
+
+Der Dockerfile unter `ha_legacy_dashboard/` ist die einzige Container-
+Buildquelle. Das alte `build.yaml` wurde entfernt. CI und Release verwenden
+Docker Buildx/BuildKit mit `npm ci --omit=dev`, OCI-Labels, Lockfile,
+Build-Provenance und SBOM. `config.yaml` referenziert ausschließlich das
+generische Image:
+
+```text
+ghcr.io/tekky85/ha-legacy-dashboard
+```
+
+`.github/workflows/test.yml` besitzt nur `contents: read` und führt Test Gate,
+Produktionsaudit, reproduzierbares Standalone-Archiv sowie einen nicht
+publizierenden amd64/aarch64-Build aus. `.github/workflows/release.yml` wird
+nur durch validierte `v*.*.*`-Tags ausgelöst. Zwei getrennte Architekturjobs
+veröffentlichen interne Tags. Erst nach beiden Erfolgen entsteht das
+versionierte Multi-Arch-Manifest. Ein anschließender Container-Smoke-Test
+verwendet ausschließlich einen lokalen Supervisor-/HA-Mock mit Fake-
+Credential. Erst danach wird ein GitHub Release erzeugt; `latest` entsteht nur
+bei Stable, niemals bei einem RC.
+
+`release/create-standalone-bundle.js` erzeugt deterministisch
+`ha-legacy-dashboard-1.0.0-rc.1.tar.gz` und `SHA256SUMS`. Das Archiv enthält
+Runtime-Quellcode, npm-Lockfile, `.env.example`, Readmes, Changelog, Lizenz,
+Standalone-Deploymentdokumentation, systemd-Unit und `VERSION`. Ausgeschlossen
+sind `.env`, `node_modules`, Tests, Daten, Git-Metadaten, Screenshots, Schlüssel
+und Logs. Zwei unabhängig erzeugte Archive waren bytegleich; die lokale
+SHA256-Prüfung und Tar-Inhaltsprüfung waren erfolgreich.
+
+Die Upgrade-Regression initialisiert sowohl einen simulierten Standalone-
+Datenpfad als auch einen App-`/data`-äquivalenten Pfad, persistiert Dashboards,
+Summary-Privacy, Entity Rules, Security-Entities, Critical-Label-Modus,
+Grace-Regeln und Expected Offline und lädt sie nach dem simulierten
+Versionswechsel unverändert neu. Theme bleibt browserlokal und wird von keinem
+Release-Artefakt berührt. Die bestehende atomare Primär-/Backup-Semantik bleibt
+unverändert.
+
+Das Release Security Gate scannt alle verfolgten und nicht ignorierten Quellen
+auf private Dateinamen, Private-Key-Header und verbreitete Tokenmuster. Root-
+und App-Docker-Kontexte schließen `.env`, Daten, Schlüssel, Tests und Logs aus.
+CI verwendet `github.token`, keine Registry-PATs, keine HA-/Supervisor-/Admin-
+Secrets und keine Produktions-HA-Adresse. Der Produktionsaudit meldet keine
+bekannten Schwachstellen. Die bestehenden HA-Write-Allowlists, backend-only
+Credentials und Browser-Payloads wurden nicht verändert.
+
+Die vollständige lokale Regression besteht nach der finalen Korrektur mit 257
+von 257 Tests; sämtliche JavaScript-Dateien unter `src/`, `test/` und
+`release/` bestehen `node --check`, alle Shellskripte `sh -n`, und die GitHub-
+Workflow-, Repository- und App-YAML-Dateien wurden lokal geparst. Da auf dem
+Entwicklungs-Mac kein Docker/Buildx installiert ist, sind der echte lokale
+amd64/aarch64-Build, Manifest-Push und Container-Smoke-Test dort nicht
+ausführbar. Diese Prüfungen sind verbindlich im GitHub-Workflow implementiert,
+aber erst nach Review und Tag-Push tatsächlich auszuführen.
+
+`docs/RELEASING.md` dokumentiert RC und Stable, Fresh Install und Upgrade für
+App und Standalone, Backup/Rollback, GHCR-/Manifestprüfung, minimale CI-Rechte,
+Failure Atomicity, Secret Gate sowie manuelle Legacy-Safari- und Test-HAOS-
+Checklisten. README Deutsch und Englisch bleiben semantisch synchron und
+verlinken die offizielle My-Home-Assistant-Repository-Weiterleitung. Die
+öffentliche GHCR-Sichtbarkeit, das echte GitHub-Prerelease, eine reale HAOS-
+Installation, das App-Update mit `/data`, aarch64-Runtime und die physische
+iOS-9-Abnahme bleiben bewusste manuelle Schritte. Da keine sichtbare
+Produktoberfläche geändert wurde, sind keine Screenshots oder Asset-
+Cacheversionen zu aktualisieren.

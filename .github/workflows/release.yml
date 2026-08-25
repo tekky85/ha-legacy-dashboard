@@ -1,0 +1,262 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      stable: ${{ steps.release.outputs.stable }}
+      image: ${{ steps.release.outputs.image }}
+      standalone_artifact: ${{ steps.release.outputs.standalone_artifact }}
+      release_notes: ${{ steps.release.outputs.release_notes }}
+
+    steps:
+      - name: Check out exact release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Require release commit on main
+        run: |
+          git fetch --no-tags origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Validate tag and release versions
+        id: release
+        run: >-
+          node release/check-version.js
+          --tag "$GITHUB_REF_NAME"
+          --github-output "$GITHUB_OUTPUT"
+
+      - name: Run complete release test gate
+        run: ./release/test-gate.sh "$GITHUB_REF_NAME"
+
+      - name: Check production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Create standalone release bundle and checksum
+        env:
+          SOURCE_DATE_EPOCH: "0"
+        run: node release/create-standalone-bundle.js dist
+
+      - name: Verify standalone checksum
+        working-directory: dist
+        run: sha256sum --check SHA256SUMS
+
+      - name: Upload validated standalone artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: standalone-release
+          path: |
+            dist/${{ steps.release.outputs.standalone_artifact }}
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 7
+
+  build-images:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - docker_arch: amd64
+            ha_arch: amd64
+          - docker_arch: arm64
+            ha_arch: aarch64
+
+    steps:
+      - name: Check out exact release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR with GitHub token
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build and push architecture image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ha_legacy_dashboard/Dockerfile
+          platforms: linux/${{ matrix.docker_arch }}
+          push: true
+          tags: >-
+            ${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}-${{ matrix.ha_arch }}
+          build-args: |
+            APP_SOURCE_PATH=ha_legacy_dashboard
+            BUILD_ARCH=${{ matrix.ha_arch }}
+            BUILD_VERSION=${{ needs.validate.outputs.version }}
+            BUILD_REVISION=${{ github.sha }}
+            BUILD_DATE=1970-01-01T00:00:00Z
+          cache-from: type=gha,scope=${{ matrix.ha_arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.ha_arch }}
+          provenance: mode=max
+          sbom: true
+
+  publish-manifest:
+    needs:
+      - validate
+      - build-images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out release validation tools
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR with GitHub token
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Publish versioned multi-architecture manifest
+        run: |
+          docker buildx imagetools create \
+            --tag "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}" \
+            "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}-amd64" \
+            "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}-aarch64"
+
+      - name: Validate manifest platforms
+        run: >-
+          docker buildx imagetools inspect
+          "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}"
+          --raw | node release/validate-manifest.js
+
+  smoke-test:
+    needs:
+      - validate
+      - publish-manifest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Check out smoke-test tools
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Log in to GHCR with GitHub token
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Pull versioned multi-architecture image
+        run: >-
+          docker pull
+          "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}"
+
+      - name: Run App container against localhost mock only
+        run: >-
+          ./release/smoke-container.sh
+          "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}"
+
+  publish-release:
+    needs:
+      - validate
+      - smoke-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Check out exact release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Docker Buildx
+        if: needs.validate.outputs.stable == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR for stable latest tag
+        if: needs.validate.outputs.stable == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Publish latest only after stable validation
+        if: needs.validate.outputs.stable == 'true'
+        run: |
+          docker buildx imagetools create \
+            --tag "${{ needs.validate.outputs.image }}:latest" \
+            "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}"
+          docker buildx imagetools inspect \
+            "${{ needs.validate.outputs.image }}:latest" \
+            --raw | node release/validate-manifest.js
+
+      - name: Download standalone artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: standalone-release
+          path: dist
+
+      - name: Create GitHub Release and attach checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ needs.validate.outputs.stable }}" = "true" ]; then
+            gh release create "$GITHUB_REF_NAME" \
+              --verify-tag \
+              --title "HA Legacy Dashboard ${{ needs.validate.outputs.version }}" \
+              --notes-file "${{ needs.validate.outputs.release_notes }}"
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --verify-tag \
+              --prerelease \
+              --title "HA Legacy Dashboard ${{ needs.validate.outputs.version }}" \
+              --notes-file "${{ needs.validate.outputs.release_notes }}"
+          fi
+          gh release upload "$GITHUB_REF_NAME" \
+            "dist/${{ needs.validate.outputs.standalone_artifact }}" \
+            dist/SHA256SUMS

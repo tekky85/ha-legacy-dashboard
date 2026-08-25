@@ -29,6 +29,17 @@ Home Assistant
 
 Das Projekt ist **kein Lovelace-Dashboard**, kein Custom Panel und kein internes Home-Assistant-Frontend. Der Home-Assistant-Token bleibt ausschließlich im Backend.
 
+## Installationsart wählen
+
+- **Home Assistant OS:** als benutzerdefinierte Home Assistant App über das
+  [Custom App Repository hinzufügen](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Ftekky85%2Fha-legacy-dashboard).
+- **LXC, VM oder eigener Linux-Server:** das versionierte Standalone-
+  Release-Archiv von [GitHub Releases](https://github.com/tekky85/ha-legacy-dashboard/releases)
+  verwenden.
+
+Das Projekt ist ein Custom App Repository und keine offizielle Home-Assistant-
+App.
+
 ## Zielplattform
 
 - Apple iPad mini 1
@@ -434,28 +445,48 @@ Produktionscredentials dürfen niemals für lokale Integrationstests verwendet w
 
 ### Installation A – Home Assistant App
 
-Das lokale App-Paket liegt unter `ha_legacy_dashboard/` und unterstützt
-`amd64` sowie `aarch64`. Es verlangt nur `homeassistant_api: true`, nutzt weder
-Ingress noch Host-/Docker-/Supervisor-API-Rechte und stellt Port `3000/tcp`
-konfigurierbar für direkten LAN-Zugriff bereit. Die persistente Konfiguration
-liegt unter `/data/dashboards.json` und wird über den normalen Home-Assistant-
-App-Backupmechanismus gesichert.
+Das App-Paket unter `ha_legacy_dashboard/` verwendet das generische
+Multi-Arch-Image `ghcr.io/tekky85/ha-legacy-dashboard` für `amd64` und
+`aarch64`. Repository hinzufügen, App Store aktualisieren, **HA Legacy
+Dashboard** installieren, Netzwerkport prüfen, starten und Logs kontrollieren.
+Port `3000/tcp` bleibt für direkten LAN-Zugriff konfigurierbar.
 
-Sprint 24 ist eine lokale Development-/Test-Verpackung; die öffentliche
-Repository-/Image-Veröffentlichung folgt in Sprint 25. Eine kontrollierte
-lokale Installation wird in `ha_legacy_dashboard/DOCS.md` beschrieben.
+Die App verlangt nur `homeassistant_api: true`, nutzt weder Ingress noch Host-,
+Docker- oder Supervisor-API-Rechte. Die persistente Konfiguration liegt unter
+`/data/dashboards.json` und wird über Home-Assistant-Backups gesichert. Vor
+Installation eines Release Candidates und vor jedem Upgrade ein Backup
+erstellen.
 
 Wichtig: Die Home Assistant App besitzt einen eigenen Datenbereich. Eine
 bestehende Standalone-/LXC-Konfiguration wird nicht automatisch übernommen.
 
 ### Installation B – Standalone
 
-Der Standalone-Betrieb setzt Node.js 22 oder neuer voraus und unterstützt
-Debian-basierte LXC-/VM-Systeme mit systemd. `HA_URL` und `HA_TOKEN` bleiben in
-der serverseitigen `.env`; der bestehende Standardpfad
-`data/dashboards.json` bleibt unverändert.
+Der Standalone-Betrieb setzt Node.js 22 oder neuer voraus. Release-Archiv und
+`SHA256SUMS` herunterladen, Checksum prüfen, entpacken,
+`.env.example` serverseitig als `.env` einrichten und anschließend
+`npm ci --omit=dev` ausführen. Debian-basierte LXC-/VM-Systeme können die
+mitgelieferte systemd-Unit verwenden. `HA_URL` und `HA_TOKEN` bleiben in der
+geschützten `.env`; `data/dashboards.json` bleibt bei Upgrades unverändert.
 
-Vollständige Anleitungen: `docs/DEPLOYMENT.md`.
+Vor einem Upgrade `.env` und `data` sichern. Neue Releases bevorzugt in ein
+neues Verzeichnis entpacken und erst nach erfolgreichem Health Check die alte
+Runtime außer Betrieb nehmen. Für Rollback das alte Release und das passende
+Konfigurationsbackup aktivieren.
+
+Vollständige Anleitungen: `docs/DEPLOYMENT.md` und `docs/RELEASING.md`.
+
+## Releases, Support und Lizenz
+
+Release Candidates und stabile Releases verwenden SemVer-Tags. Jeder Release
+enthält ein versioniertes Standalone-Archiv und `SHA256SUMS`; Container stehen
+unter `ghcr.io/tekky85/ha-legacy-dashboard:<version>`. RC-Versionen verändern
+`latest` nicht. Fehler bitte über
+[GitHub Issues](https://github.com/tekky85/ha-legacy-dashboard/issues) melden.
+
+Der Quellcode steht unter der [ISC-Lizenz](LICENSE). Home-Assistant- und
+Supervisor-Zugangsdaten bleiben in jeder Distributionsform ausschließlich im
+Backend. Das Projekt enthält keine Telemetrie oder Analytics.
 
 ## Projektstatus und Roadmap
 
