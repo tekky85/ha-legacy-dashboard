@@ -64,6 +64,14 @@ The legacy frontend remains framework-free and uses the existing `Legacy.http` /
 - Light/Dark mode
 - stale-data and reconnect behavior
 
+Light and Dark are one global browser preference for `/`, every
+`/d/<dashboard-id>` route, Summary, and System Status. The selection is loaded
+early before rendering from the existing `ha-legacy-theme` key. If an older
+Safari exposes `localStorage` but rejects writes, a same-name, non-sensitive
+root-path cookie copy keeps the selection stable across refresh and internal
+navigation. If both storage paths are unavailable, the current view remains
+operable without crashing.
+
 Every default and custom dashboard has a neutral, always-visible Summary
 navigation control in its header. A compact Errors / Health indicator appears
 beside it only for `warning`, `error`, or `critical`. `info` notices alone do
@@ -146,6 +154,13 @@ Shows, among other things:
 - compact Device Cards for entity issues sharing the same real `device_id`
 - child-entity details collapsed by default
 - a separately persisted 1/2/3-column view with responsive fallback
+
+The four severity subsets are exact filters: `Critical` shows only
+`critical`, `Error` only `error`, `Warning` only `warning`, and `Info` only
+`info`. Severity and state are combined with AND on the same child issue. For
+Device Cards, child issues are filtered first; the count, visible severity,
+and expanded details are then derived only from those matches. This changes
+neither the unfiltered overall status nor the global Health indicator.
 
 The total likewise appears only once in the header. The All filters do not
 repeat it, while the severity subsets and the `Unavailable` and `Unknown`

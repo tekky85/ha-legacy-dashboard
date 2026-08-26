@@ -210,6 +210,7 @@ Bedeutung von „fest“:
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung nach Review offen |
+| 25.1 | Pre-Release UI State & Filter Correctness | lokal umgesetzt, reale iPad-Abnahme und Review offen |
 
 ---
 
@@ -1529,6 +1530,38 @@ Fresh Install, Upgrade, Backup/Rollback, RC-/Stable-Ablauf sowie Legacy-Safari-
 und HA-App-Gates sind in `docs/RELEASING.md` dokumentiert. Die tatsächliche
 öffentliche Veröffentlichung und reale HAOS-/iOS-9-Abnahme sind kein
 automatischer Teil der Implementierung.
+
+---
+
+# Sprint 25.1 – Pre-Release UI State & Filter Correctness
+
+## Status
+
+Lokal umgesetzt; Review und reale Abnahme auf iPad mini/iOS 9 bleiben als
+Release Gate offen.
+
+## Ergebnis
+
+- Das bestehende globale Theme `ha-legacy-theme` wird auf Default-, Custom-
+  und System-Dashboards vor dem Rendern validiert und angewandt.
+- `localStorage` bleibt der primäre Speicher. Eine gleichnamige, nicht
+  sensible Root-Cookie-Kopie fängt den bekannten Legacy-Safari-Pfad ab, in dem
+  `localStorage` vorhanden ist, aber Schreibzugriffe ablehnt. Ein vollständiger
+  Storage-Ausfall verursacht weiterhin keinen Crash.
+- Return-Navigation und Dashboard-Routen besitzen keine eigene Theme-Logik und
+  überschreiben die globale Auswahl nicht. Die Admin-Oberfläche hat weiterhin
+  nur ihren unabhängigen Card-Preview-Schalter und kein globales UI-Theme.
+- Error-Severity filtert exakt statt als Schwelle. Severity und Status werden
+  mit UND auf demselben Child-Issue ausgewertet; Cross-Child-Treffer sind
+  ausgeschlossen.
+- Device Groups entstehen für die Anzeige aus passenden Children. Eine
+  `visibleSeverity`, sichtbare Counts, Dauer sowie Security-/Flapping-/Recovery-
+  Metadaten werden aus dieser Teilmenge abgeleitet. Das ursprüngliche Payload
+  und seine Gruppen-Severity bleiben unverändert.
+- Overall Health, der kleine Sprint-21.5-Status und alle Sprint-22/23-
+  Fachregeln bleiben ungefiltert und unverändert.
+- Die gemeinsame Legacy-Assetversion ist 43. Automatisiert bestehen 260 von
+  260 Tests; die physische Safari-Abnahme ist bewusst noch nicht ersetzt.
 
 ---
 

@@ -585,6 +585,180 @@ test("Error-Filter und Device-Details arbeiten ohne Reload", function () {
 });
 
 
+test("Error-Filter bilden exakte sichtbare Device Groups ohne Cross-Child-Matches", function () {
+
+    const harness = createHarness(
+        "/system/errors",
+        "errors.js"
+    );
+    const payload = {
+        overallStatus: "critical",
+        summary: {
+            total: 4,
+            critical: 1,
+            error: 1,
+            warning: 1,
+            info: 1,
+            unavailable: 2,
+            unknown: 2
+        },
+        filters: {
+            severity: {
+                all: 4,
+                critical: 1,
+                error: 1,
+                warning: 1,
+                info: 1
+            },
+            state: {
+                all: 4,
+                unavailable: 2,
+                unknown: 2
+            }
+        },
+        groups: [{
+            id: "device-mixed",
+            type: "device",
+            title: "Gemischtes Gerät",
+            severity: "critical",
+            issueCount: 4,
+            counts: {
+                critical: 1,
+                error: 1,
+                warning: 1,
+                info: 1,
+                unavailable: 2,
+                unknown: 2
+            },
+            issues: [
+                {
+                    title: "Critical unavailable",
+                    entityId: "binary_sensor.critical",
+                    severity: "critical",
+                    state: "unavailable"
+                },
+                {
+                    title: "Error unknown",
+                    entityId: "sensor.error",
+                    severity: "error",
+                    state: "unknown"
+                },
+                {
+                    title: "Warning unknown",
+                    entityId: "sensor.warning",
+                    severity: "warning",
+                    state: "unknown"
+                },
+                {
+                    title: "Info unavailable",
+                    entityId: "sensor.info",
+                    severity: "info",
+                    state: "unavailable"
+                }
+            ]
+        }],
+        meta: meta(true, false, "2026-08-11T18:00:00.000Z")
+    };
+
+    function textOf(element) {
+        return (element.children || []).map(function (child) {
+            if (typeof child.textContent === "string") {
+                return child.textContent;
+            }
+            return textOf(child);
+        }).join("");
+    }
+
+    function visibleCard() {
+        return harness.elements.errorGroups.children[0];
+    }
+
+    function assertVisibleSeverity(filterButton, severity, label) {
+        let card;
+
+        filterButton.onclick();
+        card = visibleCard();
+        assert.equal(harness.elements.errorGroups.children.length, 1);
+        assert.match(card.className, new RegExp("error-card-" + severity));
+        assert.equal(textOf(card.children[0].children[1]), label);
+        assert.equal(textOf(card.children[1].children[0]), "1 Entity betroffen");
+    }
+
+    harness.requests[0].success(payload);
+
+    assert.match(visibleCard().className, /error-card-critical/);
+    assert.equal(textOf(visibleCard().children[1].children[0]), "4 Entities betroffen");
+
+    assertVisibleSeverity(harness.elements.errorFilterCritical, "critical", "Kritisch");
+    assertVisibleSeverity(harness.elements.errorFilterError, "error", "Fehler");
+    assertVisibleSeverity(harness.elements.errorFilterWarning, "warning", "Warnung");
+    assertVisibleSeverity(harness.elements.errorFilterInfo, "info", "Info");
+
+    harness.elements.errorFilterAll.onclick();
+    harness.elements.errorStateUnknown.onclick();
+    assert.match(visibleCard().className, /error-card-error/);
+    assert.equal(textOf(visibleCard().children[1].children[0]), "2 Entities betroffen");
+
+    harness.elements.errorStateUnavailable.onclick();
+    assert.match(visibleCard().className, /error-card-critical/);
+    assert.equal(textOf(visibleCard().children[1].children[0]), "2 Entities betroffen");
+
+    [
+        [harness.elements.errorFilterCritical, "critical", harness.elements.errorStateUnavailable, true],
+        [harness.elements.errorFilterCritical, "critical", harness.elements.errorStateUnknown, false],
+        [harness.elements.errorFilterError, "error", harness.elements.errorStateUnavailable, false],
+        [harness.elements.errorFilterError, "error", harness.elements.errorStateUnknown, true],
+        [harness.elements.errorFilterWarning, "warning", harness.elements.errorStateUnavailable, false],
+        [harness.elements.errorFilterWarning, "warning", harness.elements.errorStateUnknown, true],
+        [harness.elements.errorFilterInfo, "info", harness.elements.errorStateUnavailable, true],
+        [harness.elements.errorFilterInfo, "info", harness.elements.errorStateUnknown, false]
+    ].forEach(function (combination) {
+        combination[0].onclick();
+        combination[2].onclick();
+        assert.equal(
+            harness.elements.errorGroups.children.length,
+            combination[3] ? 1 : 0
+        );
+        if (combination[3]) {
+            assert.match(
+                visibleCard().className,
+                new RegExp("error-card-" + combination[1])
+            );
+        }
+    });
+
+    harness.elements.errorFilterInfo.onclick();
+    harness.elements.errorStateAll.onclick();
+    visibleCard().children[3].onclick();
+    assert.equal(visibleCard().children[2].children[0].children.length, 1);
+    assert.equal(
+        textOf(visibleCard().children[2].children[0].children[0].children[0]),
+        "Info unavailable"
+    );
+
+    harness.elements.errorStateUnknown.onclick();
+    assert.equal(harness.elements.errorGroups.children.length, 0);
+    assert.equal(harness.elements.errorFilterEmpty.hidden, false);
+
+    harness.elements.errorFilterWarning.onclick();
+    assert.equal(harness.elements.errorGroups.children.length, 1);
+    assert.match(visibleCard().className, /error-card-warning/);
+
+    harness.elements.errorStateUnavailable.onclick();
+    assert.equal(harness.elements.errorGroups.children.length, 0);
+
+    harness.elements.errorFilterCritical.onclick();
+    assert.equal(harness.elements.errorGroups.children.length, 1);
+    assert.match(visibleCard().className, /error-card-critical/);
+
+    assert.equal(harness.elements.errorOverall.className, "error-overall is-critical");
+    assert.equal(payload.groups[0].severity, "critical");
+    assert.equal(payload.groups[0].issueCount, 4);
+    assert.equal(payload.groups[0].issues.length, 4);
+    assert.equal(harness.requests.length, 1);
+});
+
+
 test("Summary-Filter nutzen Serverkategorien ohne Reload und mit eigenem Empty State", function () {
 
     const harness = createHarness(
@@ -828,9 +1002,9 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=42/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=43/);
     assert.match(html, /id="dashboardReturnNavigation"/);
-    assert.match(html, /\/js\/core\/system-navigation\.js\?v=42/);
+    assert.match(html, /\/js\/core\/system-navigation\.js\?v=43/);
     assert.match(html, /id="errorOverallLabel"/);
     assert.match(html, /id="errorFilterAll"/);
     assert.match(html, /id="errorUnknownCount"/);

@@ -1,8 +1,9 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 25. August 2026, Sprint 25 auf Basis von Sprint 24 implementiert;
-Release Candidate 1.0.0-rc.1 lokal geprüft, Veröffentlichung sowie reale
-HAOS-/Multi-Arch- und physische Safari-Abnahme offen
+Stand: 25. August 2026, Sprint 25.1 lokal auf dem vorbereiteten Sprint-25-RC
+implementiert; Release Candidate 1.0.0-rc.1 automatisiert geprüft,
+Veröffentlichung sowie reale HAOS-/Multi-Arch- und physische Safari-Abnahme
+offen
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -10,6 +11,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-25.1-Ausgangscommit: `10c1f75`
 - Sprint-25-Ausgangscommit: `95f6603`
 - Sprint-23-Ausgangscommit: `e692eed`
 - Sprint-24-Ausgangscommit: `0c968b4`
@@ -30,6 +32,11 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 - Sprint-19-Commit: `b4da718`
 - Sprint-18-Commit: `94ce1c0`
 - Sprint-17.1-Commit: `53ce672`
+
+Der Arbeitsbaum war vor Sprint 25.1 auf `main` bei `10c1f75` sauber und mit
+`origin/main` identisch. Die in Abschnitt 20 beschriebene Sprint-25.1-
+Implementierung liegt zur Benutzerprüfung bewusst uncommittet im Arbeitsbaum;
+Commit, Push, LXC-Rollout und Release-Tag sind noch nicht erfolgt.
 
 Die Sprint-17.6-Implementierung baut auf dem vollständig ausgerollten
 Sprint-21.2-Stand und der getrennten Sprint-17.5-Focus-Architektur auf. Die bestehende
@@ -73,6 +80,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung offen |
+| 25.1 | Pre-Release UI State & Filter Correctness | lokal umgesetzt, Review und iPad-Abnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -173,11 +181,16 @@ propagiertes Security-Flag, die älteste aktive Child-Dauer, Issue-Counts sowie
 Device Name, Raum und Integration. Entities ohne Device-ID und alle
 Config-Entry-, Repair-, Matter- und System-Issues bleiben Standalone.
 
-Die Kopfzahlen sind als Filter für Alle, Kritisch, Fehler, Warnungen und
-Unknown bedienbar. Unknown filtert weiterhin den State und ist keine neue
-Severity. Child-Entities sind standardmäßig eingeklappt und werden erst beim
-Öffnen der Details in den DOM eingefügt. Summary und Errors verwenden dieselbe
-Filterdarstellung und besitzen getrennte persistente 1-/2-/3-Spalten-
+Die Kopfzahlen sind als getrennte Filter für Severity und Status bedienbar.
+Critical, Error, Warning und Info vergleichen exakt; Unknown und Unavailable
+bleiben exakte States. Beide Dimensionen werden per UND am selben Child-Issue
+geprüft. Device Groups werden für die Anzeige erst nach dem Child-Filter
+gebildet: sichtbare Severity, Anzahl, Dauer und relevante Zustandsmerkmale
+stammen nur aus den passenden Children. Die ursprüngliche Gruppen-Severity,
+der Overall Health und der globale Sprint-21.5-Health-Indikator bleiben dabei
+unverändert. Child-Entities sind standardmäßig eingeklappt und werden erst
+beim Öffnen der Details in den DOM eingefügt. Summary und Errors verwenden
+dieselbe Filterdarstellung und besitzen getrennte persistente 1-/2-/3-Spalten-
 Präferenzen. Unter 701 Pixeln wird auf eine, unter 900 Pixeln höchstens auf
 zwei Spalten zurückgefallen; bei wieder ausreichender Breite wird die
 gespeicherte Präferenz erneut angewendet.
@@ -289,17 +302,22 @@ Pixelbreite/-höhe. Geometrie und Presentation Mode werden pro Profil und
 relevanter Breite gecacht; State-Polls lösen keine unnötige Neuberechnung aus.
 Resize und Orientation Change wenden die passende Geometrie erneut an.
 
-Die bestehende Theme-Persistenz verwendet weiterhin ausschließlich den Key
-`ha-legacy-theme`. Das externe Theme-Skript läuft nun im Dokumentkopf und
-setzt die gespeicherte Klasse früh auf das Root-Element; nach Aufbau des Bodys
-werden Root, Body und Toggle synchronisiert. Storage-Zugriffe bleiben in
-`try/catch`. `/`, `/d/:dashboardId`, `/system/summary` und `/system/errors`
-übernehmen dieselbe Light-/Dark-Auswahl nach Reload. CSP wurde nicht gelockert.
+Die bestehende Theme-Persistenz verwendet weiterhin genau die globale
+Präferenz `ha-legacy-theme`. Das externe Theme-Skript läuft im Dokumentkopf,
+validiert den gespeicherten Wert und setzt die Klasse früh auf das
+Root-Element; nach Aufbau des Bodys werden Root, Body und Toggle synchronisiert.
+`localStorage` ist der primäre Speicher. Weil Safari auf älteren iOS-Versionen
+das Objekt anbieten und Schreibzugriffe dennoch ablehnen kann, wird derselbe
+nicht sensible Wert zusätzlich in einem Root-Pfad-Cookie gespiegelt. Schlagen
+beide Wege fehl, bleibt der aktuelle Session-State ohne Crash bedienbar. `/`,
+`/d/:dashboardId`, `/system/summary` und `/system/errors` übernehmen dieselbe
+Light-/Dark-Auswahl nach Reload; Return-Navigation ändert sie nicht. CSP wurde
+nicht gelockert.
 
 Alle Dateien unter `src/public/js/` bleiben ECMAScript 5. Das Wall-Display
 verwendet weiterhin `Legacy.http.get`, kein `fetch`, keine Promise, kein CSS
 Grid, kein Flexbox-`gap` und keine CSS-Custom-Property-Abhängigkeit. Die
-Assetversion des Wall-Displays ist 39.
+Assetversion des Wall-Displays und der Systemansichten ist 43.
 
 ## 8a. Sprint 17.3 – Preview, Controls und Focus
 
@@ -669,10 +687,12 @@ die vorhandene Device-Präsentation. Nicht vorgezogen wurden fachliche Summary-
 Aggregation, persistente Historie, weitere Schreibdomänen oder freie System-
 Dashboard-Layouts.
 
-Empfohlener nächster Schritt ist Sprint 24 – Home Assistant App Packaging.
-Dabei müssen die bestehenden Standalone-/systemd-Pfade, die getrennten Tokens,
-die read-only Automationsdiagnose und alle expliziten Write-Allowlists erhalten
-bleiben.
+Der aktuelle nächste Schritt ist kein weiterer Funktionssprint, sondern die
+physische Sprint-25.1-Release-Gate-Abnahme auf iPad mini/iOS 9: Dark und Light
+müssen die vollständige Routenmatrix überstehen, und ein gemischter
+Error-Datensatz muss alle exakten Severity-/Status-Kombinationen bestätigen.
+Erst danach sind Commit, LXC-Rollout und die Entscheidung über den RC-
+beziehungsweise Stable-Tag sinnvoll.
 
 ## 14. Dokumentation und Screenshot-Baseline
 
@@ -1217,7 +1237,8 @@ Im App-Modus ist `/data` der zentrale persistente Datenpfad und
 und `.bak` enthalten Dashboards, Layouts, Widgets, Entity Rules, Critical-
 Detection- und Sprint-22-Regeln. Home Assistant nimmt den App-Datenbereich in
 Backups auf; `backup: cold` liefert einen konsistenten Snapshot. Theme-Wahl
-bleibt absichtlich im browserlokalen `localStorage`. Registry-, Trace- und
+bleibt absichtlich browserlokal; Sprint 25.1 ergänzt zum primären
+`localStorage` einen gleichnamigen Cookie-Fallback. Registry-, Trace- und
 Flapping-Caches bleiben begrenzt im Arbeitsspeicher und dürfen nach einem
 Neustart neu aufgebaut werden. Eine vorhandene LXC-Konfiguration wird nicht
 automatisch in den getrennten App-Datenbereich übernommen.
@@ -1327,3 +1348,66 @@ Installation, das App-Update mit `/data`, aarch64-Runtime und die physische
 iOS-9-Abnahme bleiben bewusste manuelle Schritte. Da keine sichtbare
 Produktoberfläche geändert wurde, sind keine Screenshots oder Asset-
 Cacheversionen zu aktualisieren.
+
+## 20. Sprint 25.1 – Pre-Release UI State & Filter Correctness
+
+Sprint 25.1 startet auf dem sauberen, mit `origin/main` identischen Commit
+`10c1f75`. Der Commit enthält bereits die Sprint-25.1-Spezifikation; die
+produktive Sprint-25-Implementierung liegt im vorherigen Commit `6628d81`.
+
+Die Theme-Regression lag nicht in getrennten Route-Keys: Default-, Custom- und
+System-Dashboards luden bereits dasselbe `ha-legacy-theme`. Der reale
+Fehlerpfad war die alte Storage-Abstraktion: Stellt Safari `localStorage`
+bereit, lehnt `setItem()` aber ab, wurde die Exception nur abgefangen. Beim
+nächsten Dokument- oder Routenladen las `Theme.loadEarly()` deshalb `null` und
+setzte Light. Die bisherigen Tests bestätigten lediglich, dass der laufende
+JavaScript-Kontext nach dem Fehler bedienbar blieb.
+
+`src/public/js/core/theme.js` behält genau diese globale logische Präferenz.
+Es validiert nur `light` oder `dark`, liest primär `localStorage` und fällt auf
+eine gleichnamige, nicht sensible Cookie-Kopie mit `path=/` zurück. Beim
+bewussten Umschalten werden beide Backends gespiegelt. Kann auch das Cookie
+nicht gelesen oder geschrieben werden, werden alle Exceptions abgefangen und
+der aktuelle In-Memory-State bleibt nutzbar. Das Theme-Skript läuft auf
+`index.html` und `system.html` weiterhin vor den Styles: lesen, validieren,
+Root-Klasse anwenden, später Body und Toggle synchronisieren. Die sichere
+Return-Navigation arbeitet nur mit internen Pfaden und verändert keinen
+Theme-State. Der moderne Admin besitzt kein globales Oberflächen-Theme; sein
+Light-/Dark-Schalter bleibt ausschließlich eine Card-Preview-Einstellung.
+
+Beim Error Dashboard waren Severity- und State-Predicates bereits exakte
+Vergleiche und am selben Child per UND verbunden. Der Renderpfad übergab aber
+anschließend die ungefilterte Device Group an die Karte. Damit blieben
+Kartenklasse, Badge, Issue-Count und Gruppenmetadaten auf der ursprünglichen
+höchsten Severity; eine Info-Teilmenge konnte somit weiterhin als Warning oder
+Critical erscheinen.
+
+Die neue reine Frontend-Presentation-Pipeline filtert zuerst die Child-Issues,
+verwirft Gruppen ohne Treffer und baut eine flache, nicht mutierende
+Darstellungskopie. `visibleSeverity`, sichtbare Counts, Dauer, Security-Flag,
+Unavailable/Unknown sowie Flapping/Recovery werden nur aus den passenden
+Children abgeleitet. Das Original-Payload, `group.severity`, Backend-
+Klassifikation, Sprint-22-Regeln, Automation Impact, Overall Status und der
+separate Sprint-21.5-Health-Endpunkt bleiben unverändert. Aufgeklappte Details
+erhalten ausschließlich die bereits gefilterten Children. Dadurch sind
+Critical, Error, Warning und Info exakte Teilmengen; kombinierte Statusfilter
+können keinen Treffer mehr aus zwei unterschiedlichen Children konstruieren.
+
+Die gemeinsame Assetversion ist 43. Der vollständige Lauf mit ausschließlich
+localhost-Mocks und Fake-Credentials besteht mit 260 von 260 Tests. Die neuen
+Regressionen prüfen Dark und Light über Default, Custom, Summary, Errors und
+Return, LocalStorage-/Cookie-Ausfälle, ungültige Werte, alle vier exakten
+Severity-Karten, sichtbare Child-Counts und Details, Status-UND, Cross-Child-
+Abwehr, Payload-Unveränderlichkeit, konstanten Overall Health und ausbleibende
+zusätzliche HA-Abfragen. Alle Frontenddateien bleiben ES5; es gibt keine neue
+Route, HA-Abfrage oder Write-Fähigkeit. Das vollständige Release Test Gate für
+`v1.0.0-rc.1` besteht einschließlich Versionskonsistenz, Syntaxprüfungen und
+Secret Scan. Die physische iPad-Abnahme bleibt vor Freigabe offen.
+
+README Deutsch und Englisch wurden semantisch synchron ergänzt. Die echten
+D1-Screenshots wurden geprüft: Die Theme-Farben und das ungefilterte
+Systemstatus-Layout ändern sich nicht; der Fix korrigiert ausschließlich
+persistenten Zustand und gefilterte Präsentationsdaten. Daher wäre ein neuer
+Screenshot ohne reale zusätzliche Aussage und wurde nicht erzeugt. Die reale
+iPad-mini-, optionale iPad-Air-2- und macOS-Safari-Abnahme bleiben vor einer
+Stable-Empfehlung verbindlich.

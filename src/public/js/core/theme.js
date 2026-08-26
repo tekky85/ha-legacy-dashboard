@@ -26,6 +26,42 @@ var Theme = {
     },
 
 
+    readCookieValue: function (key) {
+
+        var cookies;
+        var prefix;
+        var index;
+        var value;
+
+
+        try {
+
+            cookies = String(document.cookie || "").split(";");
+            prefix = encodeURIComponent(key) + "=";
+
+            for (index = 0; index < cookies.length; index++) {
+
+                value = cookies[index].replace(/^\s+|\s+$/g, "");
+
+                if (value.indexOf(prefix) === 0) {
+                    return decodeURIComponent(
+                        value.substring(prefix.length)
+                    );
+                }
+
+            }
+
+        } catch (error) {
+
+            return null;
+
+        }
+
+        return null;
+
+    },
+
+
     storeValue: function (key, value) {
 
         try {
@@ -33,6 +69,8 @@ var Theme = {
             if (window.localStorage) {
 
                 window.localStorage.setItem(key, value);
+
+                return true;
 
             }
 
@@ -42,17 +80,62 @@ var Theme = {
 
         }
 
+        return false;
+
+    },
+
+
+    storeCookieValue: function (key, value) {
+
+        try {
+
+            document.cookie =
+                encodeURIComponent(key) +
+                "=" +
+                encodeURIComponent(value) +
+                "; path=/; max-age=31536000";
+
+            return true;
+
+        } catch (error) {
+
+            return false;
+
+        }
+
     },
 
 
     readStoredTheme: function () {
-        return this.readStoredValue(this.storageKey);
+
+        var storedTheme =
+            this.readStoredValue(this.storageKey);
+
+
+        if (storedTheme === "dark" || storedTheme === "light") {
+            return storedTheme;
+        }
+
+        storedTheme =
+            this.readCookieValue(this.storageKey);
+
+        return storedTheme === "dark" || storedTheme === "light"
+            ? storedTheme
+            : null;
 
     },
 
 
     storeTheme: function (name) {
+
         this.storeValue(this.storageKey, name);
+
+        /*
+         * Safari on older iOS versions can expose localStorage while
+         * rejecting writes. The same non-sensitive preference is mirrored
+         * in a root-path cookie so route changes still retain the theme.
+         */
+        this.storeCookieValue(this.storageKey, name);
 
     },
 

@@ -294,11 +294,18 @@ test("Presentation Mode berücksichtigt reale verfügbare Pixel", function () {
 });
 
 
-function createThemeContext(storage, shouldThrow) {
+function createThemeContext(
+    storage,
+    shouldThrow,
+    cookieStorage,
+    cookieShouldThrow,
+    pathname
+) {
 
     const elements = {};
     const root = {className: ""};
     const body = {className: ""};
+    const cookies = cookieStorage || {};
     const button = {
         attributes: {},
         setAttribute: function (name, value) {
@@ -310,15 +317,41 @@ function createThemeContext(storage, shouldThrow) {
     elements.themeButton = button;
     elements.themeButtonLabel = label;
 
-    const context = vm.createContext({
-        document: {
-            documentElement: root,
-            body: body,
-            getElementById: function (id) {
-                return elements[id] || null;
+    const document = {
+        documentElement: root,
+        body: body,
+        getElementById: function (id) {
+            return elements[id] || null;
+        }
+    };
+
+    Object.defineProperty(document, "cookie", {
+        get: function () {
+            if (cookieShouldThrow) {
+                throw new Error("cookies unavailable");
             }
+            return Object.keys(cookies).map(function (key) {
+                return encodeURIComponent(key) + "=" +
+                    encodeURIComponent(cookies[key]);
+            }).join("; ");
         },
+        set: function (value) {
+            const pair = String(value || "").split(";")[0].split("=");
+            const key = decodeURIComponent(pair.shift() || "");
+
+            if (cookieShouldThrow) {
+                throw new Error("cookies unavailable");
+            }
+            cookies[key] = decodeURIComponent(pair.join("="));
+        }
+    });
+
+    const context = vm.createContext({
+        document: document,
         window: {
+            location: {
+                pathname: pathname || "/"
+            },
             localStorage: {
                 getItem: function (key) {
                     if (shouldThrow) {
@@ -345,7 +378,8 @@ function createThemeContext(storage, shouldThrow) {
         root: root,
         body: body,
         button: button,
-        label: label
+        label: label,
+        cookies: cookies
     };
 }
 
@@ -389,18 +423,83 @@ test("Theme bleibt bei Storage-Fehlern für die aktuelle Sitzung bedienbar", fun
 });
 
 
+test("Theme-Fallback bleibt bei LocalStorage-Fehlern über alle Legacy-Routen erhalten", function () {
+
+    const cookies = {};
+    const routes = [
+        "/",
+        "/d/custom-dashboard",
+        "/system/summary",
+        "/system/errors",
+        "/"
+    ];
+    const first = createThemeContext({}, true, cookies, false);
+
+    first.context.Theme.load();
+    first.context.Theme.toggle();
+    assert.equal(cookies["ha-legacy-theme"], "dark");
+
+    routes.forEach(function (route) {
+        const reload = createThemeContext({}, true, cookies, false, route);
+
+        assert.equal(reload.context.window.location.pathname, route);
+        assert.match(reload.root.className, /theme-dark/);
+        reload.context.Theme.load();
+        assert.equal(reload.context.Theme.current, "dark");
+        assert.match(reload.body.className, /theme-dark/);
+    });
+
+    const light = createThemeContext({}, true, cookies, false);
+    light.context.Theme.load();
+    light.context.Theme.toggle();
+    assert.equal(cookies["ha-legacy-theme"], "light");
+
+    routes.forEach(function (route) {
+        const reload = createThemeContext({}, true, cookies, false, route);
+
+        assert.equal(reload.context.window.location.pathname, route);
+        reload.context.Theme.load();
+        assert.equal(reload.context.Theme.current, "light");
+        assert.doesNotMatch(reload.root.className, /theme-dark/);
+        assert.doesNotMatch(reload.body.className, /theme-dark/);
+    });
+});
+
+
+test("Ungültige Theme-Werte und vollständiger Storage-Ausfall bleiben sicher", function () {
+
+    const invalid = createThemeContext(
+        {"ha-legacy-theme": "sepia"},
+        false,
+        {"ha-legacy-theme": "contrast"},
+        false
+    );
+    const unavailable = createThemeContext({}, true, {}, true);
+
+    invalid.context.Theme.load();
+    assert.equal(invalid.context.Theme.current, "light");
+
+    assert.doesNotThrow(function () {
+        unavailable.context.Theme.load();
+        unavailable.context.Theme.toggle();
+    });
+    assert.equal(unavailable.context.Theme.current, "dark");
+    assert.match(unavailable.body.className, /theme-dark/);
+});
+
+
 test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function () {
 
     const indexHtml = read("src/public/index.html");
     const systemHtml = read("src/public/system.html");
 
     assert.ok(
-        indexHtml.indexOf("/js/core/theme.js?v=39") <
-            indexHtml.indexOf("/css/style.css?v=39")
+        indexHtml.indexOf("/js/core/theme.js?v=43") <
+            indexHtml.indexOf("/css/style.css?v=43")
     );
     assert.ok(
-        systemHtml.indexOf("/js/core/theme.js?v=42") <
-            systemHtml.indexOf("/css/style.css?v=42")
+        systemHtml.indexOf("/js/core/theme.js?v=43") <
+            systemHtml.indexOf("/css/style.css?v=43")
     );
     assert.equal(
         (indexHtml.match(/\/js\/core\/theme\.js/g) || []).length,
@@ -410,7 +509,7 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
         (systemHtml.match(/\/js\/core\/theme\.js/g) || []).length,
         1
     );
-    assert.match(indexHtml, /\/js\/app\.js\?v=39/);
-    assert.match(systemHtml, /\/js\/system\/summary\.js\?v=42/);
-    assert.match(systemHtml, /\/js\/system\/errors\.js\?v=42/);
+    assert.match(indexHtml, /\/js\/app\.js\?v=43/);
+    assert.match(systemHtml, /\/js\/system\/summary\.js\?v=43/);
+    assert.match(systemHtml, /\/js\/system\/errors\.js\?v=43/);
 });

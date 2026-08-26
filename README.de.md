@@ -66,6 +66,14 @@ Das Legacy-Frontend bleibt frameworkfrei und verwendet die vorhandene `Legacy.ht
 - Light/Dark Mode
 - Stale-Data- und Reconnect-Verhalten
 
+Light und Dark sind eine globale Browser-Präferenz für `/`, alle
+`/d/<dashboard-id>`-Routen sowie Summary und Systemstatus. Die Auswahl wird
+unter dem bestehenden Schlüssel `ha-legacy-theme` früh vor dem Rendern
+geladen. Falls ein älteres Safari `localStorage` zwar anbietet, Schreibzugriffe
+aber ablehnt, hält eine gleichnamige, nicht sensible Cookie-Kopie mit Root-Pfad
+die Auswahl auch über Refresh und interne Navigation hinweg stabil. Wenn beide
+Speicherwege fehlen, bleibt die laufende Ansicht bedienbar und stürzt nicht ab.
+
 Jedes Standard- und Custom-Dashboard besitzt im Header eine neutrale, immer
 sichtbare Summary-Navigation. Daneben erscheint ein kompakter
 Error-/Health-Indikator nur bei `warning`, `error` oder `critical`. Reine
@@ -149,6 +157,14 @@ Zeigt unter anderem:
 - kompakte Device Cards für Entity-Issues mit derselben echten `device_id`
 - standardmäßig eingeklappte Child-Entity-Details
 - getrennt persistierte 1-/2-/3-Spaltenansicht mit responsivem Fallback
+
+Die vier Severity-Teilfilter sind exakte Filter: `Kritisch` zeigt nur
+`critical`, `Fehler` nur `error`, `Warnung` nur `warning` und `Info` nur
+`info`. Severity und Status werden am selben Child-Issue per UND verknüpft.
+Bei Device Cards werden zuerst die Children gefiltert; Anzahl, sichtbare
+Severity und aufgeklappte Details werden anschließend nur aus diesen Treffern
+gebildet. Das verändert weder den ungefilterten Gesamtstatus noch den globalen
+Health-Indikator.
 
 Auch hier erscheint die Gesamtzahl nur einmal im Header. Die Filter `Alle`
 wiederholen sie nicht; die Teilmengen für Kritikalität sowie `Unavailable` und

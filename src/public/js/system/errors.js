@@ -305,20 +305,163 @@
     }
 
 
-    function groupMatches(group) {
+    function highestVisibleSeverity(issues, fallback) {
+
+        var ranks = {
+            critical: 4,
+            error: 3,
+            warning: 2,
+            info: 1
+        };
+        var severity = fallback || "info";
+        var highestRank = 0;
         var index;
 
-        if (!group.issues || group.issues.length === 0) {
-            return issueMatches(group);
-        }
-
-        for (index = 0; group.issues && index < group.issues.length; index++) {
-            if (issueMatches(group.issues[index])) {
-                return true;
+        for (index = 0; index < issues.length; index++) {
+            if ((ranks[issues[index].severity] || 0) > highestRank) {
+                severity = issues[index].severity;
+                highestRank = ranks[severity];
             }
         }
 
-        return false;
+        return severity;
+
+    }
+
+
+    function visibleCounts(issues) {
+
+        var counts = {
+            critical: 0,
+            error: 0,
+            warning: 0,
+            info: 0,
+            unavailable: 0,
+            unknown: 0,
+            flapping: 0,
+            recoveryPending: 0
+        };
+        var index;
+
+        for (index = 0; index < issues.length; index++) {
+            if (typeof counts[issues[index].severity] === "number") {
+                counts[issues[index].severity] += 1;
+            }
+            if (issues[index].state === "unavailable") {
+                counts.unavailable += 1;
+            }
+            if (issues[index].state === "unknown") {
+                counts.unknown += 1;
+            }
+            if (issues[index].flapping === true) {
+                counts.flapping += 1;
+            }
+            if (issues[index].recoveryPending === true) {
+                counts.recoveryPending += 1;
+            }
+        }
+
+        return counts;
+
+    }
+
+
+    function visibleGroup(group) {
+
+        var sourceIssues = group.issues || [];
+        var matchingIssues = [];
+        var result = {};
+        var counts;
+        var durationSeconds = null;
+        var securityRelevant = false;
+        var property;
+        var index;
+
+        if (sourceIssues.length === 0) {
+            if (!issueMatches(group)) {
+                return null;
+            }
+        } else {
+            for (index = 0; index < sourceIssues.length; index++) {
+                if (issueMatches(sourceIssues[index])) {
+                    matchingIssues.push(sourceIssues[index]);
+                }
+            }
+
+            if (matchingIssues.length === 0) {
+                return null;
+            }
+        }
+
+        for (property in group) {
+            if (Object.prototype.hasOwnProperty.call(group, property)) {
+                result[property] = group[property];
+            }
+        }
+
+        if (sourceIssues.length === 0) {
+            result.originalSeverity = group.severity;
+            result.visibleSeverity = group.severity;
+            return result;
+        }
+
+        result.originalSeverity = group.severity;
+        result.visibleSeverity = highestVisibleSeverity(
+            matchingIssues,
+            group.severity
+        );
+        result.issues = matchingIssues;
+        result.issueCount = matchingIssues.length;
+        counts = visibleCounts(matchingIssues);
+        result.counts = counts;
+        result.unavailableCount = counts.unavailable;
+        result.unknownCount = counts.unknown;
+        result.flappingCount = counts.flapping;
+        result.recoveryPendingCount = counts.recoveryPending;
+
+        for (index = 0; index < matchingIssues.length; index++) {
+            if (matchingIssues[index].securityRelevant === true) {
+                securityRelevant = true;
+            }
+            if (
+                typeof matchingIssues[index].durationSeconds === "number" &&
+                (
+                    durationSeconds === null ||
+                    matchingIssues[index].durationSeconds > durationSeconds
+                )
+            ) {
+                durationSeconds = matchingIssues[index].durationSeconds;
+            }
+        }
+
+        result.securityRelevant = securityRelevant;
+        result.durationSeconds = durationSeconds;
+
+        return result;
+
+    }
+
+
+    function groupVisibleSeverity(group) {
+        return group.visibleSeverity || group.severity || "info";
+    }
+
+
+    function visibleGroups(payload) {
+
+        var groups = presentationGroups(payload);
+        var result = [];
+        var group;
+        var index;
+
+        for (index = 0; index < groups.length; index++) {
+            group = visibleGroup(groups[index]);
+            if (group) {
+                result.push(group);
+            }
+        }
+
+        return result;
 
     }
 
@@ -525,9 +668,6 @@
             index < group.issues.length && rendered < limit;
             index++
         ) {
-            if (!issueMatches(group.issues[index])) {
-                continue;
-            }
             list.appendChild(childIssueRow(group.issues[index]));
             rendered += 1;
         }
@@ -544,11 +684,12 @@
 
     function createDeviceCard(group, childLimit) {
 
-        var definition = SEVERITY[group.severity] || SEVERITY.info;
+        var severityName = groupVisibleSeverity(group);
+        var definition = SEVERITY[severityName] || SEVERITY.info;
         var expanded = expandedGroups[group.id] === true;
         var card = createElement(
             "article",
-            "error-card error-device-card error-card-" + group.severity +
+            "error-card error-device-card error-card-" + severityName +
                 (expanded ? " is-expanded" : "")
         );
         var header = createElement("div", "error-card-header");
@@ -678,7 +819,7 @@
             expandedGroups[group.id] = !isExpanded;
             card.className =
                 "error-card error-device-card error-card-" +
-                group.severity +
+                severityName +
                 (!isExpanded ? " is-expanded" : "");
             button.innerHTML = Legacy.html.escape(
                 !isExpanded ? "Details ausblenden" : "Details anzeigen"
@@ -706,10 +847,11 @@
 
     function createStandaloneCard(group) {
 
-        var definition = SEVERITY[group.severity] || SEVERITY.info;
+        var severityName = groupVisibleSeverity(group);
+        var definition = SEVERITY[severityName] || SEVERITY.info;
         var card = createElement(
             "article",
-            "error-card error-standalone-card error-card-" + group.severity
+            "error-card error-standalone-card error-card-" + severityName
         );
         var header = createElement("div", "error-card-header");
         var heading = createElement(
@@ -838,21 +980,9 @@
         var index;
 
         for (index = 0; index < groups.length; index++) {
-            if (!groupMatches(groups[index])) {
-                continue;
-            }
-            for (
-                var issueIndex = 0;
-                groups[index].issues && issueIndex < groups[index].issues.length;
-                issueIndex++
-            ) {
-                if (issueMatches(groups[index].issues[issueIndex])) {
-                    total += 1;
-                }
-            }
-            if (!groups[index].issues || groups[index].issues.length === 0) {
-                total += 1;
-            }
+            total += groups[index].issues && groups[index].issues.length > 0
+                ? groups[index].issues.length
+                : 1;
         }
 
         return total;
@@ -864,7 +994,7 @@
 
         var groupsElement = SystemDashboard.byId("errorGroups");
         var emptyElement = SystemDashboard.byId("errorFilterEmpty");
-        var groups = presentationGroups(payload);
+        var groups = visibleGroups(payload);
         var totalMatching = matchingIssueCount(groups);
         var representedIssues = 0;
         var renderedCards = 0;
@@ -883,15 +1013,13 @@
             var issueIndex;
 
             for (issueIndex = 0; group.issues && issueIndex < group.issues.length; issueIndex++) {
-                if (issueMatches(group.issues[issueIndex])) {
-                    groupSize += 1;
-                }
+                groupSize += 1;
             }
             if (!group.issues || group.issues.length === 0) {
                 groupSize = 1;
             }
 
-            if (!groupMatches(group) || remaining <= 0) {
+            if (remaining <= 0) {
                 continue;
             }
 
