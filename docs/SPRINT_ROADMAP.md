@@ -210,7 +210,7 @@ Bedeutung von „fest“:
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung nach Review offen |
-| 25.1 | Pre-Release UI State & Filter Correctness | lokal umgesetzt, reale iPad-Abnahme und Review offen |
+| 25.1 | Pre-Release UI State & Filter Correctness | umgesetzt und auf LXC ausgerollt, reale iPad-Abnahme offen |
 
 ---
 
@@ -1537,8 +1537,9 @@ automatischer Teil der Implementierung.
 
 ## Status
 
-Lokal umgesetzt; Review und reale Abnahme auf iPad mini/iOS 9 bleiben als
-Release Gate offen.
+Als `a438e3c` umgesetzt, auf `origin/main` gepusht und auf dem Standalone-LXC
+ausgerollt; die reale Abnahme auf iPad mini/iOS 9 bleibt als Release Gate
+offen.
 
 ## Ergebnis
 

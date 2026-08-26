@@ -1,9 +1,9 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 25. August 2026, Sprint 25.1 lokal auf dem vorbereiteten Sprint-25-RC
-implementiert; Release Candidate 1.0.0-rc.1 automatisiert geprüft,
-Veröffentlichung sowie reale HAOS-/Multi-Arch- und physische Safari-Abnahme
-offen
+Stand: 26. August 2026, Sprint 25.1 als Commit `a438e3c` implementiert,
+auf `origin/main` gepusht und auf dem Standalone-LXC ausgerollt; Release
+Candidate 1.0.0-rc.1 automatisiert geprüft, Veröffentlichung sowie reale
+HAOS-/Multi-Arch- und physische Safari-Abnahme offen
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -35,8 +35,10 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 
 Der Arbeitsbaum war vor Sprint 25.1 auf `main` bei `10c1f75` sauber und mit
 `origin/main` identisch. Die in Abschnitt 20 beschriebene Sprint-25.1-
-Implementierung liegt zur Benutzerprüfung bewusst uncommittet im Arbeitsbaum;
-Commit, Push, LXC-Rollout und Release-Tag sind noch nicht erfolgt.
+Implementierung wurde nach Review als `a438e3c` committet, auf `origin/main`
+gepusht und per Fast-Forward nach
+`/home/dashboard/ha-legacy-dashboard` ausgerollt. Der Release-Tag wurde
+bewusst noch nicht gesetzt.
 
 Die Sprint-17.6-Implementierung baut auf dem vollständig ausgerollten
 Sprint-21.2-Stand und der getrennten Sprint-17.5-Focus-Architektur auf. Die bestehende
@@ -80,7 +82,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung offen |
-| 25.1 | Pre-Release UI State & Filter Correctness | lokal umgesetzt, Review und iPad-Abnahme offen |
+| 25.1 | Pre-Release UI State & Filter Correctness | implementiert, gepusht und auf LXC ausgerollt; iPad-Abnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -1403,6 +1405,13 @@ zusätzliche HA-Abfragen. Alle Frontenddateien bleiben ES5; es gibt keine neue
 Route, HA-Abfrage oder Write-Fähigkeit. Das vollständige Release Test Gate für
 `v1.0.0-rc.1` besteht einschließlich Versionskonsistenz, Syntaxprüfungen und
 Secret Scan. Die physische iPad-Abnahme bleibt vor Freigabe offen.
+
+Der Standalone-Rollout am 26. August 2026 aktualisierte den sauberen LXC per
+Fast-Forward von `6628d81` auf `a438e3c`. Direkt auf dem LXC bestanden erneut
+260 von 260 Tests. `ha-legacy-dashboard.service` ist aktiv; `/health`,
+`/api/status`, `/api/dashboard` und `/api/system-dashboards/status` antworteten
+anschließend jeweils mit HTTP 200. Es wurden weder ein reales HA-Token
+ausgegeben noch ein Release-Tag oder öffentliches Release erzeugt.
 
 README Deutsch und Englisch wurden semantisch synchron ergänzt. Die echten
 D1-Screenshots wurden geprüft: Die Theme-Farben und das ungefilterte
