@@ -211,7 +211,7 @@ Bedeutung von „fest“:
 | 24 | Home Assistant App Packaging | umgesetzt |
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung nach Review offen |
 | 25.1 | Pre-Release UI State & Filter Correctness | umgesetzt und auf LXC ausgerollt, reale iPad-Abnahme offen |
-| 25.2 | HomeScreen Standalone Navigation Correctness | implementiert, Review und reale Geräteabnahme offen |
+| 25.2 | HomeScreen Standalone Navigation Correctness | umgesetzt und auf LXC ausgerollt, reale Geräteabnahme offen |
 
 ---
 
@@ -1571,8 +1571,8 @@ offen.
 
 ## Status
 
-Implementiert auf Basis von `94c7efa`; Commit, Push, LXC-Rollout und reale
-iPad-Abnahme erfolgen erst nach Review.
+Als `c432d7c` umgesetzt, auf `origin/main` gepusht und auf dem Standalone-LXC
+ausgerollt; die reale iPad-Abnahme bleibt als Release Gate offen.
 
 ## Ergebnis
 

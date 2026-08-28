@@ -1,7 +1,7 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 28. August 2026, Sprint 25.2 auf Basis von `94c7efa` implementiert und
-lokal geprüft; Review, Commit, Push, Standalone-LXC-Rollout sowie reale
+Stand: 28. August 2026, Sprint 25.2 als `c432d7c` implementiert, auf
+`origin/main` gepusht und auf dem Standalone-LXC ausgerollt; reale
 HomeScreen-/Safari-Abnahme offen. Release Candidate 1.0.0-rc.1 bleibt bis zur
 physischen Release-Gate-Abnahme unveröffentlicht.
 
@@ -35,8 +35,9 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 - Sprint-17.1-Commit: `53ce672`
 
 Der Arbeitsbaum war vor Sprint 25.2 auf `main` bei `94c7efa` sauber und mit
-`origin/main` identisch. Die Sprint-25.2-Änderungen sind zur Review bewusst
-noch nicht committet, gepusht oder ausgerollt.
+`origin/main` identisch. Die Sprint-25.2-Änderungen wurden nach Review als
+`c432d7c` committet, auf `origin/main` gepusht und per Fast-Forward auf dem
+Standalone-LXC ausgerollt.
 
 Der Arbeitsbaum war vor Sprint 25.1 auf `main` bei `10c1f75` sauber und mit
 `origin/main` identisch. Die in Abschnitt 20 beschriebene Sprint-25.1-
@@ -88,7 +89,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 24 | Home Assistant App Packaging | umgesetzt |
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung offen |
 | 25.1 | Pre-Release UI State & Filter Correctness | implementiert, gepusht und auf LXC ausgerollt; iPad-Abnahme offen |
-| 25.2 | HomeScreen Standalone Navigation Correctness | implementiert und lokal geprüft; Review, Rollout und Geräteabnahme offen |
+| 25.2 | HomeScreen Standalone Navigation Correctness | implementiert, gepusht und auf LXC ausgerollt; Geräteabnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -1430,8 +1431,8 @@ Stable-Empfehlung verbindlich.
 ## 21. Sprint 25.2 – HomeScreen Standalone Navigation Correctness
 
 Sprint 25.2 startet auf dem sauberen, mit `origin/main` identischen Commit
-`94c7efa`. Die Implementierung ist lokal vorhanden, aber entsprechend dem
-Review-Gate noch nicht committet, gepusht oder auf den LXC ausgerollt.
+`94c7efa`. Die Implementierung wurde nach Review als `c432d7c` committet, auf
+`origin/main` gepusht und auf den LXC ausgerollt.
 
 Die Root Cause lag in der Navigationsart des Legacy-Frontends: Summary,
 Health/Errors und die meisten System-Dashboard-Links waren gewöhnliche
@@ -1481,5 +1482,11 @@ bestehen 265 von 265 Tests; das RC-Gate bestätigt zusätzlich konsistente
 Versionen, alle JavaScript-Syntaxprüfungen und einen erfolgreichen Secret Scan.
 Deshalb bleiben die reale iPad-mini-HomeScreen-Abnahme, dieselben Rundreisen
 auf dem iPad Air 2 und der normale macOS-Safari-Test vor einer Stable-
-Empfehlung verbindlich. Commit, Rollout und diese Geräteabnahme folgen erst
-nach Review.
+Empfehlung verbindlich.
+
+Der Standalone-Rollout aktualisierte den sauberen LXC per Fast-Forward von
+`de7fad0` auf `c432d7c`. Direkt auf dem LXC bestanden erneut 265 von 265 Tests.
+`ha-legacy-dashboard.service` ist aktiv; `/health`, `/api/status`,
+`/api/dashboard` und `/api/system-dashboards/status` antworteten anschließend
+jeweils mit HTTP 200. Es wurden keine Zugangsdaten ausgegeben und weder ein
+Release-Tag noch ein öffentliches Release erzeugt.
