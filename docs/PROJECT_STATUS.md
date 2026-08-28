@@ -1,8 +1,7 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 28. August 2026, Sprint 25.3 ausgehend von `c8d452b` lokal
-implementiert und zur Review vorbereitet. Entsprechend der Sprint-Vorgabe ist
-dieser Stand noch nicht committet, gepusht oder ausgerollt. Reale
+Stand: 28. August 2026, Sprint 25.3 als `f010350` implementiert, auf
+`origin/main` gepusht und auf dem Standalone-LXC ausgerollt. Reale
 iPad-/HomeScreen-/Safari-Abnahme bleibt offen. Release Candidate 1.0.0-rc.1
 bleibt bis zur physischen Release-Gate-Abnahme unveröffentlicht.
 
@@ -13,6 +12,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 
 - Branch: `main`
 - Sprint-25.3-Ausgangscommit: `c8d452b`
+- Sprint-25.3-Implementierungscommit: `f010350`
 - Sprint-25.2-Ausgangscommit: `94c7efa`
 - Sprint-25.1-Ausgangscommit: `10c1f75`
 - Sprint-25-Ausgangscommit: `95f6603`
@@ -44,8 +44,9 @@ Standalone-LXC ausgerollt.
 Der Arbeitsbaum war vor Sprint 25.3 auf `main` bei `c8d452b` sauber und mit
 `origin/main` identisch. Der Ausgangscommit ergänzt ausschließlich die
 vollständige Sprint-25.3-Spezifikation um die Full-Height-/Footer-Anforderungen.
-Die in Abschnitt 22 beschriebene Implementierung liegt derzeit als
-Review-Diff vor.
+Die in Abschnitt 22 beschriebene Implementierung wurde nach Review als
+`f010350` committet, auf `origin/main` gepusht und per Fast-Forward auf dem
+Standalone-LXC ausgerollt.
 
 Der Arbeitsbaum war vor Sprint 25.1 auf `main` bei `10c1f75` sauber und mit
 `origin/main` identisch. Die in Abschnitt 20 beschriebene Sprint-25.1-
@@ -98,7 +99,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung offen |
 | 25.1 | Pre-Release UI State & Filter Correctness | implementiert, gepusht und auf LXC ausgerollt; iPad-Abnahme offen |
 | 25.2 | HomeScreen Standalone Navigation Correctness | implementiert, gepusht und auf LXC ausgerollt; Geräteabnahme offen |
-| 25.3 | Dashboard Backgrounds & Full-Height Layout | lokal implementiert, Review und Geräteabnahme offen |
+| 25.3 | Dashboard Backgrounds & Full-Height Layout | implementiert, gepusht und auf LXC ausgerollt; Geräteabnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -1506,8 +1507,8 @@ Release-Tag noch ein öffentliches Release erzeugt.
 ## 22. Sprint 25.3 – Dashboard Backgrounds & Full-Height Layout
 
 Sprint 25.3 startet auf dem sauberen, mit `origin/main` identischen Commit
-`c8d452b`. Der Stand liegt entsprechend der Sprint-Vorgabe lokal zur Review
-vor und wurde noch nicht committet, gepusht oder ausgerollt.
+`c8d452b`. Der Stand wurde nach Review als `f010350` committet, auf
+`origin/main` gepusht und auf den Standalone-LXC ausgerollt.
 
 Das persistente Dashboard-Schema ist Version 9. Jedes normale Default- oder
 Custom-Dashboard besitzt `showTitle` sowie entweder `background: null` oder
@@ -1603,5 +1604,14 @@ erreichbar bleibt; Browserkonsole und Warnungsprotokoll bleiben leer.
 Vor einer Stable-Empfehlung bleiben die physische Abnahme auf iPad mini/iOS 9,
 iPad Air 2/iPadOS 15 und macOS Safari sowie Portrait, Landscape, Rotation,
 HomeScreen, Light/Dark, unterschiedliche Hintergründe, fehlendes Asset und
-0/1/wenige/viele Cards verbindlich. Erst nach Review darf der Stand committet,
-gepusht und auf den LXC ausgerollt werden.
+0/1/wenige/viele Cards verbindlich.
+
+Der Standalone-Rollout aktualisierte den sauberen LXC per Fast-Forward von
+`29722a6` auf `f010350`. Direkt auf dem LXC bestanden erneut 275 von 275 Tests
+einschließlich Syntax-, Security- und Integrationsprüfungen.
+`ha-legacy-dashboard.service` ist aktiv; `/health`, `/api/status` und die
+öffentliche Dashboard-Konfiguration antworteten anschließend jeweils mit
+HTTP 200. Das persistente `data`-Verzeichnis gehört `dashboard:dashboard` und
+hat Modus 0700; `data/backgrounds` wird sicher beim ersten Upload erzeugt. Es
+wurden keine Zugangsdaten ausgegeben und weder ein Release-Tag noch ein
+öffentliches Release erzeugt.

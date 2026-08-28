@@ -1612,9 +1612,8 @@ docs/sprints/SPRINT-25.2.md
 
 ## Status
 
-Ausgehend von `c8d452b` lokal implementiert und zur Review vorbereitet; noch
-nicht committet, gepusht oder ausgerollt. Die physische iPad-/Safari-Abnahme
-bleibt Release Gate.
+Als `f010350` umgesetzt, auf `origin/main` gepusht und auf dem Standalone-LXC
+ausgerollt; die physische iPad-/Safari-Abnahme bleibt Release Gate.
 
 ## Ergebnis
 
@@ -1960,11 +1959,10 @@ Ziel bleibt:
 
 # Nächster Schritt
 
-Sprint 25.3 liegt zur Review vor. Nach Freigabe, Commit, LXC-Rollout und
-Screenshot-Prüfung folgt vor dem ersten Stable Release die dokumentierte
-RC-Abnahme von `v1.0.0-rc.1`: GitHub-/GHCR-Pipeline, Custom-App-Installation
-auf Test-HAOS, Update mit erhaltener `/data`-Konfiguration sowie physische
-Safari-iOS-9-Prüfung einschließlich Hintergrund, Titel, Full-Height-Footer,
-Rotation und HomeScreen-Navigation. Ergebnisse oder Fehler aus dieser Abnahme
-bestimmen den nächsten Korrektursprint; es wird keine neue Produktfunktion
-vorgezogen.
+Sprint 25.3 ist gepusht und auf dem Standalone-LXC ausgerollt. Vor dem ersten
+Stable Release folgt die dokumentierte RC-Abnahme von `v1.0.0-rc.1`:
+GitHub-/GHCR-Pipeline, Custom-App-Installation auf Test-HAOS, Update mit
+erhaltener `/data`-Konfiguration sowie physische Safari-iOS-9-Prüfung
+einschließlich Hintergrund, Titel, Full-Height-Footer, Rotation und
+HomeScreen-Navigation. Ergebnisse oder Fehler aus dieser Abnahme bestimmen
+den nächsten Korrektursprint; es wird keine neue Produktfunktion vorgezogen.
