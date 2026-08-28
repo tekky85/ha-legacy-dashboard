@@ -173,6 +173,159 @@
         });
     }
 
+    function backgroundImageUrl(background) {
+        return background && background.imageId
+            ? "/assets/backgrounds/" +
+                encodeURIComponent(background.imageId)
+            : "";
+    }
+
+    function appendSelectOption(select, value, label, selectedValue) {
+        const option = createElement("option", "", label);
+        option.value = value;
+        option.selected = value === selectedValue;
+        select.appendChild(option);
+    }
+
+    function renderBackgroundEditor(dashboard) {
+        const section = createElement("section", "background-settings");
+        const heading = createElement("div", "section-heading");
+        const headingText = createElement("div");
+        const controls = createElement("div", "background-controls");
+        const background = dashboard.background;
+
+        headingText.appendChild(createElement("h2", "", "Darstellung"));
+        headingText.appendChild(createElement(
+            "p",
+            "muted",
+            "Titel und Hintergrund gelten nur für dieses Dashboard."
+        ));
+        heading.appendChild(headingText);
+        section.appendChild(heading);
+
+        const showTitleLabel = createElement("label", "checkbox-row");
+        const showTitleInput = createElement("input");
+        showTitleInput.type = "checkbox";
+        showTitleInput.checked = dashboard.showTitle !== false;
+        showTitleInput.dataset.field = "dashboard-show-title";
+        showTitleLabel.appendChild(showTitleInput);
+        showTitleLabel.appendChild(createElement(
+            "span",
+            "",
+            "Dashboard-Titel anzeigen"
+        ));
+        controls.appendChild(showTitleLabel);
+
+        const fileField = createElement("div", "background-file-field");
+        const fileInput = createElement("input");
+        fileInput.id = "dashboardBackgroundFile";
+        fileInput.type = "file";
+        fileInput.accept = "image/jpeg,image/png,.jpg,.jpeg,.png";
+        appendLabeledInput(
+            fileField,
+            background ? "Hintergrund ersetzen" : "Hintergrund hochladen",
+            fileInput
+        );
+        fileField.appendChild(createElement(
+            "small",
+            "",
+            "JPEG oder PNG, maximal 10 MB und 4096 × 4096 Pixel."
+        ));
+        controls.appendChild(fileField);
+
+        const positionField = createElement("div");
+        const positionSelect = createElement("select");
+        positionSelect.id = "dashboardBackgroundPosition";
+        positionSelect.dataset.field = "dashboard-background-position";
+        positionSelect.disabled = !background;
+        [
+            ["center center", "Zentriert"],
+            ["center top", "Oben"],
+            ["center bottom", "Unten"],
+            ["left center", "Links"],
+            ["right center", "Rechts"]
+        ].forEach(function (entry) {
+            appendSelectOption(
+                positionSelect,
+                entry[0],
+                entry[1],
+                background ? background.position : "center center"
+            );
+        });
+        appendLabeledInput(positionField, "Bildposition", positionSelect);
+        controls.appendChild(positionField);
+
+        const sizeField = createElement("div");
+        const sizeSelect = createElement("select");
+        sizeSelect.id = "dashboardBackgroundSize";
+        sizeSelect.dataset.field = "dashboard-background-size";
+        sizeSelect.disabled = !background;
+        appendSelectOption(
+            sizeSelect,
+            "cover",
+            "Ausfüllen (Cover)",
+            background ? background.size : "cover"
+        );
+        appendSelectOption(
+            sizeSelect,
+            "contain",
+            "Einpassen (Contain)",
+            background ? background.size : "cover"
+        );
+        appendLabeledInput(sizeField, "Bildgröße", sizeSelect);
+        controls.appendChild(sizeField);
+
+        const overlayField = createElement("div");
+        const overlaySelect = createElement("select");
+        overlaySelect.id = "dashboardBackgroundOverlay";
+        overlaySelect.dataset.field = "dashboard-background-overlay";
+        overlaySelect.disabled = !background;
+        [0, 10, 20, 30, 40, 50].forEach(function (value) {
+            appendSelectOption(
+                overlaySelect,
+                String(value),
+                value === 0 ? "Kein Overlay" : value + " % dunkel",
+                String(background ? background.overlay : 20)
+            );
+        });
+        appendLabeledInput(overlayField, "Abdunklung", overlaySelect);
+        controls.appendChild(overlayField);
+
+        const actions = createElement("div", "background-actions");
+        actions.appendChild(createButton(
+            background ? "Bild ersetzen" : "Bild hochladen",
+            "background-upload",
+            "",
+            "button primary compact"
+        ));
+        if (background) {
+            actions.appendChild(createButton(
+                "Bild entfernen",
+                "background-remove",
+                "",
+                "button danger compact"
+            ));
+        }
+        controls.appendChild(actions);
+        section.appendChild(controls);
+
+        if (background) {
+            const preview = createElement("figure", "background-image-preview");
+            const image = createElement("img");
+            image.src = backgroundImageUrl(background);
+            image.alt = "Vorschau des Dashboard-Hintergrunds";
+            preview.appendChild(image);
+            preview.appendChild(createElement(
+                "figcaption",
+                "muted",
+                "Gespeicherter Hintergrund dieses Dashboards"
+            ));
+            section.appendChild(preview);
+        }
+
+        return section;
+    }
+
     function renderDashboardList() {
         const draft = admin.State.getDraft();
         const selectedId = admin.State.getSelectedDashboardId();
@@ -466,6 +619,11 @@
         const tabs = createElement("div", "layout-profile-tabs");
         const themeTabs = createElement("div", "layout-theme-tabs");
         const grid = createElement("div", "layout-editor-grid");
+        const canvas = createElement("div", "dashboard-preview-canvas");
+        const backgroundOverlay = createElement(
+            "div",
+            "dashboard-preview-overlay"
+        );
         const profileName = activeLayoutProfile;
         const columns = admin.Layout.COLUMNS[profileName];
         const rows = admin.Layout.rowCount(dashboard, profileName) + 1;
@@ -516,6 +674,30 @@
         heading.appendChild(viewControls);
         section.appendChild(heading);
 
+        if (dashboard.background) {
+            canvas.style.backgroundImage =
+                "url(\"" +
+                backgroundImageUrl(dashboard.background) +
+                "\")";
+            canvas.style.backgroundPosition =
+                dashboard.background.position;
+            canvas.style.backgroundSize = dashboard.background.size;
+            backgroundOverlay.style.backgroundColor =
+                "rgba(0, 0, 0, " +
+                (dashboard.background.overlay / 100) +
+                ")";
+        }
+
+        canvas.appendChild(backgroundOverlay);
+
+        if (dashboard.showTitle !== false) {
+            canvas.appendChild(createElement(
+                "div",
+                "dashboard-preview-title",
+                dashboard.title
+            ));
+        }
+
         grid.classList.add("preview-theme-" + previewTheme);
         grid.dataset.layoutGrid = profileName;
         grid.dataset.rowHeight = "194";
@@ -533,7 +715,8 @@
         preview.hidden = true;
         preview.setAttribute("aria-hidden", "true");
         grid.appendChild(preview);
-        section.appendChild(grid);
+        canvas.appendChild(grid);
+        section.appendChild(canvas);
         section.appendChild(createElement(
             "p",
             "layout-help muted",
@@ -632,6 +815,9 @@
         settings.appendChild(refreshField);
         settings.appendChild(defaultLabel);
         elements.dashboardEditor.appendChild(settings);
+        elements.dashboardEditor.appendChild(
+            renderBackgroundEditor(dashboard)
+        );
         elements.dashboardEditor.appendChild(
             renderLayoutEditor(dashboard)
         );
@@ -1487,6 +1673,36 @@
                 });
                 renderEditor();
             } else if (
+                event.target.dataset.field === "dashboard-show-title"
+            ) {
+                admin.Dashboards.update(dashboard.id, {
+                    showTitle: event.target.checked
+                });
+                renderEditor();
+            } else if (
+                event.target.dataset.field === "dashboard-background-position" ||
+                event.target.dataset.field === "dashboard-background-size" ||
+                event.target.dataset.field === "dashboard-background-overlay"
+            ) {
+                const background = admin.State.clone(dashboard.background);
+
+                if (!background) {
+                    return;
+                }
+
+                if (event.target.dataset.field === "dashboard-background-position") {
+                    background.position = event.target.value;
+                } else if (event.target.dataset.field === "dashboard-background-size") {
+                    background.size = event.target.value;
+                } else {
+                    background.overlay = Number(event.target.value);
+                }
+
+                admin.Dashboards.update(dashboard.id, {
+                    background: background
+                });
+                renderEditor();
+            } else if (
                 event.target.dataset.field === "dashboard-default" &&
                 event.target.checked
             ) {
@@ -1500,7 +1716,7 @@
         updateDirtyState();
     }
 
-    function handleEditorClick(event) {
+    async function handleEditorClick(event) {
         const button = event.target.closest("button[data-action]");
         const dashboard = admin.State.getSelectedDashboard();
 
@@ -1544,6 +1760,51 @@
                     renderAll();
                 } else {
                     showNotice("Diese Rasteränderung ist wegen Grenze, Mindestgröße oder Kollision nicht möglich.", true);
+                }
+            } else if (button.dataset.action === "background-upload") {
+                const fileInput = byId("dashboardBackgroundFile");
+                const file = fileInput && fileInput.files
+                    ? fileInput.files[0]
+                    : null;
+
+                if (admin.State.isDirty()) {
+                    throw new Error(
+                        "Speichern oder verwerfen Sie zuerst die offenen Änderungen."
+                    );
+                }
+                if (!file) {
+                    throw new Error("Bitte wählen Sie zuerst ein JPEG- oder PNG-Bild aus.");
+                }
+                if (["image/jpeg", "image/png"].indexOf(file.type) === -1) {
+                    throw new Error("Nur JPEG- und PNG-Bilder sind erlaubt.");
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    throw new Error("Das Bild darf höchstens 10 MB groß sein.");
+                }
+
+                button.disabled = true;
+                button.textContent = "Lädt hoch …";
+
+                const uploaded = await admin.Api.uploadBackground(
+                    dashboard.id,
+                    file
+                );
+                admin.State.setConfiguration(uploaded.configuration);
+                renderAll();
+                showNotice("Hintergrundbild wurde gespeichert.", false);
+            } else if (button.dataset.action === "background-remove") {
+                if (admin.State.isDirty()) {
+                    throw new Error(
+                        "Speichern oder verwerfen Sie zuerst die offenen Änderungen."
+                    );
+                }
+                if (window.confirm("Hintergrundbild dieses Dashboards entfernen?")) {
+                    const removed = await admin.Api.removeBackground(
+                        dashboard.id
+                    );
+                    admin.State.setConfiguration(removed.configuration);
+                    renderAll();
+                    showNotice("Hintergrundbild wurde entfernt.", false);
                 }
             } else if (button.dataset.action === "dashboard-duplicate") {
                 openDashboardForm("duplicate");
@@ -1590,6 +1851,12 @@
                 }
             }
         } catch (error) {
+            if (button.dataset.action === "background-upload") {
+                button.disabled = false;
+                button.textContent = dashboard.background
+                    ? "Bild ersetzen"
+                    : "Bild hochladen";
+            }
             showNotice(error.message, true);
         }
     }

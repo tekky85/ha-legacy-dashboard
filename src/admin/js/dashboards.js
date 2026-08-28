@@ -86,6 +86,8 @@
         draft.dashboards.push({
             id: id,
             title: cleanTitle,
+            showTitle: true,
+            background: null,
             refreshIntervalMs: 5000,
             widgets: [],
             layouts: admin.Layout.emptyLayouts()
@@ -124,6 +126,14 @@
             dashboard.refreshIntervalMs = interval;
         }
 
+        if (typeof changes.showTitle !== "undefined") {
+            dashboard.showTitle = Boolean(changes.showTitle);
+        }
+
+        if (typeof changes.background !== "undefined") {
+            dashboard.background = changes.background;
+        }
+
         admin.State.markDirty();
         return dashboard;
     }
@@ -140,6 +150,8 @@
         const duplicateDashboard = {
             id: newId,
             title: cleanTitle,
+            showTitle: source.showTitle !== false,
+            background: null,
             refreshIntervalMs: source.refreshIntervalMs,
             widgets: source.widgets.map(function (widget) {
                 const duplicateWidget = admin.State.clone(widget);

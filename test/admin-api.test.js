@@ -44,18 +44,24 @@ function request(
 
     return new Promise(function (resolve, reject) {
 
+        const rawPayload = Buffer.isBuffer(body);
+
         const payload =
             typeof body === "undefined"
                 ? null
-                : JSON.stringify(body);
+                : rawPayload
+                    ? body
+                    : JSON.stringify(body);
 
         const requestHeaders =
             Object.assign({}, headers || {});
 
 
         if (payload !== null) {
-            requestHeaders["Content-Type"] =
-                "application/json";
+            if (!rawPayload) {
+                requestHeaders["Content-Type"] =
+                    "application/json";
+            }
             requestHeaders["Content-Length"] =
                 Buffer.byteLength(payload);
         }
@@ -302,6 +308,11 @@ test(
                             adminToken,
                         DASHBOARD_CONFIG_PATH:
                             configPath,
+                        DATA_DIR:
+                            path.join(
+                                temporaryDirectory,
+                                name + "-data"
+                            ),
                         HA_TOKEN:
                             FAKE_HA_TOKEN,
                         HA_URL:
@@ -582,7 +593,7 @@ test(
                 );
 
                 assert.equal(initial.status, 200);
-                assert.equal(initial.json.schemaVersion, 8);
+                assert.equal(initial.json.schemaVersion, 9);
                 assert.equal(
                     initial.json.dashboards[0].layouts.portrait.columns,
                     6
@@ -737,6 +748,162 @@ test(
 
 
         await t.test(
+            "Dashboard-Hintergründe sind geschützt, typgeprüft und sicher ersetzbar",
+            async function () {
+
+                const gateway = await startGateway(
+                    "backgrounds",
+                    "true",
+                    FAKE_ADMIN_TOKEN,
+                    null
+                );
+
+                const auth = {
+                    Authorization:
+                        "Bearer " +
+                        FAKE_ADMIN_TOKEN,
+                    "Content-Type": "image/png"
+                };
+
+                const png = Buffer.from(
+                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+                    "base64"
+                );
+
+                const unauthorized = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/background",
+                    png,
+                    {"Content-Type": "image/png"}
+                );
+                assert.equal(unauthorized.status, 401);
+
+                const svg = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/background",
+                    Buffer.from("<svg></svg>"),
+                    Object.assign({}, auth, {
+                        "Content-Type": "image/svg+xml"
+                    })
+                );
+                assert.equal(svg.status, 400);
+                assert.equal(
+                    svg.json.error,
+                    "background_content_type_invalid"
+                );
+
+                const mismatch = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/background",
+                    png,
+                    Object.assign({}, auth, {
+                        "Content-Type": "image/jpeg"
+                    })
+                );
+                assert.equal(mismatch.status, 400);
+
+                const traversal = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/%2e%2e/background",
+                    png,
+                    auth
+                );
+                assert.equal(traversal.status, 404);
+
+                const uploaded = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/background",
+                    png,
+                    auth
+                );
+                assert.equal(uploaded.status, 201);
+                assert.match(
+                    uploaded.json.background.imageId,
+                    /^bg-[a-f0-9]{32}\.png$/
+                );
+                assert.equal(
+                    uploaded.json.configuration.dashboards[0]
+                        .background.imageId,
+                    uploaded.json.background.imageId
+                );
+
+                const firstImageId =
+                    uploaded.json.background.imageId;
+
+                const publicConfiguration = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/dashboard/config"
+                );
+                assert.equal(
+                    publicConfiguration.json.background.image_url,
+                    "/assets/backgrounds/" + firstImageId
+                );
+                assert.equal(
+                    Object.prototype.hasOwnProperty.call(
+                        publicConfiguration.json.background,
+                        "imageId"
+                    ),
+                    false
+                );
+
+                const firstAsset = await request(
+                    gateway.port,
+                    "GET",
+                    "/assets/backgrounds/" + firstImageId
+                );
+                assert.equal(firstAsset.status, 200);
+                assert.equal(firstAsset.headers["content-type"], "image/png");
+                assert.match(
+                    firstAsset.headers["cache-control"],
+                    /immutable/
+                );
+
+                const replaced = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/background",
+                    png,
+                    auth
+                );
+                assert.equal(replaced.status, 201);
+                assert.notEqual(
+                    replaced.json.background.imageId,
+                    firstImageId
+                );
+
+                const removedOldAsset = await request(
+                    gateway.port,
+                    "GET",
+                    "/assets/backgrounds/" + firstImageId
+                );
+                assert.equal(removedOldAsset.status, 404);
+
+                const removed = await request(
+                    gateway.port,
+                    "DELETE",
+                    "/api/admin/dashboards/default/background",
+                    undefined,
+                    {Authorization: "Bearer " + FAKE_ADMIN_TOKEN}
+                );
+                assert.equal(removed.status, 200);
+                assert.equal(
+                    removed.json.configuration.dashboards[0].background,
+                    null
+                );
+
+                await stopChild(gateway.child);
+
+            }
+        );
+
+
+        await t.test(
             "Bearer-Authentifizierung, CRUD und Inventar",
             async function () {
 
@@ -788,7 +955,7 @@ test(
                 assert.equal(initialConfig.status, 200);
                 assert.equal(
                     initialConfig.json.schemaVersion,
-                    8
+                    9
                 );
                 assert.equal(
                     initialConfig.json.defaultDashboardId,

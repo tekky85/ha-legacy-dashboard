@@ -79,7 +79,7 @@ function settings(mode, labelId, securityEntities) {
 }
 
 
-test("Schema 8 bewahrt Detection-Modus und stabile Label-ID", function () {
+test("Schema 9 bewahrt Detection-Modus und stabile Label-ID", function () {
     const valid = DashboardConfig.cloneConfiguration(
         DashboardConfig.DEFAULT_CONFIGURATION
     );
@@ -105,7 +105,7 @@ test("Schema 8 bewahrt Detection-Modus und stabile Label-ID", function () {
     delete sprint21.systemDashboards.errors.criticalDetectionMode;
     delete sprint21.systemDashboards.errors.criticalLabelId;
     const migrated = DashboardConfig.migrateConfiguration(sprint21);
-    assert.equal(migrated.configuration.schemaVersion, 8);
+    assert.equal(migrated.configuration.schemaVersion, 9);
     assert.equal(
         migrated.configuration.systemDashboards.errors.criticalDetectionMode,
         "device_class"

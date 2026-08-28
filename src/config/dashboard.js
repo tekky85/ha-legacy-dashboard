@@ -18,7 +18,11 @@ const Layout =
 const IssueRules =
     require("../services/issues/rule-engine");
 
-const SCHEMA_VERSION = 8;
+const DashboardBackgrounds =
+    require("../services/dashboard-backgrounds");
+
+const SCHEMA_VERSION = 9;
+const RULES_SCHEMA_VERSION = 8;
 const CRITICAL_DETECTION_SCHEMA_VERSION = 7;
 const ERRORS_SCHEMA_VERSION = 6;
 const SUMMARY_SCHEMA_VERSION = 5;
@@ -81,6 +85,28 @@ const DEFAULT_REFRESH_INTERVAL_MS = 5000;
 const MINIMUM_REFRESH_INTERVAL_MS = 3000;
 const MAXIMUM_REFRESH_INTERVAL_MS = 300000;
 
+const BACKGROUND_POSITIONS = [
+    "center center",
+    "center top",
+    "center bottom",
+    "left center",
+    "right center"
+];
+
+const BACKGROUND_SIZES = [
+    "cover",
+    "contain"
+];
+
+const BACKGROUND_OVERLAYS = [
+    0,
+    10,
+    20,
+    30,
+    40,
+    50
+];
+
 const DEFAULT_SYSTEM_DASHBOARDS = {
     summary: {
         ignoredEntities: [],
@@ -104,6 +130,8 @@ const DEFAULT_CONFIGURATION = {
         {
             id: "default",
             title: "Übersicht",
+            showTitle: true,
+            background: null,
             refreshIntervalMs: DEFAULT_REFRESH_INTERVAL_MS,
             widgets: [
                 {
@@ -189,6 +217,8 @@ const DEFAULT_CONFIGURATION = {
         {
             id: "esszimmer",
             title: "Esszimmer",
+            showTitle: true,
+            background: null,
             refreshIntervalMs: DEFAULT_REFRESH_INTERVAL_MS,
             widgets: [
                 {
@@ -289,6 +319,10 @@ function validateConfigurationVersion(candidate, schemaVersion) {
             dashboard.title,
             "Dashboard-Titel"
         );
+
+        if (schemaVersion >= SCHEMA_VERSION) {
+            validateDashboardAppearance(dashboard);
+        }
 
         if (
             typeof dashboard.refreshIntervalMs !== "number" ||
@@ -424,12 +458,67 @@ function validateConfigurationVersion(candidate, schemaVersion) {
             candidate.systemDashboards,
             schemaVersion >= ERRORS_SCHEMA_VERSION,
             schemaVersion >= CRITICAL_DETECTION_SCHEMA_VERSION,
-            schemaVersion >= SCHEMA_VERSION
+            schemaVersion >= RULES_SCHEMA_VERSION
         );
     }
 
 
     return true;
+
+}
+
+
+function validateDashboardAppearance(dashboard) {
+
+    if (typeof dashboard.showTitle !== "boolean") {
+        const error = new Error(
+            "Dashboard-Titelanzeige ist ungültig: " +
+            dashboard.id
+        );
+
+        error.code = "invalid_dashboard_show_title";
+        throw error;
+    }
+
+    if (dashboard.background === null) {
+        return;
+    }
+
+    const background = dashboard.background;
+
+    if (!background || typeof background !== "object") {
+        const error = new Error(
+            "Dashboard-Hintergrund ist ungültig: " +
+            dashboard.id
+        );
+
+        error.code = "invalid_dashboard_background";
+        throw error;
+    }
+
+    if (
+        typeof background.imageId !== "string" ||
+        !DashboardBackgrounds.IMAGE_ID_PATTERN.test(
+            background.imageId
+        ) ||
+        BACKGROUND_POSITIONS.indexOf(
+            background.position
+        ) === -1 ||
+        BACKGROUND_SIZES.indexOf(
+            background.size
+        ) === -1 ||
+        BACKGROUND_OVERLAYS.indexOf(
+            background.overlay
+        ) === -1
+    ) {
+        const error = new Error(
+            "Dashboard-Hintergrund ist ungültig: " +
+            dashboard.id
+        );
+
+        error.code = "invalid_dashboard_background";
+        throw error;
+    }
 
 }
 
@@ -761,7 +850,8 @@ function migrateConfiguration(candidate) {
             candidate.schemaVersion !== LAYOUT_SCHEMA_VERSION &&
             candidate.schemaVersion !== SUMMARY_SCHEMA_VERSION &&
             candidate.schemaVersion !== ERRORS_SCHEMA_VERSION &&
-            candidate.schemaVersion !== CRITICAL_DETECTION_SCHEMA_VERSION
+            candidate.schemaVersion !== CRITICAL_DETECTION_SCHEMA_VERSION &&
+            candidate.schemaVersion !== RULES_SCHEMA_VERSION
         )
     ) {
         return {
@@ -786,6 +876,14 @@ function migrateConfiguration(candidate) {
             : cloneSystemDashboards(DEFAULT_SYSTEM_DASHBOARDS);
 
     migrated.dashboards.forEach(function (dashboard) {
+
+        dashboard.showTitle =
+            typeof dashboard.showTitle === "boolean"
+                ? dashboard.showTitle
+                : true;
+
+        dashboard.background =
+            dashboard.background || null;
 
         if (candidate.schemaVersion === GRID_SCHEMA_VERSION) {
             dashboard.layouts =
@@ -817,6 +915,19 @@ function cloneDashboard(dashboard) {
     return {
         id: dashboard.id,
         title: dashboard.title,
+        showTitle:
+            typeof dashboard.showTitle === "boolean"
+                ? dashboard.showTitle
+                : true,
+        background:
+            dashboard.background
+                ? {
+                    imageId: dashboard.background.imageId,
+                    position: dashboard.background.position,
+                    size: dashboard.background.size,
+                    overlay: dashboard.background.overlay
+                }
+                : null,
         refreshIntervalMs: dashboard.refreshIntervalMs,
         widgets: dashboard.widgets.map(cloneWidget),
         layouts:
@@ -1162,6 +1273,22 @@ function getPublicDashboardConfig(dashboardId) {
     return {
         id: dashboard.id,
         title: dashboard.title,
+        show_title: dashboard.showTitle !== false,
+        background:
+            dashboard.background
+                ? {
+                    image_url:
+                        "/assets/backgrounds/" +
+                        encodeURIComponent(
+                            dashboard.background.imageId
+                        ),
+                    position:
+                        dashboard.background.position,
+                    size: dashboard.background.size,
+                    overlay:
+                        dashboard.background.overlay
+                }
+                : null,
         refresh_interval_ms:
             getRefreshIntervalMs(dashboard.id),
         widgets: visibleWidgets,
@@ -1202,6 +1329,12 @@ module.exports = {
         SUPPORTED_WIDGET_TYPES.slice(0),
     SUPPORTED_WIDGET_SIZES:
         SUPPORTED_WIDGET_SIZES.slice(0),
+    BACKGROUND_POSITIONS:
+        BACKGROUND_POSITIONS.slice(0),
+    BACKGROUND_SIZES:
+        BACKGROUND_SIZES.slice(0),
+    BACKGROUND_OVERLAYS:
+        BACKGROUND_OVERLAYS.slice(0),
     DEFAULT_WIDGET_SIZE: DEFAULT_WIDGET_SIZE,
     LAYOUT_PROFILES:
         Layout.PROFILES.slice(0),

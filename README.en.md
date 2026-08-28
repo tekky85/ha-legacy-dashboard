@@ -61,6 +61,11 @@ The legacy frontend remains framework-free and uses the existing `Legacy.http` /
 - independent viewport-aware Focus view with prioritized values and controls
 - shared SVG-based Power Control for Light and Climate in Grid and Focus
 - Light and Climate control through explicitly allowed backend endpoints
+- one independent JPEG/PNG background image per default or custom dashboard
+- selectable image position, cover/contain, and optional dark overlay
+- a title that can be shown or hidden per dashboard
+- viewport-filling presentation with a quiet update footer at the bottom for
+  short content and normal scrolling for many cards
 - Light/Dark mode
 - stale-data and reconnect behavior
 
@@ -94,6 +99,12 @@ as the same protocol, host, and port. The direct LAN web UI therefore remains
 independent of Home Assistant Ingress; internal navigation uses neither
 `target="_blank"` nor `window.open()`.
 
+Dashboard backgrounds are uploaded through the protected Admin area and
+stored independently per dashboard. The normal wall display receives only a
+controlled, read-only image URL; neither the data path nor tokens are exposed.
+Hiding a title removes only its unused space. Summary navigation, the Health
+indicator, connection state, and theme toggle remain available.
+
 ### Admin Area
 
 Dashboards and widgets are managed under `/admin`.
@@ -110,6 +121,8 @@ Features include:
 - portrait / landscape layouts
 - live card preview
 - light / dark preview
+- upload, preview, replace, or remove JPEG/PNG backgrounds
+- image position, cover/contain, overlay, and title visibility per dashboard
 - searchable Entity Rule Manager for Summary ignore, security relevance,
   Errors ignore, Expected Offline, and entity/device grace, flapping, and
   recovery rules
@@ -324,6 +337,15 @@ The current gallery was captured from the unchanged application using a local, c
 
 ![User dashboard in dark mode](docs/screenshots/dashboards/main-dark.png)
 
+#### Per-Dashboard Background
+
+Every default and custom dashboard can use its own JPEG or PNG image,
+position, cover/contain mode, overlay strength and optional title display.
+The background remains behind navigation, the Health Indicator, cards and the
+Focus view.
+
+![User dashboard with a per-dashboard background](docs/screenshots/dashboards/background-image.png)
+
 #### Compact Cards in Landscape Layout
 
 ![Compact cards in landscape layout](docs/screenshots/dashboards/compact-cards.png)
@@ -353,6 +375,10 @@ independent Focus geometry remains unchanged.
 #### Dashboard Management
 
 ![Dashboard management in the Admin area](docs/screenshots/admin/dashboard-management.png)
+
+#### Dashboard Background
+
+![Background upload and display settings in the Admin area](docs/screenshots/admin/dashboard-background.png)
 
 #### Layout Editor
 
@@ -412,10 +438,12 @@ docs/
     dashboards/
       main-light.png
       main-dark.png
+      background-image.png
       compact-cards.png
       focus-card.png
     admin/
       dashboard-management.png
+      dashboard-background.png
       layout-editor.png
       live-preview.png
       system-diagnostics.png
@@ -463,7 +491,8 @@ configurable for direct LAN access.
 
 The App requests only `homeassistant_api: true` and uses neither Ingress nor
 host, Docker, or Supervisor API privileges. Persistent configuration is stored
-at `/data/dashboards.json` and is covered by Home Assistant backups. Create a
+at `/data/dashboards.json`, with background images under `/data/backgrounds/`;
+both are covered by Home Assistant backups. Create a
 backup before installing a release candidate and before every upgrade.
 
 Important: the Home Assistant App has its own data area. Existing
@@ -476,6 +505,8 @@ and `SHA256SUMS`, verify the checksum, extract it, configure `.env.example` as
 a server-side `.env`, and run `npm ci --omit=dev`. Debian-based LXC/VM systems
 can use the included systemd unit. `HA_URL` and `HA_TOKEN` remain in the
 protected `.env`, and `data/dashboards.json` remains unchanged during upgrades.
+Background images are stored under `data/backgrounds/` by default. `DATA_DIR`
+can override the shared persistent data path for both configuration and images.
 
 Back up `.env` and `data` before an upgrade. Prefer extracting new releases
 into a new directory and retire the old runtime only after a successful health

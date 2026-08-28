@@ -7,6 +7,8 @@ const dashboardReturnTarget =
     require("./services/dashboard-return-target");
 const logger = require("./services/logger");
 const Runtime = require("./config/runtime");
+const dashboardBackgrounds =
+    require("./services/dashboard-backgrounds");
 
 
 let runtimeMode;
@@ -158,10 +160,25 @@ function setAdminHeaders(res) {
 
 app.disable("x-powered-by");
 app.use(setSecurityHeaders);
-app.use(express.json({
+const jsonParser = express.json({
     limit: "16kb",
     strict: true
-}));
+});
+
+app.use(function (req, res, next) {
+
+    if (
+        req.method === "POST" &&
+        /^\/api\/admin\/dashboards\/[^/]+\/background$/.test(
+            req.path
+        )
+    ) {
+        return next();
+    }
+
+    return jsonParser(req, res, next);
+
+});
 app.get("/health", function (req, res) {
     return res.json({
         status: "ok"
@@ -175,6 +192,45 @@ app.use("/api", function (req, res) {
     });
 
 });
+app.get(
+    "/assets/backgrounds/:imageId",
+    function (req, res) {
+
+        const imageId = req.params.imageId;
+
+        const referenced =
+            dashboardConfig
+                .getConfiguration()
+                .dashboards
+                .some(function (dashboard) {
+                    return Boolean(
+                        dashboard.background &&
+                        dashboard.background.imageId ===
+                            imageId
+                    );
+                });
+
+        const asset = referenced
+            ? dashboardBackgrounds.resolve(imageId)
+            : null;
+
+
+        if (!asset) {
+            return res.status(404)
+                .type("text/plain")
+                .send("Hintergrundbild nicht gefunden");
+        }
+
+        res.setHeader(
+            "Cache-Control",
+            "public, max-age=31536000, immutable"
+        );
+        res.type(asset.mimeType);
+
+        return res.sendFile(asset.filePath);
+
+    }
+);
 app.get("/d/:dashboardId", function (req, res) {
 
     if (

@@ -1608,6 +1608,52 @@ docs/sprints/SPRINT-25.2.md
 
 ---
 
+# Sprint 25.3 – Dashboard Backgrounds & Full-Height Layout
+
+## Status
+
+Ausgehend von `c8d452b` lokal implementiert und zur Review vorbereitet; noch
+nicht committet, gepusht oder ausgerollt. Die physische iPad-/Safari-Abnahme
+bleibt Release Gate.
+
+## Ergebnis
+
+- Schema 9 ergänzt je Default-/Custom-Dashboard `showTitle` und genau einen
+  optionalen, unabhängig konfigurierbaren Hintergrund mit fester Position,
+  `cover`/`contain` und 0–50 Prozent Overlay. Schema 8 migriert mit sichtbarem
+  Titel und ohne Hintergrund.
+- Ein eng begrenzter, Bearer-geschützter Admin-Endpunkt akzeptiert nur JPEG
+  oder PNG bis 10 MiB und 4096 × 4096 Pixel. MIME-Typ, Magic Bytes, Struktur,
+  Dashboard-ID und sichere generierte Dateinamen werden serverseitig geprüft;
+  SVG, HTML, Pfadtraversierung und generische Uploads bleiben ausgeschlossen.
+- Assets liegen unter `<DATA_DIR>/backgrounds`, damit im App-Modus unter
+  `/data/backgrounds`. Atomare Speicherung, neue IDs beim Ersetzen und die
+  Reihenfolge neues Asset → Konfiguration → altes Asset bewahren den letzten
+  gültigen Stand und vermeiden Legacy-Safari-Cachefehler.
+- Das Wall-Display erhält ausschließlich eine kontrollierte read-only
+  Asset-URL. DATA_DIR, HA-/Supervisor-/Admin-Tokens und zusätzliche HA-
+  Fähigkeiten bleiben vollständig serverseitig beziehungsweise unverändert.
+- Der Admin bietet Upload, Vorschau, Ersetzen, Entfernen, Position,
+  Cover/Contain, Overlay und Titelanzeige. Summary und Errors erhalten in
+  diesem Sprint keine Hintergründe.
+- Das Legacy-Wall-Display verwendet weiterhin ES5, Flexbox mit WebKit-Präfixen
+  und kein CSS Grid/Flex-gap. Der optionale Titel entfernt nur seinen Platz;
+  Summary, Health, Verbindung und Theme bleiben erreichbar.
+- Die Seite füllt bei 0/1/wenigen Cards den echten Viewport, lässt bei vielen
+  Cards normales Scrollen zu und hält den einzeiligen Aktualisierungs-Footer
+  ohne Fixed Overlay unten beziehungsweise nach dem Inhalt. Die Version steht
+  nur noch dezent im Admin und in Summary/Errors.
+- Sprint 25.1 Theme-/Filterlogik, Sprint 25.2 Same-Window-Navigation und alle
+  HA-Schreib-Allowlists bleiben unverändert. Die Legacy-Assetversion ist 45.
+
+Details:
+
+```text
+docs/sprints/SPRINT-25.3.md
+```
+
+---
+
 # Gemeinsames Datenmodell der System-Dashboards
 
 ## Summary
@@ -1886,6 +1932,9 @@ nächste Planung
 23  Automation Impact & Advanced Diagnostics
 24  Home Assistant App Packaging
 25  Release & Distribution
+25.1 Pre-Release UI State & Filter Correctness
+25.2 HomeScreen Standalone Navigation Correctness
+25.3 Dashboard Backgrounds & Full-Height Layout
 ```
 
 ---
@@ -1911,9 +1960,11 @@ Ziel bleibt:
 
 # Nächster Schritt
 
-Die aktuelle Roadmap ist implementiert. Vor dem ersten Stable Release folgt
-die dokumentierte RC-Abnahme von `v1.0.0-rc.1`: GitHub-/GHCR-Pipeline,
-Custom-App-Installation auf Test-HAOS, Update mit erhaltener `/data`-
-Konfiguration und physische Safari-iOS-9-Prüfung. Ergebnisse oder Fehler aus
-dieser Abnahme bestimmen den nächsten Korrektursprint; es wird keine neue
-Produktfunktion vorgezogen.
+Sprint 25.3 liegt zur Review vor. Nach Freigabe, Commit, LXC-Rollout und
+Screenshot-Prüfung folgt vor dem ersten Stable Release die dokumentierte
+RC-Abnahme von `v1.0.0-rc.1`: GitHub-/GHCR-Pipeline, Custom-App-Installation
+auf Test-HAOS, Update mit erhaltener `/data`-Konfiguration sowie physische
+Safari-iOS-9-Prüfung einschließlich Hintergrund, Titel, Full-Height-Footer,
+Rotation und HomeScreen-Navigation. Ergebnisse oder Fehler aus dieser Abnahme
+bestimmen den nächsten Korrektursprint; es wird keine neue Produktfunktion
+vorgezogen.

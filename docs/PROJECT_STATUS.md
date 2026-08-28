@@ -1,9 +1,10 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 28. August 2026, Sprint 25.2 als `c432d7c` implementiert, auf
-`origin/main` gepusht und auf dem Standalone-LXC ausgerollt; reale
-HomeScreen-/Safari-Abnahme offen. Release Candidate 1.0.0-rc.1 bleibt bis zur
-physischen Release-Gate-Abnahme unveröffentlicht.
+Stand: 28. August 2026, Sprint 25.3 ausgehend von `c8d452b` lokal
+implementiert und zur Review vorbereitet. Entsprechend der Sprint-Vorgabe ist
+dieser Stand noch nicht committet, gepusht oder ausgerollt. Reale
+iPad-/HomeScreen-/Safari-Abnahme bleibt offen. Release Candidate 1.0.0-rc.1
+bleibt bis zur physischen Release-Gate-Abnahme unveröffentlicht.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -11,6 +12,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-25.3-Ausgangscommit: `c8d452b`
 - Sprint-25.2-Ausgangscommit: `94c7efa`
 - Sprint-25.1-Ausgangscommit: `10c1f75`
 - Sprint-25-Ausgangscommit: `95f6603`
@@ -38,6 +40,12 @@ Der Arbeitsbaum war vor Sprint 25.2 auf `main` bei `94c7efa` sauber und mit
 `origin/main` identisch. Die Sprint-25.2-Änderungen wurden nach Review als
 `c432d7c` committet, auf `origin/main` gepusht und per Fast-Forward auf dem
 Standalone-LXC ausgerollt.
+
+Der Arbeitsbaum war vor Sprint 25.3 auf `main` bei `c8d452b` sauber und mit
+`origin/main` identisch. Der Ausgangscommit ergänzt ausschließlich die
+vollständige Sprint-25.3-Spezifikation um die Full-Height-/Footer-Anforderungen.
+Die in Abschnitt 22 beschriebene Implementierung liegt derzeit als
+Review-Diff vor.
 
 Der Arbeitsbaum war vor Sprint 25.1 auf `main` bei `10c1f75` sauber und mit
 `origin/main` identisch. Die in Abschnitt 20 beschriebene Sprint-25.1-
@@ -90,6 +98,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung offen |
 | 25.1 | Pre-Release UI State & Filter Correctness | implementiert, gepusht und auf LXC ausgerollt; iPad-Abnahme offen |
 | 25.2 | HomeScreen Standalone Navigation Correctness | implementiert, gepusht und auf LXC ausgerollt; Geräteabnahme offen |
+| 25.3 | Dashboard Backgrounds & Full-Height Layout | lokal implementiert, Review und Geräteabnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -223,7 +232,7 @@ Nach Recovery ersetzt ein frischer Snapshot die veralteten Daten.
 
 ## 6. Persistente Konfiguration
 
-Die Konfiguration verwendet Schema 8. Zusätzlich zu
+Die Konfiguration verwendet Schema 9. Zusätzlich zu
 `defaultDashboardId` und `dashboards` enthält sie:
 
 ```json
@@ -250,12 +259,15 @@ Die Konfiguration verwendet Schema 8. Zusätzlich zu
 }
 ```
 
-Schema 1 bis 7 werden automatisch und atomar auf Schema 8 migriert. Bei Schema
+Jeder Eintrag unter `dashboards` ergänzt `showTitle` und `background`; Details
+stehen in Abschnitt 22. Schema 1 bis 8 werden automatisch und atomar auf
+Schema 9 migriert. Bei Schema
 4 bleiben die 6/12-Spalten-Layouts unverändert. Bei Schema 5 bleiben Summary
 und Layouts unverändert und die leeren Error-Standardwerte werden ergänzt.
 Vollständige Validierung, atomarer
 Dateiersatz und genau ein `.bak` bleiben erhalten. Ungültige Entity-IDs,
-Duplikate oder ein nicht-boolesches Privacy-Flag werden abgelehnt, ohne die
+Duplikate, ungültige Hintergrundwerte oder ein nicht-boolesches Privacy-Flag
+werden abgelehnt, ohne die
 letzte gültige Datei zu ersetzen.
 
 ## 7. Admin UI
@@ -1490,3 +1502,106 @@ Der Standalone-Rollout aktualisierte den sauberen LXC per Fast-Forward von
 `/api/dashboard` und `/api/system-dashboards/status` antworteten anschließend
 jeweils mit HTTP 200. Es wurden keine Zugangsdaten ausgegeben und weder ein
 Release-Tag noch ein öffentliches Release erzeugt.
+
+## 22. Sprint 25.3 – Dashboard Backgrounds & Full-Height Layout
+
+Sprint 25.3 startet auf dem sauberen, mit `origin/main` identischen Commit
+`c8d452b`. Der Stand liegt entsprechend der Sprint-Vorgabe lokal zur Review
+vor und wurde noch nicht committet, gepusht oder ausgerollt.
+
+Das persistente Dashboard-Schema ist Version 9. Jedes normale Default- oder
+Custom-Dashboard besitzt `showTitle` sowie entweder `background: null` oder
+ein Objekt mit einer generierten `imageId`, einer aus fünf festen Positionen,
+`cover`/`contain` und einer Abdunklung von 0 bis 50 Prozent in Zehnerschritten.
+Schema 8 migriert atomar mit `showTitle: true` und ohne Hintergrund. Summary
+und Errors bleiben feste System-Dashboards ohne Hintergrundkonfiguration.
+
+JPEG und PNG werden ausschließlich über
+`POST /api/admin/dashboards/:dashboardId/background` als roher Bildkörper
+hochgeladen. Die bestehende Bearer-Authentifizierung und das Admin-Write-
+Rate-Limit laufen vor dem Body-Parser. Der Server prüft den exakten MIME-Typ,
+JPEG-/PNG-Signatur und Struktur, positive Abmessungen, höchstens 4096 × 4096
+Pixel beziehungsweise 16.777.216 Pixel sowie maximal 10 MiB. SVG, HTML,
+abweichende MIME-Typen, ungültige IDs und Pfadtraversierung werden kontrolliert
+abgewiesen. Sichere zufällige Namen haben die Form
+`bg-<32 hex>.jpg|png`; Verzeichnis und Dateien verwenden 0700/0600.
+
+Assets liegen unter `<DATA_DIR>/backgrounds`. Damit bleibt Standalone beim
+bisherigen `data/backgrounds` und die Home Assistant App bei
+`/data/backgrounds`. Ein Upload wird zunächst über temporäre Datei, `fsync`
+und Rename atomar abgelegt. Erst nach erfolgreicher atomarer
+Konfigurationspersistenz wird das alte Asset gelöscht; bei einem Fehler bleibt
+der vorige gültige Hintergrund erhalten. Das Entfernen persistiert zuerst die
+Konfiguration und löscht danach nur das zugeordnete Asset. Entfernte
+Dashboards werden nach erfolgreichem Batch-Speichern ebenfalls bereinigt.
+
+Das Wall-Display erhält nur die bereinigte URL
+`/assets/backgrounds/<imageId>` sowie Position, Größe und Overlay. Die Route
+liefert nur eine aktuell referenzierte, streng validierte Bild-ID mit
+`nosniff` und immutable Cache aus; der übrige Datenpfad besitzt weder Static
+Serving noch Directory Listing. Ersetzen erzeugt stets eine neue ID und
+umgeht so aggressive Legacy-Safari-Caches. Fehlende Assets führen lediglich
+zu einem fehlenden Hintergrund, nicht zu einem Dashboard-Ausfall.
+
+Der moderne Admin ergänzt Upload, gespeicherte Vorschau, Ersetzen und
+Entfernen sowie Batch-Einstellungen für Position, Cover/Contain, Overlay und
+Titelanzeige. Andere offene Konfigurationsänderungen müssen vor einer direkten
+Asset-Operation gespeichert oder verworfen werden. Die Layout-Vorschau zeigt
+Hintergrund, Overlay und optionalen Titel gemeinsam mit den echten Card-
+Vorschauen. Duplikate übernehmen die Titelanzeige, aber absichtlich nicht die
+Asset-ID, sodass ihr Hintergrund unabhängig bleibt.
+
+Im Legacy-Frontend setzt eine ES5-Funktion die ausschließlich servervalidierte
+Darstellung. `showTitle=false` entfernt Brand und Titelabstand, während
+Summary, Health, Verbindung, Uhr und Theme erreichbar bleiben. Der Focus-
+Layer liegt weiterhin oberhalb von Hintergrund und Overlay. Die globale
+Sprint-25.1-Theme-Persistenz und die Sprint-25.2-Same-Window-Navigation wurden
+nicht verändert. Die gemeinsame Wall-Assetversion ist 45.
+
+`html`, `body` und `.app` propagieren die volle Höhe; `.app` ist eine
+iOS-9-kompatible Flex-Spalte und das Dashboard übernimmt den freien Raum. Eine
+kleine `window.innerHeight`-Synchronisierung berücksichtigt den tatsächlichen
+HomeScreen-Viewport bei Start und Rotation. Bei wenig beziehungsweise null
+Cards bleibt der einzeilige, mittige Aktualisierungs-Footer unten; bei vielen
+Cards wächst der Inhalt normal und der Footer folgt ihm. Er ist nicht fixed
+und überdeckt keine Card. Die Versionsangabe wurde aus normalen Dashboards
+entfernt und ist dezent im Admin sowie in Summary/Errors als
+`1.0.0-rc.1` auffindbar.
+
+Relevante Dateien:
+
+- Schema/Public Config: `src/config/dashboard.js`
+- sicherer Asset-Speicher: `src/services/dashboard-backgrounds.js`
+- Admin API und Bereinigung: `src/routes/admin.js`
+- kontrolliertes Asset Serving: `src/server.js`
+- Admin UI: `src/admin/index.html`, `src/admin/js/api.js`,
+  `src/admin/js/dashboards.js`, `src/admin/js/app.js`,
+  `src/admin/css/admin.css`
+- Legacy-Darstellung: `src/public/index.html`, `src/public/js/app.js`,
+  `src/public/css/style.css`
+- Tests: `test/sprint-25-3.test.js`, `test/admin-api.test.js` sowie die
+  aktualisierten Schema-/Cache-Regressionsprüfungen
+
+Die isolierten Tests verwenden nur temporäre lokale Datenverzeichnisse,
+localhost-Mocks und Fake-Credentials. Die vollständige Suite ist mit
+275 von 275 Tests erfolgreich. `node --check` ist für alle geänderten und
+neuen JavaScript-Dateien erfolgreich; `git diff --check` und der Scan des
+Wall-Frontends auf ausgeschlossene moderne JavaScript-Merkmale sind ebenfalls
+sauber. Eine reale Home-Assistant-Instanz wurde dabei nicht kontaktiert.
+
+Die sichtbaren Dashboard-/Admin-Änderungen wurden gemäß Sprint D1 mit der
+echten Anwendung gegen einen kontrollierten lokalen Mock und Fake-Credentials
+neu aufgenommen. Aktualisiert sind `main-light.png` und `main-dark.png`; neu
+hinzugekommen sind `dashboards/background-image.png` und
+`admin/dashboard-background.png`. Die Aufnahmen enthalten keine Tokens,
+internen Adressen oder privaten Produktionsdaten. Die Browserprüfung bestätigt
+für 768 × 1024 den vollständig gefüllten Viewport und den Footer bei 1006 von
+1024 Pixeln sowie für 1280 × 720 eine Dokumenthöhe von 720 Pixeln und den
+Footer bei 702 Pixeln. Titel aus blendet den Titel aus, während Summary
+erreichbar bleibt; Browserkonsole und Warnungsprotokoll bleiben leer.
+
+Vor einer Stable-Empfehlung bleiben die physische Abnahme auf iPad mini/iOS 9,
+iPad Air 2/iPadOS 15 und macOS Safari sowie Portrait, Landscape, Rotation,
+HomeScreen, Light/Dark, unterschiedliche Hintergründe, fehlendes Asset und
+0/1/wenige/viele Cards verbindlich. Erst nach Review darf der Stand committet,
+gepusht und auf den LXC ausgerollt werden.

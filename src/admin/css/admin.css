@@ -556,6 +556,111 @@ input[readonly] {
     min-width: 960px;
 }
 
+.background-settings {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.8rem;
+    background: var(--surface-subtle);
+}
+
+.background-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 0.8rem 1rem;
+    align-items: end;
+}
+
+.background-controls .checkbox-row {
+    align-self: center;
+}
+
+.background-file-field small {
+    display: block;
+    margin-top: 0.35rem;
+}
+
+.background-file-field {
+    min-width: 0;
+}
+
+.background-file-field input[type="file"] {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+@media (min-width: 1200px) {
+    .background-file-field {
+        grid-column: span 2;
+    }
+}
+
+.background-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.background-image-preview {
+    margin: 1rem 0 0;
+}
+
+.background-image-preview img {
+    display: block;
+    width: min(100%, 520px);
+    max-height: 260px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: 0.7rem;
+    background: #dbe3ed;
+}
+
+.background-image-preview figcaption {
+    margin-top: 0.35rem;
+}
+
+.dashboard-preview-canvas {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #b8c5d6;
+    border-radius: 0.8rem;
+    background-color: #edf2f8;
+    background-repeat: no-repeat;
+}
+
+.dashboard-preview-overlay {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    pointer-events: none;
+}
+
+.dashboard-preview-title {
+    position: relative;
+    z-index: 1;
+    padding: 0.75rem 0.75rem 0;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 750;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.dashboard-preview-canvas .layout-editor-grid {
+    z-index: 1;
+    border: 0;
+    background-color: transparent;
+}
+
+.admin-version {
+    padding: 1.4rem 1rem 5rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-align: center;
+}
+
 .layout-tile,
 .layout-preview {
     min-width: 0;

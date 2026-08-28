@@ -4,6 +4,9 @@ const express = require("express");
 const dashboardConfig =
     require("../config/dashboard");
 
+const dashboardBackgrounds =
+    require("../services/dashboard-backgrounds");
+
 const ha =
     require("../services/homeassistant");
 
@@ -245,6 +248,49 @@ function persistConfiguration(res, candidate) {
 }
 
 
+function cleanupUnusedBackgrounds(previous, persisted) {
+
+    const activeImageIds = Object.create(null);
+
+
+    persisted.dashboards.forEach(function (dashboard) {
+        if (dashboard.background) {
+            activeImageIds[
+                dashboard.background.imageId
+            ] = true;
+        }
+    });
+
+
+    previous.dashboards.forEach(function (dashboard) {
+
+        const imageId =
+            dashboard.background
+                ? dashboard.background.imageId
+                : null;
+
+
+        if (!imageId || activeImageIds[imageId]) {
+            return;
+        }
+
+
+        try {
+            dashboardBackgrounds.remove(imageId);
+        } catch (error) {
+            logger.warn(
+                "dashboard_background_cleanup_failed",
+                {
+                    error_type: error.name
+                }
+            );
+        }
+
+    });
+
+}
+
+
 function sanitizeEntity(state) {
 
     const attributes =
@@ -379,6 +425,14 @@ router.use(requireAdmin);
 router.use(limitAdminWrites);
 
 
+const parseBackgroundImage = express.raw({
+    limit: dashboardBackgrounds.MAX_FILE_SIZE,
+    type: function () {
+        return true;
+    }
+});
+
+
 router.get("/config", function (req, res) {
     res.json(
         dashboardConfig.getConfiguration()
@@ -388,6 +442,9 @@ router.get("/config", function (req, res) {
 
 router.put("/config", function (req, res) {
 
+    const previous =
+        dashboardConfig.getConfiguration();
+
     const persisted =
         persistConfiguration(
             res,
@@ -395,6 +452,10 @@ router.put("/config", function (req, res) {
         );
 
     if (persisted) {
+        cleanupUnusedBackgrounds(
+            previous,
+            persisted
+        );
         res.json(persisted);
     }
 
@@ -424,6 +485,14 @@ router.post("/dashboards", function (req, res) {
     const dashboard = {
         id: body.id,
         title: body.title,
+        showTitle:
+            typeof body.showTitle === "boolean"
+                ? body.showTitle
+                : true,
+        background:
+            typeof body.background !== "undefined"
+                ? body.background
+                : null,
         refreshIntervalMs:
             body.refreshIntervalMs,
         widgets:
@@ -495,6 +564,14 @@ router.put("/dashboards/:dashboardId", function (req, res) {
             typeof body.title !== "undefined"
                 ? body.title
                 : current.title,
+        showTitle:
+            typeof body.showTitle !== "undefined"
+                ? body.showTitle
+                : current.showTitle,
+        background:
+            typeof body.background !== "undefined"
+                ? body.background
+                : current.background,
         refreshIntervalMs:
             typeof body.refreshIntervalMs !== "undefined"
                 ? body.refreshIntervalMs
@@ -524,10 +601,199 @@ router.put("/dashboards/:dashboardId", function (req, res) {
 });
 
 
+router.post(
+    "/dashboards/:dashboardId/background",
+    parseBackgroundImage,
+    function (req, res) {
+
+        const candidate =
+            dashboardConfig.getConfiguration();
+
+        const dashboardIndex =
+            findDashboardIndex(
+                candidate,
+                req.params.dashboardId
+            );
+
+
+        if (dashboardIndex === -1) {
+            return res.status(404).json({
+                error: "dashboard_not_found"
+            });
+        }
+
+        const dashboard =
+            candidate.dashboards[dashboardIndex];
+
+        const previousImageId =
+            dashboard.background
+                ? dashboard.background.imageId
+                : null;
+
+        let stored;
+
+
+        try {
+            stored = dashboardBackgrounds.store(
+                req.body,
+                req.get("content-type")
+            );
+        } catch (error) {
+            return res.status(400).json({
+                error:
+                    error.code ||
+                    "background_file_invalid",
+                message: error.message
+            });
+        }
+
+
+        dashboard.background = {
+            imageId: stored.imageId,
+            position:
+                dashboard.background
+                    ? dashboard.background.position
+                    : "center center",
+            size:
+                dashboard.background
+                    ? dashboard.background.size
+                    : "cover",
+            overlay:
+                dashboard.background
+                    ? dashboard.background.overlay
+                    : 20
+        };
+
+        const persisted =
+            persistConfiguration(res, candidate);
+
+
+        if (!persisted) {
+            try {
+                dashboardBackgrounds.remove(
+                    stored.imageId
+                );
+            } catch (cleanupError) {
+                logger.warn(
+                    "dashboard_background_rollback_failed",
+                    {
+                        error_type: cleanupError.name
+                    }
+                );
+            }
+
+            return;
+        }
+
+
+        if (
+            previousImageId &&
+            previousImageId !== stored.imageId
+        ) {
+            try {
+                dashboardBackgrounds.remove(
+                    previousImageId
+                );
+            } catch (cleanupError) {
+                logger.warn(
+                    "dashboard_background_cleanup_failed",
+                    {
+                        error_type: cleanupError.name
+                    }
+                );
+            }
+        }
+
+
+        return res.status(201).json({
+            configuration: persisted,
+            background: dashboard.background,
+            image: {
+                imageId: stored.imageId,
+                mimeType: stored.mimeType,
+                size: stored.size,
+                width: stored.width,
+                height: stored.height
+            }
+        });
+
+    }
+);
+
+
+router.delete(
+    "/dashboards/:dashboardId/background",
+    function (req, res) {
+
+        const candidate =
+            dashboardConfig.getConfiguration();
+
+        const dashboardIndex =
+            findDashboardIndex(
+                candidate,
+                req.params.dashboardId
+            );
+
+
+        if (dashboardIndex === -1) {
+            return res.status(404).json({
+                error: "dashboard_not_found"
+            });
+        }
+
+        const dashboard =
+            candidate.dashboards[dashboardIndex];
+
+        const previousImageId =
+            dashboard.background
+                ? dashboard.background.imageId
+                : null;
+
+
+        dashboard.background = null;
+
+        const persisted =
+            persistConfiguration(res, candidate);
+
+
+        if (!persisted) {
+            return;
+        }
+
+
+        if (previousImageId) {
+            try {
+                dashboardBackgrounds.remove(
+                    previousImageId
+                );
+            } catch (cleanupError) {
+                logger.warn(
+                    "dashboard_background_cleanup_failed",
+                    {
+                        error_type: cleanupError.name
+                    }
+                );
+            }
+        }
+
+
+        return res.json({
+            configuration: persisted
+        });
+
+    }
+);
+
+
 router.delete("/dashboards/:dashboardId", function (req, res) {
 
     const candidate =
         dashboardConfig.getConfiguration();
+
+    const previous =
+        dashboardConfig.cloneConfiguration(
+            candidate
+        );
 
     const dashboardIndex =
         findDashboardIndex(
@@ -561,6 +827,10 @@ router.delete("/dashboards/:dashboardId", function (req, res) {
 
 
     if (persisted) {
+        cleanupUnusedBackgrounds(
+            previous,
+            persisted
+        );
         res.status(204).end();
     }
 

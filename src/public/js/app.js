@@ -88,6 +88,132 @@ var dashboardStateUrl =
         : "/api/dashboard";
 
 
+function applyDashboardViewportHeight() {
+
+    var appElement =
+        document.getElementsByClassName("app")[0];
+
+    var viewportHeight =
+        window.innerHeight ||
+        (
+            document.documentElement
+                ? document.documentElement.clientHeight
+                : 0
+        ) ||
+        0;
+
+
+    if (appElement && viewportHeight > 0) {
+        appElement.style.minHeight =
+            viewportHeight + "px";
+    }
+
+}
+
+
+function applyDashboardAppearance(data) {
+
+    var body = document.body;
+
+    var header =
+        document.getElementsByClassName(
+            "app-header"
+        )[0];
+
+    var overlay =
+        Legacy.dom.byId(
+            "dashboardBackgroundOverlay"
+        );
+
+    var background =
+        data && data.background
+            ? data.background
+            : null;
+
+    var allowedPositions = [
+        "center center",
+        "center top",
+        "center bottom",
+        "left center",
+        "right center"
+    ];
+
+    var allowedSizes = [
+        "cover",
+        "contain"
+    ];
+
+
+    if (body && !body.style) {
+        body.style = {};
+    }
+
+
+    if (header) {
+        if (data && data.show_title === false) {
+            addClass(header, "is-title-hidden");
+        } else {
+            removeClass(header, "is-title-hidden");
+        }
+    }
+
+    if (
+        !body ||
+        !background ||
+        typeof background.image_url !== "string" ||
+        background.image_url.indexOf(
+            "/assets/backgrounds/bg-"
+        ) !== 0 ||
+        allowedPositions.indexOf(
+            background.position
+        ) === -1 ||
+        allowedSizes.indexOf(
+            background.size
+        ) === -1
+    ) {
+        if (body) {
+            body.style.backgroundImage = "none";
+            body.style.backgroundPosition = "";
+            body.style.backgroundSize = "";
+            body.style.backgroundRepeat = "";
+        }
+
+        if (overlay) {
+            overlay.setAttribute("hidden", "hidden");
+            overlay.style.opacity = "0";
+        }
+
+        return;
+    }
+
+
+    body.style.backgroundImage =
+        "url(\"" + background.image_url + "\")";
+    body.style.backgroundPosition =
+        background.position;
+    body.style.backgroundSize = background.size;
+    body.style.backgroundRepeat = "no-repeat";
+
+    if (overlay) {
+        overlay.style.opacity =
+            String(
+                Math.max(
+                    0,
+                    Math.min(
+                        50,
+                        Number(background.overlay) || 0
+                    )
+                ) / 100
+            );
+        overlay.removeAttribute("hidden");
+    }
+
+}
+
+
+applyDashboardViewportHeight();
+
+
 if (typeof SystemNavigation !== "undefined") {
     SystemNavigation.initializeDashboard();
 }
@@ -1932,6 +2058,9 @@ function loadDashboardConfiguration() {
                 false;
 
 
+            applyDashboardAppearance(data);
+
+
             if (dashboardTitleElement) {
 
                 dashboardTitleElement.innerHTML =
@@ -2385,6 +2514,7 @@ function applyDashboardLayoutAfterResize() {
     layoutResizeTimer = window.setTimeout(
         function () {
             layoutResizeTimer = null;
+            applyDashboardViewportHeight();
             Dashboard.applyLayout();
         },
         120

@@ -63,6 +63,11 @@ Das Legacy-Frontend bleibt frameworkfrei und verwendet die vorhandene `Legacy.ht
 - eigenständige, viewportbasierte Focus-Ansicht mit priorisierten Werten und Controls
 - gemeinsames, SVG-basiertes Power-Control für Light und Climate in Grid und Focus
 - Light- und Climate-Steuerung über explizit freigegebene Backend-Endpunkte
+- ein eigenes JPEG-/PNG-Hintergrundbild je Standard- oder Custom-Dashboard
+- wählbare Bildposition, Cover/Contain und optionale Abdunklung
+- pro Dashboard ein- oder ausblendbarer Titel
+- viewportfüllende Darstellung mit ruhigem Aktualisierungs-Footer am unteren
+  Rand bei wenig Inhalt und normalem Scrollen bei vielen Cards
 - Light/Dark Mode
 - Stale-Data- und Reconnect-Verhalten
 
@@ -97,6 +102,13 @@ Standalone-/Fullscreen-Kontext sowie Protokoll, Host und Port. Die direkte
 LAN-Weboberfläche bleibt damit unabhängig von Home Assistant Ingress; interne
 Navigation verwendet weder `target="_blank"` noch `window.open()`.
 
+Dashboard-Hintergründe werden über den geschützten Admin-Bereich hochgeladen
+und getrennt je Dashboard gespeichert. Das normale Wall-Display erhält nur
+eine kontrollierte, read-only Bild-URL; weder der Datenpfad noch Tokens werden
+offengelegt. Ein ausgeblendeter Titel entfernt nur seinen ungenutzten Platz.
+Summary-Navigation, Health-Indikator, Verbindung und Theme-Umschalter bleiben
+erreichbar.
+
 ### Admin-Bereich
 
 Unter `/admin` werden Dashboards und Widgets verwaltet.
@@ -113,6 +125,8 @@ Dazu gehören unter anderem:
 - Portrait-/Landscape-Layouts
 - Live-Card-Vorschau
 - Light-/Dark-Vorschau
+- JPEG-/PNG-Hintergrund hochladen, voranzeigen, ersetzen oder entfernen
+- Bildposition, Cover/Contain, Abdunklung und Titelanzeige je Dashboard
 - durchsuchbarer Entity Rule Manager für Summary-Ignore,
   Sicherheitsrelevanz, Error-Ignore, Expected Offline sowie Entity-/Geräte-
   Karenz-, Flapping- und Recovery-Regeln
@@ -335,6 +349,15 @@ Die aktuelle Galerie wurde mit der unveränderten Anwendung und einem lokalen, k
 
 ![Benutzerdashboard im Dark Mode](docs/screenshots/dashboards/main-dark.png)
 
+#### Individueller Dashboard-Hintergrund
+
+Jedes Standard- und Custom-Dashboard kann ein eigenes JPEG- oder PNG-Bild,
+Position, Cover/Contain, Overlay-Stärke und eine optionale Titelanzeige
+verwenden. Der Hintergrund bleibt hinter Navigation, Health Indicator, Cards
+und Focus-Ansicht.
+
+![Benutzerdashboard mit individuellem Hintergrund](docs/screenshots/dashboards/background-image.png)
+
 #### Kompakte Karten im Landscape-Layout
 
 ![Kompakte Karten im Landscape-Layout](docs/screenshots/dashboards/compact-cards.png)
@@ -366,6 +389,10 @@ davon unberührt.
 #### Dashboard-Verwaltung
 
 ![Dashboard-Verwaltung im Admin-Bereich](docs/screenshots/admin/dashboard-management.png)
+
+#### Dashboard-Hintergrund
+
+![Hintergrund-Upload und Darstellungseinstellungen im Admin-Bereich](docs/screenshots/admin/dashboard-background.png)
 
 #### Layout-Editor
 
@@ -425,10 +452,12 @@ docs/
     dashboards/
       main-light.png
       main-dark.png
+      background-image.png
       compact-cards.png
       focus-card.png
     admin/
       dashboard-management.png
+      dashboard-background.png
       layout-editor.png
       live-preview.png
       system-diagnostics.png
@@ -476,7 +505,8 @@ Port `3000/tcp` bleibt für direkten LAN-Zugriff konfigurierbar.
 
 Die App verlangt nur `homeassistant_api: true`, nutzt weder Ingress noch Host-,
 Docker- oder Supervisor-API-Rechte. Die persistente Konfiguration liegt unter
-`/data/dashboards.json` und wird über Home-Assistant-Backups gesichert. Vor
+`/data/dashboards.json`, Hintergrundbilder unter `/data/backgrounds/`; beides
+wird über Home-Assistant-Backups gesichert. Vor
 Installation eines Release Candidates und vor jedem Upgrade ein Backup
 erstellen.
 
@@ -491,6 +521,9 @@ Der Standalone-Betrieb setzt Node.js 22 oder neuer voraus. Release-Archiv und
 `npm ci --omit=dev` ausführen. Debian-basierte LXC-/VM-Systeme können die
 mitgelieferte systemd-Unit verwenden. `HA_URL` und `HA_TOKEN` bleiben in der
 geschützten `.env`; `data/dashboards.json` bleibt bei Upgrades unverändert.
+Hintergrundbilder liegen standardmäßig unter `data/backgrounds/`. `DATA_DIR`
+kann den gemeinsamen persistenten Datenpfad für Konfiguration und Bilder
+überschreiben.
 
 Vor einem Upgrade `.env` und `data` sichern. Neue Releases bevorzugt in ein
 neues Verzeichnis entpacken und erst nach erfolgreichem Health Check die alte

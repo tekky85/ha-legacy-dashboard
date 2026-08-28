@@ -27,7 +27,9 @@
             "Accept": "application/json"
         };
 
-        if (typeof settings.body !== "undefined") {
+        if (typeof settings.rawBody !== "undefined") {
+            headers["Content-Type"] = settings.contentType;
+        } else if (typeof settings.body !== "undefined") {
             headers["Content-Type"] = "application/json";
         }
 
@@ -40,7 +42,9 @@
                     method: settings.method || "GET",
                     headers: headers,
                     body:
-                        typeof settings.body !== "undefined"
+                        typeof settings.rawBody !== "undefined"
+                            ? settings.rawBody
+                            : typeof settings.body !== "undefined"
                             ? JSON.stringify(settings.body)
                             : undefined,
                     cache: "no-store",
@@ -107,6 +111,28 @@
         },
         getLabels: function () {
             return request("/labels");
+        },
+        uploadBackground: function (dashboardId, file) {
+            return request(
+                "/dashboards/" +
+                    encodeURIComponent(dashboardId) +
+                    "/background",
+                {
+                    method: "POST",
+                    rawBody: file,
+                    contentType: file.type
+                }
+            );
+        },
+        removeBackground: function (dashboardId) {
+            return request(
+                "/dashboards/" +
+                    encodeURIComponent(dashboardId) +
+                    "/background",
+                {
+                    method: "DELETE"
+                }
+            );
         }
     };
 }(window.HALegacyAdmin = window.HALegacyAdmin || {}));
