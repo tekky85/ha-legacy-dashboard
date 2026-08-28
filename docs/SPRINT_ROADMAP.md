@@ -1934,6 +1934,7 @@ nächste Planung
 25.1 Pre-Release UI State & Filter Correctness
 25.2 HomeScreen Standalone Navigation Correctness
 25.3 Dashboard Backgrounds & Full-Height Layout
+25.4 RC Validation
 ```
 
 ---
@@ -1959,10 +1960,15 @@ Ziel bleibt:
 
 # Nächster Schritt
 
-Sprint 25.3 ist gepusht und auf dem Standalone-LXC ausgerollt. Vor dem ersten
-Stable Release folgt die dokumentierte RC-Abnahme von `v1.0.0-rc.1`:
-GitHub-/GHCR-Pipeline, Custom-App-Installation auf Test-HAOS, Update mit
-erhaltener `/data`-Konfiguration sowie physische Safari-iOS-9-Prüfung
-einschließlich Hintergrund, Titel, Full-Height-Footer, Rotation und
-HomeScreen-Navigation. Ergebnisse oder Fehler aus dieser Abnahme bestimmen
-den nächsten Korrektursprint; es wird keine neue Produktfunktion vorgezogen.
+Sprint 25.4 hat `v1.0.0-rc.1`, GitHub-Prerelease, Standalone-Bundle,
+SHA256-Prüfsumme und das öffentliche amd64/aarch64-GHCR-Manifest
+veröffentlicht. Standalone/LXC und die Distribution sind validiert.
+
+Vor einer Stable-Empfehlung müssen die in `docs/RC_CHECKLIST.md` aufgeführten
+RC-Blocker geschlossen werden: reale Custom-App-Installation auf Test-HAOS,
+Supervisor REST/WebSocket, direkter LAN-Zugriff, `/data`-Persistenz über
+App-/HA-Restart und Backup/Restore sowie der vollständige iPad-mini-/iOS-9-
+HomeScreen-Lauf einschließlich Backgrounds, Titel, Footer, Rotation, Theme,
+Error-Filtern, Focus und Controls. Ergebnisse dieser Abnahme bestimmen einen
+gezielten RC-Fix-Sprint oder die Stable-Freigabe; es wird keine neue
+Produktfunktion vorgezogen.

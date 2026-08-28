@@ -1615,3 +1615,33 @@ HTTP 200. Das persistente `data`-Verzeichnis gehört `dashboard:dashboard` und
 hat Modus 0700; `data/backgrounds` wird sicher beim ersten Upload erzeugt. Es
 wurden keine Zugangsdaten ausgegeben und weder ein Release-Tag noch ein
 öffentliches Release erzeugt.
+
+## 23. Sprint 25.4 – RC Validation
+
+Sprint 25.4 prüfte den sauberen Stand `741bba4` als `v1.0.0-rc.1`. Es wurden
+keine Produktfunktionen verändert. Die vollständige Ergebnismatrix,
+Einzelprüfungen und offenen Pflichtabnahmen stehen in `docs/RC_CHECKLIST.md`.
+
+Das lokale Release Gate, der reale LXC-Deployment-Check und beide GitHub-
+Workflows bestanden jeweils mit 275 von 275 Tests. `npm audit` meldete keine
+Schwachstellen. Der GitHub-Prerelease, das Standalone-Bundle und
+`SHA256SUMS` wurden veröffentlicht und öffentlich verifiziert. Das anonyme
+GHCR-OCI-Manifest enthält `linux/amd64` und `linux/arm64`; der Release-
+Container-Smoke-Test bestand. Der RC-Tag zeigt auf den exakt geprüften Commit.
+
+Der Standalone-LXC war sauber auf diesem Commit, lief unprivilegiert als
+`dashboard`, verwendete ausschließlich die Standalone-Credentials und behielt
+seine 0600-Dashboard-Konfiguration unverändert über einen Dienstneustart.
+HA REST und die ausschließlich backendseitige HA-WebSocket-Diagnose waren
+verfügbar. Default und Custom Dashboard, Summary, Errors, Theme-Persistenz,
+Same-Origin-Navigation, exakte Error-Filter, Focus und Full-Height-Footer
+wurden im laufenden LAN-System geprüft. Die letzten Dienstlogs enthielten
+keine Secret-, Stacktrace- oder Reconnect-Schleifen-Muster.
+
+Eine Stable-Empfehlung ist noch blockiert. Es stand keine reale HAOS-
+Testinstanz für Repository-Installation, Supervisor REST/WebSocket, direkten
+LAN-Zugriff, `/data`-Persistenz, App-/HA-Restart und Backup/Restore zur
+Verfügung. Ebenso war kein steuerbarer iPad-mini-/iOS-9-Lauf für HomeScreen,
+Theme, Filter, Backgrounds, Footer, Rotation, Focus und Controls verfügbar.
+Diese Punkte sind deshalb ausdrücklich `BLOCKED` und nicht aus Mock- oder
+Desktop-Tests als bestanden abgeleitet.
