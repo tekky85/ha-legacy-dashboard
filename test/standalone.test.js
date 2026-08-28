@@ -67,17 +67,17 @@ test("iOS-Standalone-Metadaten sind vollständig", function () {
 
     assert.match(
         html,
-        /rel="manifest" href="\/manifest\.json\?v=43"/
+        /rel="manifest" href="\/manifest\.json\?v=44"/
     );
 
     assert.match(
         html,
-        /sizes="76x76"[\s\S]*\/icons\/app-icon-76\.png\?v=43/
+        /sizes="76x76"[\s\S]*\/icons\/app-icon-76\.png\?v=44/
     );
 
     assert.match(
         html,
-        /sizes="152x152"[\s\S]*\/icons\/app-icon-152\.png\?v=43/
+        /sizes="152x152"[\s\S]*\/icons\/app-icon-152\.png\?v=44/
     );
 
     assert.doesNotMatch(html, /\?v=16/);
@@ -107,7 +107,7 @@ test("Manifest beschreibt eine Standalone-Web-App", function () {
     );
 
     manifest.icons.forEach(function (icon) {
-        assert.match(icon.src, /\?v=43$/);
+        assert.match(icon.src, /\?v=44$/);
     });
 
 });

@@ -90,6 +90,13 @@ abgewiesen und fallen sicher auf `/` zurück. Der Indikator verwendet nur
 vollständige Summary-/Error-Payloads werden für die Header-Navigation nicht
 geladen.
 
+Alle produktinternen Dashboard-, Summary-, Systemstatus- und Zurück-Links
+verwenden validierte, root-relative Pfade und öffnen im selben Fenster. Das
+hält auf älteren iPads auch beim Start über das HomeScreen-Icon denselben
+Standalone-/Fullscreen-Kontext sowie Protokoll, Host und Port. Die direkte
+LAN-Weboberfläche bleibt damit unabhängig von Home Assistant Ingress; interne
+Navigation verwendet weder `target="_blank"` noch `window.open()`.
+
 ### Admin-Bereich
 
 Unter `/admin` werden Dashboards und Widgets verwaltet.

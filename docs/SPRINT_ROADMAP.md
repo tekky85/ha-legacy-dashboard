@@ -211,6 +211,7 @@ Bedeutung von „fest“:
 | 24 | Home Assistant App Packaging | umgesetzt |
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung nach Review offen |
 | 25.1 | Pre-Release UI State & Filter Correctness | umgesetzt und auf LXC ausgerollt, reale iPad-Abnahme offen |
+| 25.2 | HomeScreen Standalone Navigation Correctness | implementiert, Review und reale Geräteabnahme offen |
 
 ---
 
@@ -1563,6 +1564,47 @@ offen.
   Fachregeln bleiben ungefiltert und unverändert.
 - Die gemeinsame Legacy-Assetversion ist 43. Automatisiert bestehen 260 von
   260 Tests; die physische Safari-Abnahme ist bewusst noch nicht ersetzt.
+
+---
+
+# Sprint 25.2 – HomeScreen Standalone Navigation Correctness
+
+## Status
+
+Implementiert auf Basis von `94c7efa`; Commit, Push, LXC-Rollout und reale
+iPad-Abnahme erfolgen erst nach Review.
+
+## Ergebnis
+
+- Die tatsächliche Regression entstand durch native interne `<a href>`-
+  Navigation ohne JavaScript-Übernahme. Altes Mobile Safari kann diesen Linktyp
+  aus einer HomeScreen-Web-App an die normale Safari-App übergeben.
+- `src/public/js/core/system-navigation.js` validiert jetzt zentral `/`,
+  `/d/<dashboard-id>`, `/system/summary` und `/system/errors` einschließlich
+  des internen `returnTo` und navigiert per `window.location.href` im selben
+  Browsing Context. Die echten `href`-Attribute bleiben als Fallback erhalten
+  und verwenden höchstens `target="_self"`.
+- Summary, Health/Errors, der Wechsel zwischen beiden Systemseiten und die
+  Rücknavigation verwenden denselben Helper. Ein einzelner Click-Handler mit
+  `preventDefault()` vermeidet doppelte Touch-/Click-Navigation.
+- Es gab im Wall Display weder `window.open()` noch absolute interne URLs,
+  Origin-/Port-/Protokoll- oder Ingress-Wechsel. Im Admin wurden jedoch
+  vorhandene interne `_blank`-Links derselben Fehlerklasse auf normale
+  Same-Window-Links korrigiert.
+- Externe, protokollrelative, `javascript:`, `data:` und `blob:`-Ziele sowie
+  ungültige System-`returnTo`-Queries bleiben abgewiesen. Sprint 21.5,
+  Sprint 25.1, die HA-Sicherheitsgrenzen und die Schreib-Allowlists bleiben
+  unverändert.
+- Die gemeinsame Legacy-Assetversion ist 44. Automatisierte Tests simulieren
+  normalen Safari und `navigator.standalone=true`; 265 von 265 Tests sowie das
+  vollständige RC-Gate bestehen. Die verbindliche physische Abnahme auf iPad
+  mini, iPad Air 2 und macOS Safari bleibt offen.
+
+Details:
+
+```text
+docs/sprints/SPRINT-25.2.md
+```
 
 ---
 

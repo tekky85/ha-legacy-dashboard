@@ -570,8 +570,6 @@
 
         dashboardTitle.id = "editorTitle";
         previewLink.href = "/d/" + encodeURIComponent(dashboard.id);
-        previewLink.target = "_blank";
-        previewLink.rel = "noopener";
         previewLink.textContent = "Dashboard öffnen: /d/" + dashboard.id;
         url.appendChild(previewLink);
         headingText.appendChild(dashboardTitle);

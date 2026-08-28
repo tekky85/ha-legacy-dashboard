@@ -120,13 +120,102 @@ var SystemNavigation = (function () {
     }
 
 
+    function validateInternalPath(path) {
+
+        var value = typeof path === "string"
+            ? path
+            : "";
+        var queryIndex = value.indexOf("?");
+        var pathname = queryIndex === -1
+            ? value
+            : value.substring(0, queryIndex);
+        var query = queryIndex === -1
+            ? ""
+            : value.substring(queryIndex + 1);
+        var returnTarget;
+
+
+        if (
+            value.indexOf("#") !== -1 ||
+            pathname.indexOf("//") === 0
+        ) {
+            return null;
+        }
+
+
+        if (validateDashboardPath(pathname)) {
+            return query ? null : value;
+        }
+
+
+        if (
+            pathname !== "/system/summary" &&
+            pathname !== "/system/errors"
+        ) {
+            return null;
+        }
+
+
+        if (!query) {
+            return pathname;
+        }
+
+
+        if (
+            query.indexOf("&") !== -1 ||
+            query.indexOf("returnTo=") !== 0
+        ) {
+            return null;
+        }
+
+
+        returnTarget = queryValue("returnTo", "?" + query);
+
+        return validateDashboardPath(returnTarget)
+            ? value
+            : null;
+
+    }
+
+
+    function navigateInternal(path) {
+
+        var target = validateInternalPath(path);
+
+
+        if (!target) {
+            return false;
+        }
+
+
+        window.location.href = target;
+
+        return true;
+
+    }
+
+
     function setLink(id, href) {
 
         var link = byId(id);
+        var target = validateInternalPath(href);
 
-        if (link) {
-            link.href = href;
-            link.setAttribute("href", href);
+        if (link && target) {
+            link.href = target;
+            link.setAttribute("href", target);
+            link.setAttribute("target", "_self");
+
+            link.onclick = function (event) {
+
+                if (event && event.preventDefault) {
+                    event.preventDefault();
+                }
+
+                navigateInternal(target);
+
+                return false;
+
+            };
         }
 
     }
@@ -405,7 +494,7 @@ var SystemNavigation = (function () {
                     return false;
                 }
 
-                window.location.href = "/";
+                navigateInternal("/");
                 return false;
 
             };
@@ -421,11 +510,13 @@ var SystemNavigation = (function () {
         initializeDashboard: initializeDashboard,
         initializeSystemPage: initializeSystemPage,
         markUnavailable: markUnavailable,
+        navigateInternal: navigateInternal,
         refreshHealth: refreshHealth,
         renderHealth: renderHealth,
         returnContext: returnContext,
         systemUrl: systemUrl,
-        validateDashboardPath: validateDashboardPath
+        validateDashboardPath: validateDashboardPath,
+        validateInternalPath: validateInternalPath
     };
 
 }());

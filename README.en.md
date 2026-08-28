@@ -87,6 +87,13 @@ back to `/`. The indicator uses only `GET /api/system-dashboards/status` and
 its reduced severity overview; complete Summary or Errors payloads are not
 loaded for header navigation.
 
+All internal dashboard, Summary, System Status, and Back links use validated,
+root-relative paths and open in the same window. On older iPads launched from
+a HomeScreen icon, this keeps the same standalone/fullscreen context as well
+as the same protocol, host, and port. The direct LAN web UI therefore remains
+independent of Home Assistant Ingress; internal navigation uses neither
+`target="_blank"` nor `window.open()`.
+
 ### Admin Area
 
 Dashboards and widgets are managed under `/admin`.

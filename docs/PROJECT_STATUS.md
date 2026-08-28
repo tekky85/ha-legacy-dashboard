@@ -1,9 +1,9 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 26. August 2026, Sprint 25.1 als Commit `a438e3c` implementiert,
-auf `origin/main` gepusht und auf dem Standalone-LXC ausgerollt; Release
-Candidate 1.0.0-rc.1 automatisiert geprüft, Veröffentlichung sowie reale
-HAOS-/Multi-Arch- und physische Safari-Abnahme offen
+Stand: 28. August 2026, Sprint 25.2 auf Basis von `94c7efa` implementiert und
+lokal geprüft; Review, Commit, Push, Standalone-LXC-Rollout sowie reale
+HomeScreen-/Safari-Abnahme offen. Release Candidate 1.0.0-rc.1 bleibt bis zur
+physischen Release-Gate-Abnahme unveröffentlicht.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -11,6 +11,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-25.2-Ausgangscommit: `94c7efa`
 - Sprint-25.1-Ausgangscommit: `10c1f75`
 - Sprint-25-Ausgangscommit: `95f6603`
 - Sprint-23-Ausgangscommit: `e692eed`
@@ -32,6 +33,10 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 - Sprint-19-Commit: `b4da718`
 - Sprint-18-Commit: `94ce1c0`
 - Sprint-17.1-Commit: `53ce672`
+
+Der Arbeitsbaum war vor Sprint 25.2 auf `main` bei `94c7efa` sauber und mit
+`origin/main` identisch. Die Sprint-25.2-Änderungen sind zur Review bewusst
+noch nicht committet, gepusht oder ausgerollt.
 
 Der Arbeitsbaum war vor Sprint 25.1 auf `main` bei `10c1f75` sauber und mit
 `origin/main` identisch. Die in Abschnitt 20 beschriebene Sprint-25.1-
@@ -83,6 +88,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 24 | Home Assistant App Packaging | umgesetzt |
 | 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung offen |
 | 25.1 | Pre-Release UI State & Filter Correctness | implementiert, gepusht und auf LXC ausgerollt; iPad-Abnahme offen |
+| 25.2 | HomeScreen Standalone Navigation Correctness | implementiert und lokal geprüft; Review, Rollout und Geräteabnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -1420,3 +1426,60 @@ persistenten Zustand und gefilterte Präsentationsdaten. Daher wäre ein neuer
 Screenshot ohne reale zusätzliche Aussage und wurde nicht erzeugt. Die reale
 iPad-mini-, optionale iPad-Air-2- und macOS-Safari-Abnahme bleiben vor einer
 Stable-Empfehlung verbindlich.
+
+## 21. Sprint 25.2 – HomeScreen Standalone Navigation Correctness
+
+Sprint 25.2 startet auf dem sauberen, mit `origin/main` identischen Commit
+`94c7efa`. Die Implementierung ist lokal vorhanden, aber entsprechend dem
+Review-Gate noch nicht committet, gepusht oder auf den LXC ausgerollt.
+
+Die Root Cause lag in der Navigationsart des Legacy-Frontends: Summary,
+Health/Errors und die meisten System-Dashboard-Links waren gewöhnliche
+`<a href>`-Links. Nur der besondere Zurück-Fall ohne explizites `returnTo`
+hatte einen Click-Handler. In normalem Safari blieb ein solcher Link im Tab;
+altes Mobile Safari kann native Link-Navigation aus einer vom HomeScreen
+gestarteten Web-App jedoch an die normale Safari-App übergeben. Im Wall
+Display waren weder `target="_blank"` noch `window.open()`, absolute interne
+URLs, ein Host-/Port-/Protokollwechsel oder ein Ingress-Wechsel beteiligt.
+Der moderne Admin enthielt allerdings drei interne `_blank`-Fälle derselben
+Fehlerklasse: Summary, Errors und die Dashboard-Vorschau.
+
+`src/public/js/core/system-navigation.js` besitzt jetzt eine gemeinsame
+ES5-Funktion `navigateInternal(path)`. Ihr vorgeschalteter Validator akzeptiert
+nur `/`, gültige `/d/<dashboard-id>`-Pfade sowie `/system/summary` und
+`/system/errors`; bei Systemrouten ist höchstens ein gültiges, internes
+`returnTo` erlaubt. Absolute und protokollrelative URLs, `javascript:`,
+`data:`, `blob:`, Fragmente, unbekannte Routen und manipulierte Queries werden
+abgelehnt. Relative Root-Pfade und `window.location.href` erhalten automatisch
+dasselbe Protokoll, denselben Host und denselben Port und benötigen kein
+Ingress.
+
+Alle vier Wall-Display-Navigationsrichtungen – Dashboard zu Summary,
+Dashboard zu Errors, Summary/Errors untereinander und zurück zum Default- oder
+Custom-Dashboard – verwenden jetzt denselben Helper. Die echten `href`-Werte
+bleiben als Fallback erhalten, Links erhalten `_self`, und genau ein
+Click-Handler verhindert die native Standardnavigation. Es wurde kein
+zusätzlicher Touch-Handler ergänzt, sodass kein `touchend`/`click`-Doppelpfad
+entsteht. Die Admin-Links öffnen ebenfalls im aktuellen Fenster. Die Logik
+hängt nicht von `navigator.standalone` ab und verhält sich deshalb in einem
+normalen Safari-Tab gleich.
+
+Sprint 21.5 behält seine validierten Return Targets und den serverseitigen
+Open-Redirect-Schutz. Sprint 25.1 behält die globale Theme-Persistenz und die
+exakte Severity-/Status-Filterung; die vollständige Suite prüft diese
+Regressionen erneut. Es wurden keine Backendroute, Home-Assistant-Abfrage,
+Credential-Grenze, Write-Route oder Allowlist verändert. Die gemeinsame
+Legacy-Assetversion ist 44. Da keine sichtbare Geometrie oder Fachanzeige
+geändert wurde, bleiben die echten D1-Screenshots repräsentativ.
+
+Automatisierte Tests decken beide Werte von `navigator.standalone`, Default-
+und Custom-Dashboards, Summary, Errors, Back, wiederholbare relative
+Same-Window-Ziele, externe/protokollrelative/aktive Protokolle, ungültige
+Return Targets, `_blank`-/`window.open`-Guards und ES5 ab. Diese Simulation
+kann nicht bestätigen, dass physisches iOS keine Safari-UI öffnet. Lokal
+bestehen 265 von 265 Tests; das RC-Gate bestätigt zusätzlich konsistente
+Versionen, alle JavaScript-Syntaxprüfungen und einen erfolgreichen Secret Scan.
+Deshalb bleiben die reale iPad-mini-HomeScreen-Abnahme, dieselben Rundreisen
+auf dem iPad Air 2 und der normale macOS-Safari-Test vor einer Stable-
+Empfehlung verbindlich. Commit, Rollout und diese Geräteabnahme folgen erst
+nach Review.
