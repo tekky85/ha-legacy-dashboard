@@ -1,10 +1,11 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 29. August 2026, Sprint 25.6 auf Basis von `91045b8` implementiert und
-lokal vollständig validiert. Release Candidate `1.0.0-rc.1` ist veröffentlicht;
-die JPEG-Härtung aus Sprint 25.5 und die Kartenkorrekturen aus Sprint 25.6
-gehören zum noch nicht neu getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/
-Safari- und verbleibende HAOS-Persistenzabnahmen bleiben offen.
+Stand: 29. August 2026, Sprint 25.6 auf Basis von `91045b8` als `03648a9`
+implementiert, auf `origin/main` gepusht und auf dem Standalone-LXC ausgerollt.
+Release Candidate `1.0.0-rc.1` ist veröffentlicht; die JPEG-Härtung aus Sprint
+25.5 und die Kartenkorrekturen aus Sprint 25.6 gehören zum noch nicht neu
+getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/Safari- und verbleibende
+HAOS-Persistenzabnahmen bleiben offen.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -13,6 +14,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 
 - Branch: `main`
 - Sprint-25.6-Ausgangscommit: `91045b8`
+- Sprint-25.6-Implementierungscommit: `03648a9`
 - Sprint-25.5-Ausgangscommit: `02abf11`
 - Sprint-25.5-Implementierungscommits: `e0df018`, `42d88f3`
 - Sprint-25.4-RC-Commit und Tag: `741bba4`, `v1.0.0-rc.1`
@@ -1805,3 +1807,11 @@ Landscape einschließlich Rotation, langem Namen, Off/Unknown/Unavailable,
 Minus/Plus/Power und Focus geprüft werden. Zusätzlich bleiben Light-Power,
 lange Sensor-/Binary-Inhalte, Theme, Background-Lesbarkeit, HomeScreen und
 Footer Teil des zusammenhängenden iPad-Release-Gates.
+
+Der Standalone-Rollout aktualisierte den sauberen LXC per Fast-Forward von
+`91045b8` auf `03648a9`. Das Deployment-Gate bestand dort ebenfalls mit 290
+von 290 Tests. Der Dienst wurde regulär neu gestartet; Git-Stand und
+`origin/main` waren identisch, `systemctl` meldete `active` und der produktive
+Health-Check meldete Gateway, Home Assistant sowie Dashboard online und fünf
+geladene Widgets. Persistente Konfiguration und Background-Assets wurden nicht
+verändert.

@@ -178,7 +178,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | --- | --- | --- |
 | Repository-Metadaten | PASS | Vollständig und konsistent. |
 | Versionen | PASS | `1.0.0-rc.1` in allen Release-Quellen. |
-| Tests und Syntax | PASS | Sprint-25.6-Stand lokal 290/290; veröffentlichter RC.1 und zugehörige GitHub Actions 275/275. |
+| Tests und Syntax | PASS | Sprint-25.6-Stand lokal und auf LXC 290/290; veröffentlichter RC.1 und zugehörige GitHub Actions 275/275. |
 | Secret Scan und Dependency Audit | PASS | Keine Release-Secrets, 0 bekannte npm-Schwachstellen. |
 | GitHub Release und Checksummen | PASS | Prerelease und zwei verifizierte Assets veröffentlicht. |
 | GHCR Image Availability | PASS | Anonym abrufbar. |
