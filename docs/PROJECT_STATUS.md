@@ -1,7 +1,8 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 29. August 2026, Sprint 25.6 auf Basis von `91045b8` als `03648a9`
-implementiert, auf `origin/main` gepusht und auf dem Standalone-LXC ausgerollt.
+Stand: 29. August 2026, Sprint 25.7 auf Basis von `2cf2d23` dokumentiert und
+repositoryseitig validiert. Sprint 25.6 wurde als `03648a9` implementiert, auf
+`origin/main` gepusht und auf dem Standalone-LXC ausgerollt.
 Release Candidate `1.0.0-rc.1` ist veröffentlicht; die JPEG-Härtung aus Sprint
 25.5 und die Kartenkorrekturen aus Sprint 25.6 gehören zum noch nicht neu
 getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/Safari- und verbleibende
@@ -13,6 +14,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-25.7-Ausgangscommit: `2cf2d23`
 - Sprint-25.6-Ausgangscommit: `91045b8`
 - Sprint-25.6-Implementierungscommit: `03648a9`
 - Sprint-25.5-Ausgangscommit: `02abf11`
@@ -64,6 +66,12 @@ Der Arbeitsbaum war vor Sprint 25.6 auf `main` bei `91045b8` sauber und mit
 `origin/main` identisch. Der Commit enthält nur die dokumentierte
 Sprint-25.5-LXC-Abnahme; die Sprint-25.6-Implementierung startete ohne
 unbekannte oder nicht eingeordnete Voränderungen.
+
+Der Arbeitsbaum war vor Sprint 25.7 auf `main` bei `2cf2d23` sauber und mit
+`origin/main` identisch. Sprint 25.7 verändert keine Anwendung, keine
+Konfiguration und keine Sicherheitsgrenze. Die physische iOS-9.3.5-Abnahme
+bleibt offen und wird nicht aus Dokumenten- oder Quelltests als bestanden
+abgeleitet.
 
 Die Implementierung wurde als `e0df018` gepusht. Beim anschließenden LXC-
 Rollout zeigte sich `data/backgrounds/` als einzige unversionierte
@@ -126,6 +134,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 25.4 | RC Validation | RC.1 veröffentlicht; Standalone validiert, reale HAOS-/iPad-Punkte teilweise offen |
 | 25.5 | HAOS Network Access & Background Upload Hardening | implementiert und lokal mit vollständigem Release Gate validiert; neuer HAOS-Build und Realgerätetest offen |
 | 25.6 | Card Size Matrix & Responsive Layout Hardening | implementiert und lokal mit vollständiger Test-/Browsermatrix validiert; iPad-mini-Abnahme offen |
+| 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; physische iPad-mini-Abnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -1815,3 +1824,51 @@ von 290 Tests. Der Dienst wurde regulär neu gestartet; Git-Stand und
 Health-Check meldete Gateway, Home Assistant sowie Dashboard online und fünf
 geladene Widgets. Persistente Konfiguration und Background-Assets wurden nicht
 verändert.
+
+## 26. Sprint 25.7 – Legacy iPad Kiosk Deployment & Guided Access Validation
+
+Sprint 25.7 startete auf dem sauberen, mit `origin/main` identischen Commit
+`2cf2d23`. Der Sprint ändert kein Anwendungsverhalten. Die neue Betriebsanleitung
+`docs/IPAD_KIOSK.md` dokumentiert für das iPad mini 1 mit iOS 9.3.5 den
+historischen Pfad `Einstellungen > Allgemein > Bedienungshilfen > Geführter
+Zugriff`, Codeeinrichtung, Home-Dreifachklick, Sitzungsoptionen, sicheren Exit,
+Auto-Lock-/Dauerstrombetrieb und Wiederanlaufgrenzen.
+
+Für ein einzelnes privates Wall-Display ist Geführter Zugriff die Empfehlung.
+Touch bleibt aktiv; Standby-Taste, Lautstärke, Bewegung/Rotation, Tastatur und
+Zugriffszeit werden bewusst je Betriebsziel gesetzt. Es werden keine sperrbaren
+Bildschirmflächen empfohlen, weil diese nach Rotation Navigation oder Controls
+verdecken können. Der iOS-9-Systempfad zur automatischen Sperre wird getrennt
+von modernen, in historischen Anleitungen nicht belegten Guided-Access-
+Optionen behandelt.
+
+Geführter Zugriff wird ausdrücklich nicht als vollverwalteter Auto-Start-Kiosk
+beschrieben. Nach iPad-Reboot, vollständigem Stromverlust oder Beenden der
+HomeScreen-Web-App kann ein manueller Start erforderlich sein. WLAN-Reconnect,
+Home-Assistant-Neustart, HA-Legacy-Dashboard-App-/Dienstneustart und dauerhafte
+Display-Aktivität sind als konkrete physische Prüfpunkte dokumentiert.
+
+Für mehrere verwaltete Geräte beschreibt die Anleitung Supervision plus Single
+App Mode/App Lock über Apple Configurator oder MDM als strengere Alternative.
+Aktuelle Enrollment-Menüs werden nicht auf iOS 9 übertragen; Webclip-Eignung,
+Configurator-/MDM-Kompatibilität und Reboot-Wiederanlauf müssen mit der
+tatsächlich eingesetzten Verwaltungsumgebung geprüft werden. MDM ist für ein
+einzelnes privates Gerät keine Voraussetzung.
+
+Die Sprint-25.2-Same-Origin-/Same-Window-Navigation und Standalone-Metadaten
+sind repositoryseitig vorhanden. Die Anleitung bewahrt alle bestehenden
+Sicherheitsgrenzen: kein HA-/Supervisor-Token im Browser, keine automatische
+Admin-Anmeldung, getrenntes `ADMIN_TOKEN` und unveränderte Write-Allowlists.
+
+Die vollständige lokale Testsuite bestand mit 290 von 290 Tests. Dazu gehören
+die Sprint-25.2-HomeScreen-Navigation, sichere Return Targets, fehlende neue
+Fenster, Standalone-Metadaten, ES5-Kompatibilität und unveränderte HA-Write-
+Flächen. Die Tests verwendeten ausschließlich lokale Mocks und Fake-
+Credentials. Da keine Anwendung und keine sichtbare Produktoberfläche geändert
+wurde, waren weder JavaScript-Syntaxprüfungen noch neue Screenshots erforderlich.
+
+Die vollständige manuelle Checkliste umfasst HomeScreen-Vollbild, Guided-
+Access-Start und -Exit, Home-Taste, Summary, Errors, Custom Dashboard,
+Light/Climate, Rotation, Display-Dauerbetrieb, WLAN- und Backend-Reconnect sowie
+iPad-Reboot/Stromverlust. Mangels fernsteuerbarer iOS-9-Hardware bleiben diese
+Realgerätpunkte offen und sind kein bestandener Release Gate.

@@ -57,7 +57,7 @@ The legacy frontend remains framework-free and uses the existing `Legacy.http` /
 - drag-and-drop grid layout
 - portrait and landscape layouts
 - configurable card sizes
-- responsive compact / normal / expanded presentation
+- responsive compact / standard / wide / tall / large presentation
 - independent viewport-aware Focus view with prioritized values and controls
 - shared SVG-based Power Control for Light and Climate in Grid and Focus
 - Light and Climate control through explicitly allowed backend endpoints
@@ -104,6 +104,25 @@ stored independently per dashboard. The normal wall display receives only a
 controlled, read-only image URL; neither the data path nor tokens are exposed.
 Hiding a title removes only its unused space. Summary navigation, the Health
 indicator, connection state, and theme toggle remain available.
+
+### iPad mini as a Wall Display
+
+For one iPad mini 1 running iOS 9.3.5, **Guided Access** is the recommended
+practical kiosk mode. Launch the dashboard from its HomeScreen icon first,
+then lock it with a triple-click of the Home button. A normal Home-button press
+must no longer leave the web app; Touch must remain enabled for navigation and
+Light/Climate controls.
+
+Guided Access is not a guaranteed auto-start kiosk after an iPad reboot or
+power loss. The operator may need to unlock the device, launch the HomeScreen
+web app again, and start a new Guided Access session. For multiple centrally
+managed devices, Supervision plus Single App Mode/App Lock through Apple
+Configurator or MDM is the stronger alternative. Neither approach
+automatically stores Admin or Home Assistant credentials on the iPad.
+
+The historical iOS 9 menu paths, recommended button/Touch/rotation options,
+recovery limits, and mandatory real-device checklist are documented in
+[`docs/IPAD_KIOSK.md`](docs/IPAD_KIOSK.md).
 
 ### Admin Area
 

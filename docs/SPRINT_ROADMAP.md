@@ -216,6 +216,7 @@ Bedeutung von „fest“:
 | 25.4 | RC Validation | umgesetzt; RC.1 veröffentlicht, reale Pflichtabnahmen teilweise offen |
 | 25.5 | HAOS Network Access & Background Upload Hardening | umgesetzt und automatisiert validiert; neuer HAOS-Build und Realgerätetest offen |
 | 25.6 | Card Size Matrix & Responsive Layout Hardening | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
+| 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; reale iOS-9-Abnahme offen |
 
 ---
 
@@ -1967,16 +1968,19 @@ Ziel bleibt:
 
 # Nächster Schritt
 
-Sprint 25.6 hat alle vier realen Wall-Renderer, sämtliche 252 zulässigen
-Typ-/Profil-/Größenkombinationen und 1.128 repräsentative Zustandsfälle in einer
-automatisierten Browsermatrix geprüft. Die fünf Presentation-Tiers trennen
-weiterhin Grid-Geometrie und Widget-Darstellung; Climate Large besitzt nun eine
-eigene vollständige Informations- und Control-Hierarchie.
+Sprint 25.7 dokumentiert den praktischen Einzelgerätebetrieb mit Geführtem
+Zugriff und grenzt ihn klar vom verwalteten Single App Mode ab. Die historische
+iOS-9-Schrittfolge und die verbindliche physische Abnahme stehen in
+`docs/IPAD_KIOSK.md`; kein Realgerätpunkt wird aus Quellcode oder moderner
+iPadOS-Dokumentation als bestanden abgeleitet.
 
-Als nächstes müssen die kritischen Matrixfälle auf dem iPad mini in Portrait,
-Landscape und nach Rotation abgenommen werden. Parallel bleibt ein neuer,
-RC.1 nicht überschreibender HAOS-Build mit Sprint 25.5/25.6 zu installieren und
-gegen JPEG Upload/Replace/Remove, `/data`-Persistenz, App-/HA-Restart,
-Backup/Restore, Supervisor REST/WebSocket und Logs zu prüfen. Erst diese
-Realgerät- und Laufzeitergebnisse entscheiden über einen weiteren gezielten
-RC-Fix oder die Stable-Freigabe.
+Als nächstes ist die Checkliste auf dem iPad mini 1 mit iOS 9.3.5 vollständig
+durchzuführen. Sie verbindet HomeScreen-Vollbild, Home-/Sleep-Wake-/Volume-
+Verhalten, Touch, Rotation, Display-Dauerbetrieb, Summary/Errors/Custom-
+Navigation, Light/Climate sowie WLAN-, HA-, Dashboard-App-, Reboot- und
+Stromverlusttests mit den kritischen Sprint-25.6-Matrixfällen. Parallel bleibt
+ein neuer, RC.1 nicht überschreibender HAOS-Build mit Sprint 25.5/25.6 gegen
+JPEG Upload/Replace/Remove, `/data`-Persistenz, App-/HA-Restart, Backup/Restore,
+Supervisor REST/WebSocket und Logs zu prüfen. Erst diese Realgerät- und
+Laufzeitergebnisse entscheiden über einen weiteren gezielten RC-Fix oder die
+Stable-Freigabe.

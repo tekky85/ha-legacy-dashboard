@@ -59,7 +59,7 @@ Das Legacy-Frontend bleibt frameworkfrei und verwendet die vorhandene `Legacy.ht
 - Drag-and-drop-Rasterlayout
 - Portrait- und Landscape-Layouts
 - konfigurierbare Card-Größen
-- responsive Compact-/Normal-/Expanded-Darstellung
+- responsive Compact-/Standard-/Wide-/Tall-/Large-Darstellung
 - eigenständige, viewportbasierte Focus-Ansicht mit priorisierten Werten und Controls
 - gemeinsames, SVG-basiertes Power-Control für Light und Climate in Grid und Focus
 - Light- und Climate-Steuerung über explizit freigegebene Backend-Endpunkte
@@ -108,6 +108,26 @@ eine kontrollierte, read-only Bild-URL; weder der Datenpfad noch Tokens werden
 offengelegt. Ein ausgeblendeter Titel entfernt nur seinen ungenutzten Platz.
 Summary-Navigation, Health-Indikator, Verbindung und Theme-Umschalter bleiben
 erreichbar.
+
+### iPad mini als Wall-Display
+
+Für ein einzelnes iPad mini 1 mit iOS 9.3.5 ist **Geführter Zugriff** der
+empfohlene praktische Kioskmodus. Das Dashboard wird zuerst über sein
+HomeScreen-Symbol gestartet und danach per Home-Dreifachklick gesperrt. Ein
+normaler Druck auf die Home-Taste darf die Web-App dann nicht verlassen;
+Berührung muss für Navigation sowie Light-/Climate-Controls aktiviert bleiben.
+
+Geführter Zugriff ist kein garantierter Auto-Start-Kiosk nach iPad-Neustart
+oder Stromverlust. Der Betreiber muss gegebenenfalls das Gerät entsperren, die
+HomeScreen-Web-App erneut öffnen und die Sitzung neu starten. Für mehrere
+zentral verwaltete Geräte ist Supervision plus Single App Mode/App Lock über
+Apple Configurator oder MDM die strengere Alternative. Admin- oder Home-
+Assistant-Credentials werden in keinem der beiden Fälle auf dem iPad
+automatisch hinterlegt.
+
+Die historischen iOS-9-Menüpfade, empfohlenen Tasten-/Touch-/Rotationsoptionen,
+Wiederanlaufgrenzen und die verbindliche Realgerät-Checkliste stehen in
+[`docs/IPAD_KIOSK.md`](docs/IPAD_KIOSK.md).
 
 ### Admin-Bereich
 
