@@ -1,10 +1,11 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 29. August 2026, Sprint 25.5 auf Basis von `02abf11` vollständig
-implementiert und lokal validiert. Release Candidate `1.0.0-rc.1` ist
-veröffentlicht; die korrigierte JPEG-Implementierung gehört zum noch nicht neu
-getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/Safari- und verbleibende
-HAOS-Persistenzabnahmen bleiben offen.
+Stand: 29. August 2026, Sprint 25.5 auf Basis von `02abf11` als `e0df018` und
+`42d88f3` implementiert, auf `origin/main` gepusht und auf dem Standalone-LXC
+ausgerollt. Release Candidate `1.0.0-rc.1` ist veröffentlicht; die korrigierte
+JPEG-Implementierung gehört zum noch nicht neu getaggten Stand nach RC.1.
+Reale iPad-/HomeScreen-/Safari- und verbleibende HAOS-Persistenzabnahmen bleiben
+offen.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -13,6 +14,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 
 - Branch: `main`
 - Sprint-25.5-Ausgangscommit: `02abf11`
+- Sprint-25.5-Implementierungscommits: `e0df018`, `42d88f3`
 - Sprint-25.4-RC-Commit und Tag: `741bba4`, `v1.0.0-rc.1`
 - Sprint-25.3-Ausgangscommit: `c8d452b`
 - Sprint-25.3-Implementierungscommit: `f010350`
@@ -55,6 +57,12 @@ Der Arbeitsbaum war vor Sprint 25.5 auf `main` bei `02abf11` sauber und mit
 `origin/main` identisch. Der Commit nach dem RC-Tag ergänzt ausschließlich die
 Spezifikationen für Sprint 25.5 und spätere Sprints; die Sprint-25.5-
 Implementierung startete daher ohne nicht eingeordnete Voränderungen.
+
+Die Implementierung wurde als `e0df018` gepusht. Beim anschließenden LXC-
+Rollout zeigte sich `data/backgrounds/` als einzige unversionierte
+Persistenzablage; keine Datei wurde verändert. `42d88f3` ergänzt den fehlenden
+Ignore-Eintrag samt Regressionstest. Danach lief der LXC per Fast-Forward und
+regulärem Deployment erfolgreich auf genau diesen Stand.
 
 Der Arbeitsbaum war vor Sprint 25.1 auf `main` bei `10c1f75` sauber und mit
 `origin/main` identisch. Die in Abschnitt 20 beschriebene Sprint-25.1-
@@ -1708,12 +1716,19 @@ und blockieren kein sicheres Fast-Forward-Deployment; vorhandene Bilder werden
 dabei weder verschoben noch gelöscht.
 
 `node --check` bestand für alle geänderten und neuen JavaScript-Dateien. Das
-vollständige Release Gate bestand mit 283 von 283 Tests, 0 Fehlern, einschließlich
+vollständige Release Gate bestand lokal und auf dem LXC mit 283 von 283 Tests,
+0 Fehlern, einschließlich
 Shell-Syntax, Versionskonsistenz, Secret Scan, reproduzierbarem Bundle und
 allen Sprint-25.1-/25.2-/25.3-Sicherheitsregressionen. Es wurden nur lokale
 Fixtures, temporäre Datenpfade, localhost-Mocks und Fake-Credentials verwendet;
 keine Produktions-`.env` und keine reale HA-API wurden für automatisierte Tests
 kontaktiert.
+
+Der Standalone-Rollout aktualisierte den LXC ohne Änderung der vorhandenen
+`data/backgrounds` auf `42d88f3`. Dienstneustart, `/health`, `/api/status` und
+Dashboard-Metadaten bestanden; Gateway und reale backendseitige HA-Verbindung
+meldeten online, fünf Widgets wurden geladen. Der Remote-Arbeitsbaum ist durch
+den neuen Ignore-Eintrag wieder sauber.
 
 Vor einer Stable-Empfehlung muss die korrigierte Version als neuer, nicht den
 immutablen RC.1 überschreibender HAOS-Build installiert werden. Danach sind

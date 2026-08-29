@@ -57,7 +57,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | Standalone-Credentials getrennt | PASS | HA-Token vorhanden, kein `SUPERVISOR_TOKEN`, kein App-Modus; Werte wurden nicht ausgegeben. |
 | Admin-Token vom HA-Token getrennt | PASS | Admin API aktiviert, beide Werte vorhanden und ungleich; Werte wurden nicht ausgegeben. |
 | Admin API ohne Bearer-Token geschützt | PASS | `GET /api/admin/config` antwortet mit HTTP 401. |
-| Vollständiger Deployment-Check auf dem LXC | PASS | 275 Tests, 0 Fehler; Syntax-, Mock-, Integrations- und Security-Checks enthalten. |
+| Vollständiger Deployment-Check auf dem LXC | PASS | Sprint-25.5-Stand `42d88f3`: 283 Tests, 0 Fehler; Syntax-, Mock-, Integrations- und Security-Checks enthalten. |
 | Startup und Health | PASS | Dienstneustart, danach `/health` HTTP 200 und Dienst `active/running`. |
 | Home Assistant REST | PASS | `/api/status` und Dashboard-State liefern HTTP 200 gegen die reale Backend-Verbindung. |
 | Home Assistant WebSocket nur im Backend | PASS | Geschützte Diagnose meldet Registry-, Config-Entry-, Repairs- und Automation-Quellen verfügbar; Browser erhält weder Credentials noch generische WS-Kommandos. |
@@ -163,7 +163,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | --- | --- | --- |
 | Repository-Metadaten | PASS | Vollständig und konsistent. |
 | Versionen | PASS | `1.0.0-rc.1` in allen Release-Quellen. |
-| Tests und Syntax | PASS | Sprint-25.5-Stand lokal 283/283; veröffentlichter RC.1, LXC und zugehörige GitHub Actions 275/275. |
+| Tests und Syntax | PASS | Sprint-25.5-Stand lokal und auf LXC 283/283; veröffentlichter RC.1 und zugehörige GitHub Actions 275/275. |
 | Secret Scan und Dependency Audit | PASS | Keine Release-Secrets, 0 bekannte npm-Schwachstellen. |
 | GitHub Release und Checksummen | PASS | Prerelease und zwei verifizierte Assets veröffentlicht. |
 | GHCR Image Availability | PASS | Anonym abrufbar. |
