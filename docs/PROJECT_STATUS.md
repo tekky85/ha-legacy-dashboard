@@ -1702,8 +1702,13 @@ Authentifizierung, Rate Limit, `DATA_DIR`-/`/data`-Grenze, HA-/Supervisor-
 Token-Isolation und die bestehenden Home-Assistant-Write-Allowlists wurden
 nicht verändert.
 
+`data/backgrounds/` ist nun ausdrücklich von Git ausgeschlossen. Persistente
+Standalone-Bilder erscheinen dadurch nicht mehr als unversionierte Quellen
+und blockieren kein sicheres Fast-Forward-Deployment; vorhandene Bilder werden
+dabei weder verschoben noch gelöscht.
+
 `node --check` bestand für alle geänderten und neuen JavaScript-Dateien. Das
-vollständige Release Gate bestand mit 282 von 282 Tests, 0 Fehlern, einschließlich
+vollständige Release Gate bestand mit 283 von 283 Tests, 0 Fehlern, einschließlich
 Shell-Syntax, Versionskonsistenz, Secret Scan, reproduzierbarem Bundle und
 allen Sprint-25.1-/25.2-/25.3-Sicherheitsregressionen. Es wurden nur lokale
 Fixtures, temporäre Datenpfade, localhost-Mocks und Fake-Credentials verwendet;

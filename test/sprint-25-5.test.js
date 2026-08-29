@@ -264,6 +264,13 @@ test("App-Bind, Port und WebUI bleiben korrekt und ohne breite Netzwerkrechte", 
 });
 
 
+test("persistente Standalone-Hintergründe blockieren kein Git-Deployment", function () {
+    const gitignore = read(".gitignore");
+
+    assert.match(gitignore, /^data\/backgrounds\/$/m);
+});
+
+
 test("Sprint 25.5 erweitert weder Browser- noch Home-Assistant-Schreibfläche", function () {
     const backgrounds = read(
         "src/services/dashboard-backgrounds.js"

@@ -31,7 +31,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | App-Icon und Logo valide | PASS | PNG-Dateien vorhanden, lesbar und mit erwarteten Dateirechten. |
 | Minimalberechtigungen der Home Assistant App | PASS | `homeassistant_api: true`, AppArmor aktiv; kein Host-, Docker-, Config-, Geräte- oder Privileged-Zugriff. |
 | Dockerfile ist Build-Quelle | PASS | Release-Workflow baut beide Architekturen aus dem Root-`Dockerfile` mit BuildKit/Buildx. |
-| Vollständiges Release Gate | PASS | RC.1: 275 Tests; Sprint-25.5-Stand: 282 Tests, jeweils 0 Fehler. JavaScript-/Shell-Syntax, Versionscheck und Secret Scan enthalten. |
+| Vollständiges Release Gate | PASS | RC.1: 275 Tests; Sprint-25.5-Stand: 283 Tests, jeweils 0 Fehler. JavaScript-/Shell-Syntax, Versionscheck und Secret Scan enthalten. |
 | Dependency-Audit | PASS | `npm audit --omit=dev --audit-level=high`: 0 Schwachstellen. |
 | GitHub Test-Workflow | PASS | Run `33203376334`, Abschluss `success`. |
 | GitHub Release-Workflow | PASS | Run `33203376391`; Validate, beide Builds, Manifest, Smoke-Test und Release abgeschlossen. |
@@ -153,7 +153,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | Oversize und ungültige Abmessungen | PASS | Body-Limit sowie Datei-, Kanten- und Pixelgrenzen bleiben wirksam. |
 | Pfadtraversierung | PASS | Dashboard-/Asset-IDs und Speicherpfade bleiben streng validiert. |
 | Fehlgeschlagenes Replace | PASS | Altes Asset und Config bleiben erhalten; keine temporäre oder partielle Datei verbleibt. |
-| Vollständiges lokales Release Gate | PASS | 282 Tests, 0 Fehler; nur Fixtures, temporäre Pfade, localhost-Mocks und Fake-Credentials. |
+| Vollständiges lokales Release Gate | PASS | 283 Tests, 0 Fehler; nur Fixtures, temporäre Pfade, localhost-Mocks und Fake-Credentials. |
 | Neuer JPEG-Fix auf realer HAOS-App | BLOCKED | RC.1 enthält den Fix nicht; ein neuer, separat versionierter HAOS-Build muss installiert werden. |
 | JPEG Upload/Replace/Remove auf iPad mini | BLOCKED | Nach Installation des neuen Builds mit echten freigegebenen JPEGs prüfen. |
 
@@ -163,7 +163,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | --- | --- | --- |
 | Repository-Metadaten | PASS | Vollständig und konsistent. |
 | Versionen | PASS | `1.0.0-rc.1` in allen Release-Quellen. |
-| Tests und Syntax | PASS | Sprint-25.5-Stand lokal 282/282; veröffentlichter RC.1, LXC und zugehörige GitHub Actions 275/275. |
+| Tests und Syntax | PASS | Sprint-25.5-Stand lokal 283/283; veröffentlichter RC.1, LXC und zugehörige GitHub Actions 275/275. |
 | Secret Scan und Dependency Audit | PASS | Keine Release-Secrets, 0 bekannte npm-Schwachstellen. |
 | GitHub Release und Checksummen | PASS | Prerelease und zwei verifizierte Assets veröffentlicht. |
 | GHCR Image Availability | PASS | Anonym abrufbar. |
