@@ -154,6 +154,8 @@ function inspectJpeg(buffer) {
     let width = 0;
     let height = 0;
     let sawFrame = false;
+    let sawScan = false;
+    let sawEnd = false;
 
 
     if (
@@ -170,11 +172,13 @@ function inspectJpeg(buffer) {
     }
 
 
-    while (offset < buffer.length - 2) {
+    while (offset < buffer.length) {
 
         if (buffer[offset] !== 0xff) {
-            offset += 1;
-            continue;
+            throw backgroundError(
+                "background_file_invalid",
+                "JPEG-Marker fehlt"
+            );
         }
 
         while (
@@ -193,7 +197,23 @@ function inspectJpeg(buffer) {
 
 
         if (marker === 0xd9) {
+            sawEnd = true;
+
+            if (offset !== buffer.length) {
+                throw backgroundError(
+                    "background_file_invalid",
+                    "JPEG-Ende ist ungültig"
+                );
+            }
+
             break;
+        }
+
+        if (marker === 0x00 || marker === 0xd8) {
+            throw backgroundError(
+                "background_file_invalid",
+                "JPEG-Marker ist ungültig"
+            );
         }
 
         if (
@@ -223,7 +243,23 @@ function inspectJpeg(buffer) {
         }
 
         if (isJpegStartOfFrame(marker)) {
-            if (segmentLength < 7) {
+            if (segmentLength < 11) {
+                throw backgroundError(
+                    "background_file_invalid",
+                    "JPEG-Bildheader ist ungültig"
+                );
+            }
+
+            const componentCount =
+                buffer[offset + 7];
+
+
+            if (
+                componentCount < 1 ||
+                componentCount > 4 ||
+                segmentLength !==
+                    8 + componentCount * 3
+            ) {
                 throw backgroundError(
                     "background_file_invalid",
                     "JPEG-Bildheader ist ungültig"
@@ -238,13 +274,79 @@ function inspectJpeg(buffer) {
 
         offset += segmentLength;
 
+
+        if (marker === 0xda) {
+            const componentCount =
+                buffer[offset - segmentLength + 2];
+
+
+            if (
+                !sawFrame ||
+                componentCount < 1 ||
+                componentCount > 4 ||
+                segmentLength !==
+                    6 + componentCount * 2
+            ) {
+                throw backgroundError(
+                    "background_file_invalid",
+                    "JPEG-Scanheader ist ungültig"
+                );
+            }
+
+            sawScan = true;
+
+
+            while (offset < buffer.length) {
+
+                if (buffer[offset] !== 0xff) {
+                    offset += 1;
+                    continue;
+                }
+
+                const markerOffset = offset;
+
+
+                while (
+                    offset < buffer.length &&
+                    buffer[offset] === 0xff
+                ) {
+                    offset += 1;
+                }
+
+                if (offset >= buffer.length) {
+                    throw backgroundError(
+                        "background_file_invalid",
+                        "JPEG-Scandaten sind unvollständig"
+                    );
+                }
+
+                const scanMarker = buffer[offset];
+
+
+                if (
+                    scanMarker === 0x00 ||
+                    (
+                        scanMarker >= 0xd0 &&
+                        scanMarker <= 0xd7
+                    )
+                ) {
+                    offset += 1;
+                    continue;
+                }
+
+                offset = markerOffset;
+                break;
+
+            }
+        }
+
     }
 
 
-    if (!sawFrame) {
+    if (!sawFrame || !sawScan || !sawEnd) {
         throw backgroundError(
             "background_file_invalid",
-            "JPEG-Bildheader fehlt"
+            "JPEG-Datei ist unvollständig"
         );
     }
 

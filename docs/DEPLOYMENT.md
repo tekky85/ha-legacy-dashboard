@@ -42,11 +42,39 @@ Network bei Bedarf anpassen. Die direkte Wall-Display-URL lautet anschließend
 beispielsweise:
 
 ```text
-http://homeassistant.local:3000/
+http://<reservierte-oder-statische-IPv4>:3000/
 ```
 
 Der konkrete Port ist der in der App-Netzwerkkonfiguration gewählte Host-Port.
 Ingress ist nicht aktiviert und für den iPad-Zugriff nicht erforderlich.
+
+### Direkter LAN-Zugriff und `.local`
+
+Ein erfolgreicher Zugriff über die IPv4-Adresse, aber nicht über
+`homeassistant.local`, ist nicht automatisch ein Anwendungsfehler. Der Name
+kann per mDNS gleichzeitig einen A-Record und einen oder mehrere AAAA-Records
+liefern. Wählt der Client IPv6, während der veröffentlichte App-Port auf dem
+HAOS-Host nur über IPv4 erreichbar ist, scheitert allein die Hostname-URL.
+
+Die Ebenen getrennt prüfen:
+
+```bash
+ping homeassistant.local
+curl -4 -v http://homeassistant.local:3000/health
+curl -6 -v http://homeassistant.local:3000/health
+curl -v http://<HAOS-IPv4>:3000/health
+```
+
+Zusätzlich den tatsächlich gewählten Host-Port im Network-Bereich der App
+prüfen. Die WebUI-Vorlage lautet `http://[HOST]:[PORT:3000]/`; die Anwendung
+selbst bindet im App-Modus an `0.0.0.0:3000`. Protokoll und Port müssen bei
+IP- und Hostname-Test identisch sein.
+
+Wenn A- und AAAA-Auflösung korrekt sind, aber nur IPv4 den App-Port erreicht,
+für Legacy-Wall-Displays eine reservierte/statische HAOS-IPv4 oder einen lokalen
+DNS-Namen mit eindeutigem A-Record verwenden. Keine zusätzlichen App-Rechte,
+kein Host-Networking und keine mDNS- oder IPv6-Hacks in der Anwendung
+aktivieren.
 
 Lokaler Container-Build aus einem sicheren temporären Kontext:
 

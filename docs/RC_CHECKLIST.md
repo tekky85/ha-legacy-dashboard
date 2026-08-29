@@ -1,6 +1,6 @@
 # RC Checklist – 1.0.0-rc.1
 
-Stand: 28. August 2026
+Stand: 29. August 2026
 
 Diese Checkliste dokumentiert die Release-Candidate-Abnahme aus Sprint 25.4.
 Sie trennt statische Prüfungen, automatisierte Tests und tatsächlich verfügbare
@@ -31,7 +31,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | App-Icon und Logo valide | PASS | PNG-Dateien vorhanden, lesbar und mit erwarteten Dateirechten. |
 | Minimalberechtigungen der Home Assistant App | PASS | `homeassistant_api: true`, AppArmor aktiv; kein Host-, Docker-, Config-, Geräte- oder Privileged-Zugriff. |
 | Dockerfile ist Build-Quelle | PASS | Release-Workflow baut beide Architekturen aus dem Root-`Dockerfile` mit BuildKit/Buildx. |
-| Vollständiges Release Gate | PASS | 275 Tests, 0 Fehler; JavaScript-/Shell-Syntax, Versionscheck und Secret Scan enthalten. |
+| Vollständiges Release Gate | PASS | RC.1: 275 Tests; Sprint-25.5-Stand: 282 Tests, jeweils 0 Fehler. JavaScript-/Shell-Syntax, Versionscheck und Secret Scan enthalten. |
 | Dependency-Audit | PASS | `npm audit --omit=dev --audit-level=high`: 0 Schwachstellen. |
 | GitHub Test-Workflow | PASS | Run `33203376334`, Abschluss `success`. |
 | GitHub Release-Workflow | PASS | Run `33203376391`; Validate, beide Builds, Manifest, Smoke-Test und Release abgeschlossen. |
@@ -94,13 +94,15 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | Supervisor REST-Proxy in Simulation | PASS | Isolierter Sprint-24-Test gegen lokalen Supervisor-Mock bestanden. |
 | Supervisor WebSocket-Proxy in Simulation | PASS | Authentifizierung und normalisierte Registry-Metadaten im isolierten Mock-Test bestanden. |
 | `/data` als App-Datenpfad in Simulation | PASS | Persistenz- und Upgrade-Tests für Konfiguration und Assets im vollständigen Gate bestanden. |
-| Repository in realem HAOS hinzufügen | BLOCKED | Keine freigegebene HAOS-Testinstanz beziehungsweise Supervisor-Oberfläche verfügbar. |
-| App aus Repository auf realem HAOS installieren | BLOCKED | Abhängig von einer realen HAOS-Testinstanz. |
-| App auf realem HAOS starten | BLOCKED | Abhängig von einer realen HAOS-Testinstanz. |
-| Direkter LAN-Zugriff auf App-Port 3000 | BLOCKED | Kein real installierter App-Container mit freigegebenem LAN-Port verfügbar. |
-| Supervisor Core REST in realem App-Container | BLOCKED | Kein Zugriff auf eine reale HAOS-App-Laufzeit. |
-| Supervisor Core WebSocket in realem App-Container | BLOCKED | Kein Zugriff auf eine reale HAOS-App-Laufzeit. |
-| Reale App startet ohne `HA_TOKEN` | BLOCKED | Nur Mock- und Container-Smoke-Test verfügbar; reale Supervisor-Injektion nicht geprüft. |
+| Repository in realem HAOS hinzufügen | PASS | Vom Betreiber auf der realen HAOS-Instanz bestätigt. |
+| App aus Repository auf realem HAOS installieren | PASS | Installation von RC.1 auf der realen HAOS-Instanz bestätigt. |
+| App auf realem HAOS starten | PASS | App-Start und erreichbare Dashboards auf der realen HAOS-Instanz bestätigt. |
+| Direkter LAN-Zugriff auf App-Port 3000 über IPv4 | PASS | `http://192.168.1.16:3000` und `/health` sind erreichbar; der funktionierende Pfad bleibt unverändert. |
+| Direkter LAN-Zugriff über `homeassistant.local:3000` | FAIL | mDNS liefert IPv4 und IPv6; der Client kann IPv6 wählen, auf dem Port 3000 nicht erreichbar ist. `curl -4` funktioniert, `curl -6` scheitert. |
+| Container-Bind, Port-Mapping und WebUI-Vorlage | PASS | App bindet `0.0.0.0:3000`, veröffentlicht `3000/tcp: 3000` und verwendet `http://[HOST]:[PORT:3000]/`. |
+| Supervisor Core REST in realem App-Container | PASS | Die reale App liefert Dashboard-States ohne manuelles HA-Token über den App-Modus. |
+| Supervisor Core WebSocket in realem App-Container | BLOCKED | Reale read-only Registry-/Diagnosequelle noch nicht separat geprüft. |
+| Reale App startet ohne `HA_TOKEN` | PASS | Die App besitzt keine `HA_TOKEN`-Option und wurde real mit Supervisor-Verbindung gestartet. |
 | App-Dateirechte unter `/data` | BLOCKED | Reales `/data` eines installierten App-Containers nicht verfügbar. |
 | App Restart Persistenz | BLOCKED | Theme, Dashboards, Rules, Critical Mode, Grace Rules, Background und `showTitle` müssen auf realem HAOS gesetzt und nach App-Restart geprüft werden. |
 | Home-Assistant-Restart und Recovery | BLOCKED | Kein freigegebener HAOS-Testhost für den erforderlichen Restart. |
@@ -115,6 +117,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 
 | Prüfung | Status | Nachweis |
 | --- | --- | --- |
+| iPad mini / iOS 9 – Default und Custom grundsätzlich erreichbar | PASS | Vom Betreiber gegen die reale HAOS-App bestätigt. |
 | iPad mini / iOS 9 – Default Dashboard Portrait | BLOCKED | Kein steuerbarer Realgerätelauf verfügbar. |
 | iPad mini / iOS 9 – Default Dashboard Landscape und Rotation | BLOCKED | Kein steuerbarer Realgerätelauf verfügbar. |
 | iPad mini / iOS 9 – Custom Dashboard | BLOCKED | Kein steuerbarer Realgerätelauf verfügbar. |
@@ -124,10 +127,35 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | iPad mini / iOS 9 – Default/Custom Background, Titel, Dark/Light | BLOCKED | Reale Bilder und Realgerätelauf fehlen. |
 | iPad mini / iOS 9 – Full-Height, 0/1/wenige/viele Cards, Footer | BLOCKED | Kein steuerbarer Realgerätelauf verfügbar. |
 | iPad mini / iOS 9 – Sensor/Binary/Light/Climate Focus | BLOCKED | Kein steuerbarer Realgerätelauf verfügbar. |
-| iPad mini / iOS 9 – Power und Climate Minus/Plus | BLOCKED | Kein steuerbarer Realgerätelauf verfügbar. |
+| iPad mini / iOS 9 – Light-/Climate-Power | PASS | Vom Betreiber gegen die reale HAOS-App bestätigt. |
+| iPad mini / iOS 9 – Climate Minus/Plus im vollständigen Focus-Lauf | BLOCKED | Zusammenhängende Focus-/Rotation-/HomeScreen-Abnahme steht noch aus. |
 | iPad mini / iOS 9 – Performance | BLOCKED | Keine reale Messung auf dem Zielgerät verfügbar. |
 | iPad Air 2 / iPadOS 15 – Focus und HomeScreen Regression | NOT TESTED | Optionales zweites Realgerät wurde nicht ausgeführt. |
 | macOS Safari – vollständiger manueller RC-Lauf | NOT TESTED | Automatisiert wurde der Codex-In-App-Browser genutzt, nicht Safari. |
+
+## Sprint 25.5 – HAOS-Netzwerk und JPEG-Härtung
+
+| Prüfung | Status | Nachweis |
+| --- | --- | --- |
+| mDNS-/DNS-Auflösung `homeassistant.local` | PASS | Der getestete Client erhält A `192.168.1.16` sowie globale und link-lokale AAAA-Adressen. |
+| Hostname mit IPv4 auf App-Port 3000 | PASS | `curl -4 http://homeassistant.local:3000/health` liefert HTTP 200. |
+| Hostname mit IPv6 auf App-Port 3000 | FAIL | `curl -6` erreicht den veröffentlichten App-Port nicht, obwohl HA-Port 8123 über IPv6 erreichbar ist. |
+| Anwendung bindet im App-Modus korrekt | PASS | `run.sh` setzt `BIND_ADDRESS=0.0.0.0`; der Server verwendet diesen Wert und Port 3000. |
+| Breite Netzwerk- oder Supervisor-Rechte | PASS | Nicht vorhanden und durch Regressionstest abgesichert; nur `homeassistant_api: true`, AppArmor aktiv. |
+| Baseline JPEG mit JFIF/APP0 | PASS | Echtes 8×8-JPEG mit SOS-/Scandaten wird strukturell geprüft und dekodiert. |
+| Progressive JPEG | PASS | Echtes Multi-Scan-JPEG wird strukturell geprüft und dekodiert. |
+| EXIF/APP1 mit Orientation | PASS | Orientation 6 bleibt im gültigen Container erhalten. |
+| EXIF/APP1 mit eingebettetem JPEG-Thumbnail | PASS | Metadaten-Thumbnail wird als Teil des längengeprüften APP1-Segments akzeptiert. |
+| ICC-Profil/APP2 | PASS | Echtes ICC-Profil wird akzeptiert und vom Referenzdecoder erkannt. |
+| `.jpg` und `.jpeg` | PASS | Beide Erweiterungen führen über denselben geprüften `image/jpeg`-Pfad. |
+| Abgeschnittenes oder strukturell ungültiges JPEG | PASS | Kontrolliert mit HTTP 400 abgewiesen. |
+| HTML/SVG als `.jpg` | PASS | Signatur-/Strukturprüfung weist beide Inhalte ab. |
+| Oversize und ungültige Abmessungen | PASS | Body-Limit sowie Datei-, Kanten- und Pixelgrenzen bleiben wirksam. |
+| Pfadtraversierung | PASS | Dashboard-/Asset-IDs und Speicherpfade bleiben streng validiert. |
+| Fehlgeschlagenes Replace | PASS | Altes Asset und Config bleiben erhalten; keine temporäre oder partielle Datei verbleibt. |
+| Vollständiges lokales Release Gate | PASS | 282 Tests, 0 Fehler; nur Fixtures, temporäre Pfade, localhost-Mocks und Fake-Credentials. |
+| Neuer JPEG-Fix auf realer HAOS-App | BLOCKED | RC.1 enthält den Fix nicht; ein neuer, separat versionierter HAOS-Build muss installiert werden. |
+| JPEG Upload/Replace/Remove auf iPad mini | BLOCKED | Nach Installation des neuen Builds mit echten freigegebenen JPEGs prüfen. |
 
 ## RC Result Matrix
 
@@ -135,7 +163,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | --- | --- | --- |
 | Repository-Metadaten | PASS | Vollständig und konsistent. |
 | Versionen | PASS | `1.0.0-rc.1` in allen Release-Quellen. |
-| Tests und Syntax | PASS | 275/275 lokal, auf LXC und in GitHub Actions. |
+| Tests und Syntax | PASS | Sprint-25.5-Stand lokal 282/282; veröffentlichter RC.1, LXC und zugehörige GitHub Actions 275/275. |
 | Secret Scan und Dependency Audit | PASS | Keine Release-Secrets, 0 bekannte npm-Schwachstellen. |
 | GitHub Release und Checksummen | PASS | Prerelease und zwei verifizierte Assets veröffentlicht. |
 | GHCR Image Availability | PASS | Anonym abrufbar. |
@@ -144,13 +172,13 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | Standalone-Persistenz | PASS | Dashboard-Konfiguration bleibt nach Service-Restart unverändert. |
 | Standalone-Backgrounds | BLOCKED | Keine zwei real konfigurierten Backgrounds für Runtime-/Restart-Abnahme. |
 | Home Assistant App Packaging | PASS | Statisch, mit Mock und im veröffentlichten Container-Smoke-Test geprüft. |
-| Home Assistant App auf HAOS | BLOCKED | Keine reale HAOS-Testinstanz verfügbar. |
-| Supervisor REST/WebSocket real | BLOCKED | Kein realer App-Container verfügbar. |
-| Direkter LAN-Zugriff auf HAOS-App | BLOCKED | Kein realer App-Container verfügbar. |
+| Home Assistant App auf HAOS | PASS | Repository, Installation, Start und Dashboard-Zugriff auf realer HAOS-Instanz bestätigt. |
+| Supervisor REST/WebSocket real | BLOCKED | REST ist durch reale Dashboard-States bestätigt; die read-only WebSocket-Diagnose ist noch separat zu prüfen. |
+| Direkter LAN-Zugriff auf HAOS-App | PASS | IPv4 und Port 3000 funktionieren; `.local` über IPv6 ist ein dokumentierter Netzwerkfehler. |
 | App-Persistenz und Backup | BLOCKED | Kein reales `/data`, Restart oder Backup/Restore verfügbar. |
 | Legacy-Security-Grenzen | PASS | Keine neue Write-Fläche; HA-/Supervisor-Tokens bleiben backend-only. |
 | Browser-Navigation und Filter im Desktop-Smoke-Test | PASS | Same-Origin, Theme und exakte Filter live geprüft. |
-| iPad mini / iOS 9 | BLOCKED | Pflicht-Realgerätelauf fehlt. |
+| iPad mini / iOS 9 | BLOCKED | Default/Custom und Power-Controls funktionieren; der vollständige Pflichtlauf einschließlich neuem JPEG-Fix fehlt. |
 | HomeScreen-Navigation | BLOCKED | Pflicht-Realgerätelauf fehlt. |
 | Focus und Controls auf iPad | BLOCKED | Pflicht-Realgerätelauf fehlt. |
 | Logs Standalone | PASS | Keine Secret-, Crash- oder Reconnect-Muster. |
@@ -160,11 +188,10 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 
 ## RC BLOCKERS
 
-1. Die veröffentlichte Home Assistant App muss auf einer realen HAOS-
-   Testinstanz aus dem GitHub-Repository installiert und gestartet werden.
-2. Direkter LAN-Zugriff, Supervisor REST, Supervisor WebSocket, App-Logs und
-   der Start ohne manuelles `HA_TOKEN` müssen im realen App-Container geprüft
-   werden.
+1. Der Sprint-25.5-Fix muss als neuer, RC.1 nicht überschreibender HAOS-Build
+   installiert werden; JPEG Upload/Replace/Remove sind danach real zu prüfen.
+2. Supervisor WebSocket, App-Logs und die App-Dateirechte unter `/data` müssen
+   im realen App-Container noch separat geprüft werden.
 3. Die vollständige App-Konfiguration einschließlich zweier Backgrounds muss
    unter `/data` einen App-Restart überstehen; anschließend sind HA-Restart und
    Backup/Restore zu prüfen.
@@ -182,8 +209,8 @@ Browsertests ersetzen diese realen Laufzeit- und Geräteprüfungen nicht.
 
 ## Manuelle Abschlussreihenfolge
 
-1. Repository in HAOS hinzufügen, App installieren und starten.
-2. Direkten LAN-Zugriff auf Port 3000 sowie REST-/WebSocket-Diagnose prüfen.
+1. Einen neuen, separat versionierten HAOS-Build mit Sprint 25.5 installieren.
+2. Direkten IPv4-LAN-Zugriff erneut bestätigen und die WebSocket-Diagnose prüfen.
 3. Default Background A und Custom Background B setzen; Position, Cover/
    Contain, Overlay, Titel, Dark/Light, Portrait und Landscape prüfen.
 4. Theme, Entity Rules, Critical Mode, Grace Rules, Background und `showTitle`
@@ -191,4 +218,3 @@ Browsertests ersetzen diese realen Laufzeit- und Geräteprüfungen nicht.
 5. Home Assistant neu starten und Recovery prüfen; danach Backup/Restore.
 6. Den vollständigen iPad-mini-HomeScreen-Lauf durchführen und die Statuswerte
    dieser Checkliste aktualisieren.
-

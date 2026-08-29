@@ -489,6 +489,14 @@ repository, refresh the App store, install **HA Legacy Dashboard**, check the
 network port, start it, and inspect its logs. Port `3000/tcp` remains
 configurable for direct LAN access.
 
+For wall displays, a reserved/static IPv4 address or a local DNS name with an
+unambiguous A record is the most reliable choice. A `.local` name can return
+both IPv4 and IPv6 even when the published App port is reachable on the HAOS
+host through IPv4 only. In that case the IP URL or an IPv4-forced test works,
+while the browser may choose an unreachable IPv6 address for the hostname.
+This is not a reason to enable host networking or broader App privileges;
+check A/AAAA resolution and port 3000 separately.
+
 The App requests only `homeassistant_api: true` and uses neither Ingress nor
 host, Docker, or Supervisor API privileges. Persistent configuration is stored
 at `/data/dashboards.json`, with background images under `/data/backgrounds/`;

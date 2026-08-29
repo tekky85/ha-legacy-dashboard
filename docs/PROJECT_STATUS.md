@@ -1,9 +1,10 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 28. August 2026, Sprint 25.3 als `f010350` implementiert, auf
-`origin/main` gepusht und auf dem Standalone-LXC ausgerollt. Reale
-iPad-/HomeScreen-/Safari-Abnahme bleibt offen. Release Candidate 1.0.0-rc.1
-bleibt bis zur physischen Release-Gate-Abnahme unveröffentlicht.
+Stand: 29. August 2026, Sprint 25.5 auf Basis von `02abf11` vollständig
+implementiert und lokal validiert. Release Candidate `1.0.0-rc.1` ist
+veröffentlicht; die korrigierte JPEG-Implementierung gehört zum noch nicht neu
+getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/Safari- und verbleibende
+HAOS-Persistenzabnahmen bleiben offen.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -11,6 +12,8 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-25.5-Ausgangscommit: `02abf11`
+- Sprint-25.4-RC-Commit und Tag: `741bba4`, `v1.0.0-rc.1`
 - Sprint-25.3-Ausgangscommit: `c8d452b`
 - Sprint-25.3-Implementierungscommit: `f010350`
 - Sprint-25.2-Ausgangscommit: `94c7efa`
@@ -47,6 +50,11 @@ vollständige Sprint-25.3-Spezifikation um die Full-Height-/Footer-Anforderungen
 Die in Abschnitt 22 beschriebene Implementierung wurde nach Review als
 `f010350` committet, auf `origin/main` gepusht und per Fast-Forward auf dem
 Standalone-LXC ausgerollt.
+
+Der Arbeitsbaum war vor Sprint 25.5 auf `main` bei `02abf11` sauber und mit
+`origin/main` identisch. Der Commit nach dem RC-Tag ergänzt ausschließlich die
+Spezifikationen für Sprint 25.5 und spätere Sprints; die Sprint-25.5-
+Implementierung startete daher ohne nicht eingeordnete Voränderungen.
 
 Der Arbeitsbaum war vor Sprint 25.1 auf `main` bei `10c1f75` sauber und mit
 `origin/main` identisch. Die in Abschnitt 20 beschriebene Sprint-25.1-
@@ -96,10 +104,12 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
-| 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung offen |
+| 25 | Release & Distribution | umgesetzt, RC.1 veröffentlicht |
 | 25.1 | Pre-Release UI State & Filter Correctness | implementiert, gepusht und auf LXC ausgerollt; iPad-Abnahme offen |
 | 25.2 | HomeScreen Standalone Navigation Correctness | implementiert, gepusht und auf LXC ausgerollt; Geräteabnahme offen |
 | 25.3 | Dashboard Backgrounds & Full-Height Layout | implementiert, gepusht und auf LXC ausgerollt; Geräteabnahme offen |
+| 25.4 | RC Validation | RC.1 veröffentlicht; Standalone validiert, reale HAOS-/iPad-Punkte teilweise offen |
+| 25.5 | HAOS Network Access & Background Upload Hardening | implementiert und lokal mit vollständigem Release Gate validiert; neuer HAOS-Build und Realgerätetest offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -1645,3 +1655,65 @@ Verfügung. Ebenso war kein steuerbarer iPad-mini-/iOS-9-Lauf für HomeScreen,
 Theme, Filter, Backgrounds, Footer, Rotation, Focus und Controls verfügbar.
 Diese Punkte sind deshalb ausdrücklich `BLOCKED` und nicht aus Mock- oder
 Desktop-Tests als bestanden abgeleitet.
+
+## 24. Sprint 25.5 – HAOS Network Access & Background Upload Hardening
+
+Sprint 25.5 startete auf dem sauberen, mit `origin/main` identischen Commit
+`02abf11`. Die inzwischen durchgeführte reale HAOS-Abnahme bestätigt, dass das
+Custom-App-Repository hinzugefügt, die App installiert und gestartet werden
+kann. Default und Custom Dashboard sind auf dem iPad mini erreichbar; die
+bestehenden Light-/Climate-Power-Controls funktionieren. Der direkte LAN-
+Zugriff über die HAOS-IPv4 und Port 3000 bleibt unverändert funktionsfähig.
+
+Der Hostnamefehler ist als Dual-Stack-Netzwerk-/mDNS-Fall eingegrenzt. Auf dem
+getesteten Client liefert `homeassistant.local` sowohl `192.168.1.16` als auch
+globale und link-lokale IPv6-Adressen. Port 8123 ist über IPv6 erreichbar,
+der veröffentlichte App-Port 3000 jedoch nicht. `curl -4` und die direkte
+IPv4-URL liefern für `/health` HTTP 200, während `curl -6` auf Port 3000
+scheitert. Die App bindet korrekt an `0.0.0.0:3000`, `config.yaml` veröffentlicht
+`3000/tcp` auf Host-Port 3000 und die WebUI-Vorlage nutzt
+`http://[HOST]:[PORT:3000]/`. Damit liegt kein Anwendungs- oder WebUI-URL-Fehler
+vor. Es wurden weder Host-Networking noch zusätzliche App-Rechte oder andere
+Netzwerk-Hacks ergänzt. Für Wall-Displays ist eine reservierte/statische IPv4
+oder ein lokaler DNS-Name mit eindeutigem A-Record dokumentiert.
+
+Die JPEG-Ursache lag im serverseitigen Strukturprüfer: Nach dem ersten SOS-
+Marker behandelte er die komprimierten Entropiedaten weiter als reguläre
+JPEG-Segmente. Gültiges Byte-Stuffing (`FF 00`), Restart-Marker oder gewöhnliche
+komprimierte Bytes konnten deshalb als falsche Segmentlänge gelesen werden und
+den kontrollierten Fehler „JPEG-Segment ist ungültig“ auslösen. Der Parser
+trennt jetzt Marker- und Scanmodus, akzeptiert Byte-Stuffing und Restart-Marker,
+kehrt für weitere progressive Scans sauber in den Markermodus zurück und
+verlangt weiterhin vollständigen Frame, Scan und EOI.
+
+Tests verwenden echte, lokal erzeugte 8×8-JPEG-Fixtures für Baseline und
+Progressive sowie JFIF/APP0, EXIF/APP1 mit Orientation, EXIF mit eingebettetem
+JPEG-Thumbnail und ICC/APP2. Alle Varianten wurden zusätzlich von Pillow als
+echte Bilder dekodiert. `.jpg` und `.jpeg` verwenden denselben geprüften
+`image/jpeg`-Pfad. HTML oder SVG mit JPEG-Endung, abgeschnittene oder
+strukturell ungültige JPEGs, übergroße Dateien/Abmessungen und Pfadtraversierung
+bleiben abgewiesen.
+
+Der Admin-API-Regressionstest ersetzt einen vorhandenen Hintergrund zunächst
+mit einem ungültigen JPEG und bestätigt HTTP 400, unveränderte Public Config,
+erhaltenes altes Asset und das Fehlen von Teil- oder Fremddateien. Erst ein
+anschließendes gültiges Progressive-JPEG wird atomar übernommen. Bearer-
+Authentifizierung, Rate Limit, `DATA_DIR`-/`/data`-Grenze, HA-/Supervisor-
+Token-Isolation und die bestehenden Home-Assistant-Write-Allowlists wurden
+nicht verändert.
+
+`node --check` bestand für alle geänderten und neuen JavaScript-Dateien. Das
+vollständige Release Gate bestand mit 282 von 282 Tests, 0 Fehlern, einschließlich
+Shell-Syntax, Versionskonsistenz, Secret Scan, reproduzierbarem Bundle und
+allen Sprint-25.1-/25.2-/25.3-Sicherheitsregressionen. Es wurden nur lokale
+Fixtures, temporäre Datenpfade, localhost-Mocks und Fake-Credentials verwendet;
+keine Produktions-`.env` und keine reale HA-API wurden für automatisierte Tests
+kontaktiert.
+
+Vor einer Stable-Empfehlung muss die korrigierte Version als neuer, nicht den
+immutablen RC.1 überschreibender HAOS-Build installiert werden. Danach sind
+JPEG-Upload/Replace/Remove mit echten Bildern, `/data`-Persistenz über App- und
+HA-Neustart, Backup/Restore, Supervisor REST/WebSocket und App-Logs erneut real
+abzunehmen. Auf dem iPad mini bleiben außerdem Theme über alle Routen, exakte
+Error-Filter, HomeScreen-Navigation, Background-Darstellung, Footer/Rotation
+und alle Focus-Controls als zusammenhängender Release-Gate-Lauf offen.

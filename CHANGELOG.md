@@ -3,6 +3,19 @@
 All notable user-facing changes are documented here. Release tags follow
 Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 
+## Unreleased
+
+### Fixed
+
+- Accept normal baseline and progressive JPEG backgrounds with JFIF, EXIF,
+  orientation, embedded metadata thumbnails, and ICC profiles while retaining
+  structural validation and atomic rollback behavior.
+
+### Documentation
+
+- Documented the HAOS direct-LAN dual-stack case where `.local` resolves to
+  IPv4 and IPv6 but the published App port is reachable through IPv4 only.
+
 ## 1.0.0-rc.1 – 2026-08-25
 
 ### Added

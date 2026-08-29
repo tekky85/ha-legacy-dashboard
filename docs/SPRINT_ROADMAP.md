@@ -209,9 +209,12 @@ Bedeutung von „fest“:
 | 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
-| 25 | Release & Distribution | umgesetzt, RC-Veröffentlichung nach Review offen |
+| 25 | Release & Distribution | umgesetzt, RC.1 veröffentlicht |
 | 25.1 | Pre-Release UI State & Filter Correctness | umgesetzt und auf LXC ausgerollt, reale iPad-Abnahme offen |
 | 25.2 | HomeScreen Standalone Navigation Correctness | umgesetzt und auf LXC ausgerollt, reale Geräteabnahme offen |
+| 25.3 | Dashboard Backgrounds & Full-Height Layout | umgesetzt und auf LXC ausgerollt, reale Geräteabnahme offen |
+| 25.4 | RC Validation | umgesetzt; RC.1 veröffentlicht, reale Pflichtabnahmen teilweise offen |
+| 25.5 | HAOS Network Access & Background Upload Hardening | umgesetzt und automatisiert validiert; neuer HAOS-Build und Realgerätetest offen |
 
 ---
 
@@ -1490,8 +1493,9 @@ nach einem geprüften Versionstag ausgeführt.
 
 ## Status
 
-Umgesetzt; die erste öffentliche RC-Veröffentlichung bleibt eine bewusste
-manuelle Freigabe nach Review und realer Geräteabnahme.
+Umgesetzt; `v1.0.0-rc.1`, Prerelease, Standalone-Bundle, SHA256-Prüfsumme und
+amd64/aarch64-GHCR-Manifest sind veröffentlicht. Spätere RC-Fixes werden mit
+neuer Version und neuem unveränderlichem Tag veröffentlicht.
 
 ## Ziel
 
@@ -1935,6 +1939,7 @@ nächste Planung
 25.2 HomeScreen Standalone Navigation Correctness
 25.3 Dashboard Backgrounds & Full-Height Layout
 25.4 RC Validation
+25.5 HAOS Network Access & Background Upload Hardening
 ```
 
 ---
@@ -1960,15 +1965,18 @@ Ziel bleibt:
 
 # Nächster Schritt
 
-Sprint 25.4 hat `v1.0.0-rc.1`, GitHub-Prerelease, Standalone-Bundle,
-SHA256-Prüfsumme und das öffentliche amd64/aarch64-GHCR-Manifest
-veröffentlicht. Standalone/LXC und die Distribution sind validiert.
+Sprint 25.5 hat den gültigen IPv4-Direktzugriff der real installierten HAOS-App
+bestätigt und den `.local`-Fehler auf eine Dual-Stack-Erreichbarkeitsdifferenz
+eingegrenzt: mDNS liefert IPv4 und IPv6, Port 3000 ist auf dem getesteten Host
+aber nur über IPv4 erreichbar. Das wird betrieblich mit reservierter/statischer
+IPv4 oder eindeutigem lokalem A-Record gelöst, nicht mit breiteren App-Rechten
+oder Host-Networking. Der JPEG-Prüfer unterstützt nun echte Baseline-/Progressive-
+Dateien einschließlich JFIF, EXIF/Orientation/Thumbnail und ICC, ohne die
+Struktur-, Größen- oder Atomicity-Prüfungen abzuschalten.
 
-Vor einer Stable-Empfehlung müssen die in `docs/RC_CHECKLIST.md` aufgeführten
-RC-Blocker geschlossen werden: reale Custom-App-Installation auf Test-HAOS,
-Supervisor REST/WebSocket, direkter LAN-Zugriff, `/data`-Persistenz über
-App-/HA-Restart und Backup/Restore sowie der vollständige iPad-mini-/iOS-9-
-HomeScreen-Lauf einschließlich Backgrounds, Titel, Footer, Rotation, Theme,
-Error-Filtern, Focus und Controls. Ergebnisse dieser Abnahme bestimmen einen
-gezielten RC-Fix-Sprint oder die Stable-Freigabe; es wird keine neue
-Produktfunktion vorgezogen.
+Als nächstes muss ein neuer, RC.1 nicht überschreibender HAOS-Build mit diesem
+Fix real installiert werden. Danach sind JPEG Upload/Replace/Remove,
+`/data`-Persistenz, App-/HA-Restart, Backup/Restore, Supervisor REST/WebSocket
+und Logs sowie der vollständige iPad-mini-/iOS-9-HomeScreen-Lauf aus
+`docs/RC_CHECKLIST.md` abzunehmen. Erst diese Ergebnisse entscheiden über einen
+weiteren gezielten RC-Fix oder die Stable-Freigabe.

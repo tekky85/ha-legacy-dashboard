@@ -503,6 +503,14 @@ Multi-Arch-Image `ghcr.io/tekky85/ha-legacy-dashboard` für `amd64` und
 Dashboard** installieren, Netzwerkport prüfen, starten und Logs kontrollieren.
 Port `3000/tcp` bleibt für direkten LAN-Zugriff konfigurierbar.
 
+Für Wall-Displays ist eine reservierte/statische IPv4-Adresse oder ein lokaler
+DNS-Name mit eindeutigem A-Record am zuverlässigsten. Ein `.local`-Name kann
+gleichzeitig IPv4 und IPv6 liefern, obwohl der veröffentlichte App-Port auf dem
+HAOS-Host nur über IPv4 erreichbar ist. Dann funktionieren die IP-URL oder ein
+IPv4-erzwungener Test, während der Browser beim Hostnamen eine nicht erreichbare
+IPv6-Adresse wählen kann. Das ist kein Grund für Host-Networking oder breitere
+App-Berechtigungen; A-/AAAA-Auflösung und Port 3000 sind getrennt zu prüfen.
+
 Die App verlangt nur `homeassistant_api: true`, nutzt weder Ingress noch Host-,
 Docker- oder Supervisor-API-Rechte. Die persistente Konfiguration liegt unter
 `/data/dashboards.json`, Hintergrundbilder unter `/data/backgrounds/`; beides

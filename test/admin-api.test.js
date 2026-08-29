@@ -6,6 +6,7 @@ const net = require("node:net");
 const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
+const JpegSamples = require("./fixtures/jpeg-samples");
 
 
 const FAKE_HA_TOKEN =
@@ -835,6 +836,40 @@ test(
                 const firstImageId =
                     uploaded.json.background.imageId;
 
+                const failedReplacement = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/background",
+                    JpegSamples.baseline.subarray(
+                        0,
+                        JpegSamples.baseline.length - 2
+                    ),
+                    Object.assign({}, auth, {
+                        "Content-Type": "image/jpeg"
+                    })
+                );
+                assert.equal(failedReplacement.status, 400);
+
+                const preservedConfiguration = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/dashboard/config"
+                );
+                assert.equal(
+                    preservedConfiguration.json.background.image_url,
+                    "/assets/backgrounds/" + firstImageId
+                );
+
+                const backgroundDirectory = path.join(
+                    temporaryDirectory,
+                    "backgrounds-data",
+                    "backgrounds"
+                );
+                assert.deepEqual(
+                    fs.readdirSync(backgroundDirectory),
+                    [firstImageId]
+                );
+
                 const publicConfiguration = await request(
                     gateway.port,
                     "GET",
@@ -868,13 +903,19 @@ test(
                     gateway.port,
                     "POST",
                     "/api/admin/dashboards/default/background",
-                    png,
-                    auth
+                    JpegSamples.progressive,
+                    Object.assign({}, auth, {
+                        "Content-Type": "image/jpeg"
+                    })
                 );
                 assert.equal(replaced.status, 201);
                 assert.notEqual(
                     replaced.json.background.imageId,
                     firstImageId
+                );
+                assert.match(
+                    replaced.json.background.imageId,
+                    /^bg-[a-f0-9]{32}\.jpg$/
                 );
 
                 const removedOldAsset = await request(

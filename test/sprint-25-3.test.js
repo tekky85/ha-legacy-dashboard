@@ -9,6 +9,7 @@ const Backgrounds =
 const DashboardConfig =
     require("../src/config/dashboard");
 const Runtime = require("../src/config/runtime");
+const JpegSamples = require("./fixtures/jpeg-samples");
 
 
 const ROOT = path.join(__dirname, "..");
@@ -18,13 +19,7 @@ const PNG = Buffer.from(
     "base64"
 );
 
-const JPEG = Buffer.from([
-    0xff, 0xd8,
-    0xff, 0xc0, 0x00, 0x0b,
-    0x08, 0x00, 0x01, 0x00, 0x01,
-    0x01, 0x01, 0x11, 0x00,
-    0xff, 0xd9
-]);
+const JPEG = JpegSamples.baseline;
 
 
 function read(relativePath) {
@@ -67,8 +62,8 @@ test("Bildprüfung akzeptiert ausschließlich stimmige JPEG- und PNG-Dateien", f
         {
             extension: "jpg",
             mimeType: "image/jpeg",
-            width: 1,
-            height: 1,
+            width: 8,
+            height: 8,
             size: JPEG.length
         }
     );

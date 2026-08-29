@@ -67,6 +67,14 @@ Ingress is intentionally not enabled: old iPads must be able to use the
 direct LAN URL without loading the modern Home Assistant frontend. Existing
 write allowlists and the separately authenticated Admin API apply unchanged.
 
+For legacy wall displays, prefer a reserved/static HAOS IPv4 address or a local
+DNS name that resolves unambiguously to that address. A `.local` hostname can
+resolve to both IPv4 and IPv6 even when the published App port is reachable on
+the host through IPv4 only. Test the A and AAAA results and compare
+`curl -4`/`curl -6` against the configured port before treating a hostname
+failure as an App problem. Do not enable host networking or broader App
+permissions as a workaround.
+
 `GET /health` checks only the local Node process. A temporary Home Assistant
 outage is reported by the existing application status and does not make the
 container healthcheck fail.
