@@ -215,6 +215,7 @@ Bedeutung von „fest“:
 | 25.3 | Dashboard Backgrounds & Full-Height Layout | umgesetzt und auf LXC ausgerollt, reale Geräteabnahme offen |
 | 25.4 | RC Validation | umgesetzt; RC.1 veröffentlicht, reale Pflichtabnahmen teilweise offen |
 | 25.5 | HAOS Network Access & Background Upload Hardening | umgesetzt und automatisiert validiert; neuer HAOS-Build und Realgerätetest offen |
+| 25.6 | Card Size Matrix & Responsive Layout Hardening | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
 
 ---
 
@@ -1940,6 +1941,7 @@ nächste Planung
 25.3 Dashboard Backgrounds & Full-Height Layout
 25.4 RC Validation
 25.5 HAOS Network Access & Background Upload Hardening
+25.6 Card Size Matrix & Responsive Layout Hardening
 ```
 
 ---
@@ -1965,18 +1967,16 @@ Ziel bleibt:
 
 # Nächster Schritt
 
-Sprint 25.5 hat den gültigen IPv4-Direktzugriff der real installierten HAOS-App
-bestätigt und den `.local`-Fehler auf eine Dual-Stack-Erreichbarkeitsdifferenz
-eingegrenzt: mDNS liefert IPv4 und IPv6, Port 3000 ist auf dem getesteten Host
-aber nur über IPv4 erreichbar. Das wird betrieblich mit reservierter/statischer
-IPv4 oder eindeutigem lokalem A-Record gelöst, nicht mit breiteren App-Rechten
-oder Host-Networking. Der JPEG-Prüfer unterstützt nun echte Baseline-/Progressive-
-Dateien einschließlich JFIF, EXIF/Orientation/Thumbnail und ICC, ohne die
-Struktur-, Größen- oder Atomicity-Prüfungen abzuschalten.
+Sprint 25.6 hat alle vier realen Wall-Renderer, sämtliche 252 zulässigen
+Typ-/Profil-/Größenkombinationen und 1.128 repräsentative Zustandsfälle in einer
+automatisierten Browsermatrix geprüft. Die fünf Presentation-Tiers trennen
+weiterhin Grid-Geometrie und Widget-Darstellung; Climate Large besitzt nun eine
+eigene vollständige Informations- und Control-Hierarchie.
 
-Als nächstes muss ein neuer, RC.1 nicht überschreibender HAOS-Build mit diesem
-Fix real installiert werden. Danach sind JPEG Upload/Replace/Remove,
-`/data`-Persistenz, App-/HA-Restart, Backup/Restore, Supervisor REST/WebSocket
-und Logs sowie der vollständige iPad-mini-/iOS-9-HomeScreen-Lauf aus
-`docs/RC_CHECKLIST.md` abzunehmen. Erst diese Ergebnisse entscheiden über einen
-weiteren gezielten RC-Fix oder die Stable-Freigabe.
+Als nächstes müssen die kritischen Matrixfälle auf dem iPad mini in Portrait,
+Landscape und nach Rotation abgenommen werden. Parallel bleibt ein neuer,
+RC.1 nicht überschreibender HAOS-Build mit Sprint 25.5/25.6 zu installieren und
+gegen JPEG Upload/Replace/Remove, `/data`-Persistenz, App-/HA-Restart,
+Backup/Restore, Supervisor REST/WebSocket und Logs zu prüfen. Erst diese
+Realgerät- und Laufzeitergebnisse entscheiden über einen weiteren gezielten
+RC-Fix oder die Stable-Freigabe.

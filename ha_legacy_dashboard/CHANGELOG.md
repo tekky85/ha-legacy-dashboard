@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Changed
+
+- Hardened responsive Sensor, Binary, Light, and Climate card presentations
+  across every valid portrait and landscape grid size.
+
 ### Fixed
 
 - Hardened JPEG background validation for baseline, progressive, JFIF, EXIF,

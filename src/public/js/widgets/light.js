@@ -109,7 +109,8 @@ LightWidget.prototype.render =
 
             '<section class="card card-light ' +
                 this.getSizeClass() +
-            '"' + this.getLayoutAttribute() + '>' +
+            '"' + this.getLayoutAttribute() +
+                this.getPresentationAttribute(data) + '>' +
 
 
                 '<div class="card-header">' +

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sprint 25.6 Card Matrix</title>
+    <link rel="stylesheet" href="/src/public/css/style.css">
+    <style>
+        body {
+            padding: 16px;
+            background: #dfe5ec;
+        }
+
+        .matrix-summary {
+            position: relative;
+            z-index: 2;
+            margin: 0 0 16px;
+            padding: 12px;
+            overflow: auto;
+            background: #ffffff;
+            border-radius: 10px;
+            white-space: pre-wrap;
+        }
+
+        .matrix-board {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+            flex-wrap: wrap;
+            -webkit-align-items: flex-start;
+            align-items: flex-start;
+        }
+
+        .matrix-case {
+            position: relative;
+            margin: 6px;
+            padding: 0;
+        }
+
+        .matrix-case > .card {
+            position: relative;
+            top: auto;
+            left: auto;
+            margin: 0;
+            min-height: 0;
+        }
+
+        .matrix-case-label {
+            display: block;
+            max-width: 100%;
+            margin-top: 3px;
+            overflow: hidden;
+            color: #172033;
+            font: 11px/14px sans-serif;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body data-matrix-status="running">
+    <pre id="matrix-result" class="matrix-summary">Matrix wird geprüft …</pre>
+    <main id="matrix-board" class="matrix-board"></main>
+
+    <script src="/src/public/js/core/compat.js"></script>
+    <script src="/src/public/js/core/icons.js"></script>
+    <script src="/src/public/js/core/presentation.js"></script>
+    <script src="/src/public/js/core/widget.js"></script>
+    <script src="/src/public/js/controls/power.js"></script>
+    <script src="/src/public/js/widgets/sensor.js"></script>
+    <script src="/src/public/js/widgets/binary.js"></script>
+    <script src="/src/public/js/widgets/light.js"></script>
+    <script src="/src/public/js/widgets/climate.js"></script>
+    <script src="/test/fixtures/card-matrix.js"></script>
+    <script src="/test/fixtures/card-matrix-harness.js"></script>
+</body>
+</html>

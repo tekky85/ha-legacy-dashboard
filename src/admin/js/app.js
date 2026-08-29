@@ -495,7 +495,8 @@
             item.w,
             item.h,
             geometry.width,
-            geometry.height
+            geometry.height,
+            LegacyPresentation.getHints(widget, entity)
         );
         const card = createElement(
             "div",

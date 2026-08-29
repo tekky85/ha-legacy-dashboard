@@ -5,6 +5,18 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 
 ## Unreleased
 
+### Changed
+
+- Added five dimension-aware wall-card presentation tiers and a deliberate
+  large Climate layout across every valid portrait and landscape grid size.
+- Hardened long sensor values, units, binary states, and Climate controls
+  against overflow while retaining approximately 44-pixel touch targets.
+
+### Added
+
+- Added a test-only Card Matrix harness covering all 1,128 supported
+  renderer, size, profile, and representative-state combinations.
+
 ### Fixed
 
 - Accept normal baseline and progressive JPEG backgrounds with JFIF, EXIF,

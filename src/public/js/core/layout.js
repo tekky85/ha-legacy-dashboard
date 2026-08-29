@@ -300,7 +300,8 @@ var LegacyLayout = (function () {
         width,
         height,
         effectiveWidth,
-        effectiveHeight
+        effectiveHeight,
+        hints
     ) {
 
         presentationComputationCount++;
@@ -312,7 +313,8 @@ var LegacyLayout = (function () {
                 width,
                 height,
                 effectiveWidth,
-                effectiveHeight
+                effectiveHeight,
+                hints
             );
         }
 
@@ -322,59 +324,69 @@ var LegacyLayout = (function () {
             typeof effectiveHeight === "number"
         ) {
 
-            if (widget && widget.type === "climate") {
-
-                if (
-                    effectiveWidth >= 360 &&
-                    effectiveHeight >= 210
-                ) {
-                    return "expanded";
-                }
-
-                if (
-                    effectiveWidth < 200 ||
-                    effectiveHeight < 170
-                ) {
-                    return "compact";
-                }
-
-                return "normal";
-
-            }
-
-
             if (
-                effectiveWidth >= 220 &&
-                effectiveHeight >= 210
-            ) {
-                return "expanded";
-            }
-
-            if (
-                effectiveWidth < 180 ||
-                effectiveHeight < 150
+                widget &&
+                widget.type === "climate" &&
+                effectiveWidth < 250
             ) {
                 return "compact";
             }
 
-            return "normal";
+            if (
+                effectiveWidth >= 440 &&
+                effectiveHeight >= 210
+            ) {
+                return "large";
+            }
+
+            if (
+                effectiveHeight < 150
+            ) {
+                return effectiveWidth >= 400
+                    ? "wide"
+                    : "compact";
+            }
+
+
+            if (effectiveHeight >= 300) {
+                return "tall";
+            }
+
+
+            if (effectiveWidth >= 400) {
+                return "wide";
+            }
+
+
+            return "standard";
 
         }
 
 
-        if (height >= 2 || width >= 6) {
-            return "expanded";
+        if (height >= 2 && width >= 6) {
+            return "large";
         }
 
-        if (widget && widget.type === "climate") {
-            return width <= 4
-                ? "compact"
-                : "normal";
+
+        if (height >= 3) {
+            return "tall";
         }
 
-        return width <= 2
+
+        if (width >= 5) {
+            return "wide";
+        }
+
+
+        return height === 1 && width <= (
+            widget && widget.type === "climate"
+                ? 4
+                : 3
+        )
             ? "compact"
-            : "normal";
+            : width >= 5
+                ? "wide"
+                : "standard";
 
     }
 
@@ -384,14 +396,18 @@ var LegacyLayout = (function () {
         widget,
         item,
         effectiveWidth,
-        effectiveHeight
+        effectiveHeight,
+        hints
     ) {
 
         var key = name + ":" + widget.id;
         var signature =
             widget.type + ":" + item.w + ":" + item.h +
             ":" + Math.round(effectiveWidth) +
-            ":" + Math.round(effectiveHeight);
+            ":" + Math.round(effectiveHeight) +
+            ":" + hints.contentDensity +
+            ":" + hints.controlCount +
+            ":" + hints.hasSecondary;
         var cached = presentationCache[key];
 
 
@@ -407,13 +423,33 @@ var LegacyLayout = (function () {
                 item.w,
                 item.h,
                 effectiveWidth,
-                effectiveHeight
+                effectiveHeight,
+                hints
             )
         };
 
         presentationCache[key] = cached;
 
         return cached.mode;
+
+    }
+
+
+    function presentationHints(card) {
+
+        return {
+            contentDensity:
+                card.getAttribute("data-card-density") === "dense"
+                    ? "dense"
+                    : "normal",
+            controlCount:
+                parseInt(
+                    card.getAttribute("data-card-controls"),
+                    10
+                ) || 0,
+            hasSecondary:
+                card.getAttribute("data-card-secondary") === "true"
+        };
 
     }
 
@@ -505,7 +541,7 @@ var LegacyLayout = (function () {
 
 
         className = className.replace(
-            /\s*card-presentation-(compact|normal|expanded)/g,
+            /\s*card-presentation-(compact|standard|wide|tall|large|normal|expanded)/g,
             ""
         );
 
@@ -528,6 +564,7 @@ var LegacyLayout = (function () {
         var item;
         var widget;
         var presentationMode;
+        var hints;
         var effectiveWidth;
         var effectiveHeight;
         var widthPercent;
@@ -588,12 +625,15 @@ var LegacyLayout = (function () {
                     geometry.gutter
             );
 
+            hints = presentationHints(card);
+
             presentationMode = resolvePresentationMode(
                 name,
                 widget,
                 item,
                 effectiveWidth,
-                effectiveHeight
+                effectiveHeight,
+                hints
             );
 
             applyPresentationMode(

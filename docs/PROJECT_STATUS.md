@@ -1,11 +1,10 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 29. August 2026, Sprint 25.5 auf Basis von `02abf11` als `e0df018` und
-`42d88f3` implementiert, auf `origin/main` gepusht und auf dem Standalone-LXC
-ausgerollt. Release Candidate `1.0.0-rc.1` ist veröffentlicht; die korrigierte
-JPEG-Implementierung gehört zum noch nicht neu getaggten Stand nach RC.1.
-Reale iPad-/HomeScreen-/Safari- und verbleibende HAOS-Persistenzabnahmen bleiben
-offen.
+Stand: 29. August 2026, Sprint 25.6 auf Basis von `91045b8` implementiert und
+lokal vollständig validiert. Release Candidate `1.0.0-rc.1` ist veröffentlicht;
+die JPEG-Härtung aus Sprint 25.5 und die Kartenkorrekturen aus Sprint 25.6
+gehören zum noch nicht neu getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/
+Safari- und verbleibende HAOS-Persistenzabnahmen bleiben offen.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -13,6 +12,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-25.6-Ausgangscommit: `91045b8`
 - Sprint-25.5-Ausgangscommit: `02abf11`
 - Sprint-25.5-Implementierungscommits: `e0df018`, `42d88f3`
 - Sprint-25.4-RC-Commit und Tag: `741bba4`, `v1.0.0-rc.1`
@@ -57,6 +57,11 @@ Der Arbeitsbaum war vor Sprint 25.5 auf `main` bei `02abf11` sauber und mit
 `origin/main` identisch. Der Commit nach dem RC-Tag ergänzt ausschließlich die
 Spezifikationen für Sprint 25.5 und spätere Sprints; die Sprint-25.5-
 Implementierung startete daher ohne nicht eingeordnete Voränderungen.
+
+Der Arbeitsbaum war vor Sprint 25.6 auf `main` bei `91045b8` sauber und mit
+`origin/main` identisch. Der Commit enthält nur die dokumentierte
+Sprint-25.5-LXC-Abnahme; die Sprint-25.6-Implementierung startete ohne
+unbekannte oder nicht eingeordnete Voränderungen.
 
 Die Implementierung wurde als `e0df018` gepusht. Beim anschließenden LXC-
 Rollout zeigte sich `data/backgrounds/` als einzige unversionierte
@@ -118,6 +123,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 25.3 | Dashboard Backgrounds & Full-Height Layout | implementiert, gepusht und auf LXC ausgerollt; Geräteabnahme offen |
 | 25.4 | RC Validation | RC.1 veröffentlicht; Standalone validiert, reale HAOS-/iPad-Punkte teilweise offen |
 | 25.5 | HAOS Network Access & Background Upload Hardening | implementiert und lokal mit vollständigem Release Gate validiert; neuer HAOS-Build und Realgerätetest offen |
+| 25.6 | Card Size Matrix & Responsive Layout Hardening | implementiert und lokal mit vollständiger Test-/Browsermatrix validiert; iPad-mini-Abnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -1737,3 +1743,65 @@ HA-Neustart, Backup/Restore, Supervisor REST/WebSocket und App-Logs erneut real
 abzunehmen. Auf dem iPad mini bleiben außerdem Theme über alle Routen, exakte
 Error-Filter, HomeScreen-Navigation, Background-Darstellung, Footer/Rotation
 und alle Focus-Controls als zusammenhängender Release-Gate-Lauf offen.
+
+## 25. Sprint 25.6 – Card Size Matrix & Responsive Layout Hardening
+
+Sprint 25.6 startete auf dem sauberen, mit `origin/main` identischen Commit
+`91045b8`. Die tatsächliche Wall-Ausgabe unterstützt genau vier Renderer:
+`SensorWidget`, `BinaryWidget`, `LightWidget` und `ClimateWidget`. Es gibt
+keine produktiven Renderer oder erlaubten Konfigurationstypen für Switch,
+Cover, Fan, Lock, Media Player oder Vacuum.
+
+Die vollständige Größenquelle ist die serverseitige Layoutvalidierung. In
+Portrait gelten sechs, in Landscape zwölf Spalten und jeweils Höhen von eins
+bis vier Rasterzeilen. Sensor, Binary und Light erlauben Breiten von 2–6 bzw.
+2–12; Climate erlaubt 2–6 bzw. 3–12. Daraus entstehen 252 gültige
+Typ-/Profil-/Größenkombinationen. Mit 4 Sensor-, 4 Binary-, 4 Light- und 6
+Climate-Zuständen rendert der neue Test-Harness 1.128 Fälle. Die vollständige
+Herleitung steht in `docs/CARD_MATRIX.md`.
+
+Die Ursache der großen Climate-Fehlausrichtung war keine einzelne iPad-
+Abweichung, sondern das zu grobe Präsentationsmodell. Es unterschied nur
+Compact, Normal und Expanded; Expanded vergrößerte überwiegend Icon und Wert,
+ohne Climate eine eigenständige Large-Hierarchie zu geben. Zusätzlich lag die
+Target-Zone als `width: 100%`-Flex-Kind neben dem aktuellen Temperaturblock.
+Beide Breiten konnten dadurch zusammen größer als die Card werden, während
+große Flächen in anderen Fällen ungenutzt blieben.
+
+Grid-Geometrie und Widget-Presentation bleiben getrennt. Die Geometrie setzt
+weiterhin nur Position und Pixelmaße. `LegacyPresentation` wertet zusätzlich
+Renderer-Typ, `w`/`h`, effektive Pixelbreite/-höhe, Capabilities, Control-Anzahl,
+Sekundärinhalt und Inhaltsdichte aus und vergibt genau einen der Tiers
+`compact`, `standard`, `wide`, `tall` oder `large`. Admin-Vorschau und
+Wall-Display nutzen dieselbe Entscheidung; die Focus-Geometrie aus Sprint 17.5
+bleibt davon isoliert.
+
+Climate Large besitzt nun eine bewusste großflächige Hierarchie: Identität und
+HVAC/Action im Header, Current als eigener großer Bereich und Target zusammen
+mit Minus, Plus und Power als klar begrenzte Control-Zone. Standard, Wide,
+Tall und Compact besitzen ebenfalls explizite Anordnungen. Lange Sensorwerte
+und Units sowie lange Binary-Zustände werden tierabhängig verkleinert,
+umgebrochen oder mit Legacy-kompatiblem Ellipsis begrenzt. Sichtbare Controls
+bleiben mindestens ungefähr 44 × 44 Pixel groß.
+
+Die Quelltests bestanden vollständig mit 290 von 290 Tests. Alle geänderten
+JavaScript-Dateien bestanden `node --check`. Der browserbasierte Matrix-Harness
+lief im Codex-In-App-Browser mit 1.128 von 1.128 Fällen ohne Overflow,
+Clipping, fehlende oder doppelte Controls, ungültige Tier-Klassen oder zu
+kleine sichtbare Touchziele. Große Climate-Cards wurden in repräsentativen
+Portrait- und Landscape-Abmessungen zusätzlich visuell geprüft. Es wurden nur
+Mock-Zustände verwendet und keine reale Home-Assistant-Instanz kontaktiert.
+
+Die Home-Assistant-Write-Routen und Entity-Allowlists sind unverändert. Das
+Wall-JavaScript bleibt ECMAScript 5, die Darstellung Flexbox-basiert und frei
+von CSS Grid, Flexbox `gap`, Container Queries oder modernen Modul-/Promise-
+Abhängigkeiten. Die produktive Assetversion wurde einheitlich von 45 auf 46
+erhöht. Die vorhandenen Produkt-Screenshots bleiben als allgemeine Oberfläche
+repräsentativ; der neue Test-Harness ist bewusst kein Produkt-Screenshot.
+
+Für die RC-Freigabe bleibt die Realgerät-Abnahme `BLOCKED`: Climate Compact,
+Standard, Wide, Tall und Large müssen auf dem iPad mini in Portrait und
+Landscape einschließlich Rotation, langem Namen, Off/Unknown/Unavailable,
+Minus/Plus/Power und Focus geprüft werden. Zusätzlich bleiben Light-Power,
+lange Sensor-/Binary-Inhalte, Theme, Background-Lesbarkeit, HomeScreen und
+Footer Teil des zusammenhängenden iPad-Release-Gates.

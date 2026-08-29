@@ -84,6 +84,32 @@ Widget.prototype.getLayoutAttribute = function () {
 };
 
 
+Widget.prototype.getPresentationAttribute = function (data) {
+
+    var hints =
+        typeof LegacyPresentation !== "undefined"
+            ? LegacyPresentation.getHints(this, data)
+            : {
+                available: false,
+                contentDensity: "normal",
+                controlCount: 0,
+                hasSecondary: Boolean(this.subtitle)
+            };
+
+
+    return ' data-card-density="' +
+        hints.contentDensity +
+        '" data-card-controls="' +
+        hints.controlCount +
+        '" data-card-secondary="' +
+        (hints.hasSecondary ? "true" : "false") +
+        '" data-card-state="' +
+        (hints.available ? "available" : "unavailable") +
+        '"';
+
+};
+
+
 Widget.prototype.getCardIdentity = function (data) {
 
     if (typeof LegacyPresentation !== "undefined") {

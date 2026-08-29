@@ -1414,7 +1414,7 @@ body.theme-dark .footer {
    ========================================================= */
 
 /*
- * The ES5 layout renderer adds only these three validated classes. Geometry
+ * The ES5 layout renderer adds only these five validated classes. Geometry
  * remains absolute-positioned Flexbox; the legacy wall display uses no CSS
  * Grid, Flexbox gap, container queries, transforms, or zoom for sizing.
  */
@@ -1422,6 +1422,7 @@ body.theme-dark .footer {
 .grid-layout-active .card {
 
     min-width: 0;
+    overflow: hidden;
 
 }
 
@@ -1485,12 +1486,28 @@ body.theme-dark .footer {
 
     font-size: 34px;
 
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
 }
 
 .grid-layout-active .card-sensor.card-presentation-compact .value span {
 
     margin-left: 3px;
     font-size: 16px;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-compact[data-card-density="dense"] .value {
+
+    font-size: 24px;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-compact[data-card-density="dense"] .value span {
+
+    display: none;
 
 }
 
@@ -1688,29 +1705,492 @@ body.theme-dark .footer {
 
 }
 
-.grid.grid-layout-active .card-presentation-expanded .icon {
+.grid.grid-layout-active .card-presentation-wide {
+
+    -webkit-flex-direction: row;
+    flex-direction: row;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: flex-start;
+    justify-content: flex-start;
+
+    padding: 12px 16px;
+
+}
+
+.grid-layout-active .card-presentation-wide .subtitle {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-wide .card-header,
+.grid-layout-active .card-binary.card-presentation-wide .card-header {
+
+    -webkit-flex: 0 0 44px;
+    flex: 0 0 44px;
+
+    min-height: 44px;
+    margin: 0 14px 0 0;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-wide .icon,
+.grid-layout-active .card-binary.card-presentation-wide .icon {
+
+    width: 44px;
+    height: 44px;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-wide .value,
+.grid-layout-active .card-binary.card-presentation-wide .status {
+
+    -webkit-flex: 0 1 auto;
+    flex: 0 1 auto;
+
+    min-width: 0;
+    margin: 0 18px 0 0;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-wide .value {
+
+    font-size: 42px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-wide[data-card-density="dense"] .value {
+
+    max-width: 45%;
+    font-size: 34px;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-wide[data-card-density="dense"] .value span {
+
+    font-size: 15px;
+
+}
+
+.grid-layout-active .card-binary.card-presentation-wide .status {
+
+    font-size: 28px;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-wide .card-identity,
+.grid-layout-active .card-binary.card-presentation-wide .card-identity {
+
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+}
+
+.grid-layout-active .card-light.card-presentation-wide .card-header {
+
+    -webkit-order: 1;
+    order: 1;
+
+    -webkit-flex: 0 0 68px;
+    flex: 0 0 68px;
+
+    min-height: 44px;
+    margin: 0 14px 0 0;
+
+}
+
+.grid-layout-active .card-light.card-presentation-wide .icon {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-light.card-presentation-wide .light-state {
+
+    min-width: 64px;
+
+}
+
+.grid-layout-active .card-light.card-presentation-wide .card-identity {
+
+    -webkit-order: 2;
+    order: 2;
+
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+}
+
+.grid-layout-active .card-light.card-presentation-wide .light-control-row {
+
+    -webkit-order: 3;
+    order: 3;
+
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    margin: 0 0 0 14px;
+
+}
+
+.grid-layout-active .card-light.card-presentation-wide .light-control-group {
+
+    width: auto;
+
+}
+
+.grid-layout-active .card-light.card-presentation-wide .dashboard-power-control {
+
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    min-height: 48px;
+    padding: 0;
+
+}
+
+.grid-layout-active .card-light.card-presentation-wide .dashboard-power-label {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-wide .card-header {
+
+    -webkit-flex: 0 1 45%;
+    flex: 0 1 45%;
+
+    min-width: 0;
+    min-height: 44px;
+    margin: 0 16px 0 0;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-wide .icon,
+.grid-layout-active .card-climate.card-presentation-wide .climate-state {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-wide .climate-values {
+
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-wide .climate-current {
+
+    margin: 0;
+    text-align: center;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-wide .climate-current-value {
+
+    font-size: 38px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-wide .climate-current-label {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-wide .climate-target-row {
+
+    display: none;
+
+}
+
+.grid-layout-active .card-presentation-tall {
+
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+
+    padding: 22px;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-tall .value,
+.grid-layout-active .card-binary.card-presentation-tall .status {
+
+    margin-top: auto;
+    margin-bottom: auto;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-tall .value {
+
+    font-size: 64px;
+
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+}
+
+.grid-layout-active .card-binary.card-presentation-tall .status {
+
+    font-size: 42px;
+
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-standard[data-card-density="dense"] .value,
+.grid-layout-active .card-sensor.card-presentation-tall[data-card-density="dense"] .value {
+
+    font-size: 46px;
+    line-height: 1.05;
+    white-space: normal;
+
+}
+
+.grid-layout-active .card-sensor.card-presentation-standard[data-card-density="dense"] .value span,
+.grid-layout-active .card-sensor.card-presentation-tall[data-card-density="dense"] .value span {
+
+    display: block;
+
+    max-width: 100%;
+    margin: 5px 0 0;
+
+    overflow: hidden;
+
+    font-size: 15px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-tall .climate-values {
+
+    display: block;
+
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-tall .climate-current {
+
+    margin: 20px 0;
+    text-align: center;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-tall .climate-target-row {
+
+    width: 100%;
+
+}
+
+.grid.grid-layout-active .card-presentation-large {
+
+    padding: 24px;
+
+}
+
+.grid.grid-layout-active .card-presentation-large .icon,
+.grid.grid-layout-active .card-presentation-tall .icon {
 
     width: 60px;
     height: 60px;
 
 }
 
-.grid.grid-layout-active .card-presentation-expanded .icon svg {
+.grid.grid-layout-active .card-presentation-large .icon svg,
+.grid.grid-layout-active .card-presentation-tall .icon svg {
 
     width: 32px;
     height: 32px;
 
 }
 
-.grid-layout-active .card-sensor.card-presentation-expanded .value {
+.grid-layout-active .card-sensor.card-presentation-large .value {
 
     font-size: 68px;
 
 }
 
-.grid-layout-active .card-binary.card-presentation-expanded .status {
+.grid-layout-active .card-binary.card-presentation-large .status {
 
     font-size: 44px;
+
+}
+
+.grid.grid-layout-active .card-climate.card-presentation-standard {
+
+    padding: 14px 16px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-standard .card-header {
+
+    margin-bottom: 6px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-standard .climate-values {
+
+    display: block;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-standard .climate-current {
+
+    margin: 0 0 6px;
+    text-align: center;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-standard .climate-current-value {
+
+    font-size: 40px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-standard .climate-current-unit {
+
+    font-size: 18px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-standard .climate-current-label {
+
+    margin-top: 1px;
+    font-size: 11px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-standard .climate-target-row {
+
+    width: 100%;
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+    max-width: none;
+    padding: 4px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-standard .climate-control,
+.grid-layout-active .card-climate.card-presentation-standard .climate-power-control {
+
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+
+    -webkit-flex: 0 0 44px;
+    flex: 0 0 44px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-standard .climate-target {
+
+    min-width: 64px;
+    padding: 0 2px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-large .card-header {
+
+    margin-bottom: 10px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-large .climate-values {
+
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+
+    -webkit-align-items: center;
+    align-items: center;
+
+    -webkit-justify-content: center;
+    justify-content: center;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-large .climate-current {
+
+    -webkit-flex: 1 1 38%;
+    flex: 1 1 38%;
+
+    min-width: 112px;
+    margin: 0 18px 0 0;
+
+    text-align: center;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-large .climate-current-value {
+
+    font-size: 64px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-large .climate-current-unit {
+
+    font-size: 24px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-large .climate-target-row {
+
+    width: auto;
+    min-width: 260px;
+    max-width: 420px;
+
+    -webkit-flex: 1 1 62%;
+    flex: 1 1 62%;
+
+    padding: 8px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-large .climate-control,
+.grid-layout-active .card-climate.card-presentation-large .climate-power-control {
+
+    width: 52px;
+    min-width: 52px;
+    height: 52px;
+    min-height: 52px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-large .climate-target {
+
+    min-width: 86px;
+
+}
+
+.grid-layout-active .card-climate.card-presentation-large .climate-target-value {
+
+    font-size: 29px;
 
 }
 

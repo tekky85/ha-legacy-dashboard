@@ -31,7 +31,7 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | App-Icon und Logo valide | PASS | PNG-Dateien vorhanden, lesbar und mit erwarteten Dateirechten. |
 | Minimalberechtigungen der Home Assistant App | PASS | `homeassistant_api: true`, AppArmor aktiv; kein Host-, Docker-, Config-, Geräte- oder Privileged-Zugriff. |
 | Dockerfile ist Build-Quelle | PASS | Release-Workflow baut beide Architekturen aus dem Root-`Dockerfile` mit BuildKit/Buildx. |
-| Vollständiges Release Gate | PASS | RC.1: 275 Tests; Sprint-25.5-Stand: 283 Tests, jeweils 0 Fehler. JavaScript-/Shell-Syntax, Versionscheck und Secret Scan enthalten. |
+| Vollständiges Release Gate | PASS | RC.1: 275 Tests; Sprint-25.6-Stand: 290 Tests, jeweils 0 Fehler. JavaScript-/Shell-Syntax, Versionscheck und Secret Scan enthalten. |
 | Dependency-Audit | PASS | `npm audit --omit=dev --audit-level=high`: 0 Schwachstellen. |
 | GitHub Test-Workflow | PASS | Run `33203376334`, Abschluss `success`. |
 | GitHub Release-Workflow | PASS | Run `33203376391`; Validate, beide Builds, Manifest, Smoke-Test und Release abgeschlossen. |
@@ -157,13 +157,28 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
 | Neuer JPEG-Fix auf realer HAOS-App | BLOCKED | RC.1 enthält den Fix nicht; ein neuer, separat versionierter HAOS-Build muss installiert werden. |
 | JPEG Upload/Replace/Remove auf iPad mini | BLOCKED | Nach Installation des neuen Builds mit echten freigegebenen JPEGs prüfen. |
 
+## Sprint 25.6 – Card Matrix und responsive Darstellung
+
+| Prüfung | Status | Nachweis |
+| --- | --- | --- |
+| Tatsächliches Renderer-Inventar | PASS | Genau Sensor, Binary, Light und Climate; nicht implementierte Typen werden nicht als unterstützt geführt. |
+| Vollständige gültige Größenmatrix | PASS | 252 Typ-/Profil-/Größenkombinationen aus der serverseitigen 6-/12-Spalten-Validierung. |
+| Repräsentative Zustandsmatrix | PASS | 1.128 Rendererfälle mit langen Namen/Werten/Units, Dezimal-/Negativwerten, On/Off, Unknown, Unavailable und Capabilities. |
+| Browserbasierte Overflow-/Clipping-Prüfung | PASS | 1.128/1.128 ohne Overflow, Clipping, fehlende/doppelte Controls oder ungültige Tier-Klassen. |
+| Touchziele in sichtbaren Grid-Controls | PASS | Harness meldet kein sichtbares Control unter ungefähr 44 × 44 Pixel. |
+| Climate Large im modernen Browser | PASS | Eigene Large-Hierarchie in repräsentativen Portrait-/Landscape-Pixelmaßen visuell geprüft. |
+| Grid-/Focus-Trennung und Sprint-17.7-Alignment | PASS | Quell- und Regressionstests; Focus-Renderer und Write-Bindings blieben unverändert. |
+| iPad mini – alle fünf Climate-Tiers | BLOCKED | Kein steuerbarer Realgerätelauf verfügbar. |
+| iPad mini – Portrait/Landscape/Rotation | BLOCKED | Kein steuerbarer Realgerätelauf verfügbar. |
+| iPad mini – lange Inhalte, Controls und Focus | BLOCKED | Kein steuerbarer zusammenhängender Release-Gate-Lauf verfügbar. |
+
 ## RC Result Matrix
 
 | Bereich | Status | Blocker/Nachweis |
 | --- | --- | --- |
 | Repository-Metadaten | PASS | Vollständig und konsistent. |
 | Versionen | PASS | `1.0.0-rc.1` in allen Release-Quellen. |
-| Tests und Syntax | PASS | Sprint-25.5-Stand lokal und auf LXC 283/283; veröffentlichter RC.1 und zugehörige GitHub Actions 275/275. |
+| Tests und Syntax | PASS | Sprint-25.6-Stand lokal 290/290; veröffentlichter RC.1 und zugehörige GitHub Actions 275/275. |
 | Secret Scan und Dependency Audit | PASS | Keine Release-Secrets, 0 bekannte npm-Schwachstellen. |
 | GitHub Release und Checksummen | PASS | Prerelease und zwei verifizierte Assets veröffentlicht. |
 | GHCR Image Availability | PASS | Anonym abrufbar. |
@@ -197,7 +212,8 @@ ausdrücklich nicht aus Simulationen oder Quellcodeprüfungen abgeleitet.
    Backup/Restore zu prüfen.
 4. Auf einem iPad mini mit iOS 9 müssen Portrait, Landscape, Rotation,
    Theme-Persistenz, exakte Error-Filter, HomeScreen-Navigation, Backgrounds,
-   `showTitle`, Full-Height/Footer, alle Focus-Typen und bestehende Controls
+   `showTitle`, Full-Height/Footer, alle fünf Climate-Präsentationsstufen,
+   lange Sensor-/Binary-Inhalte, alle Focus-Typen und bestehende Controls
    geprüft werden.
 5. Auf dem Standalone-LXC müssen zwei freigegebene reale Backgrounds für
    Default und Custom Dashboard visuell sowie über Reload und Restart geprüft

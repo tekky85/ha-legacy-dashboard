@@ -265,13 +265,13 @@ test("Presentation Mode berücksichtigt reale verfügbare Pixel", function () {
         context.LegacyLayout.getPresentationMode(
             {type: "sensor"}, 3, 2, 210, 180
         ),
-        "normal"
+        "standard"
     );
     assert.equal(
         context.LegacyLayout.getPresentationMode(
             {type: "sensor"}, 4, 2, 240, 230
         ),
-        "expanded"
+        "standard"
     );
     assert.equal(
         context.LegacyLayout.getPresentationMode(
@@ -283,13 +283,13 @@ test("Presentation Mode berücksichtigt reale verfügbare Pixel", function () {
         context.LegacyLayout.getPresentationMode(
             {type: "climate"}, 3, 2, 227, 200
         ),
-        "normal"
+        "compact"
     );
     assert.equal(
         context.LegacyLayout.getPresentationMode(
             {type: "climate"}, 6, 2, 380, 230
         ),
-        "expanded"
+        "standard"
     );
 });
 
@@ -494,8 +494,8 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
     const systemHtml = read("src/public/system.html");
 
     assert.ok(
-        indexHtml.indexOf("/js/core/theme.js?v=45") <
-            indexHtml.indexOf("/css/style.css?v=45")
+        indexHtml.indexOf("/js/core/theme.js?v=46") <
+            indexHtml.indexOf("/css/style.css?v=46")
     );
     assert.ok(
         systemHtml.indexOf("/js/core/theme.js?v=44") <
@@ -509,7 +509,7 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
         (systemHtml.match(/\/js\/core\/theme\.js/g) || []).length,
         1
     );
-    assert.match(indexHtml, /\/js\/app\.js\?v=45/);
+    assert.match(indexHtml, /\/js\/app\.js\?v=46/);
     assert.match(systemHtml, /\/js\/system\/summary\.js\?v=44/);
     assert.match(systemHtml, /\/js\/system\/errors\.js\?v=44/);
 });

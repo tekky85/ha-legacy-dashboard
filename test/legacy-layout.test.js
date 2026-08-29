@@ -210,13 +210,13 @@ test("Presentation Modes folgen Typ und Geometrie und werden je Profil gecacht",
     assert.match(cards[0].className, /card-presentation-compact/);
     assert.match(cards[1].className, /card-presentation-compact/);
     assert.match(cards[2].className, /card-presentation-compact/);
-    assert.match(cards[3].className, /card-presentation-expanded/);
+    assert.match(cards[3].className, /card-presentation-large/);
     assert.equal(context.LegacyLayout.getPresentationComputationCount(), 8);
     assert.equal(context.LegacyLayout.getGeometryComputationCount(), 2);
 });
 
 
-test("Climate bleibt bis vier Spalten kompakt und wird ab fünf normal", function () {
+test("Climate bleibt bis vier Spalten kompakt und wird ab fünf wide", function () {
     const context = vm.createContext({
         window: {innerWidth: 1024, innerHeight: 768},
         Math: Math,
@@ -231,7 +231,7 @@ test("Climate bleibt bis vier Spalten kompakt und wird ab fünf normal", functio
     );
     assert.equal(
         context.LegacyLayout.getPresentationMode({type: "climate"}, 5, 1),
-        "normal"
+        "wide"
     );
 });
 
@@ -244,7 +244,7 @@ test("kompakte Widget-CSS erhält Kerninformationen und Touchziele", function ()
     const climate = read("src/public/js/widgets/climate.js");
 
     assert.match(css, /card-presentation-compact/);
-    assert.match(css, /card-presentation-normal|card-presentation-expanded/);
+    assert.match(css, /card-presentation-standard|card-presentation-large/);
     assert.match(css, /\.climate-control\s*\{[\s\S]*?width:\s*44px;[\s\S]*?height:\s*44px;/);
     assert.match(css, /text-overflow:\s*ellipsis/);
     assert.match(css, /\.card-identity/);

@@ -104,7 +104,7 @@ test("Admin und Legacy verwenden dieselben Presentation-Regeln", function () {
             490,
             236
         ),
-        "expanded"
+        "large"
     );
 
     const adminApp = read("src/admin/js/app.js");
