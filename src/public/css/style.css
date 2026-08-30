@@ -668,6 +668,66 @@ textarea {
 
 }
 
+.dashboard-sections {
+
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex-direction: column;
+    flex-direction: column;
+
+    -webkit-flex: 1 0 auto;
+    flex: 1 0 auto;
+
+    width: 100%;
+    min-width: 0;
+
+}
+
+.dashboard-section {
+
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0 0 14px 0;
+
+}
+
+.dashboard-section:last-child {
+
+    margin-bottom: 0;
+
+}
+
+.dashboard-section-title {
+
+    margin: 2px 10px 8px 10px;
+
+    color: #526071;
+
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+
+}
+
+.dashboard-section-title-unassigned {
+
+    color: #768395;
+    font-size: 13px;
+    font-weight: 600;
+
+}
+
+.dashboard-section-grid {
+
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+
+}
+
 
 /* =========================================================
    CARDS
@@ -992,6 +1052,18 @@ body.theme-dark {
 body.theme-dark .subtitle {
 
     color: #9aa6b5;
+
+}
+
+body.theme-dark .dashboard-section-title {
+
+    color: #c8d2df;
+
+}
+
+body.theme-dark .dashboard-section-title-unassigned {
+
+    color: #98a6b8;
 
 }
 

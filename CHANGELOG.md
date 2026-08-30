@@ -14,6 +14,10 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 
 ### Added
 
+- Added persistent per-dashboard sections with optional titles, safe
+  unassigned-card handling, and read-only Home Assistant Area references.
+- Added section creation, ordering, deletion, and widget assignment to the
+  protected Admin editor.
 - Added a test-only Card Matrix harness covering all 1,128 supported
   renderer, size, profile, and representative-state combinations.
 

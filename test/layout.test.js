@@ -60,7 +60,7 @@ test("Schema 2 migriert deterministisch auf das verfeinerte Raster", function ()
     const second = dashboardConfig.migrateConfiguration(legacy);
 
     assert.equal(first.migrated, true);
-    assert.equal(first.configuration.schemaVersion, 9);
+    assert.equal(first.configuration.schemaVersion, dashboardConfig.SCHEMA_VERSION);
     assert.deepEqual(first.configuration, second.configuration);
     assert.deepEqual(
         first.configuration.dashboards.map(function (dashboard) {
@@ -127,7 +127,7 @@ test("Schema 3 skaliert x und w exakt einmal und erhält IDs, y und h", function
         .layouts.portrait.items[widgetId];
 
     assert.equal(migrated.migrated, true);
-    assert.equal(migrated.configuration.schemaVersion, 9);
+    assert.equal(migrated.configuration.schemaVersion, dashboardConfig.SCHEMA_VERSION);
     assert.deepEqual(item, {x: 2, y: 7, w: 2, h: 2});
     assert.equal(migrated.configuration.dashboards[0].id, dashboard.id);
     assert.equal(migrated.configuration.dashboards[0].widgets[0].id, widgetId);

@@ -53,6 +53,7 @@ The legacy frontend remains framework-free and uses the existing `Legacy.http` /
 
 - multiple dashboards
 - persistent configuration
+- persistent, freely named sections per dashboard
 - configurable widgets
 - drag-and-drop grid layout
 - portrait and landscape layouts
@@ -105,6 +106,18 @@ controlled, read-only image URL; neither the data path nor tokens are exposed.
 Hiding a title removes only its unused space. Summary navigation, the Health
 indicator, connection state, and theme toggle remain available.
 
+Every default and custom dashboard can optionally be divided into vertically
+arranged sections such as rooms, floors, or functional groups. Each section
+uses the existing portrait/landscape grid internally and can show or hide its
+title. Widgets can move between sections or deliberately remain Unassigned.
+Dashboards without sections render unchanged in the previous grid. Deleting a
+section retains every widget and safely returns it to the unassigned area.
+
+A section may optionally store the ID of an existing Home Assistant Area as a
+read-only metadata reference. A section and an HA Area remain separate
+concepts: sections work without an Area, and the dashboard never creates,
+renames, or modifies Home Assistant Areas.
+
 ### iPad mini as a Wall Display
 
 For one iPad mini 1 running iOS 9.3.5, **Guided Access** is the recommended
@@ -132,6 +145,9 @@ Features include:
 
 - create, rename, duplicate and delete dashboards
 - select the default dashboard
+- create, rename, order, and safely delete sections
+- assign or move widgets between sections, or leave them unassigned
+- optionally reference existing Home Assistant Areas read-only
 - browse entities
 - add and edit widgets
 - visibility and ordering

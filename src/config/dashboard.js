@@ -21,7 +21,9 @@ const IssueRules =
 const DashboardBackgrounds =
     require("../services/dashboard-backgrounds");
 
-const SCHEMA_VERSION = 9;
+const SCHEMA_VERSION = 10;
+const SECTION_SCHEMA_VERSION = 10;
+const APPEARANCE_SCHEMA_VERSION = 9;
 const RULES_SCHEMA_VERSION = 8;
 const CRITICAL_DETECTION_SCHEMA_VERSION = 7;
 const ERRORS_SCHEMA_VERSION = 6;
@@ -37,6 +39,9 @@ const DASHBOARD_ID_PATTERN =
 const WIDGET_ID_PATTERN =
     /^[a-z0-9][a-z0-9-]{0,62}$/;
 
+const SECTION_ID_PATTERN =
+    /^[a-z0-9][a-z0-9-]{0,62}$/;
+
 const ENTITY_ID_PATTERN =
     /^[a-z0-9_]+\.[a-z0-9_]+$/;
 
@@ -44,6 +49,9 @@ const LABEL_ID_PATTERN =
     /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
 
 const DEVICE_ID_PATTERN =
+    /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
+
+const AREA_ID_PATTERN =
     /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
 
 const DOMAIN_PATTERN =
@@ -133,6 +141,7 @@ const DEFAULT_CONFIGURATION = {
             showTitle: true,
             background: null,
             refreshIntervalMs: DEFAULT_REFRESH_INTERVAL_MS,
+            sections: [],
             widgets: [
                 {
                     id: "default-bathroom-temperature",
@@ -220,6 +229,7 @@ const DEFAULT_CONFIGURATION = {
             showTitle: true,
             background: null,
             refreshIntervalMs: DEFAULT_REFRESH_INTERVAL_MS,
+            sections: [],
             widgets: [
                 {
                     id: "dining-room-light",
@@ -298,6 +308,8 @@ function validateConfigurationVersion(candidate, schemaVersion) {
 
     dashboards.forEach(function (dashboard) {
 
+        const sectionIds = Object.create(null);
+
         if (
             !dashboard ||
             typeof dashboard.id !== "string" ||
@@ -320,8 +332,15 @@ function validateConfigurationVersion(candidate, schemaVersion) {
             "Dashboard-Titel"
         );
 
-        if (schemaVersion >= SCHEMA_VERSION) {
+        if (schemaVersion >= APPEARANCE_SCHEMA_VERSION) {
             validateDashboardAppearance(dashboard);
+        }
+
+        if (schemaVersion >= SECTION_SCHEMA_VERSION) {
+            validateDashboardSections(
+                dashboard,
+                sectionIds
+            );
         }
 
         if (
@@ -434,6 +453,24 @@ function validateConfigurationVersion(candidate, schemaVersion) {
                 throw error;
             }
 
+            if (
+                schemaVersion >= SECTION_SCHEMA_VERSION &&
+                typeof widget.sectionId !== "undefined" &&
+                widget.sectionId !== null &&
+                (
+                    typeof widget.sectionId !== "string" ||
+                    !sectionIds[widget.sectionId]
+                )
+            ) {
+                const error = new Error(
+                    "Widget-Abschnitt ist ungültig: " +
+                    widget.id
+                );
+
+                error.code = "invalid_widget_section";
+                throw error;
+            }
+
         });
 
 
@@ -464,6 +501,90 @@ function validateConfigurationVersion(candidate, schemaVersion) {
 
 
     return true;
+
+}
+
+
+function validateDashboardSections(dashboard, sectionIds) {
+
+    if (!Array.isArray(dashboard.sections)) {
+        const error = new Error(
+            "Dashboard-Abschnitte sind ungültig: " +
+            dashboard.id
+        );
+
+        error.code = "invalid_dashboard_sections";
+        throw error;
+    }
+
+
+    dashboard.sections.forEach(function (section) {
+
+        if (
+            !section ||
+            typeof section.id !== "string" ||
+            !SECTION_ID_PATTERN.test(section.id)
+        ) {
+            const error = new Error("Abschnitts-ID ist ungültig");
+
+            error.code = "invalid_section_id";
+            throw error;
+        }
+
+        if (sectionIds[section.id]) {
+            const error = new Error(
+                "Abschnitts-ID ist nicht eindeutig: " +
+                section.id
+            );
+
+            error.code = "duplicate_section_id";
+            throw error;
+        }
+
+        sectionIds[section.id] = true;
+
+        validateText(section.title, "Abschnittstitel");
+
+        if (
+            typeof section.order !== "number" ||
+            !Number.isFinite(section.order)
+        ) {
+            const error = new Error(
+                "Abschnitts-Reihenfolge ist ungültig: " +
+                section.id
+            );
+
+            error.code = "invalid_section_order";
+            throw error;
+        }
+
+        if (typeof section.showTitle !== "boolean") {
+            const error = new Error(
+                "Abschnitts-Titelanzeige ist ungültig: " +
+                section.id
+            );
+
+            error.code = "invalid_section_show_title";
+            throw error;
+        }
+
+        if (
+            section.areaId !== null &&
+            (
+                typeof section.areaId !== "string" ||
+                !AREA_ID_PATTERN.test(section.areaId)
+            )
+        ) {
+            const error = new Error(
+                "Abschnitts-Area ist ungültig: " +
+                section.id
+            );
+
+            error.code = "invalid_section_area";
+            throw error;
+        }
+
+    });
 
 }
 
@@ -830,10 +951,30 @@ function cloneWidget(widget) {
         unit: widget.unit,
         order: widget.order,
         visible: widget.visible,
+        sectionId:
+            typeof widget.sectionId === "string"
+                ? widget.sectionId
+                : null,
         size:
             typeof widget.size === "string"
                 ? widget.size
                 : DEFAULT_WIDGET_SIZE
+    };
+
+}
+
+
+function cloneSection(section) {
+
+    return {
+        id: section.id,
+        title: section.title,
+        order: section.order,
+        showTitle: section.showTitle,
+        areaId:
+            typeof section.areaId === "string"
+                ? section.areaId
+                : null
     };
 
 }
@@ -851,7 +992,8 @@ function migrateConfiguration(candidate) {
             candidate.schemaVersion !== SUMMARY_SCHEMA_VERSION &&
             candidate.schemaVersion !== ERRORS_SCHEMA_VERSION &&
             candidate.schemaVersion !== CRITICAL_DETECTION_SCHEMA_VERSION &&
-            candidate.schemaVersion !== RULES_SCHEMA_VERSION
+            candidate.schemaVersion !== RULES_SCHEMA_VERSION &&
+            candidate.schemaVersion !== APPEARANCE_SCHEMA_VERSION
         )
     ) {
         return {
@@ -884,6 +1026,12 @@ function migrateConfiguration(candidate) {
 
         dashboard.background =
             dashboard.background || null;
+
+        dashboard.sections = [];
+
+        dashboard.widgets.forEach(function (widget) {
+            widget.sectionId = null;
+        });
 
         if (candidate.schemaVersion === GRID_SCHEMA_VERSION) {
             dashboard.layouts =
@@ -929,6 +1077,10 @@ function cloneDashboard(dashboard) {
                 }
                 : null,
         refreshIntervalMs: dashboard.refreshIntervalMs,
+        sections:
+            Array.isArray(dashboard.sections)
+                ? dashboard.sections.map(cloneSection)
+                : [],
         widgets: dashboard.widgets.map(cloneWidget),
         layouts:
             dashboard.layouts
@@ -1212,6 +1364,29 @@ function getVisibleWidgets(dashboardId) {
 }
 
 
+function getSections(dashboardId) {
+
+    const dashboard =
+        resolveDashboard(dashboardId);
+
+
+    if (!dashboard) {
+        return [];
+    }
+
+    return dashboard.sections
+        .map(cloneSection)
+        .sort(function (first, second) {
+            if (first.order !== second.order) {
+                return first.order - second.order;
+            }
+
+            return first.id.localeCompare(second.id);
+        });
+
+}
+
+
 function getVisibleEntityIds(dashboardId) {
 
     const entityIds = [];
@@ -1291,6 +1466,7 @@ function getPublicDashboardConfig(dashboardId) {
                 : null,
         refresh_interval_ms:
             getRefreshIntervalMs(dashboard.id),
+        sections: getSections(dashboard.id),
         widgets: visibleWidgets,
         layouts:
             Layout.publicLayouts(
@@ -1321,7 +1497,9 @@ module.exports = {
     SCHEMA_VERSION: SCHEMA_VERSION,
     DASHBOARD_ID_PATTERN: DASHBOARD_ID_PATTERN,
     WIDGET_ID_PATTERN: WIDGET_ID_PATTERN,
+    SECTION_ID_PATTERN: SECTION_ID_PATTERN,
     ENTITY_ID_PATTERN: ENTITY_ID_PATTERN,
+    AREA_ID_PATTERN: AREA_ID_PATTERN,
     DEVICE_ID_PATTERN: DEVICE_ID_PATTERN,
     DOMAIN_PATTERN: DOMAIN_PATTERN,
     RISK_CLASSES: RISK_CLASSES.slice(0),
@@ -1352,6 +1530,7 @@ module.exports = {
     getDefaultDashboard: getDefaultDashboard,
     getDashboardById: getDashboardById,
     getPublicDashboardConfig: getPublicDashboardConfig,
+    getSections: getSections,
     getVisibleWidgets: getVisibleWidgets,
     getPublicWidgets: getPublicWidgets,
     getVisibleEntityIds: getVisibleEntityIds,

@@ -88,11 +88,21 @@
         );
     }
 
-    function visibleWidgetIds(dashboard, ignoredWidgetId) {
+    function sectionKey(widget) {
+        return widget && typeof widget.sectionId === "string"
+            ? widget.sectionId
+            : "";
+    }
+
+    function visibleWidgetIds(dashboard, ignoredWidgetId, targetSectionId) {
         const ids = Object.create(null);
 
         dashboard.widgets.forEach(function (widget) {
-            if (widget.visible && widget.id !== ignoredWidgetId) {
+            if (
+                widget.visible &&
+                widget.id !== ignoredWidgetId &&
+                sectionKey(widget) === targetSectionId
+            ) {
                 ids[widget.id] = true;
             }
         });
@@ -100,9 +110,13 @@
         return ids;
     }
 
-    function isFree(dashboard, profileName, candidate, ignoredWidgetId) {
+    function isFree(dashboard, widget, profileName, candidate) {
         const items = dashboard.layouts[profileName].items;
-        const blockers = visibleWidgetIds(dashboard, ignoredWidgetId);
+        const blockers = visibleWidgetIds(
+            dashboard,
+            widget.id,
+            sectionKey(widget)
+        );
 
         return !Object.keys(items).some(function (widgetId) {
             return blockers[widgetId] && overlaps(candidate, items[widgetId]);
@@ -125,7 +139,7 @@
             candidate.h <= MAX_HEIGHT &&
             candidate.x + candidate.w <= columns &&
             candidate.y + candidate.h <= MAX_ROWS &&
-            isFree(dashboard, profileName, candidate, widget.id)
+            isFree(dashboard, widget, profileName, candidate)
         );
     }
 
@@ -139,7 +153,7 @@
             for (x = 0; x <= columns - width; x += 1) {
                 candidate = {x: x, y: y, w: width, h: height};
 
-                if (isFree(dashboard, profileName, candidate, widget.id)) {
+                if (isFree(dashboard, widget, profileName, candidate)) {
                     return candidate;
                 }
             }
@@ -310,6 +324,28 @@
         });
     }
 
+    function relocateWidget(dashboardId, widgetId) {
+        const dashboard = findDashboard(dashboardId);
+        const widget = findWidget(dashboard, widgetId);
+
+        ensureDashboard(dashboard);
+
+        PROFILES.forEach(function (profileName) {
+            const current = dashboard.layouts[profileName].items[widgetId];
+            const preferred = current || preferredSize(widget, profileName);
+            const minimum = minimumSize(widget, profileName);
+
+            dashboard.layouts[profileName].items[widgetId] =
+                firstFreePosition(
+                    dashboard,
+                    widget,
+                    profileName,
+                    Math.max(minimum.w, preferred.w),
+                    Math.max(minimum.h, preferred.h)
+                );
+        });
+    }
+
     function removeWidget(dashboard, widgetId) {
         ensureDashboard(dashboard);
         PROFILES.forEach(function (profileName) {
@@ -341,13 +377,22 @@
         return layouts;
     }
 
-    function rowCount(dashboard, profileName) {
+    function rowCount(dashboard, profileName, targetSectionId) {
         const items = dashboard.layouts[profileName].items;
         let maximum = 1;
 
+        const expectedSectionId =
+            typeof targetSectionId === "string"
+                ? targetSectionId
+                : "";
+
         dashboard.widgets.forEach(function (widget) {
             const item = items[widget.id];
-            if (widget.visible && item) {
+            if (
+                widget.visible &&
+                item &&
+                sectionKey(widget) === expectedSectionId
+            ) {
                 maximum = Math.max(maximum, item.y + item.h);
             }
         });
@@ -380,6 +425,7 @@
         addWidget: addWidgetToDashboard,
         removeWidget: removeWidget,
         ensureVisiblePlacement: ensureVisiblePlacement,
+        relocateWidget: relocateWidget,
         remapLayouts: remapLayouts,
         minimumSize: minimumSize,
         preferredSize: preferredSize,
@@ -388,6 +434,7 @@
         move: move,
         resize: resize,
         rowCount: rowCount,
+        sectionKey: sectionKey,
         cellFromPoint: cellFromPoint,
         overlaps: overlaps
     };

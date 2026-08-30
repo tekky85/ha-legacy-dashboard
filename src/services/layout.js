@@ -163,6 +163,15 @@ function overlaps(first, second) {
 }
 
 
+function sectionKey(widget) {
+
+    return widget && typeof widget.sectionId === "string"
+        ? widget.sectionId
+        : "";
+
+}
+
+
 function positionIsFree(
     candidate,
     items,
@@ -251,7 +260,7 @@ function createProfile(widgets, profileName) {
         PROFILE_COLUMNS[profileName];
 
     const items = {};
-    const blockingWidgetIds = Object.create(null);
+    const blockingWidgetIdsBySection = Object.create(null);
 
     const orderedWidgets =
         widgets.slice(0).sort(function (first, second) {
@@ -263,6 +272,17 @@ function createProfile(widgets, profileName) {
 
         const preferred =
             getPreferredSize(widget, profileName);
+
+        const widgetSectionKey =
+            sectionKey(widget);
+
+        const blockingWidgetIds =
+            blockingWidgetIdsBySection[widgetSectionKey] ||
+            Object.create(null);
+
+
+        blockingWidgetIdsBySection[widgetSectionKey] =
+            blockingWidgetIds;
 
         const position =
             findFirstPosition(
@@ -477,6 +497,8 @@ function validateLayoutsWithRules(
             ) {
 
                 if (
+                    sectionKey(widgetById[visibleIds[firstIndex]]) ===
+                        sectionKey(widgetById[visibleIds[secondIndex]]) &&
                     overlaps(
                         profile.items[visibleIds[firstIndex]],
                         profile.items[visibleIds[secondIndex]]
@@ -559,7 +581,7 @@ function migrateLegacyLayouts(layouts) {
 }
 
 
-function visibleWidgetMap(dashboard, ignoredWidgetId) {
+function visibleWidgetMap(dashboard, ignoredWidgetId, targetSectionId) {
 
     const visible = Object.create(null);
 
@@ -567,7 +589,8 @@ function visibleWidgetMap(dashboard, ignoredWidgetId) {
     dashboard.widgets.forEach(function (widget) {
         if (
             widget.visible &&
-            widget.id !== ignoredWidgetId
+            widget.id !== ignoredWidgetId &&
+            sectionKey(widget) === targetSectionId
         ) {
             visible[widget.id] = true;
         }
@@ -594,7 +617,11 @@ function addWidget(dashboard, widget) {
                 preferred.h,
                 profile.columns,
                 profile.items,
-                visibleWidgetMap(dashboard, widget.id)
+                visibleWidgetMap(
+                    dashboard,
+                    widget.id,
+                    sectionKey(widget)
+                )
             );
 
     });
@@ -623,7 +650,11 @@ function ensureVisibleWidgetPlacement(dashboard, widget) {
         const profile = dashboard.layouts[profileName];
         const current = profile.items[widget.id];
         const blocking =
-            visibleWidgetMap(dashboard, widget.id);
+            visibleWidgetMap(
+                dashboard,
+                widget.id,
+                sectionKey(widget)
+            );
 
 
         if (
@@ -653,6 +684,34 @@ function ensureVisibleWidgetPlacement(dashboard, widget) {
                 profile.columns,
                 profile.items,
                 blocking
+            );
+
+    });
+
+}
+
+
+function relocateWidget(dashboard, widget) {
+    PROFILES.forEach(function (profileName) {
+
+        const profile = dashboard.layouts[profileName];
+        const current = profile.items[widget.id];
+        const preferred =
+            current || getPreferredSize(widget, profileName);
+        const minimum = getMinimumSize(widget, profileName);
+
+
+        profile.items[widget.id] =
+            findFirstPosition(
+                Math.max(minimum.w, preferred.w),
+                Math.max(minimum.h, preferred.h),
+                profile.columns,
+                profile.items,
+                visibleWidgetMap(
+                    dashboard,
+                    widget.id,
+                    sectionKey(widget)
+                )
             );
 
     });
@@ -717,6 +776,8 @@ module.exports = {
     addWidget: addWidget,
     removeWidget: removeWidget,
     ensureVisibleWidgetPlacement: ensureVisibleWidgetPlacement,
+    relocateWidget: relocateWidget,
     publicLayouts: publicLayouts,
-    overlaps: overlaps
+    overlaps: overlaps,
+    sectionKey: sectionKey
 };

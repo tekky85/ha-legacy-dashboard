@@ -217,6 +217,7 @@ Bedeutung von „fest“:
 | 25.5 | HAOS Network Access & Background Upload Hardening | umgesetzt und automatisiert validiert; neuer HAOS-Build und Realgerätetest offen |
 | 25.6 | Card Size Matrix & Responsive Layout Hardening | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
 | 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; reale iOS-9-Abnahme offen |
+| 26 | Persistent Dashboard Sections | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
 
 ---
 
@@ -1943,6 +1944,8 @@ nächste Planung
 25.4 RC Validation
 25.5 HAOS Network Access & Background Upload Hardening
 25.6 Card Size Matrix & Responsive Layout Hardening
+25.7 Legacy iPad Kiosk Deployment & Guided Access Validation
+26  Persistent Dashboard Sections
 ```
 
 ---
@@ -1966,21 +1969,26 @@ Ziel bleibt:
 
 ---
 
+# Sprint 26 – Persistent Dashboard Sections
+
+Sprint 26 erweitert jedes Default- und Custom-Dashboard additiv um persistente
+logische Abschnitte. Abschnitte werden vertikal angeordnet und verwenden das
+bestehende Portrait-/Landscape-Raster intern. Widgets können einem Abschnitt
+zugeordnet oder sicher nicht zugeordnet bleiben. Das Löschen eines Abschnitts
+löscht niemals Karten. Eine optionale `areaId` referenziert nur read-only eine
+vorhandene Home-Assistant-Area; Abschnitt und HA Area bleiben getrennt.
+
+Schema 10, Admin-Editor, abschnittslokale Kollisionsprüfung und ES5-Wall-
+Renderer sind umgesetzt. Bestehende Schema-9-Dashboards migrieren ohne
+Layoutverschiebung in den bisherigen Ein-Raster-Fallback.
+
+---
+
 # Nächster Schritt
 
-Sprint 25.7 dokumentiert den praktischen Einzelgerätebetrieb mit Geführtem
-Zugriff und grenzt ihn klar vom verwalteten Single App Mode ab. Die historische
-iOS-9-Schrittfolge und die verbindliche physische Abnahme stehen in
-`docs/IPAD_KIOSK.md`; kein Realgerätpunkt wird aus Quellcode oder moderner
-iPadOS-Dokumentation als bestanden abgeleitet.
-
-Als nächstes ist die Checkliste auf dem iPad mini 1 mit iOS 9.3.5 vollständig
-durchzuführen. Sie verbindet HomeScreen-Vollbild, Home-/Sleep-Wake-/Volume-
-Verhalten, Touch, Rotation, Display-Dauerbetrieb, Summary/Errors/Custom-
-Navigation, Light/Climate sowie WLAN-, HA-, Dashboard-App-, Reboot- und
-Stromverlusttests mit den kritischen Sprint-25.6-Matrixfällen. Parallel bleibt
-ein neuer, RC.1 nicht überschreibender HAOS-Build mit Sprint 25.5/25.6 gegen
-JPEG Upload/Replace/Remove, `/data`-Persistenz, App-/HA-Restart, Backup/Restore,
-Supervisor REST/WebSocket und Logs zu prüfen. Erst diese Realgerät- und
-Laufzeitergebnisse entscheiden über einen weiteren gezielten RC-Fix oder die
-Stable-Freigabe.
+Sprint 26.1 kann auf der vorhandenen Section- und read-only Area-Metadatenbasis
+eine native Room Card entwickeln. Area-basierte Entity-Vorschläge müssen vom
+Benutzer bestätigt werden; Controls dürfen ausschließlich bestehende explizite
+Gateway-Endpunkte und Write-Allowlists wiederverwenden. Parallel bleibt die
+physische Sprint-25.6-/25.7-/26-Abnahme auf dem iPad mini 1 mit iOS 9.3.5 sowie
+der aktualisierte HAOS-RC-Lauf offen.

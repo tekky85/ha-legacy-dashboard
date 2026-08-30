@@ -148,7 +148,7 @@ test("Hintergrundspeicher schreibt atomar mit sicheren Namen und Rechten", funct
 });
 
 
-test("Schema 8 migriert verlustfrei auf die Dashboard-Darstellung von Schema 9", function () {
+test("Schema 8 migriert verlustfrei auf die aktuelle Dashboard-Darstellung", function () {
     const previous = DashboardConfig.cloneConfiguration(
         DashboardConfig.DEFAULT_CONFIGURATION
     );
@@ -161,7 +161,7 @@ test("Schema 8 migriert verlustfrei auf die Dashboard-Darstellung von Schema 9",
 
     const migrated = DashboardConfig.migrateConfiguration(previous);
     assert.equal(migrated.migrated, true);
-    assert.equal(migrated.configuration.schemaVersion, 9);
+    assert.equal(migrated.configuration.schemaVersion, DashboardConfig.SCHEMA_VERSION);
     migrated.configuration.dashboards.forEach(function (dashboard) {
         assert.equal(dashboard.showTitle, true);
         assert.equal(dashboard.background, null);
@@ -299,7 +299,7 @@ test("Wall-Display nutzt ES5-Flexbox, Vollhöhe und optionale Titel ohne Systemn
     assert.match(html, /id="systemHealthLink"/);
     assert.match(html, /<footer id="updated"/);
     assert.doesNotMatch(html, /HA Legacy Dashboard v1\.0\.0<\/footer>/);
-    assert.match(html, /\/js\/app\.js\?v=46/);
+    assert.match(html, /\/js\/app\.js\?v=48/);
 
     assert.match(css, /\.app\s*\{[\s\S]*display: -webkit-flex;[\s\S]*-webkit-flex-direction: column;/);
     assert.match(css, /\.grid\s*\{[\s\S]*-webkit-flex: 1 0 auto;/);

@@ -622,6 +622,52 @@ input[readonly] {
     margin-top: 0.35rem;
 }
 
+.dashboard-sections-editor {
+    margin: 1rem 0 1.75rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.8rem;
+    background: var(--surface-subtle);
+}
+
+.dashboard-section-list {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+}
+
+.dashboard-section-card {
+    padding: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 0.7rem;
+    background: #ffffff;
+}
+
+.dashboard-section-fields {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(220px, 1fr) auto;
+    gap: 0.75rem;
+    align-items: end;
+}
+
+.dashboard-section-fields .checkbox-row {
+    align-self: center;
+    margin: 0;
+}
+
+.dashboard-section-meta {
+    margin: 0.65rem 0 0;
+    color: var(--muted);
+    font-size: 0.76rem;
+}
+
+.dashboard-section-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    margin-top: 0.7rem;
+}
+
 .dashboard-preview-canvas {
     position: relative;
     overflow: hidden;
@@ -644,6 +690,23 @@ input[readonly] {
     padding: 0.75rem 0.75rem 0;
     color: #ffffff;
     font-size: 1rem;
+    font-weight: 750;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.dashboard-preview-section {
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-preview-section + .dashboard-preview-section {
+    margin-top: 0.75rem;
+}
+
+.dashboard-preview-section-title {
+    padding: 0.75rem 0.75rem 0;
+    color: #ffffff;
+    font-size: 0.95rem;
     font-weight: 750;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
@@ -1414,6 +1477,7 @@ dialog::backdrop {
     .form-grid,
     .readonly-grid,
     .entity-tools,
+    .dashboard-section-fields,
     .widget-card {
         grid-template-columns: 1fr;
     }

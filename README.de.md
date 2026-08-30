@@ -55,6 +55,7 @@ Das Legacy-Frontend bleibt frameworkfrei und verwendet die vorhandene `Legacy.ht
 
 - mehrere Dashboards
 - persistente Konfiguration
+- persistente, frei benennbare Abschnitte je Dashboard
 - konfigurierbare Widgets
 - Drag-and-drop-Rasterlayout
 - Portrait- und Landscape-Layouts
@@ -109,6 +110,20 @@ offengelegt. Ein ausgeblendeter Titel entfernt nur seinen ungenutzten Platz.
 Summary-Navigation, Health-Indikator, Verbindung und Theme-Umschalter bleiben
 erreichbar.
 
+Jedes Standard- und Custom-Dashboard kann optional in vertikal angeordnete
+Abschnitte wie Räume, Etagen oder Funktionsgruppen gegliedert werden. Jeder
+Abschnitt verwendet intern das bestehende Portrait-/Landscape-Raster und kann
+seinen Titel ein- oder ausblenden. Widgets lassen sich zwischen Abschnitten
+verschieben oder bewusst „Nicht zugeordnet“ belassen. Dashboards ohne
+Abschnitte rendern unverändert im bisherigen Raster. Beim Löschen eines
+Abschnitts bleiben alle Widgets erhalten und wechseln sicher in den nicht
+zugeordneten Bereich.
+
+Ein Abschnitt kann optional die ID einer vorhandenen Home-Assistant-Area als
+read-only Metadatenreferenz speichern. Abschnitt und HA Area bleiben getrennte
+Konzepte: Abschnitte funktionieren ohne Area, und das Dashboard erstellt,
+benennt oder verändert niemals Home-Assistant-Areas.
+
 ### iPad mini als Wall-Display
 
 Für ein einzelnes iPad mini 1 mit iOS 9.3.5 ist **Geführter Zugriff** der
@@ -137,6 +152,9 @@ Dazu gehören unter anderem:
 
 - Dashboards erstellen, umbenennen, duplizieren und löschen
 - Standard-Dashboard festlegen
+- Abschnitte erstellen, umbenennen, sortieren und sicher löschen
+- Widgets Abschnitten zuordnen, verschieben oder nicht zugeordnet lassen
+- optional vorhandene Home-Assistant-Areas read-only referenzieren
 - Entities auswählen
 - Widgets hinzufügen und bearbeiten
 - Sichtbarkeit und Reihenfolge

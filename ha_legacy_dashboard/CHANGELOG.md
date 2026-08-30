@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Added
+
+- Added persistent logical dashboard sections with optional Home Assistant
+  Area references and safe unassigned-card fallback.
+
 ### Changed
 
 - Hardened responsive Sensor, Binary, Light, and Climate card presentations

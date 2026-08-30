@@ -83,6 +83,7 @@ function createHarness() {
         "js/api.js",
         "js/state.js",
         "js/layout.js",
+        "js/sections.js",
         "js/dashboards.js",
         "js/widgets.js",
         "js/entities.js",
@@ -188,6 +189,7 @@ test("Dashboard-Entwürfe unterstützen CRUD, Standardwechsel und Duplikate", fu
 
     const office = admin.Dashboards.create("buero", "Büro");
     assert.equal(office.widgets.length, 0);
+    assert.equal(office.sections.length, 0);
     assert.equal(admin.State.getSelectedDashboardId(), "buero");
 
     admin.Dashboards.update("buero", {

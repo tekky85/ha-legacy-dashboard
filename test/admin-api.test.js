@@ -7,6 +7,7 @@ const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
 const JpegSamples = require("./fixtures/jpeg-samples");
+const DashboardConfig = require("../src/config/dashboard");
 
 
 const FAKE_HA_TOKEN =
@@ -594,7 +595,7 @@ test(
                 );
 
                 assert.equal(initial.status, 200);
-                assert.equal(initial.json.schemaVersion, 9);
+                assert.equal(initial.json.schemaVersion, DashboardConfig.SCHEMA_VERSION);
                 assert.equal(
                     initial.json.dashboards[0].layouts.portrait.columns,
                     6
@@ -996,7 +997,7 @@ test(
                 assert.equal(initialConfig.status, 200);
                 assert.equal(
                     initialConfig.json.schemaVersion,
-                    9
+                    DashboardConfig.SCHEMA_VERSION
                 );
                 assert.equal(
                     initialConfig.json.defaultDashboardId,
@@ -1263,6 +1264,7 @@ test(
                         inventory.json.entities[0]
                     ).sort(),
                     [
+                        "area_id",
                         "area_name",
                         "device_class",
                         "device_id",
@@ -1273,6 +1275,7 @@ test(
                         "unit_of_measurement"
                     ]
                 );
+                assert.ok(Array.isArray(inventory.json.areas));
                 assert.equal(
                     JSON.stringify(inventory.json)
                         .indexOf("must-not-leak"),

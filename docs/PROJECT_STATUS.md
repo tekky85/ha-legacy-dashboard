@@ -1,8 +1,8 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 29. August 2026, Sprint 25.7 auf Basis von `2cf2d23` dokumentiert und
-repositoryseitig validiert. Sprint 25.6 wurde als `03648a9` implementiert, auf
-`origin/main` gepusht und auf dem Standalone-LXC ausgerollt.
+Stand: 30. August 2026, Sprint 26 auf Basis des sauberen, mit `origin/main`
+identischen Commits `6e94ea8` implementiert und repositoryseitig validiert.
+Sprint 25.7 wurde mit `6e94ea8` abgeschlossen.
 Release Candidate `1.0.0-rc.1` ist veröffentlicht; die JPEG-Härtung aus Sprint
 25.5 und die Kartenkorrekturen aus Sprint 25.6 gehören zum noch nicht neu
 getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/Safari- und verbleibende
@@ -14,6 +14,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-26-Ausgangscommit: `6e94ea8`
 - Sprint-25.7-Ausgangscommit: `2cf2d23`
 - Sprint-25.6-Ausgangscommit: `91045b8`
 - Sprint-25.6-Implementierungscommit: `03648a9`
@@ -135,6 +136,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 25.5 | HAOS Network Access & Background Upload Hardening | implementiert und lokal mit vollständigem Release Gate validiert; neuer HAOS-Build und Realgerätetest offen |
 | 25.6 | Card Size Matrix & Responsive Layout Hardening | implementiert und lokal mit vollständiger Test-/Browsermatrix validiert; iPad-mini-Abnahme offen |
 | 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; physische iPad-mini-Abnahme offen |
+| 26 | Persistent Dashboard Sections | implementiert; physische iPad-mini-Abnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -268,7 +270,7 @@ Nach Recovery ersetzt ein frischer Snapshot die veralteten Daten.
 
 ## 6. Persistente Konfiguration
 
-Die Konfiguration verwendet Schema 9. Zusätzlich zu
+Die Konfiguration verwendet Schema 10. Zusätzlich zu
 `defaultDashboardId` und `dashboards` enthält sie:
 
 ```json
@@ -295,9 +297,10 @@ Die Konfiguration verwendet Schema 9. Zusätzlich zu
 }
 ```
 
-Jeder Eintrag unter `dashboards` ergänzt `showTitle` und `background`; Details
-stehen in Abschnitt 22. Schema 1 bis 8 werden automatisch und atomar auf
-Schema 9 migriert. Bei Schema
+Jeder Eintrag unter `dashboards` ergänzt `showTitle`, `background` und
+`sections`; Widgets besitzen optional `sectionId`. Details zu Abschnitten
+stehen in Abschnitt 27. Schema 1 bis 9 werden automatisch und atomar auf
+Schema 10 migriert. Bei Schema
 4 bleiben die 6/12-Spalten-Layouts unverändert. Bei Schema 5 bleiben Summary
 und Layouts unverändert und die leeren Error-Standardwerte werden ergänzt.
 Vollständige Validierung, atomarer
@@ -580,6 +583,7 @@ Systemansichten ausgeliefert oder geloggt.
 | Snapshot und Cache | `src/services/system/snapshot.js`, `src/services/system/cache.js`, `src/services/system/index.js` |
 | System-API | `src/routes/system-dashboards.js` |
 | Schema/Persistenz | `src/config/dashboard.js`, `src/services/dashboard-config-store.js` |
+| Dashboard-Abschnitte | `src/config/dashboard.js`, `src/services/layout.js`, `src/admin/js/sections.js`, `src/admin/js/layout.js`, `src/admin/js/app.js`, `src/public/js/core/dashboard.js`, `src/public/js/core/layout.js`, `src/public/css/style.css` |
 | Legacy-Systemansichten | `src/public/system.html`, `src/public/js/system/common.js`, `src/public/js/system/summary.js`, `src/public/js/system/errors.js`, `src/public/css/system.css` |
 | Sprint-17.2-Layout | `src/public/js/core/layout.js`, `src/public/js/core/widget.js`, `src/public/css/style.css` |
 | Sprint-17.2-Widgets | `src/public/js/widgets/sensor.js`, `src/public/js/widgets/binary.js`, `src/public/js/widgets/light.js`, `src/public/js/widgets/climate.js` |
@@ -1872,3 +1876,75 @@ Access-Start und -Exit, Home-Taste, Summary, Errors, Custom Dashboard,
 Light/Climate, Rotation, Display-Dauerbetrieb, WLAN- und Backend-Reconnect sowie
 iPad-Reboot/Stromverlust. Mangels fernsteuerbarer iOS-9-Hardware bleiben diese
 Realgerätpunkte offen und sind kein bestandener Release Gate.
+
+## 27. Sprint 26 – Persistent Dashboard Sections
+
+Sprint 26 startete auf dem sauberen, mit `origin/main` identischen Commit
+`6e94ea8`. Das vorhandene Dashboardmodell wurde additiv von Schema 9 auf
+Schema 10 erweitert; es gibt keine zweite Konfigurationsdatei und kein
+paralleles Layoutformat.
+
+Jedes Default- oder Custom-Dashboard besitzt nun `sections`. Ein Abschnitt
+enthält die stabile ID, Titel, numerische Reihenfolge, `showTitle` und optional
+eine read-only `areaId`. Widgets referenzieren einen Abschnitt optional über
+`sectionId`; `null` bedeutet „Nicht zugeordnet“. Schema-9-Konfigurationen
+migrieren atomar mit leerer Abschnittsliste und nicht zugeordneten Widgets.
+Die vorhandenen Layoutkoordinaten, Hintergründe, Dashboardtitel und System-
+Dashboard-Regeln bleiben dabei unverändert. Dashboards ohne Abschnitte nehmen
+weiterhin exakt den bisherigen einzelnen Rasterpfad.
+
+Die bestehenden Portrait-/Landscape-Layouts bleiben die einzige persistente
+Geometriequelle. `x`, `y`, `w` und `h` werden bei vorhandenen Abschnitten als
+abschnittslokale Koordinaten interpretiert. Kollisionen werden deshalb nur
+zwischen sichtbaren Widgets desselben Abschnitts beziehungsweise innerhalb
+der nicht zugeordneten Gruppe geprüft. Das Wall-Display ordnet Abschnitte
+vertikal an und wendet das vorhandene absolute Flexbox-Raster separat auf die
+jeweilige Widget-Teilmenge an. Es wurde weder CSS Grid noch eine zweite
+Drag-and-drop-Geometrie in das Legacy-Frontend eingeführt. Focus bleibt über
+Widget-ID und State gebunden und außerhalb der Grid-Geometrie.
+
+Der geschützte Admin-Editor kann Abschnitte erstellen, umbenennen, nach oben
+oder unten sortieren, Titel ein-/ausblenden und löschen. Die Widgetmaske weist
+Karten einem Abschnitt oder „Nicht zugeordnet“ zu. Beim Wechsel in eine Gruppe
+mit belegten Koordinaten wird nur die betroffene Karte deterministisch auf den
+ersten freien Platz dieser Gruppe gesetzt. Beim Löschen eines Abschnitts
+werden niemals Widgets gelöscht: Alle betroffenen Karten wechseln nacheinander
+in die nicht zugeordnete Gruppe und erhalten nur bei einer dortigen Kollision
+eine freie Position.
+
+Die Area-Auswahl kommt aus dem bereits vorhandenen backendseitigen System-
+Snapshot der Home-Assistant-Area-Registry. Der Browser erhält nur reduzierte
+IDs und Namen sowie die sanitisierte `area_id` an Inventareinträgen. Abschnitt
+und HA Area sind ausdrücklich verschiedene Konzepte; Abschnitte funktionieren
+ohne Area. Es wurden keine neuen Home-Assistant-Kommandos, keine Area-Registry-
+Writes und keine neuen Write-Routen oder Allowlists ergänzt.
+
+Die Sprint-26-Tests decken Schema-9-Migration, Abschnittsvalidierung,
+abschnittslokale Kollisionen, Erstellen/Umbenennen/Sortieren/Löschen,
+Kartenrückführung, Zuordnung/Wechsel/Unassigned, alten Ein-Raster-Fallback,
+vertikale Legacy-Ausgabe, optionale Titel, Area-Read-only-Grenze, ES5 und
+CSS-Grid-Freiheit ab. Die bestehenden Tests bewahren Default-/Custom-
+Dashboards, Hintergründe, Titel, Theme, HomeScreen-Navigation, Focus,
+Presentation-Tiers, Summary/Errors und Home-Assistant-Sicherheitsgrenzen.
+Alle geänderten JavaScript-Dateien bestanden `node --check`; die vollständige
+Testsuite bestand mit 297 von 297 Tests. Ein kontrollierter Browserlauf mit
+lokalem Mock-Home-Assistant und Fake-Zugangsdaten bestätigte bei 768 x 1024
+und 1024 x 768 Pixeln drei vertikal getrennte Abschnitte ohne Kartenüberlappung
+oder horizontales Scrollen, den Footer unterhalb des Inhalts sowie ein korrekt
+zentriertes Focus-Overlay. Dabei wurde eine reale Legacy-Layout-Regression
+gefunden und behoben: Das Ersetzen der Section-CSS-Klasse veränderte eine live
+`HTMLCollection`, sodass Mobile Safari nachfolgende Raster überspringen konnte.
+Das Layout erhält die Section-Klasse nun dauerhaft; ein Regressionstest sichert
+dieses Verhalten ab.
+
+Produkt-Screenshots wurden nicht künstlich ersetzt. Dashboards ohne Abschnitte
+verwenden weiterhin die unveränderte Ein-Raster-Darstellung; eine aktualisierte
+Admin-Aufnahme des neuen Section Managers soll erst aus einer realen oder
+kontrollierten, vollständig anonymisierten Instanz aufgenommen werden.
+
+Auf dem echten iPad mini 1 bleiben Portrait und Landscape, Rotation,
+Abschnittstitel an/aus, lange Titel, viele Abschnitte, nicht zugeordnete Karten,
+Hintergrundkontinuität, Footerposition, horizontales Überlaufen und Focus über
+Abschnittsgrenzen manuell zu prüfen. Für Sprint 26.1 stehen `areaId` und die
+Section-Zuordnung bereits als saubere read-only Grundlage für Native Room
+Cards und bestätigte Area-basierte Vorschläge bereit.

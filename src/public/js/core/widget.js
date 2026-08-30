@@ -35,6 +35,12 @@ function Widget(config) {
             config.size
         );
 
+    this.sectionId =
+        typeof config.sectionId === "string" &&
+        /^[a-z0-9][a-z0-9-]{0,62}$/.test(config.sectionId)
+            ? config.sectionId
+            : null;
+
 }
 
 

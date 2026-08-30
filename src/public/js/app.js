@@ -2101,7 +2101,8 @@ function loadDashboardConfiguration() {
 
                     Dashboard.configure(
                         data.widgets,
-                        data.layouts
+                        data.layouts,
+                        data.sections
                     );
 
             }

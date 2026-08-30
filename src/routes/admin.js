@@ -352,6 +352,11 @@ function sanitizeSystemEntity(entity) {
             typeof context.areaName === "string"
                 ? context.areaName
                 : null,
+        area_id:
+            typeof context.areaId === "string" &&
+            dashboardConfig.AREA_ID_PATTERN.test(context.areaId)
+                ? context.areaId
+                : null,
         device_name:
             typeof context.deviceName === "string" &&
             context.deviceName !== entity.entityId &&
@@ -363,6 +368,27 @@ function sanitizeSystemEntity(entity) {
             dashboardConfig.DEVICE_ID_PATTERN.test(context.deviceId)
                 ? context.deviceId
                 : null
+    };
+
+}
+
+
+function sanitizeArea(area) {
+
+    if (
+        !area ||
+        typeof area.areaId !== "string" ||
+        !dashboardConfig.AREA_ID_PATTERN.test(area.areaId)
+    ) {
+        return null;
+    }
+
+    return {
+        id: area.areaId,
+        name:
+            typeof area.name === "string" && area.name
+                ? area.name
+                : area.areaId
     };
 
 }
@@ -495,6 +521,10 @@ router.post("/dashboards", function (req, res) {
                 : null,
         refreshIntervalMs:
             body.refreshIntervalMs,
+        sections:
+            Array.isArray(body.sections)
+                ? body.sections
+                : [],
         widgets:
             Array.isArray(body.widgets)
                 ? body.widgets
@@ -576,6 +606,10 @@ router.put("/dashboards/:dashboardId", function (req, res) {
             typeof body.refreshIntervalMs !== "undefined"
                 ? body.refreshIntervalMs
                 : current.refreshIntervalMs,
+        sections:
+            typeof body.sections !== "undefined"
+                ? body.sections
+                : current.sections,
         widgets:
             typeof body.widgets !== "undefined"
                 ? body.widgets
@@ -950,6 +984,15 @@ router.put(
         const current =
             dashboard.widgets[widgetIndex];
 
+        const nextSectionId =
+            typeof body.sectionId !== "undefined"
+                ? body.sectionId
+                : current.sectionId;
+
+        const sectionChanged =
+            (current.sectionId || null) !==
+            (nextSectionId || null);
+
 
         dashboard.widgets[widgetIndex] = {
             id: current.id,
@@ -989,16 +1032,25 @@ router.put(
                 typeof body.visible !== "undefined"
                     ? body.visible
                     : current.visible,
+            sectionId:
+                nextSectionId,
             size:
                 typeof body.size !== "undefined"
                     ? body.size
                     : current.size
         };
 
-        Layout.ensureVisibleWidgetPlacement(
-            dashboard,
-            dashboard.widgets[widgetIndex]
-        );
+        if (sectionChanged) {
+            Layout.relocateWidget(
+                dashboard,
+                dashboard.widgets[widgetIndex]
+            );
+        } else {
+            Layout.ensureVisibleWidgetPlacement(
+                dashboard,
+                dashboard.widgets[widgetIndex]
+            );
+        }
 
         const persisted =
             persistConfiguration(res, candidate);
@@ -1099,8 +1151,25 @@ router.get("/entities", async function (req, res) {
                 );
             });
 
+        const areas = Object.keys(
+            snapshot.metadata && snapshot.metadata.areas
+                ? snapshot.metadata.areas
+                : {}
+        )
+            .map(function (areaId) {
+                return sanitizeArea(
+                    snapshot.metadata.areas[areaId]
+                );
+            })
+            .filter(Boolean)
+            .sort(function (first, second) {
+                return first.name.localeCompare(second.name) ||
+                    first.id.localeCompare(second.id);
+            });
+
         return res.json({
-            entities: entities
+            entities: entities,
+            areas: areas
         });
     } catch (error) {
         logger.error(

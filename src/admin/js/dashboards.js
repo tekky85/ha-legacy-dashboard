@@ -89,6 +89,7 @@
             showTitle: true,
             background: null,
             refreshIntervalMs: 5000,
+            sections: [],
             widgets: [],
             layouts: admin.Layout.emptyLayouts()
         });
@@ -153,6 +154,7 @@
             showTitle: source.showTitle !== false,
             background: null,
             refreshIntervalMs: source.refreshIntervalMs,
+            sections: admin.State.clone(source.sections || []),
             widgets: source.widgets.map(function (widget) {
                 const duplicateWidget = admin.State.clone(widget);
                 duplicateWidget.id = uniqueDuplicateWidgetId(

@@ -59,6 +59,20 @@
         return widget;
     }
 
+    function validateSectionId(dashboard, sectionId) {
+        if (!sectionId) {
+            return null;
+        }
+
+        if (!(dashboard.sections || []).some(function (section) {
+            return section.id === sectionId;
+        })) {
+            throw new Error("Bitte einen gültigen Abschnitt auswählen.");
+        }
+
+        return sectionId;
+    }
+
     function assignOrders(dashboard) {
         dashboard.widgets.forEach(function (widget, index) {
             widget.order = (index + 1) * 10;
@@ -156,6 +170,10 @@
                     ? Number(fields.order)
                     : maxOrder + 10,
             visible: Boolean(fields.visible),
+            sectionId: validateSectionId(
+                dashboard,
+                fields.sectionId
+            ),
             size: validateSize(fields.size || "normal")
         };
 
@@ -191,6 +209,24 @@
         widget.order = order;
         widget.visible = Boolean(fields.visible);
         widget.size = size;
+
+        const nextSectionId = validateSectionId(
+            dashboard,
+            fields.sectionId
+        );
+
+        if (widget.sectionId !== nextSectionId) {
+            widget.sectionId = nextSectionId;
+            admin.Layout.relocateWidget(
+                dashboardId,
+                widgetId
+            );
+        } else {
+            admin.Layout.ensureVisiblePlacement(
+                dashboardId,
+                widgetId
+            );
+        }
 
         normalizeOrders(dashboard);
         admin.State.markDirty();

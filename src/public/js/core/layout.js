@@ -497,7 +497,7 @@ var LegacyLayout = (function () {
     }
 
 
-    function resolveGridGeometry(name, container, columns) {
+    function resolveGridGeometry(name, container, columns, cacheKey) {
 
         var containerWidth = parseFloat(container.clientWidth);
         var signature;
@@ -512,7 +512,8 @@ var LegacyLayout = (function () {
         signature =
             Math.round(containerWidth) + ":" + columns;
 
-        cached = geometryCache[name];
+        cacheKey = name + ":" + (cacheKey || "dashboard");
+        cached = geometryCache[cacheKey];
 
 
         if (cached && cached.signature === signature) {
@@ -528,7 +529,7 @@ var LegacyLayout = (function () {
             )
         };
 
-        geometryCache[name] = cached;
+        geometryCache[cacheKey] = cached;
 
         return cached.geometry;
 
@@ -551,10 +552,11 @@ var LegacyLayout = (function () {
     }
 
 
-    function apply(container) {
+    function apply(container, widgets, cacheKey) {
 
         var name;
         var profile;
+        var activeWidgets = widgets || configuredWidgets;
         var cards;
         var geometry;
         var maximumRow = 0;
@@ -568,9 +570,15 @@ var LegacyLayout = (function () {
         var effectiveWidth;
         var effectiveHeight;
         var widthPercent;
+        var sectionGrid;
 
 
-        if (!container || !configuredWidgets.length) {
+        if (!container) {
+            return;
+        }
+
+        if (!activeWidgets.length) {
+            container.style.height = "0px";
             return;
         }
 
@@ -578,7 +586,7 @@ var LegacyLayout = (function () {
         name = profileName();
         profile = safeProfile(
             configuredLayouts,
-            configuredWidgets,
+            activeWidgets,
             name
         );
 
@@ -591,11 +599,18 @@ var LegacyLayout = (function () {
         geometry = resolveGridGeometry(
             name,
             container,
-            profile.columns
+            profile.columns,
+            cacheKey
         );
 
+        sectionGrid =
+            (" " + (container.className || "") + " ")
+                .indexOf(" dashboard-section-grid ") !== -1;
+
         container.className =
-            "grid grid-layout-active layout-" +
+            "grid " +
+            (sectionGrid ? "dashboard-section-grid " : "") +
+            "grid-layout-active layout-" +
             name;
 
         cards =

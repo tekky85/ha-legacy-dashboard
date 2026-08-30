@@ -494,8 +494,8 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
     const systemHtml = read("src/public/system.html");
 
     assert.ok(
-        indexHtml.indexOf("/js/core/theme.js?v=46") <
-            indexHtml.indexOf("/css/style.css?v=46")
+        indexHtml.indexOf("/js/core/theme.js?v=48") <
+            indexHtml.indexOf("/css/style.css?v=48")
     );
     assert.ok(
         systemHtml.indexOf("/js/core/theme.js?v=44") <
@@ -509,7 +509,7 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
         (systemHtml.match(/\/js\/core\/theme\.js/g) || []).length,
         1
     );
-    assert.match(indexHtml, /\/js\/app\.js\?v=46/);
+    assert.match(indexHtml, /\/js\/app\.js\?v=48/);
     assert.match(systemHtml, /\/js\/system\/summary\.js\?v=44/);
     assert.match(systemHtml, /\/js\/system\/errors\.js\?v=44/);
 });

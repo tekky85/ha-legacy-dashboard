@@ -173,6 +173,35 @@
         });
     }
 
+    function sortedSections(dashboard) {
+        return (dashboard.sections || []).slice().sort(function (first, second) {
+            if (first.order !== second.order) {
+                return first.order - second.order;
+            }
+            return first.id.localeCompare(second.id);
+        });
+    }
+
+    function sectionTitle(dashboard, sectionId) {
+        if (!sectionId) {
+            return "Nicht zugeordnet";
+        }
+
+        const section = (dashboard.sections || []).find(function (item) {
+            return item.id === sectionId;
+        });
+
+        return section ? section.title : "Nicht zugeordnet";
+    }
+
+    function sectionWidgets(dashboard, sectionId) {
+        const expected = sectionId || null;
+
+        return sortedWidgets(dashboard).filter(function (widget) {
+            return (widget.sectionId || null) === expected;
+        });
+    }
+
     function backgroundImageUrl(background) {
         return background && background.imageId
             ? "/assets/backgrounds/" +
@@ -394,6 +423,11 @@
         meta.appendChild(createElement(
             "span",
             "",
+            "Abschnitt: " + sectionTitle(dashboard, widget.sectionId)
+        ));
+        meta.appendChild(createElement(
+            "span",
+            "",
             widget.visible ? "Sichtbar" : "Ausgeblendet"
         ));
         content.appendChild(title);
@@ -440,6 +474,134 @@
         label.htmlFor = input.id;
         container.appendChild(label);
         container.appendChild(input);
+    }
+
+    function renderSectionsEditor(dashboard) {
+        const section = createElement("section", "dashboard-sections-editor");
+        const heading = createElement("div", "section-heading");
+        const headingText = createElement("div");
+        const list = createElement("div", "dashboard-section-list");
+        const areas = admin.State.getAreas();
+        const sections = sortedSections(dashboard);
+
+        headingText.appendChild(createElement("h2", "", "Abschnitte"));
+        headingText.appendChild(createElement(
+            "p",
+            "muted",
+            "Optionale logische Bereiche. Nicht zugeordnete Widgets bleiben sichtbar."
+        ));
+        heading.appendChild(headingText);
+        heading.appendChild(createButton(
+            "+ Abschnitt",
+            "section-add",
+            "",
+            "button primary compact"
+        ));
+        section.appendChild(heading);
+
+        if (sections.length === 0) {
+            list.appendChild(createElement(
+                "p",
+                "empty-state",
+                "Noch keine Abschnitte. Das bestehende Dashboard bleibt unverändert."
+            ));
+        }
+
+        sections.forEach(function (item, index) {
+            const card = createElement("article", "dashboard-section-card");
+            const fields = createElement("div", "dashboard-section-fields");
+            const titleField = createElement("div");
+            const titleInput = createElement("input");
+            const areaField = createElement("div");
+            const areaSelect = createElement("select");
+            const showTitleLabel = createElement("label", "checkbox-row");
+            const showTitleInput = createElement("input");
+            const actions = createElement("div", "dashboard-section-actions");
+            const count = sectionWidgets(dashboard, item.id).length;
+
+            titleInput.id = "sectionTitle-" + item.id;
+            titleInput.type = "text";
+            titleInput.maxLength = 120;
+            titleInput.required = true;
+            titleInput.value = item.title;
+            titleInput.dataset.field = "section-title";
+            titleInput.dataset.sectionId = item.id;
+            appendLabeledInput(titleField, "Titel", titleInput);
+
+            areaSelect.id = "sectionArea-" + item.id;
+            areaSelect.dataset.field = "section-area";
+            areaSelect.dataset.sectionId = item.id;
+            appendSelectOption(
+                areaSelect,
+                "",
+                "Keine Home-Assistant-Area",
+                item.areaId || ""
+            );
+            areas.forEach(function (area) {
+                appendSelectOption(
+                    areaSelect,
+                    area.id,
+                    area.name,
+                    item.areaId || ""
+                );
+            });
+            if (
+                item.areaId &&
+                !areas.some(function (area) {
+                    return area.id === item.areaId;
+                })
+            ) {
+                appendSelectOption(
+                    areaSelect,
+                    item.areaId,
+                    "Nicht verfügbare Area (" + item.areaId + ")",
+                    item.areaId
+                );
+            }
+            appendLabeledInput(areaField, "Home-Assistant-Area (optional)", areaSelect);
+
+            showTitleInput.type = "checkbox";
+            showTitleInput.checked = item.showTitle !== false;
+            showTitleInput.dataset.field = "section-show-title";
+            showTitleInput.dataset.sectionId = item.id;
+            showTitleLabel.appendChild(showTitleInput);
+            showTitleLabel.appendChild(createElement(
+                "span",
+                "",
+                "Titel im Wall-Display anzeigen"
+            ));
+
+            fields.appendChild(titleField);
+            fields.appendChild(areaField);
+            fields.appendChild(showTitleLabel);
+            card.appendChild(fields);
+            card.appendChild(createElement(
+                "p",
+                "dashboard-section-meta",
+                item.id + " · " + count + (count === 1 ? " Widget" : " Widgets")
+            ));
+
+            const up = createButton("↑", "section-up", item.id, "icon-button");
+            up.disabled = index === 0;
+            up.setAttribute("aria-label", item.title + " nach oben");
+            actions.appendChild(up);
+
+            const down = createButton("↓", "section-down", item.id, "icon-button");
+            down.disabled = index === sections.length - 1;
+            down.setAttribute("aria-label", item.title + " nach unten");
+            actions.appendChild(down);
+            actions.appendChild(createButton(
+                "Löschen",
+                "section-delete",
+                item.id,
+                "button danger compact"
+            ));
+            card.appendChild(actions);
+            list.appendChild(card);
+        });
+
+        section.appendChild(list);
+        return section;
     }
 
     function layoutButton(label, action, widgetId, title) {
@@ -619,7 +781,6 @@
         const headingText = createElement("div");
         const tabs = createElement("div", "layout-profile-tabs");
         const themeTabs = createElement("div", "layout-theme-tabs");
-        const grid = createElement("div", "layout-editor-grid");
         const canvas = createElement("div", "dashboard-preview-canvas");
         const backgroundOverlay = createElement(
             "div",
@@ -627,14 +788,14 @@
         );
         const profileName = activeLayoutProfile;
         const columns = admin.Layout.COLUMNS[profileName];
-        const rows = admin.Layout.rowCount(dashboard, profileName) + 1;
-        const preview = createElement("div", "layout-preview");
+        const dashboardSections = sortedSections(dashboard);
+        const unassignedWidgets = sectionWidgets(dashboard, null);
 
         headingText.appendChild(createElement("h2", "", "Layout"));
         headingText.appendChild(createElement(
             "p",
             "muted",
-            "Kacheln ziehen, am Raster einrasten oder über die Tasten anpassen."
+            "Jeder Abschnitt besitzt ein eigenes Raster; Kacheln werden im Widget-Dialog zugeordnet."
         ));
 
         [
@@ -699,31 +860,73 @@
             ));
         }
 
-        grid.classList.add("preview-theme-" + previewTheme);
-        grid.dataset.layoutGrid = profileName;
-        grid.dataset.rowHeight = "194";
-        grid.style.setProperty("--layout-columns", String(columns));
-        grid.style.gridTemplateRows = "repeat(" + rows + ", 184px)";
+        function appendLayoutGroup(sectionModel, widgets, isUnassigned) {
+            const wrapper = createElement("div", "dashboard-preview-section");
+            const grid = createElement("div", "layout-editor-grid");
+            const preview = createElement("div", "layout-preview");
+            const sectionId = sectionModel ? sectionModel.id : "";
+            const rows = admin.Layout.rowCount(
+                dashboard,
+                profileName,
+                sectionId
+            ) + 1;
 
-        sortedWidgets(dashboard).forEach(function (widget) {
-            if (widget.visible) {
-                grid.appendChild(
-                    renderLayoutTile(dashboard, widget, profileName)
-                );
+            if (
+                dashboardSections.length > 0 &&
+                (isUnassigned || sectionModel.showTitle !== false)
+            ) {
+                wrapper.appendChild(createElement(
+                    "div",
+                    "dashboard-preview-section-title",
+                    isUnassigned ? "Nicht zugeordnet" : sectionModel.title
+                ));
             }
-        });
 
-        preview.hidden = true;
-        preview.setAttribute("aria-hidden", "true");
-        grid.appendChild(preview);
-        canvas.appendChild(grid);
+            grid.classList.add("preview-theme-" + previewTheme);
+            grid.dataset.layoutGrid = profileName;
+            grid.dataset.sectionId = sectionId;
+            grid.dataset.rowHeight = "194";
+            grid.style.setProperty("--layout-columns", String(columns));
+            grid.style.gridTemplateRows = "repeat(" + rows + ", 184px)";
+
+            widgets.forEach(function (widget) {
+                if (widget.visible) {
+                    grid.appendChild(
+                        renderLayoutTile(dashboard, widget, profileName)
+                    );
+                }
+            });
+
+            preview.hidden = true;
+            preview.setAttribute("aria-hidden", "true");
+            grid.appendChild(preview);
+            wrapper.appendChild(grid);
+            canvas.appendChild(wrapper);
+        }
+
+        if (dashboardSections.length === 0) {
+            appendLayoutGroup(null, unassignedWidgets, true);
+        } else {
+            dashboardSections.forEach(function (sectionModel) {
+                appendLayoutGroup(
+                    sectionModel,
+                    sectionWidgets(dashboard, sectionModel.id),
+                    false
+                );
+            });
+
+            if (unassignedWidgets.length > 0) {
+                appendLayoutGroup(null, unassignedWidgets, true);
+            }
+        }
+
         section.appendChild(canvas);
         section.appendChild(createElement(
             "p",
             "layout-help muted",
             profileName === "portrait"
-                ? "Portrait verwendet 6 Spalten. Mindestbreite: 2 Spalten."
-                : "Landscape verwendet 12 Spalten. Climate benötigt mindestens 3 Spalten."
+                ? "Portrait verwendet je Abschnitt 6 Spalten. Mindestbreite: 2 Spalten."
+                : "Landscape verwendet je Abschnitt 12 Spalten. Climate benötigt mindestens 3 Spalten."
         ));
         return section;
     }
@@ -818,6 +1021,9 @@
         elements.dashboardEditor.appendChild(settings);
         elements.dashboardEditor.appendChild(
             renderBackgroundEditor(dashboard)
+        );
+        elements.dashboardEditor.appendChild(
+            renderSectionsEditor(dashboard)
         );
         elements.dashboardEditor.appendChild(
             renderLayoutEditor(dashboard)
@@ -1342,6 +1548,8 @@
     }
 
     function openWidgetForm(widget, mode, entity) {
+        const dashboard = admin.State.getSelectedDashboard();
+
         pendingEntity = entity || null;
         elements.widgetDialogMode.value = mode;
         elements.widgetIdInput.value = widget.id || "";
@@ -1356,6 +1564,21 @@
         elements.widgetUnitInput.value = widget.unit;
         elements.widgetOrderInput.value = String(widget.order);
         elements.widgetSizeInput.value = widget.size || "normal";
+        elements.widgetSectionInput.textContent = "";
+        appendSelectOption(
+            elements.widgetSectionInput,
+            "",
+            "Nicht zugeordnet",
+            widget.sectionId || ""
+        );
+        sortedSections(dashboard).forEach(function (section) {
+            appendSelectOption(
+                elements.widgetSectionInput,
+                section.id,
+                section.title,
+                widget.sectionId || ""
+            );
+        });
         elements.widgetVisibleInput.checked = widget.visible;
         elements.widgetFormError.textContent = "";
         openDialog(elements.widgetDialog);
@@ -1464,6 +1687,7 @@
             const entities = result.entities || [];
 
             admin.State.setEntities(entities);
+            admin.State.setAreas(result.areas || []);
             rebuildEntityRuleIndex(entities);
             populateEntityRuleFilters();
         } catch (error) {
@@ -1472,6 +1696,7 @@
             }
             entityRuleLoadError = errorMessage(error);
             admin.State.setEntities([]);
+            admin.State.setAreas([]);
             rebuildEntityRuleIndex([]);
             populateEntityRuleFilters();
         }
@@ -1571,6 +1796,7 @@
         await loadEntities();
         await loadCriticalLabels();
         await loadDiagnosticsStatus();
+        renderEditor();
         renderSummarySettings();
         renderErrorSettings();
         renderEntityRules();
@@ -1668,6 +1894,27 @@
                 });
                 renderDashboardList();
                 renderEditor();
+            } else if (event.target.dataset.field === "section-title") {
+                admin.Sections.update(
+                    dashboard.id,
+                    event.target.dataset.sectionId,
+                    {title: event.target.value}
+                );
+                renderEditor();
+            } else if (event.target.dataset.field === "section-show-title") {
+                admin.Sections.update(
+                    dashboard.id,
+                    event.target.dataset.sectionId,
+                    {showTitle: event.target.checked}
+                );
+                renderEditor();
+            } else if (event.target.dataset.field === "section-area") {
+                admin.Sections.update(
+                    dashboard.id,
+                    event.target.dataset.sectionId,
+                    {areaId: event.target.value || null}
+                );
+                renderEditor();
             } else if (event.target.dataset.field === "dashboard-refresh") {
                 admin.Dashboards.update(dashboard.id, {
                     refreshIntervalMs: event.target.value
@@ -1728,7 +1975,43 @@
         hideNotice();
 
         try {
-            if (button.dataset.action === "layout-profile") {
+            if (button.dataset.action === "section-add") {
+                admin.Sections.create(dashboard.id, {
+                    title: "Neuer Abschnitt",
+                    showTitle: true,
+                    areaId: null
+                });
+                renderAll();
+            } else if (button.dataset.action === "section-up") {
+                admin.Sections.move(
+                    dashboard.id,
+                    button.dataset.id,
+                    "up"
+                );
+                renderAll();
+            } else if (button.dataset.action === "section-down") {
+                admin.Sections.move(
+                    dashboard.id,
+                    button.dataset.id,
+                    "down"
+                );
+                renderAll();
+            } else if (button.dataset.action === "section-delete") {
+                const section = dashboard.sections.find(function (item) {
+                    return item.id === button.dataset.id;
+                });
+
+                if (section && window.confirm(
+                    "Abschnitt „" + section.title +
+                    "“ löschen? Seine Widgets bleiben erhalten und werden nicht zugeordnet."
+                )) {
+                    admin.Sections.remove(
+                        dashboard.id,
+                        button.dataset.id
+                    );
+                    renderAll();
+                }
+            } else if (button.dataset.action === "layout-profile") {
                 activeLayoutProfile = button.dataset.id;
                 renderEditor();
             } else if (button.dataset.action === "preview-theme") {
@@ -2088,6 +2371,7 @@
             unit: suggestion.unit,
             order: maxOrder + 10,
             visible: true,
+            sectionId: null,
             size: "normal"
         }, "create", entity);
     }
@@ -2100,6 +2384,7 @@
             unit: elements.widgetUnitInput.value,
             order: elements.widgetOrderInput.value,
             size: elements.widgetSizeInput.value,
+            sectionId: elements.widgetSectionInput.value || null,
             visible: elements.widgetVisibleInput.checked
         };
     }
@@ -2148,7 +2433,7 @@
             "widgetDialogTitle", "widgetEntityValue", "widgetTypeValue",
             "widgetTitleInput", "widgetSubtitleInput", "widgetIconInput",
             "widgetUnitInput", "widgetOrderInput", "widgetSizeInput",
-            "widgetVisibleInput",
+            "widgetSectionInput", "widgetVisibleInput",
             "widgetFormError", "summaryShowMediaTitles",
             "entityRulesConfiguredCount", "openEntityRulesButton",
             "entityRulesDialog", "entityRuleSearch",

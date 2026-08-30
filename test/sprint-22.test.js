@@ -408,7 +408,7 @@ test("Device Aggregation ergänzt Counts und konservativen Failure Hint", functi
 });
 
 
-test("Schema 9 migriert Regeln und validiert Grenzen", function () {
+test("Altes Schema migriert Regeln und validiert Grenzen", function () {
     const schema7 = DashboardConfig.cloneConfiguration(
         DashboardConfig.DEFAULT_CONFIGURATION
     );
@@ -417,7 +417,7 @@ test("Schema 9 migriert Regeln und validiert Grenzen", function () {
 
     const migrated = DashboardConfig.migrateConfiguration(schema7);
     assert.equal(migrated.migrated, true);
-    assert.equal(migrated.configuration.schemaVersion, 9);
+    assert.equal(migrated.configuration.schemaVersion, DashboardConfig.SCHEMA_VERSION);
     assert.equal(
         migrated.configuration.systemDashboards.errors.rules
             .riskClasses.safety.unavailableGraceMs,

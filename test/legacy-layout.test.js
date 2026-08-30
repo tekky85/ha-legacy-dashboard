@@ -153,6 +153,38 @@ test("Legacy-Raster nutzt Größen-Presets als sicheren Profil-Fallback", functi
 });
 
 
+test("Abschnittsraster behalten ihre Selektorklasse nach dem Layoutlauf", function () {
+    const context = vm.createContext({
+        window: {innerWidth: 768, innerHeight: 1024},
+        Math: Math,
+        isFinite: isFinite
+    });
+    const widget = {id: "section-card", type: "sensor", size: "normal"};
+    const card = createCard(widget.id);
+    const container = createContainer([card]);
+
+    container.className = "grid dashboard-section-grid";
+
+    vm.runInContext(read("src/public/js/core/layout.js"), context);
+    context.LegacyLayout.configure({
+        portrait: {
+            columns: 6,
+            items: {"section-card": {x: 0, y: 0, w: 3, h: 1}}
+        },
+        landscape: {
+            columns: 12,
+            items: {"section-card": {x: 0, y: 0, w: 3, h: 1}}
+        }
+    }, [widget]);
+
+    context.LegacyLayout.apply(container, [widget], "section-one");
+
+    assert.match(container.className, /dashboard-section-grid/);
+    assert.match(container.className, /grid-layout-active/);
+    assert.equal(container.style.height, "128px");
+});
+
+
 test("Presentation Modes folgen Typ und Geometrie und werden je Profil gecacht", function () {
     const context = vm.createContext({
         window: {innerWidth: 768, innerHeight: 1024},

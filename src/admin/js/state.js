@@ -5,6 +5,7 @@
     let draftConfiguration = null;
     let selectedDashboardId = null;
     let entities = [];
+    let areas = [];
     let previewEntities = [];
     let dirty = false;
 
@@ -39,6 +40,7 @@
         draftConfiguration = null;
         selectedDashboardId = null;
         entities = [];
+        areas = [];
         previewEntities = [];
         dirty = false;
     }
@@ -129,6 +131,12 @@
         },
         getEntities: function () {
             return clone(entities);
+        },
+        setAreas: function (nextAreas) {
+            areas = clone(nextAreas || []);
+        },
+        getAreas: function () {
+            return clone(areas);
         },
         setPreviewEntities: function (nextEntities) {
             previewEntities = clone(nextEntities || []);
