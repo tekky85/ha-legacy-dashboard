@@ -21,7 +21,8 @@ const IssueRules =
 const DashboardBackgrounds =
     require("../services/dashboard-backgrounds");
 
-const SCHEMA_VERSION = 10;
+const SCHEMA_VERSION = 11;
+const ROOM_SCHEMA_VERSION = 11;
 const SECTION_SCHEMA_VERSION = 10;
 const APPEARANCE_SCHEMA_VERSION = 9;
 const RULES_SCHEMA_VERSION = 8;
@@ -76,8 +77,31 @@ const SUPPORTED_WIDGET_TYPES = [
     "sensor",
     "binary",
     "light",
-    "climate"
+    "climate",
+    "room"
 ];
+
+const ROOM_SINGLE_ENTITY_FIELDS = [
+    "temperature",
+    "humidity",
+    "climate",
+    "presence"
+];
+
+const ROOM_ENTITY_LIST_FIELDS = [
+    "windows",
+    "lights",
+    "switches",
+    "covers",
+    "fans",
+    "mediaPlayers",
+    "locks",
+    "batteries",
+    "alerts",
+    "secondary"
+];
+
+const MAXIMUM_ROOM_ENTITY_LIST_LENGTH = 64;
 
 const SUPPORTED_WIDGET_SIZES = [
     "compact",
@@ -383,21 +407,27 @@ function validateConfigurationVersion(candidate, schemaVersion) {
             widgetIds[widget.id] = true;
 
             if (
+                typeof widget.type !== "string" ||
+                SUPPORTED_WIDGET_TYPES.indexOf(widget.type) === -1 ||
+                (
+                    widget.type === "room" &&
+                    schemaVersion < ROOM_SCHEMA_VERSION
+                )
+            ) {
+                throw new Error(
+                    "Widget-Typ ist ungültig: " +
+                    widget.id
+                );
+            }
+
+            if (widget.type === "room") {
+                validateRoomWidget(widget);
+            } else if (
                 typeof widget.entity !== "string" ||
                 !ENTITY_ID_PATTERN.test(widget.entity)
             ) {
                 throw new Error(
                     "Widget-Entity ist ungültig: " +
-                    widget.id
-                );
-            }
-
-            if (
-                typeof widget.type !== "string" ||
-                SUPPORTED_WIDGET_TYPES.indexOf(widget.type) === -1
-            ) {
-                throw new Error(
-                    "Widget-Typ ist ungültig: " +
                     widget.id
                 );
             }
@@ -501,6 +531,118 @@ function validateConfigurationVersion(candidate, schemaVersion) {
 
 
     return true;
+
+}
+
+
+function validateOptionalEntity(value, fieldName) {
+
+    if (
+        value !== null &&
+        (
+            typeof value !== "string" ||
+            !ENTITY_ID_PATTERN.test(value)
+        )
+    ) {
+        throw new Error(fieldName + " ist ungültig");
+    }
+
+}
+
+
+function validateRoomEntityList(value, fieldName) {
+
+    if (
+        !Array.isArray(value) ||
+        value.length > MAXIMUM_ROOM_ENTITY_LIST_LENGTH
+    ) {
+        throw new Error(fieldName + " ist ungültig");
+    }
+
+    validateEntityList(value, fieldName);
+
+}
+
+
+function validateRoomBackground(background, widgetId) {
+
+    if (background === null) {
+        return;
+    }
+
+    if (
+        !background ||
+        typeof background !== "object" ||
+        typeof background.imageId !== "string" ||
+        !DashboardBackgrounds.IMAGE_ID_PATTERN.test(background.imageId) ||
+        BACKGROUND_POSITIONS.indexOf(background.position) === -1 ||
+        BACKGROUND_SIZES.indexOf(background.size) === -1 ||
+        BACKGROUND_OVERLAYS.indexOf(background.overlay) === -1
+    ) {
+        const error = new Error(
+            "Room-Card-Hintergrund ist ungültig: " + widgetId
+        );
+
+        error.code = "invalid_room_background";
+        throw error;
+    }
+
+}
+
+
+function validateRoomWidget(widget) {
+
+    const room = widget.room;
+
+    if (!room || typeof room !== "object" || Array.isArray(room)) {
+        const error = new Error(
+            "Room-Card-Konfiguration fehlt: " + widget.id
+        );
+
+        error.code = "invalid_room_configuration";
+        throw error;
+    }
+
+    if (
+        room.areaId !== null &&
+        (
+            typeof room.areaId !== "string" ||
+            !AREA_ID_PATTERN.test(room.areaId)
+        )
+    ) {
+        throw new Error("Room-Card-Area ist ungültig: " + widget.id);
+    }
+
+    if (
+        typeof room.collapsible !== "boolean" ||
+        typeof room.defaultExpanded !== "boolean"
+    ) {
+        throw new Error("Room-Card-Darstellung ist ungültig: " + widget.id);
+    }
+
+    validateRoomBackground(room.background, widget.id);
+
+    if (
+        !room.entities ||
+        typeof room.entities !== "object" ||
+        Array.isArray(room.entities)
+    ) {
+        throw new Error("Room-Card-Entities sind ungültig: " + widget.id);
+    }
+
+    ROOM_SINGLE_ENTITY_FIELDS.forEach(function (fieldName) {
+        validateOptionalEntity(
+            room.entities[fieldName],
+            "Room-Card-Entity " + fieldName
+        );
+    });
+
+    ROOM_ENTITY_LIST_FIELDS.forEach(function (fieldName) {
+        validateRoomEntityList(
+            room.entities[fieldName],
+            "Room-Card-Entities " + fieldName
+        );
+    });
 
 }
 
@@ -940,9 +1082,12 @@ function validateConfiguration(candidate) {
 
 function cloneWidget(widget) {
 
-    return {
+    const cloned = {
         id: widget.id,
-        entity: widget.entity,
+        entity:
+            typeof widget.entity === "string"
+                ? widget.entity
+                : "",
         type: widget.type,
         title: widget.title,
         subtitle: widget.subtitle,
@@ -959,6 +1104,59 @@ function cloneWidget(widget) {
             typeof widget.size === "string"
                 ? widget.size
                 : DEFAULT_WIDGET_SIZE
+    };
+
+    if (widget.type === "room" && widget.room) {
+        cloned.room = cloneRoomConfiguration(widget.room);
+    }
+
+    return cloned;
+
+}
+
+
+function cloneRoomEntities(entities) {
+
+    const source = entities || {};
+    const cloned = {};
+
+    ROOM_SINGLE_ENTITY_FIELDS.forEach(function (fieldName) {
+        cloned[fieldName] =
+            typeof source[fieldName] === "string"
+                ? source[fieldName]
+                : null;
+    });
+
+    ROOM_ENTITY_LIST_FIELDS.forEach(function (fieldName) {
+        cloned[fieldName] = Array.isArray(source[fieldName])
+            ? source[fieldName].slice(0)
+            : [];
+    });
+
+    return cloned;
+
+}
+
+
+function cloneRoomConfiguration(room) {
+
+    return {
+        areaId:
+            typeof room.areaId === "string"
+                ? room.areaId
+                : null,
+        collapsible: room.collapsible === true,
+        defaultExpanded: room.defaultExpanded === true,
+        background:
+            room.background
+                ? {
+                    imageId: room.background.imageId,
+                    position: room.background.position,
+                    size: room.background.size,
+                    overlay: room.background.overlay
+                }
+                : null,
+        entities: cloneRoomEntities(room.entities)
     };
 
 }
@@ -993,7 +1191,8 @@ function migrateConfiguration(candidate) {
             candidate.schemaVersion !== ERRORS_SCHEMA_VERSION &&
             candidate.schemaVersion !== CRITICAL_DETECTION_SCHEMA_VERSION &&
             candidate.schemaVersion !== RULES_SCHEMA_VERSION &&
-            candidate.schemaVersion !== APPEARANCE_SCHEMA_VERSION
+            candidate.schemaVersion !== APPEARANCE_SCHEMA_VERSION &&
+            candidate.schemaVersion !== SECTION_SCHEMA_VERSION
         )
     ) {
         return {
@@ -1027,10 +1226,14 @@ function migrateConfiguration(candidate) {
         dashboard.background =
             dashboard.background || null;
 
-        dashboard.sections = [];
+        if (candidate.schemaVersion < SECTION_SCHEMA_VERSION) {
+            dashboard.sections = [];
+        }
 
         dashboard.widgets.forEach(function (widget) {
-            widget.sectionId = null;
+            if (candidate.schemaVersion < SECTION_SCHEMA_VERSION) {
+                widget.sectionId = null;
+            }
         });
 
         if (candidate.schemaVersion === GRID_SCHEMA_VERSION) {
@@ -1394,12 +1597,113 @@ function getVisibleEntityIds(dashboardId) {
 
     getVisibleWidgets(dashboardId)
         .forEach(function (widget) {
-            if (entityIds.indexOf(widget.entity) === -1) {
+            if (
+                widget.type !== "room" &&
+                entityIds.indexOf(widget.entity) === -1
+            ) {
                 entityIds.push(widget.entity);
+            }
+
+            if (widget.type === "room" && widget.room) {
+                roomEntityIds(widget.room).forEach(function (entityId) {
+                    if (entityIds.indexOf(entityId) === -1) {
+                        entityIds.push(entityId);
+                    }
+                });
             }
         });
 
     return entityIds;
+
+}
+
+
+function getDirectVisibleEntityIds(dashboardId) {
+
+    return getVisibleWidgets(dashboardId)
+        .filter(function (widget) {
+            return widget.type !== "room";
+        })
+        .map(function (widget) {
+            return widget.entity;
+        })
+        .filter(function (entityId, index, values) {
+            return values.indexOf(entityId) === index;
+        });
+
+}
+
+
+function roomEntityIds(room) {
+
+    const result = [];
+    const entities = room && room.entities
+        ? room.entities
+        : {};
+
+    ROOM_SINGLE_ENTITY_FIELDS.forEach(function (fieldName) {
+        const entityId = entities[fieldName];
+
+        if (
+            typeof entityId === "string" &&
+            result.indexOf(entityId) === -1
+        ) {
+            result.push(entityId);
+        }
+    });
+
+    ROOM_ENTITY_LIST_FIELDS.forEach(function (fieldName) {
+        (entities[fieldName] || []).forEach(function (entityId) {
+            if (result.indexOf(entityId) === -1) {
+                result.push(entityId);
+            }
+        });
+    });
+
+    return result;
+
+}
+
+
+function getRoomWidgets(dashboardId) {
+
+    return getVisibleWidgets(dashboardId)
+        .filter(function (widget) {
+            return widget.type === "room";
+        });
+
+}
+
+
+function publicRoomConfiguration(room) {
+
+    const cloned = cloneRoomConfiguration(room);
+
+    cloned.background = room.background
+        ? {
+            image_url:
+                "/assets/backgrounds/" +
+                encodeURIComponent(room.background.imageId),
+            position: room.background.position,
+            size: room.background.size,
+            overlay: room.background.overlay
+        }
+        : null;
+
+    return cloned;
+
+}
+
+
+function publicWidget(widget) {
+
+    const cloned = cloneWidget(widget);
+
+    if (cloned.type === "room") {
+        cloned.room = publicRoomConfiguration(widget.room);
+    }
+
+    return cloned;
 
 }
 
@@ -1467,7 +1771,7 @@ function getPublicDashboardConfig(dashboardId) {
         refresh_interval_ms:
             getRefreshIntervalMs(dashboard.id),
         sections: getSections(dashboard.id),
-        widgets: visibleWidgets,
+        widgets: visibleWidgets.map(publicWidget),
         layouts:
             Layout.publicLayouts(
                 dashboard,
@@ -1507,6 +1811,10 @@ module.exports = {
         SUPPORTED_WIDGET_TYPES.slice(0),
     SUPPORTED_WIDGET_SIZES:
         SUPPORTED_WIDGET_SIZES.slice(0),
+    ROOM_SINGLE_ENTITY_FIELDS:
+        ROOM_SINGLE_ENTITY_FIELDS.slice(0),
+    ROOM_ENTITY_LIST_FIELDS:
+        ROOM_ENTITY_LIST_FIELDS.slice(0),
     BACKGROUND_POSITIONS:
         BACKGROUND_POSITIONS.slice(0),
     BACKGROUND_SIZES:
@@ -1534,6 +1842,9 @@ module.exports = {
     getVisibleWidgets: getVisibleWidgets,
     getPublicWidgets: getPublicWidgets,
     getVisibleEntityIds: getVisibleEntityIds,
+    getDirectVisibleEntityIds: getDirectVisibleEntityIds,
+    getRoomWidgets: getRoomWidgets,
+    roomEntityIds: roomEntityIds,
     getRefreshIntervalMs: getRefreshIntervalMs,
     validateConfiguration: validateConfiguration,
     cloneConfiguration: cloneConfiguration,

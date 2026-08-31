@@ -946,6 +946,162 @@ test(
 
 
         await t.test(
+            "Room-Card-Hintergründe verwenden denselben geschützten Bildspeicher",
+            async function () {
+
+                const gateway = await startGateway(
+                    "room-backgrounds",
+                    "true",
+                    FAKE_ADMIN_TOKEN,
+                    null
+                );
+                const auth = {
+                    Authorization: "Bearer " + FAKE_ADMIN_TOKEN
+                };
+                const pngAuth = Object.assign({}, auth, {
+                    "Content-Type": "image/png"
+                });
+                const png = Buffer.from(
+                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+                    "base64"
+                );
+                const room = {
+                    id: "living-room",
+                    entity: "",
+                    type: "room",
+                    title: "Wohnzimmer",
+                    subtitle: "",
+                    icon: "room",
+                    iconClass: "room",
+                    unit: "",
+                    order: 100,
+                    visible: true,
+                    sectionId: null,
+                    size: "large",
+                    room: {
+                        areaId: null,
+                        collapsible: true,
+                        defaultExpanded: false,
+                        background: null,
+                        entities: {
+                            temperature: null,
+                            humidity: null,
+                            climate: null,
+                            presence: null,
+                            windows: [],
+                            lights: [],
+                            switches: [],
+                            covers: [],
+                            fans: [],
+                            mediaPlayers: [],
+                            locks: [],
+                            batteries: [],
+                            alerts: [],
+                            secondary: []
+                        }
+                    }
+                };
+
+                assert.equal((await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/widgets",
+                    room,
+                    auth
+                )).status, 201);
+
+                assert.equal((await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/widgets/living-room/background",
+                    png,
+                    {"Content-Type": "image/png"}
+                )).status, 401);
+
+                const uploaded = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/widgets/living-room/background",
+                    png,
+                    pngAuth
+                );
+                assert.equal(uploaded.status, 201);
+                assert.match(
+                    uploaded.json.background.imageId,
+                    /^bg-[a-f0-9]{32}\.png$/
+                );
+
+                const firstImageId = uploaded.json.background.imageId;
+                const publicConfiguration = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/dashboard/config"
+                );
+                const publicRoom = publicConfiguration.json.widgets.find(
+                    function (widget) { return widget.id === "living-room"; }
+                );
+                assert.equal(
+                    publicRoom.room.background.image_url,
+                    "/assets/backgrounds/" + firstImageId
+                );
+                assert.equal(
+                    Object.prototype.hasOwnProperty.call(
+                        publicRoom.room.background,
+                        "imageId"
+                    ),
+                    false
+                );
+
+                const failedReplacement = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/widgets/living-room/background",
+                    Buffer.from("<svg></svg>"),
+                    Object.assign({}, auth, {
+                        "Content-Type": "image/svg+xml"
+                    })
+                );
+                assert.equal(failedReplacement.status, 400);
+
+                const afterFailure = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/dashboard/config"
+                );
+                assert.equal(
+                    afterFailure.json.widgets.find(function (widget) {
+                        return widget.id === "living-room";
+                    }).room.background.image_url,
+                    "/assets/backgrounds/" + firstImageId
+                );
+
+                const removed = await request(
+                    gateway.port,
+                    "DELETE",
+                    "/api/admin/dashboards/default/widgets/living-room/background",
+                    undefined,
+                    auth
+                );
+                assert.equal(removed.status, 200);
+                assert.equal(
+                    removed.json.configuration.dashboards[0].widgets.find(
+                        function (widget) { return widget.id === "living-room"; }
+                    ).room.background,
+                    null
+                );
+                assert.equal((await request(
+                    gateway.port,
+                    "GET",
+                    "/assets/backgrounds/" + firstImageId
+                )).status, 404);
+
+                await stopChild(gateway.child);
+
+            }
+        );
+
+
+        await t.test(
             "Bearer-Authentifizierung, CRUD und Inventar",
             async function () {
 
@@ -1270,6 +1426,7 @@ test(
                         "device_id",
                         "device_name",
                         "domain",
+                        "entity_category",
                         "entity_id",
                         "friendly_name",
                         "unit_of_measurement"

@@ -47,6 +47,10 @@ const WIDGET_MINIMUM_SIZES = {
     climate: {
         portrait: {w: 2, h: 1},
         landscape: {w: 3, h: 1}
+    },
+    room: {
+        portrait: {w: 2, h: 1},
+        landscape: {w: 2, h: 1}
     }
 };
 

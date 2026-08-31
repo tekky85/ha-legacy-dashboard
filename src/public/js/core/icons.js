@@ -161,6 +161,19 @@ var LegacyIcons = {
             '</svg>',
 
 
+        room:
+
+            '<svg ' +
+                'viewBox="0 0 24 24" ' +
+                'aria-hidden="true" ' +
+                'focusable="false"' +
+            '>' +
+                '<path d="M3 11.5L12 4l9 7.5"></path>' +
+                '<path d="M5.5 10.5V21h13V10.5"></path>' +
+                '<path d="M9.5 21v-6h5v6"></path>' +
+            '</svg>',
+
+
         sensor:
 
             '<svg ' +

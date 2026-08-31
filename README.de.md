@@ -124,6 +124,20 @@ read-only Metadatenreferenz speichern. Abschnitt und HA Area bleiben getrennte
 Konzepte: Abschnitte funktionieren ohne Area, und das Dashboard erstellt,
 benennt oder verändert niemals Home-Assistant-Areas.
 
+Native Room Cards bündeln Raumname, Temperatur, Luftfeuchte, Klimaziel,
+Präsenz, Öffnungen, wichtige Warnungen und optional weitere Raum-Entities in
+einer eigenen Kachel. Die kompakte Ansicht priorisiert Primärwerte und Alerts;
+die ausklappbare Ansicht ergänzt Detailzustände und ausschließlich bereits
+explizit freigegebene Light-/Climate-Controls. Switches, Covers, Fans,
+Media Player und Locks bleiben read-only.
+
+Eine vorhandene Home-Assistant-Area kann im Room-Editor als read-only Quelle
+für überprüfbare Entity-Vorschläge verwendet werden. Vorschläge werden nur
+nach ausdrücklicher Bestätigung übernommen und können anschließend vollständig
+geändert werden. Room Card und Dashboard-Abschnitt besitzen voneinander
+unabhängige `areaId`-Referenzen. Optional verwendet jede Room Card ein eigenes,
+über dieselbe sichere JPEG-/PNG-Architektur gespeichertes Hintergrundbild.
+
 ### iPad mini als Wall-Display
 
 Für ein einzelnes iPad mini 1 mit iOS 9.3.5 ist **Geführter Zugriff** der
@@ -157,6 +171,9 @@ Dazu gehören unter anderem:
 - optional vorhandene Home-Assistant-Areas read-only referenzieren
 - Entities auswählen
 - Widgets hinzufügen und bearbeiten
+- native Room Cards erstellen, Area-Vorschläge prüfen und Entity-Zuordnungen
+  manuell überschreiben
+- Room-Card-Hintergründe sicher hochladen, voranzeigen, ersetzen oder entfernen
 - Sichtbarkeit und Reihenfolge
 - Card-Größen
 - Drag-and-drop-Layout

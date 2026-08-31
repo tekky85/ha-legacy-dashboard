@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sprint 26.1 Room Card Matrix</title>
+    <link rel="stylesheet" href="/src/public/css/style.css">
+    <style>
+        body { padding: 12px; background: #dfe5ec; }
+        .room-matrix-board { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; }
+        .room-matrix-case { margin: 6px; }
+        .room-matrix-case > .card { position: relative; top: auto; left: auto; margin: 0; min-height: 0; }
+        .room-matrix-label { display: block; margin-top: 3px; font: 11px/14px sans-serif; }
+    </style>
+</head>
+<body data-room-matrix-status="running">
+    <pre id="room-matrix-result">Room Matrix wird geprüft …</pre>
+    <main id="room-matrix-board" class="room-matrix-board"></main>
+    <script src="/src/public/js/core/compat.js"></script>
+    <script src="/src/public/js/core/icons.js"></script>
+    <script src="/src/public/js/core/presentation.js"></script>
+    <script src="/src/public/js/core/widget.js"></script>
+    <script src="/src/public/js/controls/power.js"></script>
+    <script src="/src/public/js/widgets/room.js"></script>
+    <script src="/test/fixtures/room-card-matrix-harness.js"></script>
+</body>
+</html>

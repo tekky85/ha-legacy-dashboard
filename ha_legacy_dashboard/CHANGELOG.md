@@ -6,6 +6,13 @@
 
 - Added persistent logical dashboard sections with optional Home Assistant
   Area references and safe unassigned-card fallback.
+- Added native Room Cards with optional Area-based read-only suggestions,
+  collapsible details, section support, and secure JPEG/PNG backgrounds.
+
+### Security
+
+- Room Card writes remain restricted to the existing explicit Light and
+  Climate service/entity allowlists; other room entities are read-only.
 
 ### Changed
 

@@ -13,6 +13,24 @@
     let entityRuleIndex = [];
     let entityRuleLoadError = "";
     let entityRulesConfiguredOnly = false;
+    let roomEditorEntities = null;
+
+    const ROOM_ENTITY_FIELDS = [
+        {id: "temperature", label: "Primäre Temperatur", multiple: false, domains: ["sensor"]},
+        {id: "humidity", label: "Luftfeuchtigkeit", multiple: false, domains: ["sensor"]},
+        {id: "climate", label: "Climate", multiple: false, domains: ["climate"]},
+        {id: "presence", label: "Präsenz", multiple: false, domains: ["binary_sensor"]},
+        {id: "windows", label: "Fenster und Öffnungen", multiple: true, domains: ["binary_sensor", "cover"]},
+        {id: "lights", label: "Lichter", multiple: true, domains: ["light"]},
+        {id: "switches", label: "Schalter (read-only)", multiple: true, domains: ["switch"]},
+        {id: "covers", label: "Covers (read-only)", multiple: true, domains: ["cover"]},
+        {id: "fans", label: "Ventilatoren (read-only)", multiple: true, domains: ["fan"]},
+        {id: "mediaPlayers", label: "Media Player (read-only)", multiple: true, domains: ["media_player"]},
+        {id: "locks", label: "Schlösser (read-only)", multiple: true, domains: ["lock"]},
+        {id: "batteries", label: "Batterien / Diagnose", multiple: true, domains: ["sensor", "binary_sensor"]},
+        {id: "alerts", label: "Safety-/Security-Melder", multiple: true, domains: ["binary_sensor"]},
+        {id: "secondary", label: "Weitere Sensoren", multiple: true, domains: ["sensor", "binary_sensor"]}
+    ];
 
     function byId(id) {
         return document.getElementById(id);
@@ -681,6 +699,30 @@
         );
         const state = entity.state || "unknown";
 
+        if (
+            widget.type === "room" &&
+            widget.room &&
+            widget.room.background
+        ) {
+            const overlay = createElement(
+                "span",
+                "admin-room-preview-overlay"
+            );
+            card.classList.add("has-room-background");
+            card.style.backgroundImage =
+                "url(\"" +
+                backgroundImageUrl(widget.room.background) +
+                "\")";
+            card.style.backgroundPosition =
+                widget.room.background.position;
+            card.style.backgroundSize =
+                widget.room.background.size;
+            overlay.style.opacity = String(
+                widget.room.background.overlay / 100
+            );
+            card.appendChild(overlay);
+        }
+
         card.dataset.previewWidgetId = widget.id;
         icon.innerHTML = LegacyIcons.get(widget.icon);
         header.appendChild(icon);
@@ -726,6 +768,31 @@
                     button.disabled = true;
                 }
             );
+        } else if (widget.type === "room") {
+            const room = widget.room || {entities: {}};
+            const temperature = admin.State.getPreviewEntity(
+                room.entities.temperature
+            );
+            const humidity = admin.State.getPreviewEntity(
+                room.entities.humidity
+            );
+            const values = [];
+
+            if (temperature) {
+                values.push(
+                    "Temperatur " + temperature.state +
+                    (temperature.unit_of_measurement || "")
+                );
+            }
+            if (humidity) {
+                values.push(
+                    "Feuchte " + humidity.state +
+                    (humidity.unit_of_measurement || "")
+                );
+            }
+            content.textContent = values.length
+                ? values.join(" · ")
+                : "Room Card · keine Primärwerte";
         }
 
         card.appendChild(content);
@@ -1038,10 +1105,17 @@
             "",
             "button primary compact"
         );
+        const addRoom = createButton(
+            "+ Room Card",
+            "room-add",
+            "",
+            "button primary compact"
+        );
         const list = createElement("div", "widget-list");
         const widgets = sortedWidgets(dashboard);
 
         widgetHeading.appendChild(widgetTitle);
+        widgetHeading.appendChild(addRoom);
         widgetHeading.appendChild(addWidget);
         widgetSection.appendChild(widgetHeading);
 
@@ -1596,7 +1670,259 @@
             return;
         }
 
+        if (widget.type === "room") {
+            openRoomForm(widget);
+            return;
+        }
+
         openWidgetForm(widget, "edit", null);
+    }
+
+    function roomEntityMatches(entity, definition, query) {
+        const search = String(query || "").trim().toLocaleLowerCase("de");
+        const haystack = [
+            entity.friendly_name,
+            entity.entity_id,
+            entity.domain,
+            entity.device_class,
+            entity.area_name
+        ].join(" ").toLocaleLowerCase("de");
+
+        return definition.domains.indexOf(entity.domain) !== -1 &&
+            (!search || haystack.indexOf(search) !== -1);
+    }
+
+    function selectedRoomValues(select) {
+        if (!select.multiple) {
+            return select.value || null;
+        }
+
+        return Array.prototype.filter.call(select.options, function (option) {
+            return option.selected && option.value;
+        }).map(function (option) {
+            return option.value;
+        });
+    }
+
+    function syncRoomEntityFields() {
+        if (!roomEditorEntities) {
+            return;
+        }
+
+        ROOM_ENTITY_FIELDS.forEach(function (definition) {
+            const select = elements.roomEntityFields.querySelector(
+                '[data-room-field="' + definition.id + '"]'
+            );
+            if (select) {
+                roomEditorEntities[definition.id] = selectedRoomValues(select);
+            }
+        });
+    }
+
+    function renderRoomEntityFields() {
+        const query = elements.roomEntitySearch.value;
+        const inventory = admin.State.getEntities();
+
+        elements.roomEntityFields.textContent = "";
+
+        ROOM_ENTITY_FIELDS.forEach(function (definition) {
+            const field = createElement("div", "room-entity-field");
+            const label = createElement("label", "", definition.label);
+            const select = createElement("select");
+            const selected = definition.multiple
+                ? roomEditorEntities[definition.id] || []
+                : roomEditorEntities[definition.id] || "";
+            const candidates = inventory.filter(function (entity) {
+                return roomEntityMatches(entity, definition, query) ||
+                    (definition.multiple
+                        ? selected.indexOf(entity.entity_id) !== -1
+                        : selected === entity.entity_id);
+            });
+
+            select.dataset.roomField = definition.id;
+            select.multiple = definition.multiple;
+            if (definition.multiple) {
+                select.size = Math.min(6, Math.max(3, candidates.length));
+            } else {
+                appendSelectOption(select, "", "Nicht verwenden", selected);
+            }
+
+            candidates.forEach(function (entity) {
+                const context = [
+                    entity.friendly_name || entity.entity_id,
+                    entity.area_name,
+                    entity.device_class
+                ].filter(Boolean).join(" · ");
+                const option = createElement("option", "", context);
+                option.value = entity.entity_id;
+                option.selected = definition.multiple
+                    ? selected.indexOf(entity.entity_id) !== -1
+                    : selected === entity.entity_id;
+                select.appendChild(option);
+            });
+
+            label.htmlFor = "roomField-" + definition.id;
+            select.id = "roomField-" + definition.id;
+            field.appendChild(label);
+            field.appendChild(select);
+            elements.roomEntityFields.appendChild(field);
+        });
+    }
+
+    function savedRoomWidget(dashboardId, widgetId) {
+        const saved = admin.State.getSaved();
+        const dashboard = saved && saved.dashboards.find(function (item) {
+            return item.id === dashboardId;
+        });
+        return dashboard && dashboard.widgets.find(function (widget) {
+            return widget.id === widgetId && widget.type === "room";
+        }) || null;
+    }
+
+    function renderRoomBackgroundEditor(widget) {
+        const container = elements.roomBackgroundEditor;
+        const dashboard = admin.State.getSelectedDashboard();
+        const savedWidget = widget.id
+            ? savedRoomWidget(dashboard.id, widget.id)
+            : null;
+        const background = widget.room && widget.room.background;
+
+        container.textContent = "";
+        container.appendChild(createElement("h3", "", "Raumhintergrund"));
+
+        if (!savedWidget || admin.State.isDirty()) {
+            container.appendChild(createElement(
+                "p",
+                "muted",
+                "Room Card zuerst speichern. Upload und Entfernen sind nur auf einem gespeicherten, unveränderten Entwurf verfügbar."
+            ));
+            return;
+        }
+
+        const input = createElement("input");
+        input.id = "roomBackgroundFile";
+        input.type = "file";
+        input.accept = "image/jpeg,image/png,.jpg,.jpeg,.png";
+        container.appendChild(input);
+
+        if (background) {
+            const image = createElement("img", "room-background-preview");
+            image.src = backgroundImageUrl(background);
+            image.alt = "Vorschau des Raumhintergrunds";
+            container.appendChild(image);
+
+            const remove = createButton(
+                "Hintergrund entfernen",
+                "room-background-remove",
+                widget.id,
+                "button danger compact"
+            );
+            container.appendChild(remove);
+
+            const controls = createElement("div", "form-grid");
+            [
+                {
+                    field: "position",
+                    label: "Position",
+                    values: ["center center", "center top", "center bottom", "left center", "right center"]
+                },
+                {field: "size", label: "Darstellung", values: ["cover", "contain"]},
+                {field: "overlay", label: "Abdunklung", values: [0, 10, 20, 30, 40, 50]}
+            ].forEach(function (definition) {
+                const wrapper = createElement("div");
+                const select = createElement("select");
+                select.id = "roomBackground-" + definition.field;
+                select.dataset.roomBackgroundField = definition.field;
+                definition.values.forEach(function (value) {
+                    appendSelectOption(
+                        select,
+                        String(value),
+                        definition.field === "overlay" ? value + " %" : String(value),
+                        String(background[definition.field])
+                    );
+                });
+                appendLabeledInput(wrapper, definition.label, select);
+                controls.appendChild(wrapper);
+            });
+            container.appendChild(controls);
+        }
+    }
+
+    function openRoomForm(widget) {
+        const dashboard = admin.State.getSelectedDashboard();
+        const room = widget && widget.room
+            ? admin.State.clone(widget.room)
+            : admin.Rooms.emptyRoom();
+
+        elements.roomWidgetId.value = widget ? widget.id : "";
+        elements.roomDialogTitle.textContent = widget
+            ? "Room Card bearbeiten"
+            : "Room Card erstellen";
+        elements.roomTitleInput.value = widget ? widget.title : "";
+        elements.roomAreaInput.textContent = "";
+        appendSelectOption(
+            elements.roomAreaInput,
+            "",
+            "Keine Home-Assistant-Area",
+            room.areaId || ""
+        );
+        admin.State.getAreas().forEach(function (area) {
+            appendSelectOption(
+                elements.roomAreaInput,
+                area.id,
+                area.name,
+                room.areaId || ""
+            );
+        });
+        if (room.areaId && !admin.State.getAreas().some(function (area) {
+            return area.id === room.areaId;
+        })) {
+            appendSelectOption(
+                elements.roomAreaInput,
+                room.areaId,
+                "Nicht verfügbare Area (" + room.areaId + ")",
+                room.areaId
+            );
+            elements.roomAreaWarning.textContent =
+                "Die gespeicherte Area existiert nicht mehr. Manuelle Entity-Zuordnungen bleiben erhalten.";
+        } else {
+            elements.roomAreaWarning.textContent = "";
+        }
+
+        elements.roomSectionInput.textContent = "";
+        appendSelectOption(elements.roomSectionInput, "", "Nicht zugeordnet", widget && widget.sectionId || "");
+        sortedSections(dashboard).forEach(function (section) {
+            appendSelectOption(
+                elements.roomSectionInput,
+                section.id,
+                section.title,
+                widget && widget.sectionId || ""
+            );
+        });
+
+        elements.roomSizeInput.value = widget ? widget.size : "large";
+        elements.roomCollapsibleInput.checked = room.collapsible !== false;
+        elements.roomDefaultExpandedInput.checked = room.defaultExpanded === true;
+        elements.roomVisibleInput.checked = widget ? widget.visible : true;
+        elements.roomEntitySearch.value = "";
+        elements.roomFormError.textContent = "";
+        roomEditorEntities = admin.Rooms.normalizeEntities(room.entities);
+        renderRoomEntityFields();
+        renderRoomBackgroundEditor(widget || {id: "", room: room});
+        openDialog(elements.roomDialog);
+        elements.roomTitleInput.focus();
+    }
+
+    function openRoomEditor(widgetId) {
+        const dashboard = admin.State.getSelectedDashboard();
+        const widget = dashboard.widgets.find(function (item) {
+            return item.id === widgetId && item.type === "room";
+        });
+        if (!widget) {
+            showNotice("Room Card wurde nicht gefunden.", true);
+            return;
+        }
+        openRoomForm(widget);
     }
 
     function renderEntities() {
@@ -2099,6 +2425,8 @@
                     admin.Dashboards.remove(dashboard.id);
                     renderAll();
                 }
+            } else if (button.dataset.action === "room-add") {
+                openRoomForm(null);
             } else if (button.dataset.action === "widget-add") {
                 elements.entitySearch.value = "";
                 elements.entityDomainFilter.value = "";
@@ -2418,6 +2746,161 @@
         }
     }
 
+    function roomFormValues() {
+        const dashboard = admin.State.getSelectedDashboard();
+        const widgetId = elements.roomWidgetId.value;
+        const widget = widgetId
+            ? dashboard.widgets.find(function (item) {
+                return item.id === widgetId;
+            })
+            : null;
+        let background = widget && widget.room
+            ? admin.State.clone(widget.room.background)
+            : null;
+
+        syncRoomEntityFields();
+
+        if (background) {
+            Array.prototype.forEach.call(
+                elements.roomBackgroundEditor.querySelectorAll(
+                    "[data-room-background-field]"
+                ),
+                function (select) {
+                    const fieldName = select.dataset.roomBackgroundField;
+                    background[fieldName] = fieldName === "overlay"
+                        ? Number(select.value)
+                        : select.value;
+                }
+            );
+        }
+
+        return {
+            title: elements.roomTitleInput.value,
+            areaId: elements.roomAreaInput.value || null,
+            sectionId: elements.roomSectionInput.value || null,
+            size: elements.roomSizeInput.value,
+            collapsible: elements.roomCollapsibleInput.checked,
+            defaultExpanded: elements.roomDefaultExpandedInput.checked,
+            visible: elements.roomVisibleInput.checked,
+            background: background,
+            entities: admin.State.clone(roomEditorEntities)
+        };
+    }
+
+    function handleRoomForm(event) {
+        event.preventDefault();
+        elements.roomFormError.textContent = "";
+
+        const dashboard = admin.State.getSelectedDashboard();
+
+        try {
+            if (elements.roomWidgetId.value) {
+                admin.Rooms.update(
+                    dashboard.id,
+                    elements.roomWidgetId.value,
+                    roomFormValues()
+                );
+            } else {
+                admin.Rooms.create(dashboard.id, roomFormValues());
+            }
+            closeDialog(elements.roomDialog);
+            roomEditorEntities = null;
+            renderAll();
+        } catch (error) {
+            elements.roomFormError.textContent = error.message;
+        }
+    }
+
+    function roomSelectionsExist() {
+        return Object.keys(roomEditorEntities || {}).some(function (fieldName) {
+            const value = roomEditorEntities[fieldName];
+            return Array.isArray(value) ? value.length > 0 : Boolean(value);
+        });
+    }
+
+    function handleRoomAutoSetup() {
+        const areaId = elements.roomAreaInput.value;
+
+        if (!areaId) {
+            elements.roomAreaWarning.textContent =
+                "Bitte zuerst eine Home-Assistant-Area auswählen.";
+            return;
+        }
+
+        syncRoomEntityFields();
+        if (
+            roomSelectionsExist() &&
+            !window.confirm(
+                "Die Area-Vorschläge ersetzen die aktuellen manuellen Entity-Zuordnungen. Fortfahren?"
+            )
+        ) {
+            return;
+        }
+
+        roomEditorEntities = admin.Rooms.suggest(
+            areaId,
+            admin.State.getEntities()
+        );
+        elements.roomAreaWarning.textContent =
+            "Vorschläge übernommen. Bitte alle Zuordnungen prüfen und anschließend bestätigen.";
+        renderRoomEntityFields();
+    }
+
+    async function handleRoomBackgroundFile(event) {
+        const file = event.target.files && event.target.files[0];
+        const dashboard = admin.State.getSelectedDashboard();
+        const widgetId = elements.roomWidgetId.value;
+
+        if (!file || !widgetId) {
+            return;
+        }
+        if (admin.State.isDirty()) {
+            elements.roomFormError.textContent =
+                "Bitte ungespeicherte Änderungen zuerst speichern.";
+            event.target.value = "";
+            return;
+        }
+
+        try {
+            const result = await admin.Api.uploadRoomBackground(
+                dashboard.id,
+                widgetId,
+                file
+            );
+            admin.State.setConfiguration(result.configuration);
+            closeDialog(elements.roomDialog);
+            renderAll();
+            showNotice("Raumhintergrund wurde gespeichert.", false);
+        } catch (error) {
+            elements.roomFormError.textContent = errorMessage(error);
+            event.target.value = "";
+        }
+    }
+
+    async function handleRoomBackgroundRemove() {
+        const dashboard = admin.State.getSelectedDashboard();
+        const widgetId = elements.roomWidgetId.value;
+
+        if (!widgetId || admin.State.isDirty()) {
+            elements.roomFormError.textContent =
+                "Bitte ungespeicherte Änderungen zuerst speichern.";
+            return;
+        }
+
+        try {
+            const result = await admin.Api.removeRoomBackground(
+                dashboard.id,
+                widgetId
+            );
+            admin.State.setConfiguration(result.configuration);
+            closeDialog(elements.roomDialog);
+            renderAll();
+            showNotice("Raumhintergrund wurde entfernt.", false);
+        } catch (error) {
+            elements.roomFormError.textContent = errorMessage(error);
+        }
+    }
+
     function collectElements() {
         [
             "loginView", "loginForm", "adminToken", "rememberToken",
@@ -2435,6 +2918,12 @@
             "widgetUnitInput", "widgetOrderInput", "widgetSizeInput",
             "widgetSectionInput", "widgetVisibleInput",
             "widgetFormError", "summaryShowMediaTitles",
+            "roomDialog", "roomForm", "roomDialogTitle", "roomWidgetId",
+            "roomTitleInput", "roomAreaInput", "roomSectionInput",
+            "roomSizeInput", "roomAutoSetupButton", "roomAreaWarning",
+            "roomEntitySearch", "roomEntityFields", "roomCollapsibleInput",
+            "roomDefaultExpandedInput", "roomVisibleInput",
+            "roomBackgroundEditor", "roomFormError",
             "entityRulesConfiguredCount", "openEntityRulesButton",
             "entityRulesDialog", "entityRuleSearch",
             "entityRuleAreaFilter", "entityRuleDomainFilter",
@@ -2595,6 +3084,33 @@
             updateDirtyState();
         });
         elements.widgetForm.addEventListener("submit", handleWidgetForm);
+        elements.roomForm.addEventListener("submit", handleRoomForm);
+        elements.roomAutoSetupButton.addEventListener("click", handleRoomAutoSetup);
+        elements.roomEntitySearch.addEventListener("input", function () {
+            syncRoomEntityFields();
+            renderRoomEntityFields();
+        });
+        elements.roomEntityFields.addEventListener("change", syncRoomEntityFields);
+        elements.roomAreaInput.addEventListener("change", function () {
+            const areaId = elements.roomAreaInput.value;
+            const exists = admin.State.getAreas().some(function (area) {
+                return area.id === areaId;
+            });
+            elements.roomAreaWarning.textContent = areaId && !exists
+                ? "Die Area existiert nicht mehr. Manuelle Zuordnungen bleiben erhalten."
+                : "";
+        });
+        elements.roomBackgroundEditor.addEventListener("change", function (event) {
+            if (event.target.id === "roomBackgroundFile") {
+                handleRoomBackgroundFile(event);
+            }
+        });
+        elements.roomBackgroundEditor.addEventListener("click", function (event) {
+            const button = event.target.closest("button[data-action]");
+            if (button && button.dataset.action === "room-background-remove") {
+                handleRoomBackgroundRemove();
+            }
+        });
         elements.saveButton.addEventListener("click", saveConfiguration);
         elements.entityRulesSaveButton.addEventListener("click", saveConfiguration);
         elements.discardButton.addEventListener("click", discardConfiguration);

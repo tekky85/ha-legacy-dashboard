@@ -737,6 +737,16 @@ function updateClimateTargetDisplay(
 
     if (!card) {
 
+        if (
+            typeof Dashboard !== "undefined" &&
+            typeof Dashboard.render === "function" &&
+            Dashboard.states
+        ) {
+            Dashboard.render(
+                Dashboard.states
+            );
+        }
+
         return;
 
     }
@@ -1937,6 +1947,13 @@ function handleDashboardInteraction(event, boundary) {
                 hasClass(currentElement, "focus-climate-power-control")
             ) {
                 setClimatePowerState(currentElement);
+            } else if (
+                hasClass(currentElement, "room-expand-control") &&
+                typeof Dashboard !== "undefined"
+            ) {
+                Dashboard.toggleRoom(
+                    currentElement.getAttribute("data-room-widget") || ""
+                );
             }
 
             return;

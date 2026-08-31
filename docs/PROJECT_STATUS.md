@@ -1,8 +1,8 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 30. August 2026, Sprint 26 auf Basis des sauberen, mit `origin/main`
-identischen Commits `6e94ea8` implementiert und repositoryseitig validiert.
-Sprint 25.7 wurde mit `6e94ea8` abgeschlossen.
+Stand: 31. August 2026, Sprint 26.1 auf Basis des sauberen, mit `origin/main`
+identischen Commits `0878769` implementiert und repositoryseitig validiert.
+Sprint 26 wurde mit `0878769` abgeschlossen.
 Release Candidate `1.0.0-rc.1` ist veröffentlicht; die JPEG-Härtung aus Sprint
 25.5 und die Kartenkorrekturen aus Sprint 25.6 gehören zum noch nicht neu
 getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/Safari- und verbleibende
@@ -137,6 +137,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 25.6 | Card Size Matrix & Responsive Layout Hardening | implementiert und lokal mit vollständiger Test-/Browsermatrix validiert; iPad-mini-Abnahme offen |
 | 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; physische iPad-mini-Abnahme offen |
 | 26 | Persistent Dashboard Sections | implementiert; physische iPad-mini-Abnahme offen |
+| 26.1 | Native Room Card MVP | implementiert; physische iPad-mini-Abnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -270,7 +271,7 @@ Nach Recovery ersetzt ein frischer Snapshot die veralteten Daten.
 
 ## 6. Persistente Konfiguration
 
-Die Konfiguration verwendet Schema 10. Zusätzlich zu
+Die Konfiguration verwendet Schema 11. Zusätzlich zu
 `defaultDashboardId` und `dashboards` enthält sie:
 
 ```json
@@ -298,9 +299,10 @@ Die Konfiguration verwendet Schema 10. Zusätzlich zu
 ```
 
 Jeder Eintrag unter `dashboards` ergänzt `showTitle`, `background` und
-`sections`; Widgets besitzen optional `sectionId`. Details zu Abschnitten
-stehen in Abschnitt 27. Schema 1 bis 9 werden automatisch und atomar auf
-Schema 10 migriert. Bei Schema
+`sections`; Widgets besitzen optional `sectionId`. Native Room Cards ergänzen
+Schema 11 mit einer eigenen `room`-Konfiguration. Details zu Abschnitten und
+Room Cards stehen in den Abschnitten 27 und 28. Schema 1 bis 10 werden
+automatisch und atomar auf Schema 11 migriert. Bei Schema
 4 bleiben die 6/12-Spalten-Layouts unverändert. Bei Schema 5 bleiben Summary
 und Layouts unverändert und die leeren Error-Standardwerte werden ergänzt.
 Vollständige Validierung, atomarer
@@ -1948,3 +1950,96 @@ Hintergrundkontinuität, Footerposition, horizontales Überlaufen und Focus übe
 Abschnittsgrenzen manuell zu prüfen. Für Sprint 26.1 stehen `areaId` und die
 Section-Zuordnung bereits als saubere read-only Grundlage für Native Room
 Cards und bestätigte Area-basierte Vorschläge bereit.
+
+## 28. Sprint 26.1 – Native Room Card MVP
+
+Sprint 26.1 startete auf dem sauberen, mit `origin/main` identischen Commit
+`0878769`. Das bestehende Dashboardmodell wurde additiv von Schema 10 auf
+Schema 11 erweitert. Der neue Widget-Typ `room` besitzt weiterhin die normale
+stabile Widget-ID, Größe, Sichtbarkeit, Layoutkoordinaten und optionale
+`sectionId`. Seine zusätzliche `room`-Konfiguration enthält eine unabhängige
+optionale `areaId`, `collapsible`, `defaultExpanded`, einen optionalen
+Hintergrund und explizite Entity-Rollen.
+
+Die Einzelrollen sind Temperatur, Luftfeuchte, Climate und Präsenz. Listen
+stehen für Öffnungen, Lights, Switches, Covers, Fans, Media Player, Locks,
+Batterien, Sicherheitsmelder und sekundäre Sensoren zur Verfügung. Eine Room
+Card darf ohne Area und ohne optionale Rollen bestehen. Eine nicht mehr
+vorhandene Area verwirft keine manuellen Zuordnungen; der Admin zeigt dafür
+eine Warnung. Bestehende Schema-10-Dashboards und ihre Sections migrieren
+unverändert. Room Cards ohne `sectionId` bleiben im sicheren nicht
+zugeordneten Bereich sichtbar.
+
+Der native Admin-Editor bietet eine durchsuchbare Entity-Auswahl je Rolle,
+read-only Area-Auswahl, explizites Auto-Setup, manuelle Überschreibungen,
+Section-Zuordnung, alle fünf Größen, Collapse-Verhalten, Live Preview und einen
+eigenen optionalen Raumhintergrund. Auto-Setup verwendet ausschließlich
+stabile `area_id`-, Domain- und Device-Class-Metadaten des vorhandenen
+sanitisierten Inventars. Sind bereits Zuordnungen vorhanden, werden Vorschläge
+nur nach einer ausdrücklichen Bestätigung übernommen. Es gibt weder
+Namensheuristiken für Gerätezuordnung noch Area-/Entity-Registry-Writes.
+
+Raumhintergründe verwenden unverändert den typgeprüften, größenbegrenzten und
+atomaren JPEG-/PNG-Speicher aus Sprint 25.3/25.5. Der Admin kann hochladen,
+voranzeigen, ersetzen und entfernen; die normale Dashboard-Konfiguration
+erhält nur eine kontrollierte `/assets/backgrounds/...`-URL. Nicht mehr
+referenzierte Dateien werden erst nach erfolgreicher Konfigurationspersistenz
+entfernt.
+
+Das Wall-Display rendert Room Cards nativ in ES5 und Flexbox. Compact zeigt
+Raumidentität, primäre Temperatur und den wichtigsten Alert; Standard ergänzt
+Luftfeuchte, Präsenz und Öffnungsstatus; Wide und Large bieten bewusst mehr
+Platz für Alerts, Details und Controls. Tall bleibt als vorhandener fünfter
+Presentation-Tier unterstützt. Expanded zeigt zusätzliche Entities, während
+Collapsed die Informationshierarchie bewusst knapp hält. Die 20 gültigen
+Portrait- und 44 gültigen Landscape-Geometrien sind in der Card Matrix
+validiert. Die Card lässt sich innerhalb jeder Sprint-26-Section verwenden;
+Section und Room-Area bleiben unabhängig.
+
+Die Laufzeit lädt nicht separat pro Room Card. Sie projiziert alle benötigten
+Raumzustände aus einem einzigen bereits gecachten und normalisierten
+System-Snapshot pro Dashboard-Antwort. Die zentrale Issue Engine wird dabei
+einmal ausgewertet; Room Alerts filtern nur das Ergebnis und verwenden
+zusätzlich die vorhandenen Summary-, Risk-, Severity-, Grace-, Flapping- und
+Recovery-Regeln. Dadurch gibt es weder N+1-HA-Abfragen noch eine zweite
+Security Engine.
+
+Direkt bedienbar sind ausschließlich Lights und Climate-Entities, die bereits
+von den bestehenden expliziten Backend-Endpunkten und unveränderten
+Write-Allowlists freigegeben sind. Switches, Covers, Fans, Media Player und
+Locks erscheinen read-only. Es wurden keine neue HA-Schreibaktion, keine
+generische Service-Route, kein Browser-WebSocket zu HA und keine zusätzlichen
+Home-Assistant-App-Berechtigungen ergänzt. Room Cards werden inline erweitert
+und bewusst nicht in den Sprint-17.5-Focus-Renderer gezwungen; damit bleibt die
+Trennung von Grid-Geometrie, Room-Präsentation und Focus-Geometrie erhalten.
+
+Die automatisierten Sprint-26.1-Tests decken Migration, vollständige
+Validierung, Room ohne/mit Area, Area-Vorschläge, manuelle Zuordnung,
+Temperatur/Luftfeuchte/Climate/Präsenz, eine und mehrere Öffnungen, alle
+read-only Domainlisten, Low Battery, Safety Alert, Unknown/Unavailable,
+fehlende optionale Entities, Missing Area, Collapse/Expand, Hintergrund,
+lange Namen, alle gültigen Größen und Tiers, Sections, Default-/Custom-Routen,
+Theme, HomeScreen und ES5/CSS-Grid-Freiheit ab. Die vollständige bestehende
+Suite bewahrt zusätzlich Admin-Auth, Upload-Härtung, Persistenz, Summary,
+Errors, Systemregeln, Focus, Standalone und HA-App-Sicherheitsgrenzen.
+Alle 310 automatisierten Tests bestanden; sämtliche geänderten
+JavaScript-Dateien bestanden `node --check`. Der test-only Browser-Harness
+bestand Compact, Standard, Wide und Large bei 768 × 1024 sowie 1024 × 768
+Pixeln ohne horizontales Überlaufen.
+
+Produkt-Screenshots wurden nicht durch generierte Mockups ersetzt. Ein neues
+Room-Card-Bild soll erst aus der real laufenden oder einer vollständig
+anonymisierten kontrollierten Instanz aufgenommen werden. Auf dem echten iPad
+mini 1 bleiben Compact/Standard/Wide/Large in Portrait und Landscape, lange
+Raumnamen/Werte, Collapse-Touch, mehrere Alert-Chips, Climate-Plus/Minus/
+Power, Light-Power, Hintergrundkontrast, Sections, Dark/Light und HomeScreen-
+Modus manuell abzunehmen. Auf HAOS sind Persistenz und Neustart mit einem
+Room-Hintergrund ebenfalls noch real zu bestätigen.
+
+Die Umsetzung übernimmt von RoomCard ausschließlich die UX-Ideen Area-
+Vorschläge, Primärwerte, Alerts, Collapse und Raumhintergrund. Lovelace-
+Lifecycle, `hass`-Objekt, Custom Elements, Shadow DOM, HACS-Laufzeit,
+HA-Frontend-Editor und generische Actions wurden bewusst nicht übernommen.
+Künftige Erweiterungen können zusätzliche read-only Darstellungen oder neue
+explizit abgesicherte Domain-Endpunkte auf diesem nativen Modell ergänzen,
+ohne die aktuelle Sicherheits- oder Legacy-Grenze zu umgehen.

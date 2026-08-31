@@ -171,7 +171,10 @@ test("Schema 10 ergänzt Abschnitte additiv und migriert Schema 9 verlustfrei", 
     const result = DashboardConfig.migrateConfiguration(previous);
 
     assert.equal(result.migrated, true);
-    assert.equal(result.configuration.schemaVersion, 10);
+    assert.equal(
+        result.configuration.schemaVersion,
+        DashboardConfig.SCHEMA_VERSION
+    );
     assert.deepEqual(result.configuration.dashboards[0].sections, []);
     assert.ok(result.configuration.dashboards[0].widgets.every(function (widget) {
         return widget.sectionId === null;
@@ -380,5 +383,5 @@ test("Admin und Wall-Display erhalten Area-Read-only-, ES5- und Sicherheitsgrenz
 
     assert.doesNotMatch(wallCss, /display\s*:\s*grid/i);
     assert.match(wallCss, /\.dashboard-sections[\s\S]*flex-direction:\s*column/);
-    assert.match(read("src/public/index.html"), /\/js\/app\.js\?v=48/);
+    assert.match(read("src/public/index.html"), /\/js\/app\.js\?v=49/);
 });

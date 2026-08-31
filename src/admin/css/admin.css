@@ -20,6 +20,106 @@
     --shadow: 0 14px 38px rgba(26, 38, 57, 0.09);
 }
 
+.room-form {
+    max-width: 980px;
+}
+
+.room-area-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--surface-subtle);
+}
+
+.room-area-actions .form-warning {
+    margin: 0;
+}
+
+.room-entity-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.room-entity-field {
+    min-width: 0;
+}
+
+.room-entity-field select {
+    width: 100%;
+}
+
+.room-entity-field select[multiple] {
+    min-height: 108px;
+}
+
+.room-behavior-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+}
+
+.room-background-editor {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--surface-subtle);
+}
+
+.room-background-editor h3 {
+    margin: 0;
+}
+
+.room-background-preview {
+    display: block;
+    width: 100%;
+    max-height: 260px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.layout-card-preview.admin-preview-room {
+    position: relative;
+    overflow: hidden;
+    background-repeat: no-repeat;
+}
+
+.layout-card-preview.admin-preview-room > * {
+    position: relative;
+    z-index: 1;
+}
+
+.layout-card-preview.admin-preview-room .admin-room-preview-overlay {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    background: #000000;
+    pointer-events: none;
+}
+
+.layout-card-preview.admin-preview-room.has-room-background {
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
+}
+
+.admin-preview-room {
+    background: linear-gradient(135deg, #e0ecff, #f8fafc);
+}
+
+.preview-theme-dark .admin-preview-room {
+    background: linear-gradient(135deg, #1e3a5f, #172231);
+}
+
+@media (max-width: 760px) {
+    .room-entity-fields {
+        grid-template-columns: 1fr;
+    }
+}
+
 * {
     box-sizing: border-box;
 }

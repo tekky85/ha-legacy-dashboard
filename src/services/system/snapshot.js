@@ -22,6 +22,11 @@ const TEXT_ATTRIBUTES = [
 ];
 
 const NUMBER_ATTRIBUTES = [
+    ["current_temperature", "currentTemperature"],
+    ["temperature", "targetTemperature"],
+    ["min_temp", "minimumTemperature"],
+    ["max_temp", "maximumTemperature"],
+    ["target_temp_step", "targetTemperatureStep"],
     ["current_position", "currentPosition"],
     ["battery_level", "batteryLevel"],
     ["current", "currentRuns"],

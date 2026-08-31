@@ -67,17 +67,17 @@ test("iOS-Standalone-Metadaten sind vollständig", function () {
 
     assert.match(
         html,
-        /rel="manifest" href="\/manifest\.json\?v=48"/
+        /rel="manifest" href="\/manifest\.json\?v=49"/
     );
 
     assert.match(
         html,
-        /sizes="76x76"[\s\S]*\/icons\/app-icon-76\.png\?v=48/
+        /sizes="76x76"[\s\S]*\/icons\/app-icon-76\.png\?v=49/
     );
 
     assert.match(
         html,
-        /sizes="152x152"[\s\S]*\/icons\/app-icon-152\.png\?v=48/
+        /sizes="152x152"[\s\S]*\/icons\/app-icon-152\.png\?v=49/
     );
 
     assert.doesNotMatch(html, /\?v=16/);

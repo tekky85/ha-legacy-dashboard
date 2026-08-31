@@ -23,6 +23,12 @@ const writeRateLimit =
 const climatePower =
     require("../services/climate-power");
 
+const System =
+    require("../services/system");
+
+const Rooms =
+    require("../services/rooms");
+
 const projectPackage =
     require("../../package.json");
 
@@ -187,8 +193,9 @@ function addDashboardMeta(
 
 
     if (
+        dashboardEntities.length > 0 &&
         failedEntities.length ===
-        dashboardEntities.length
+            dashboardEntities.length
     ) {
 
         status = "offline";
@@ -197,6 +204,17 @@ function addDashboardMeta(
 
         status = "degraded";
 
+    }
+
+    if (entities._room_meta) {
+        if (entities._room_meta.home_assistant === "offline") {
+            status = "offline";
+        } else if (
+            entities._room_meta.stale &&
+            status === "online"
+        ) {
+            status = "degraded";
+        }
     }
 
 
@@ -222,13 +240,49 @@ async function sendDashboardState(
             dashboardId
         );
 
+    const directEntities =
+        dashboardConfig.getDirectVisibleEntityIds(
+            dashboardId
+        );
+
+    const roomWidgets =
+        dashboardConfig.getRoomWidgets(
+            dashboardId
+        );
+
 
     try {
 
         const entities =
             await ha.getEntities(
-                dashboardEntities
+                directEntities
             );
+
+        if (roomWidgets.length > 0) {
+            const roomProjection = Rooms.build(
+                await System.getSnapshot(),
+                roomWidgets,
+                dashboardConfig.getErrorsConfiguration()
+            );
+
+            Object.keys(roomProjection.states)
+                .forEach(function (entityId) {
+                    if (!entities[entityId]) {
+                        entities[entityId] =
+                            roomProjection.states[entityId];
+                    }
+                });
+
+            entities._room_alerts =
+                roomProjection.alerts;
+            entities._room_meta = {
+                stale: roomProjection.stale,
+                home_assistant:
+                    roomProjection.homeAssistantReachable
+                        ? "online"
+                        : "offline"
+            };
+        }
 
         return res.json(
             addDashboardMeta(

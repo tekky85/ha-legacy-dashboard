@@ -63,6 +63,13 @@ var Dashboard = {
         }
 
 
+        if (config.type === "room") {
+
+            return new RoomWidget(config);
+
+        }
+
+
         return null;
 
     },
@@ -183,8 +190,13 @@ var Dashboard = {
 
                 !config ||
                 config.visible === false ||
-                typeof config.entity !== "string" ||
-                !config.entity
+                (
+                    config.type !== "room" &&
+                    (
+                        typeof config.entity !== "string" ||
+                        !config.entity
+                    )
+                )
 
             ) {
 
@@ -371,6 +383,18 @@ var Dashboard = {
 
     renderWidget: function (widget, states) {
 
+        if (widget.type === "room") {
+            return widget.render(
+                states,
+                states._room_alerts && states._room_alerts[widget.id]
+                    ? states._room_alerts[widget.id]
+                    : [],
+                this.controlsDisabled || Boolean(
+                    states._room_meta && states._room_meta.stale
+                )
+            );
+        }
+
         var state = states[widget.entity];
 
 
@@ -410,7 +434,7 @@ var Dashboard = {
         var state;
 
 
-        if (!widget) {
+        if (!widget || widget.type === "room") {
             return null;
         }
 
@@ -438,6 +462,22 @@ var Dashboard = {
     setControlsDisabled: function (disabled) {
 
         this.controlsDisabled = Boolean(disabled);
+
+    },
+
+
+    toggleRoom: function (widgetId) {
+
+        var widget = this.getWidget(widgetId);
+
+        if (!widget || widget.type !== "room") {
+            return false;
+        }
+
+        widget.toggleExpanded();
+        this.render(this.states);
+
+        return true;
 
     },
 

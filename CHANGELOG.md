@@ -18,8 +18,20 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
   unassigned-card handling, and read-only Home Assistant Area references.
 - Added section creation, ordering, deletion, and widget assignment to the
   protected Admin editor.
+- Added native Room Cards with optional read-only Area auto-setup, explicit
+  entity roles, collapsed/expanded views, section integration, and responsive
+  compact through large presentations.
+- Added secure per-Room Card JPEG/PNG backgrounds by reusing the existing
+  validated and atomic background storage.
 - Added a test-only Card Matrix harness covering all 1,128 supported
   renderer, size, profile, and representative-state combinations.
+
+### Security
+
+- Room Card controls reuse only the existing Light and Climate allowlists and
+  explicit service routes; all other displayed domains remain read-only.
+- Room Cards use the cached normalized system snapshot and central issue/risk
+  rules without exposing HA credentials, registries, or generic services.
 
 ### Fixed
 

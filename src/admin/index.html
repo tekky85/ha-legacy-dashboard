@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>HA Legacy Dashboard – Administration</title>
-    <link rel="stylesheet" href="/admin/css/admin.css">
+    <link rel="stylesheet" href="/admin/css/admin.css?v=49">
 </head>
 <body>
     <a class="skip-link" href="#adminMain">Zum Inhalt springen</a>
@@ -358,18 +358,88 @@
         </form>
     </dialog>
 
-    <script src="/admin/js/auth.js" defer></script>
-    <script src="/admin/js/api.js" defer></script>
-    <script src="/admin/js/state.js" defer></script>
-    <script src="/admin/js/layout.js" defer></script>
-    <script src="/admin/js/sections.js" defer></script>
-    <script src="/admin/js/dashboards.js" defer></script>
-    <script src="/admin/js/widgets.js" defer></script>
-    <script src="/admin/js/entities.js" defer></script>
-    <script src="/admin/js/system-dashboards.js" defer></script>
-    <script src="/admin/js/entity-rules.js" defer></script>
-    <script src="/js/core/icons.js?v=29" defer></script>
-    <script src="/js/core/presentation.js?v=30" defer></script>
-    <script src="/admin/js/app.js" defer></script>
+    <dialog id="roomDialog" class="wide-dialog" aria-labelledby="roomDialogTitle">
+        <form id="roomForm" class="dialog-form room-form">
+            <div class="dialog-heading">
+                <div>
+                    <p class="eyebrow">Native Room Card</p>
+                    <h2 id="roomDialogTitle">Room Card bearbeiten</h2>
+                </div>
+                <button class="icon-button" type="button" data-close-dialog="roomDialog" aria-label="Dialog schließen">×</button>
+            </div>
+
+            <input id="roomWidgetId" type="hidden">
+            <label for="roomTitleInput">Raumname</label>
+            <input id="roomTitleInput" type="text" maxlength="120" required>
+
+            <div class="form-grid">
+                <div>
+                    <label for="roomAreaInput">Home-Assistant-Area (optional)</label>
+                    <select id="roomAreaInput"></select>
+                </div>
+                <div>
+                    <label for="roomSectionInput">Dashboard-Abschnitt</label>
+                    <select id="roomSectionInput"></select>
+                </div>
+                <div>
+                    <label for="roomSizeInput">Kachelgröße</label>
+                    <select id="roomSizeInput">
+                        <option value="compact">Kompakt</option>
+                        <option value="normal">Normal</option>
+                        <option value="wide">Breit</option>
+                        <option value="tall">Hoch</option>
+                        <option value="large">Groß</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="room-area-actions">
+                <button id="roomAutoSetupButton" class="button secondary" type="button">Vorschläge aus Area übernehmen</button>
+                <p id="roomAreaWarning" class="form-warning" role="status"></p>
+            </div>
+
+            <label for="roomEntitySearch">Entities durchsuchen</label>
+            <input id="roomEntitySearch" type="search" placeholder="Name, Entity-ID, Domain oder Device Class">
+            <div id="roomEntityFields" class="room-entity-fields"></div>
+
+            <fieldset class="room-behavior-fields">
+                <legend>Darstellung</legend>
+                <label class="checkbox-row" for="roomCollapsibleInput">
+                    <input id="roomCollapsibleInput" type="checkbox" checked>
+                    <span>Ein-/ausklappbar</span>
+                </label>
+                <label class="checkbox-row" for="roomDefaultExpandedInput">
+                    <input id="roomDefaultExpandedInput" type="checkbox">
+                    <span>Standardmäßig ausgeklappt</span>
+                </label>
+                <label class="checkbox-row" for="roomVisibleInput">
+                    <input id="roomVisibleInput" type="checkbox" checked>
+                    <span>Im Wall-Display sichtbar</span>
+                </label>
+            </fieldset>
+
+            <section id="roomBackgroundEditor" class="room-background-editor"></section>
+            <p id="roomFormError" class="form-error" role="alert"></p>
+            <div class="button-row end">
+                <button class="button secondary" type="button" data-close-dialog="roomDialog">Abbrechen</button>
+                <button class="button primary" type="submit">Übernehmen</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="/admin/js/auth.js?v=49" defer></script>
+    <script src="/admin/js/api.js?v=49" defer></script>
+    <script src="/admin/js/state.js?v=49" defer></script>
+    <script src="/admin/js/layout.js?v=49" defer></script>
+    <script src="/admin/js/sections.js?v=49" defer></script>
+    <script src="/admin/js/dashboards.js?v=49" defer></script>
+    <script src="/admin/js/widgets.js?v=49" defer></script>
+    <script src="/admin/js/rooms.js?v=49" defer></script>
+    <script src="/admin/js/entities.js?v=49" defer></script>
+    <script src="/admin/js/system-dashboards.js?v=49" defer></script>
+    <script src="/admin/js/entity-rules.js?v=49" defer></script>
+    <script src="/js/core/icons.js?v=49" defer></script>
+    <script src="/js/core/presentation.js?v=49" defer></script>
+    <script src="/admin/js/app.js?v=49" defer></script>
 </body>
 </html>

@@ -239,19 +239,19 @@ var LegacyPresentation = (function () {
         var dense =
             details.contentDensity === "dense";
         var minimumWidth =
-            type === "climate"
+            type === "climate" || type === "room"
                 ? 250
                 : details.controlCount > 0
                     ? 180
                     : 160;
         var wideWidth =
-            type === "climate"
+            type === "climate" || type === "room"
                 ? 400
                 : details.controlCount > 0
                     ? 380
                     : 360;
         var largeWidth =
-            type === "climate"
+            type === "climate" || type === "room"
                 ? 440
                 : details.controlCount > 0
                     ? 420

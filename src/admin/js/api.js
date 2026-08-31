@@ -133,6 +133,26 @@
                     method: "DELETE"
                 }
             );
+        },
+        uploadRoomBackground: function (dashboardId, widgetId, file) {
+            return request(
+                "/dashboards/" + encodeURIComponent(dashboardId) +
+                    "/widgets/" + encodeURIComponent(widgetId) +
+                    "/background",
+                {
+                    method: "POST",
+                    rawBody: file,
+                    contentType: file.type
+                }
+            );
+        },
+        removeRoomBackground: function (dashboardId, widgetId) {
+            return request(
+                "/dashboards/" + encodeURIComponent(dashboardId) +
+                    "/widgets/" + encodeURIComponent(widgetId) +
+                    "/background",
+                {method: "DELETE"}
+            );
         }
     };
 }(window.HALegacyAdmin = window.HALegacyAdmin || {}));

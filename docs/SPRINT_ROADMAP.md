@@ -218,6 +218,7 @@ Bedeutung von „fest“:
 | 25.6 | Card Size Matrix & Responsive Layout Hardening | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
 | 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; reale iOS-9-Abnahme offen |
 | 26 | Persistent Dashboard Sections | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
+| 26.1 | Native Room Card MVP | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
 
 ---
 
@@ -1984,11 +1985,29 @@ Layoutverschiebung in den bisherigen Ein-Raster-Fallback.
 
 ---
 
+# Sprint 26.1 – Native Room Card MVP
+
+Sprint 26.1 ergänzt Konfigurationsschema 11 um den nativen Widget-Typ `room`.
+Room Cards funktionieren mit oder ohne Home-Assistant-Area, unabhängig von
+Dashboard-Abschnitten, und erhalten überprüfbare read-only Entity-Vorschläge
+aus dem vorhandenen Area-/Device-/Entity-Inventar. Die Laufzeit verwendet den
+bereits normalisierten und gecachten System-Snapshot; es entstehen keine
+HA-Abfragen pro Raum.
+
+Collapsed und Expanded sowie Compact, Standard, Wide, Tall und Large besitzen
+bewusste Darstellungen. Alerts verwenden die zentrale Risk-/Severity-/Grace-/
+Flapping-/Recovery-Semantik. Nur die vorhandenen, explizit allowlist-basierten
+Light- und Climate-Endpunkte werden als Controls wiederverwendet. Andere
+Raum-Entities bleiben read-only. Optionale Raumhintergründe nutzen denselben
+sicheren JPEG-/PNG-Speicher wie Dashboard-Hintergründe.
+
+---
+
 # Nächster Schritt
 
-Sprint 26.1 kann auf der vorhandenen Section- und read-only Area-Metadatenbasis
-eine native Room Card entwickeln. Area-basierte Entity-Vorschläge müssen vom
-Benutzer bestätigt werden; Controls dürfen ausschließlich bestehende explizite
-Gateway-Endpunkte und Write-Allowlists wiederverwenden. Parallel bleibt die
-physische Sprint-25.6-/25.7-/26-Abnahme auf dem iPad mini 1 mit iOS 9.3.5 sowie
-der aktualisierte HAOS-RC-Lauf offen.
+Als nächster Produktschritt bietet sich eine reale iPad-/HAOS-Abnahme der
+Room-Card-Größen, Hintergründe und Touch-Controls an. Danach können weitere
+Room-Card-Komfortfunktionen auf demselben nativen Modell ergänzt werden, ohne
+Lovelace-, Custom-Card- oder generische Service-Abhängigkeiten einzuführen.
+Parallel bleiben die physischen Sprint-25.6-/25.7-/26-Abnahmen und der
+aktualisierte HAOS-RC-Lauf offen.

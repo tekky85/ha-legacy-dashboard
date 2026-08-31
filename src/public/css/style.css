@@ -24,6 +24,361 @@ html {
 
 }
 
+/* =========================================================
+   NATIVE ROOM CARD (SPRINT 26.1)
+   ========================================================= */
+
+.card-room {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    background-repeat: no-repeat;
+}
+
+.room-background-overlay {
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: #000;
+    pointer-events: none;
+}
+
+.room-content {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    height: 100%;
+}
+
+.has-room-background .room-content {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
+}
+
+.room-header,
+.room-heading,
+.room-primary-values,
+.room-status-line,
+.room-alerts,
+.room-entity-row,
+.room-climate-control-group {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.room-header,
+.room-entity-row {
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+}
+
+.room-heading {
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    min-width: 0;
+}
+
+.room-heading > div {
+    min-width: 0;
+}
+
+.room-icon {
+    display: block;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    margin-right: 10px;
+    color: #2563eb;
+}
+
+.has-room-background .room-icon {
+    color: #fff;
+}
+
+.room-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.room-title {
+    margin: 0;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 20px;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.room-area-reference {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    opacity: 0.72;
+}
+
+.room-expand-control {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    margin-left: 8px;
+    padding: 0;
+    border: 1px solid rgba(100, 116, 139, 0.35);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    color: #1e293b;
+    font-size: 28px;
+    line-height: 1;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.room-primary-values {
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin: 14px -5px 0;
+}
+
+.room-primary {
+    min-width: 76px;
+    margin: 0 5px 8px;
+}
+
+.room-primary strong,
+.room-primary span {
+    display: block;
+}
+
+.room-primary strong {
+    font-size: 28px;
+    line-height: 1.05;
+}
+
+.room-primary span {
+    margin-top: 3px;
+    font-size: 11px;
+    opacity: 0.72;
+}
+
+.room-status-line,
+.room-alerts {
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin: 0 -3px;
+}
+
+.room-status,
+.room-alert {
+    display: inline-block;
+    margin: 3px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: rgba(100, 116, 139, 0.14);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.room-windows.is-open,
+.room-alert-warning {
+    background: #fef3c7;
+    color: #92400e;
+    text-shadow: none;
+}
+
+.room-alert-error,
+.room-alert-critical {
+    background: #fee2e2;
+    color: #991b1b;
+    text-shadow: none;
+}
+
+.room-alert-info {
+    background: #dbeafe;
+    color: #1e40af;
+    text-shadow: none;
+}
+
+.room-expanded-content {
+    display: none;
+    min-height: 0;
+    margin-top: 9px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.card-room.is-expanded .room-expanded-content {
+    display: block;
+}
+
+.room-detail-group {
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px solid rgba(148, 163, 184, 0.26);
+}
+
+.room-detail-group h4 {
+    margin: 0 0 5px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.72;
+}
+
+.room-entity-row {
+    min-height: 44px;
+    margin: 2px 0;
+}
+
+.room-entity-name {
+    min-width: 0;
+    margin-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.room-entity-state {
+    margin-left: auto;
+    font-size: 13px;
+    opacity: 0.78;
+}
+
+.room-entity-row .dashboard-control-power {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    margin-left: 8px;
+}
+
+.room-entity-row .dashboard-control-power-label {
+    display: none;
+}
+
+.room-climate-control-group {
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.room-climate-control-group > * {
+    margin: 3px;
+}
+
+.room-climate-target {
+    min-width: 60px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.room-climate-target small {
+    font-size: 12px;
+}
+
+.card-room.card-presentation-compact .room-expand-control,
+.card-room.card-presentation-compact .room-humidity,
+.card-room.card-presentation-compact .room-target,
+.card-room.card-presentation-compact .room-presence,
+.card-room.card-presentation-compact .room-expanded-content {
+    display: none;
+}
+
+.card-room.card-presentation-compact .room-title {
+    font-size: 16px;
+}
+
+.card-room.card-presentation-compact .room-primary-values {
+    margin-top: 8px;
+}
+
+.card-room.card-presentation-compact .room-primary strong {
+    font-size: 23px;
+}
+
+.card-room.card-presentation-compact .room-alerts .room-alert:nth-child(n+2) {
+    display: none;
+}
+
+.card-room.card-presentation-standard .room-detail-switches,
+.card-room.card-presentation-standard .room-detail-covers,
+.card-room.card-presentation-standard .room-detail-fans,
+.card-room.card-presentation-standard .room-detail-mediaPlayers,
+.card-room.card-presentation-standard .room-detail-locks,
+.card-room.card-presentation-standard .room-detail-batteries,
+.card-room.card-presentation-standard .room-detail-secondary {
+    display: none;
+}
+
+.card-room.card-presentation-wide .room-expanded-content,
+.card-room.card-presentation-large .room-expanded-content {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+}
+
+.card-room.card-presentation-wide .room-detail-group,
+.card-room.card-presentation-large .room-detail-group {
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.card-room.card-presentation-large .room-title {
+    font-size: 25px;
+}
+
+.card-room.card-presentation-large .room-primary strong {
+    font-size: 36px;
+}
+
+body.theme-dark .room-expand-control {
+    border-color: rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.82);
+    color: #f8fafc;
+}
+
 html.theme-dark {
 
     background: #0d131c;

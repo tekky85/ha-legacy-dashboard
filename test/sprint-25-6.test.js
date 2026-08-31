@@ -135,12 +135,12 @@ function layoutDashboard(type, profileName, item) {
 }
 
 
-test("Card Inventory entspricht exakt den vier realen Renderern", function () {
+test("Card Inventory enthält die vier Sprint-25.6-Renderer und die native Room Card", function () {
     const dashboard = read("src/public/js/core/dashboard.js");
 
     assert.deepEqual(
         DashboardConfig.SUPPORTED_WIDGET_TYPES,
-        Matrix.TYPES
+        Matrix.TYPES.concat(["room"])
     );
     assert.deepEqual(Matrix.TYPES, [
         "sensor",
@@ -148,6 +148,7 @@ test("Card Inventory entspricht exakt den vier realen Renderern", function () {
         "light",
         "climate"
     ]);
+    assert.match(dashboard, /config\.type === "room"/);
 
     Matrix.TYPES.forEach(function (type) {
         assert.match(
@@ -357,7 +358,8 @@ test("Sprint 25.6 bleibt ES5, CSS-Grid-frei und ohne neue Write-Fläche", functi
         "src/public/js/widgets/sensor.js",
         "src/public/js/widgets/binary.js",
         "src/public/js/widgets/light.js",
-        "src/public/js/widgets/climate.js"
+        "src/public/js/widgets/climate.js",
+        "src/public/js/widgets/room.js"
     ];
     const forbidden = [
         /\blet\b/,

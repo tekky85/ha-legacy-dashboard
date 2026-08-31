@@ -118,6 +118,20 @@ read-only metadata reference. A section and an HA Area remain separate
 concepts: sections work without an Area, and the dashboard never creates,
 renames, or modifies Home Assistant Areas.
 
+Native Room Cards combine the room name, temperature, humidity, climate
+target, presence, openings, important alerts, and optional additional room
+entities in one card. The collapsed view prioritizes primary values and
+alerts; the expandable view adds detailed states and only the already
+explicitly authorized Light/Climate controls. Switches, covers, fans, media
+players, and locks remain read-only.
+
+An existing Home Assistant Area can be used by the Room editor as a read-only
+source of reviewable entity suggestions. Suggestions are applied only after
+explicit confirmation and can then be changed completely. A Room Card and its
+dashboard section hold independent `areaId` references. Each Room Card may
+also use its own optional background stored through the same secure JPEG/PNG
+architecture.
+
 ### iPad mini as a Wall Display
 
 For one iPad mini 1 running iOS 9.3.5, **Guided Access** is the recommended
@@ -150,6 +164,9 @@ Features include:
 - optionally reference existing Home Assistant Areas read-only
 - browse entities
 - add and edit widgets
+- create native Room Cards, review Area suggestions, and manually override
+  entity assignments
+- securely upload, preview, replace, or remove Room Card backgrounds
 - visibility and ordering
 - card sizes
 - drag-and-drop layout

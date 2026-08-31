@@ -169,8 +169,13 @@ app.use(function (req, res, next) {
 
     if (
         req.method === "POST" &&
-        /^\/api\/admin\/dashboards\/[^/]+\/background$/.test(
-            req.path
+        (
+            /^\/api\/admin\/dashboards\/[^/]+\/background$/.test(
+                req.path
+            ) ||
+            /^\/api\/admin\/dashboards\/[^/]+\/widgets\/[^/]+\/background$/.test(
+                req.path
+            )
         )
     ) {
         return next();
@@ -207,7 +212,14 @@ app.get(
                         dashboard.background &&
                         dashboard.background.imageId ===
                             imageId
-                    );
+                    ) || dashboard.widgets.some(function (widget) {
+                        return Boolean(
+                            widget.type === "room" &&
+                            widget.room &&
+                            widget.room.background &&
+                            widget.room.background.imageId === imageId
+                        );
+                    });
                 });
 
         const asset = referenced

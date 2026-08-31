@@ -7,7 +7,8 @@
         "humidity",
         "window",
         "light",
-        "heating"
+        "heating",
+        "room"
     ];
 
     const SIZES = [

@@ -259,6 +259,18 @@ function cleanupUnusedBackgrounds(previous, persisted) {
                 dashboard.background.imageId
             ] = true;
         }
+
+        dashboard.widgets.forEach(function (widget) {
+            if (
+                widget.type === "room" &&
+                widget.room &&
+                widget.room.background
+            ) {
+                activeImageIds[
+                    widget.room.background.imageId
+                ] = true;
+            }
+        });
     });
 
 
@@ -270,21 +282,40 @@ function cleanupUnusedBackgrounds(previous, persisted) {
                 : null;
 
 
-        if (!imageId || activeImageIds[imageId]) {
-            return;
+        if (imageId && !activeImageIds[imageId]) {
+            try {
+                dashboardBackgrounds.remove(imageId);
+            } catch (error) {
+                logger.warn(
+                    "dashboard_background_cleanup_failed",
+                    {
+                        error_type: error.name
+                    }
+                );
+            }
         }
 
+        dashboard.widgets.forEach(function (widget) {
+            const roomImageId =
+                widget.type === "room" &&
+                widget.room &&
+                widget.room.background
+                    ? widget.room.background.imageId
+                    : null;
 
-        try {
-            dashboardBackgrounds.remove(imageId);
-        } catch (error) {
-            logger.warn(
-                "dashboard_background_cleanup_failed",
-                {
-                    error_type: error.name
-                }
-            );
-        }
+            if (!roomImageId || activeImageIds[roomImageId]) {
+                return;
+            }
+
+            try {
+                dashboardBackgrounds.remove(roomImageId);
+            } catch (error) {
+                logger.warn(
+                    "room_background_cleanup_failed",
+                    {error_type: error.name}
+                );
+            }
+        });
 
     });
 
@@ -367,6 +398,10 @@ function sanitizeSystemEntity(entity) {
             typeof context.deviceId === "string" &&
             dashboardConfig.DEVICE_ID_PATTERN.test(context.deviceId)
                 ? context.deviceId
+                : null,
+        entity_category:
+            typeof context.entityCategory === "string"
+                ? context.entityCategory
                 : null
     };
 
@@ -819,6 +854,161 @@ router.delete(
 );
 
 
+router.post(
+    "/dashboards/:dashboardId/widgets/:widgetId/background",
+    parseBackgroundImage,
+    function (req, res) {
+
+        const candidate = dashboardConfig.getConfiguration();
+        const dashboardIndex = findDashboardIndex(
+            candidate,
+            req.params.dashboardId
+        );
+
+        if (dashboardIndex === -1) {
+            return res.status(404).json({error: "dashboard_not_found"});
+        }
+
+        const dashboard = candidate.dashboards[dashboardIndex];
+        const widgetIndex = findWidgetIndex(dashboard, req.params.widgetId);
+
+        if (widgetIndex === -1) {
+            return res.status(404).json({error: "widget_not_found"});
+        }
+
+        const widget = dashboard.widgets[widgetIndex];
+
+        if (widget.type !== "room" || !widget.room) {
+            return res.status(400).json({error: "room_widget_required"});
+        }
+
+        const previousImageId = widget.room.background
+            ? widget.room.background.imageId
+            : null;
+        let stored;
+
+        try {
+            stored = dashboardBackgrounds.store(
+                req.body,
+                req.get("content-type")
+            );
+        } catch (error) {
+            return res.status(400).json({
+                error: error.code || "background_file_invalid",
+                message: error.message
+            });
+        }
+
+        widget.room.background = {
+            imageId: stored.imageId,
+            position: widget.room.background
+                ? widget.room.background.position
+                : "center center",
+            size: widget.room.background
+                ? widget.room.background.size
+                : "cover",
+            overlay: widget.room.background
+                ? widget.room.background.overlay
+                : 20
+        };
+
+        const persisted = persistConfiguration(res, candidate);
+
+        if (!persisted) {
+            try {
+                dashboardBackgrounds.remove(stored.imageId);
+            } catch (cleanupError) {
+                logger.warn(
+                    "room_background_rollback_failed",
+                    {error_type: cleanupError.name}
+                );
+            }
+            return;
+        }
+
+        if (previousImageId && previousImageId !== stored.imageId) {
+            try {
+                dashboardBackgrounds.remove(previousImageId);
+            } catch (cleanupError) {
+                logger.warn(
+                    "room_background_cleanup_failed",
+                    {error_type: cleanupError.name}
+                );
+            }
+        }
+
+        return res.status(201).json({
+            configuration: persisted,
+            background: widget.room.background,
+            image: {
+                imageId: stored.imageId,
+                mimeType: stored.mimeType,
+                size: stored.size,
+                width: stored.width,
+                height: stored.height
+            }
+        });
+
+    }
+);
+
+
+router.delete(
+    "/dashboards/:dashboardId/widgets/:widgetId/background",
+    function (req, res) {
+
+        const candidate = dashboardConfig.getConfiguration();
+        const dashboardIndex = findDashboardIndex(
+            candidate,
+            req.params.dashboardId
+        );
+
+        if (dashboardIndex === -1) {
+            return res.status(404).json({error: "dashboard_not_found"});
+        }
+
+        const dashboard = candidate.dashboards[dashboardIndex];
+        const widgetIndex = findWidgetIndex(dashboard, req.params.widgetId);
+
+        if (widgetIndex === -1) {
+            return res.status(404).json({error: "widget_not_found"});
+        }
+
+        const widget = dashboard.widgets[widgetIndex];
+
+        if (widget.type !== "room" || !widget.room) {
+            return res.status(400).json({error: "room_widget_required"});
+        }
+
+        const previousImageId = widget.room.background
+            ? widget.room.background.imageId
+            : null;
+
+        widget.room.background = null;
+
+        const persisted = persistConfiguration(res, candidate);
+
+        if (!persisted) {
+            return;
+        }
+
+        if (previousImageId) {
+            try {
+                dashboardBackgrounds.remove(previousImageId);
+            } catch (cleanupError) {
+                logger.warn(
+                    "room_background_cleanup_failed",
+                    {error_type: cleanupError.name}
+                );
+            }
+        }
+
+        return res.json({configuration: persisted});
+
+    }
+);
+
+
 router.delete("/dashboards/:dashboardId", function (req, res) {
 
     const candidate =
@@ -1037,7 +1227,11 @@ router.put(
             size:
                 typeof body.size !== "undefined"
                     ? body.size
-                    : current.size
+                    : current.size,
+            room:
+                typeof body.room !== "undefined"
+                    ? body.room
+                    : current.room
         };
 
         if (sectionChanged) {
@@ -1106,6 +1300,8 @@ router.delete(
             });
         }
 
+        const removedWidget = dashboard.widgets[widgetIndex];
+
         dashboard.widgets.splice(
             widgetIndex,
             1
@@ -1121,6 +1317,23 @@ router.delete(
 
 
         if (persisted) {
+            if (
+                removedWidget.type === "room" &&
+                removedWidget.room &&
+                removedWidget.room.background
+            ) {
+                try {
+                    dashboardBackgrounds.remove(
+                        removedWidget.room.background.imageId
+                    );
+                } catch (cleanupError) {
+                    logger.warn(
+                        "room_background_cleanup_failed",
+                        {error_type: cleanupError.name}
+                    );
+                }
+            }
+
             res.status(204).end();
         }
 
