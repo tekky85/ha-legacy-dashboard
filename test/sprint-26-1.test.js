@@ -1,5 +1,6 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
@@ -405,8 +406,15 @@ test("Room Card unterstützt Background, fehlenden Background und alle Präsenta
         size: "cover",
         overlay: 30
     };
-    assert.match(widget.render(states, []), /has-room-background/);
-    assert.match(widget.render(states, []), /bg-0123456789abcdef0123456789abcdef\.jpg/);
+    const backgroundHtml = widget.render(states, []);
+    const openingTag = backgroundHtml.slice(0, backgroundHtml.indexOf(">") + 1);
+
+    assert.match(backgroundHtml, /has-room-background/);
+    assert.match(backgroundHtml, /class="room-background-image"/);
+    assert.match(backgroundHtml, /bg-0123456789abcdef0123456789abcdef\.jpg/);
+    assert.doesNotMatch(openingTag, /background-image/);
+    assert.doesNotMatch(backgroundHtml, /style="[^"]*background-image/);
+    assert.match(backgroundHtml, /data-room-background-url=/);
 
     const presentation = vm.createContext({
         Boolean: Boolean,
@@ -423,6 +431,233 @@ test("Room Card unterstützt Background, fehlenden Background und alle Präsenta
     assert.equal(presentation.LegacyPresentation.getMode(config, 3, 2, 310, 230, {}), "standard");
     assert.equal(presentation.LegacyPresentation.getMode(config, 6, 1, 430, 140, {}), "wide");
     assert.equal(presentation.LegacyPresentation.getMode(config, 6, 2, 500, 260, {}), "large");
+});
+
+test("Persistierter Room-Hintergrund bleibt zwischen Admin und Public Runtime identisch", function (t) {
+    const directory = fs.mkdtempSync(
+        path.join(os.tmpdir(), "ha-room-background-")
+    );
+    const widget = roomWidget();
+    const candidate = configurationWithRoom(widget);
+    const customWidget = roomWidget({
+        id: "custom-room",
+        title: "Custom Room"
+    });
+    const customDashboard = candidate.dashboards[1];
+
+    t.after(function () {
+        DashboardConfig.replaceConfiguration(
+            DashboardConfig.DEFAULT_CONFIGURATION
+        );
+        fs.rmSync(directory, {recursive: true, force: true});
+    });
+
+    DashboardConfig.initialize({
+        configPath: path.join(directory, "dashboards.json")
+    });
+
+    widget.room.background = {
+        imageId: "bg-0123456789abcdef0123456789abcdef.jpg",
+        position: "center bottom",
+        size: "contain",
+        overlay: 30
+    };
+    customWidget.sectionId = "custom-section";
+    customDashboard.sections = [{
+        id: "custom-section",
+        title: "Custom Section",
+        order: 10,
+        showTitle: true,
+        areaId: null
+    }];
+    customDashboard.widgets = [customWidget];
+    customDashboard.layouts = Layout.createLayouts(
+        customDashboard.widgets
+    );
+
+    DashboardConfig.replaceConfiguration(candidate);
+
+    const persisted = DashboardConfig.getDashboardById("default")
+        .widgets[0].room.background;
+    const publicBackground = DashboardConfig.getPublicDashboardConfig(
+        "default"
+    ).widgets[0].room.background;
+    const publicCustom = DashboardConfig.getPublicDashboardConfig(
+        customDashboard.id
+    );
+
+    assert.equal(
+        persisted.imageId,
+        "bg-0123456789abcdef0123456789abcdef.jpg"
+    );
+    assert.deepEqual(publicBackground, {
+        image_url: "/assets/backgrounds/bg-0123456789abcdef0123456789abcdef.jpg",
+        position: "center bottom",
+        size: "contain",
+        overlay: 30
+    });
+    assert.equal(typeof publicBackground.imageId, "undefined");
+    assert.equal(publicCustom.widgets[0].type, "room");
+    assert.equal(publicCustom.widgets[0].sectionId, "custom-section");
+    assert.equal(publicCustom.sections[0].id, "custom-section");
+});
+
+test("Room Toggle aktualisiert DOM und ARIA ohne das komplette Grid neu zu rendern", function () {
+    const symbol = {innerHTML: "+"};
+    const attributes = {"data-widget-id": "living-room"};
+    const controlAttributes = {"aria-expanded": "false"};
+    const content = {scrollTop: 17};
+    const backgroundLayer = {
+        style: {},
+        getAttribute: function (name) {
+            const values = {
+                "data-room-background-url":
+                    "/assets/backgrounds/bg-0123456789abcdef0123456789abcdef.jpg",
+                "data-room-background-position": "center bottom",
+                "data-room-background-size": "contain"
+            };
+            return values[name] || null;
+        }
+    };
+    const backgroundOverlay = {
+        style: {},
+        getAttribute: function (name) {
+            return name === "data-room-background-overlay" ? "30" : null;
+        }
+    };
+    const control = {
+        getElementsByTagName: function (name) {
+            return name === "span" ? [symbol] : [];
+        },
+        setAttribute: function (name, value) {
+            controlAttributes[name] = value;
+        }
+    };
+    const card = {
+        className: "card card-room is-collapsed card-presentation-large",
+        getAttribute: function (name) { return attributes[name] || null; },
+        getElementsByClassName: function (name) {
+            if (name === "room-expand-control") { return [control]; }
+            if (name === "room-content") { return [content]; }
+            if (name === "room-background-image") { return [backgroundLayer]; }
+            if (name === "room-background-overlay") { return [backgroundOverlay]; }
+            return [];
+        }
+    };
+    const container = {
+        getElementsByClassName: function (name) {
+            return name === "card-room" ? [card] : [];
+        }
+    };
+    const context = vm.createContext({
+        Boolean: Boolean,
+        Math: Math,
+        Number: Number,
+        String: String,
+        document: {
+            getElementById: function (id) {
+                return id === "dashboard" ? container : null;
+            }
+        }
+    });
+    let expanded = false;
+
+    vm.runInContext(read("src/public/js/core/dashboard.js"), context);
+    context.Dashboard.widgets = [{
+        id: "living-room",
+        type: "room",
+        toggleExpanded: function () {
+            expanded = !expanded;
+            return expanded;
+        }
+    }];
+
+    context.Dashboard.applyRoomAppearances(container);
+    assert.equal(
+        backgroundLayer.style.backgroundImage,
+        'url("/assets/backgrounds/bg-0123456789abcdef0123456789abcdef.jpg")'
+    );
+    assert.equal(backgroundLayer.style.backgroundPosition, "center bottom");
+    assert.equal(backgroundLayer.style.backgroundSize, "contain");
+    assert.equal(backgroundOverlay.style.opacity, "0.3");
+
+    assert.equal(context.Dashboard.toggleRoom("living-room"), true);
+    assert.match(card.className, /is-expanded/);
+    assert.doesNotMatch(card.className, /is-collapsed/);
+    assert.equal(controlAttributes["aria-expanded"], "true");
+    assert.equal(controlAttributes["aria-label"], "Raumdetails einklappen");
+    assert.equal(symbol.innerHTML, "−");
+
+    assert.equal(context.Dashboard.toggleRoom("living-room"), true);
+    assert.match(card.className, /is-collapsed/);
+    assert.doesNotMatch(card.className, /is-expanded/);
+    assert.equal(controlAttributes["aria-expanded"], "false");
+    assert.equal(controlAttributes["aria-label"], "Raumdetails ausklappen");
+    assert.equal(symbol.innerHTML, "+");
+    assert.equal(content.scrollTop, 0);
+});
+
+test("Room Controls lösen niemals versehentlich Collapse aus", function () {
+    const source = read("src/public/js/app.js");
+    const start = source.indexOf("function handleDashboardInteraction");
+    const end = source.indexOf("\n\nvar dashboardElement", start);
+    const counters = {light: 0, climate: 0, power: 0, room: 0, focus: 0};
+    const context = vm.createContext({
+        window: {},
+        hasClass: function (element, name) {
+            return (" " + (element.className || "") + " ")
+                .indexOf(" " + name + " ") !== -1;
+        },
+        setLightState: function () { counters.light += 1; },
+        setClimateTemperature: function () { counters.climate += 1; },
+        setClimatePowerState: function () { counters.power += 1; },
+        Dashboard: {
+            toggleRoom: function () { counters.room += 1; }
+        },
+        LegacyFocus: {
+            open: function () { counters.focus += 1; }
+        }
+    });
+
+    assert.ok(start >= 0 && end > start);
+    vm.runInContext(source.slice(start, end), context);
+
+    const boundary = {parentNode: null};
+    const roomCard = {
+        className: "card card-room is-expanded",
+        parentNode: boundary,
+        getAttribute: function () { return "living-room"; }
+    };
+    const lightButton = {
+        tagName: "BUTTON",
+        className: "dashboard-control light-control room-light-control",
+        parentNode: roomCard
+    };
+    const lightIcon = {tagName: "SPAN", className: "", parentNode: lightButton};
+    const roomButton = {
+        tagName: "BUTTON",
+        className: "room-expand-control",
+        parentNode: roomCard,
+        getAttribute: function () { return "living-room"; }
+    };
+    const roomSymbol = {tagName: "SPAN", className: "", parentNode: roomButton};
+
+    context.handleDashboardInteraction({
+        target: lightIcon,
+        preventDefault: function () {},
+        stopPropagation: function () {}
+    }, boundary);
+    assert.deepEqual(counters, {
+        light: 1, climate: 0, power: 0, room: 0, focus: 0
+    });
+
+    context.handleDashboardInteraction({
+        target: roomSymbol,
+        preventDefault: function () {},
+        stopPropagation: function () {}
+    }, boundary);
+    assert.equal(counters.room, 1);
+    assert.equal(counters.focus, 0);
 });
 
 test("Room Card Matrix akzeptiert jede gültige Portrait- und Landscape-Größe", function () {
@@ -534,6 +769,14 @@ test("Room Card bleibt in Sections, Default/Custom, Themes und HomeScreen integr
     assert.match(css, /card-presentation-standard/);
     assert.match(css, /card-presentation-wide/);
     assert.match(css, /card-presentation-large/);
+    assert.match(css, /card-room\.is-expanded \.room-content[\s\S]*overflow-y: auto/);
+    assert.match(css, /card-room\.is-expanded \.room-expanded-content[\s\S]*flex-shrink: 0/);
+    assert.match(dashboardSource, /applyRoomAppearances/);
+    assert.match(dashboardSource, /layer\.style\.backgroundImage/);
+    assert.doesNotMatch(
+        css,
+        /card-presentation-compact \.room-expand-control/
+    );
 });
 
 test("Room Datenpfad nutzt einen Cache-Snapshot ohne N+1 oder neue Write-API", function () {
@@ -590,5 +833,9 @@ test("Legacy Room Card bleibt ES5, Flexbox-basiert und ohne Lovelace-Abhängigke
     assert.match(harness, /getBoundingClientRect/);
     assert.match(harness, /horizontal-overflow/);
     assert.match(harness, /touch-target/);
+    assert.match(harness, /runtime-background-missing/);
+    assert.match(harness, /expanded-content-inaccessible/);
+    assert.match(harness, /collapse-state-invalid/);
     assert.match(read("test/room-card-matrix-harness.html"), /widgets\/room\.js/);
+    assert.match(read("test/room-card-matrix-harness.html"), /core\/dashboard\.js/);
 });

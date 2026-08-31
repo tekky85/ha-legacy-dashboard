@@ -125,6 +125,13 @@ alerts; the expandable view adds detailed states and only the already
 explicitly authorized Light/Climate controls. Switches, covers, fans, media
 players, and locks remain read-only.
 
+The Plus/Minus control expands or collapses details directly inside the card
+without rebuilding the dashboard grid. Compact cards remain expandable, and
+long detail content scrolls inside the card. An optional room background uses
+its own layer, separate from grid geometry. The controller applies validated
+image values through CSP-safe JavaScript without weakening the strict
+`style-src` policy.
+
 An existing Home Assistant Area can be used by the Room editor as a read-only
 source of reviewable entity suggestions. Suggestions are applied only after
 explicit confirmation and can then be changed completely. A Room Card and its

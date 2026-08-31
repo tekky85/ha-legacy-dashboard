@@ -218,7 +218,7 @@ Bedeutung von „fest“:
 | 25.6 | Card Size Matrix & Responsive Layout Hardening | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
 | 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; reale iOS-9-Abnahme offen |
 | 26 | Persistent Dashboard Sections | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
-| 26.1 | Native Room Card MVP | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
+| 26.1 | Native Room Card MVP | vollständig re-auditiert; Runtime-Hintergrund und Collapse korrigiert; iPad-mini-Abnahme offen |
 | 26.2 | Controllable Entity Authorization & Climate Capability Hardening | umgesetzt und automatisiert validiert; Mehrgeräte-iPad-Abnahme offen |
 
 ---
@@ -2002,6 +2002,16 @@ Light- und Climate-Endpunkte werden als Controls wiederverwendet. Andere
 Raum-Entities bleiben read-only. Optionale Raumhintergründe nutzen denselben
 sicheren JPEG-/PNG-Speicher wie Dashboard-Hintergründe.
 
+Der vollständige Re-Audit auf Basis von `2097af2` bestätigte zwei reale
+Darstellungsfehler trotz zuvor grüner Markup-Tests: Expanded-Inhalt konnte im
+festen Grid auf 0 Pixel schrumpfen, und die strenge CSP blockierte die vom
+Renderer erzeugten Inline-Hintergrundstile. Die Details scrollen nun in einer expliziten
+ES5-kompatiblen Card-Innenfläche; Compact bleibt ebenfalls ausklappbar. Das
+Bild liegt auf einer eigenen, vom Grid unabhängigen Ebene und wird nach der
+DOM-Erzeugung CSP-konform per Controller gesetzt. Der Browser-Harness
+prüft Compact, Standard, Wide und Large jeweils auf Expand/Collapse,
+zugänglichen Detailinhalt, Hintergrund, Overflow und Touch-Ziele.
+
 ---
 
 # Sprint 26.2 – Controllable Entity Authorization & Climate Capability Hardening
@@ -2033,9 +2043,10 @@ den letzten bestätigten Wert wieder her.
 
 # Nächster Schritt
 
-Als nächster Produktschritt bietet sich eine reale iPad-/HAOS-Abnahme mit
+Als nächster Produktschritt bleibt eine reale iPad-/HAOS-Abnahme mit
 mindestens zwei unterschiedlichen Lights und zwei unterschiedlichen
-Thermostaten sowie der Room-Card-Größen, Hintergründe und Touch-Controls an.
+Thermostaten sowie der Room-Card-Größen, Hintergründe, internem Scrollen und
+Touch-Controls offen.
 Danach können weitere
 Room-Card-Komfortfunktionen auf demselben nativen Modell ergänzt werden, ohne
 Lovelace-, Custom-Card- oder generische Service-Abhängigkeiten einzuführen.

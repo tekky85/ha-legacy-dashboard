@@ -1,8 +1,8 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 31. August 2026, Sprint 26.2 auf Basis des sauberen, mit `origin/main`
-identischen Commits `7bc0abc` implementiert und repositoryseitig validiert.
-Sprint 26.1 wurde zuvor mit `8789ee3` abgeschlossen.
+Stand: 31. August 2026, Sprint 26.1 auf Basis des sauberen, mit `origin/main`
+identischen Commits `2097af2` vollständig erneut auditiert und korrigiert.
+Sprint 26.2 wurde zuvor mit `2097af2` abgeschlossen.
 Release Candidate `1.0.0-rc.1` ist veröffentlicht; die JPEG-Härtung aus Sprint
 25.5 und die Kartenkorrekturen aus Sprint 25.6 gehören zum noch nicht neu
 getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/Safari- und verbleibende
@@ -14,6 +14,7 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-26.1-Re-Audit-Ausgangscommit: `2097af2`
 - Sprint-26.2-Ausgangscommit: `7bc0abc`
 - Sprint-26.1-Implementierungscommit: `8789ee3`
 - Sprint-26-Ausgangscommit: `6e94ea8`
@@ -139,7 +140,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 25.6 | Card Size Matrix & Responsive Layout Hardening | implementiert und lokal mit vollständiger Test-/Browsermatrix validiert; iPad-mini-Abnahme offen |
 | 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; physische iPad-mini-Abnahme offen |
 | 26 | Persistent Dashboard Sections | implementiert; physische iPad-mini-Abnahme offen |
-| 26.1 | Native Room Card MVP | implementiert; physische iPad-mini-Abnahme offen |
+| 26.1 | Native Room Card MVP | vollständig re-auditiert; Runtime-Hintergrund und Collapse korrigiert; physische iPad-mini-Abnahme offen |
 | 26.2 | Controllable Entity Authorization & Climate Capability Hardening | implementiert und automatisiert validiert; Mehrgeräte-iPad-Abnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
@@ -2171,3 +2172,155 @@ der Off-State-Sollwert nicht einschaltet; Power und Sollwert zusätzlich in
 Grid, Focus und einer Room Card prüfen. Integrationen, die Sollwerte in `off`
 grundsätzlich ablehnen, bleiben bewusst nicht erzwingbar und müssen den
 kontrollierten Fehler samt Wert-Rollback zeigen.
+
+## 30. Sprint 26.1 – vollständiger Re-Audit und Runtime-Korrektur
+
+Der Re-Audit startete auf dem sauberen Commit `2097af2`. Die vorherige
+Sprint-26.1-Umsetzung war funktional weitgehend vollständig, ihre Tests
+prüften Collapse und Hintergrund jedoch hauptsächlich als erzeugtes Markup.
+Der reale Browserpfad zeigte deshalb zwei nicht erfasste Fehler: Die
+Expanded-Fläche hatte bei einer großen, inhaltsreichen Room Card trotz korrekt
+gesetzter `is-expanded`-Klasse eine Höhe von exakt 0 Pixel. Zudem erreichten
+`imageId`, persistierte Konfiguration, Public API und Renderer zwar korrekt die
+Laufzeit, die strenge `style-src 'self'`-CSP blockierte aber den vom Renderer
+erzeugten Inline-Hintergrund und die Inline-Overlay-Deckkraft. Die anschließend
+per JavaScript gesetzte Grid-Geometrie war deshalb der einzige verbliebene
+Style am äußeren Element. Die Admin-Vorschau setzt ihr Bild bereits per CSSOM
+und blieb daher korrekt.
+
+Expanded-Inhalt scrollt nun in der begrenzten Room-Innenfläche und wird nicht
+mehr auf 0 Pixel geschrumpft. Compact unterdrückt Toggle und Detailinhalt nicht
+mehr. `Dashboard.toggleRoom` aktualisiert Klasse, ARIA-Status, Symbol und
+Scrollposition direkt auf der betroffenen Karte, ohne das vollständige Grid
+neu zu rendern. Es gibt weiterhin nur einen synthetisierten `click`-Pfad; ein
+zusätzlicher `touchend`-Listener und damit Doppel-Auslösungen wurden nicht
+eingeführt. Light-/Climate-Controls werden vor dem Room-Toggle verarbeitet und
+beenden das Event, sodass sie Collapse nicht auslösen.
+
+Der Raumhintergrund wird nun als dedizierte absolute
+`.room-background-image`-Ebene innerhalb der Card gerendert. Grid-Position,
+Breite und Höhe bleiben ausschließlich auf dem äußeren Card-Element. Der
+Renderer liefert nur validierte `data-*`-Metadaten; der ES5-Controller setzt
+Bild, Position, Größe und Overlay danach per CSSOM. Die CSP bleibt unverändert
+streng. Upload,
+Bild-ID, atomare Persistenz, Public URL, geschützte Asset-Route und Overlay
+bleiben unverändert aus Sprint 25.3/25.5. Damit verwenden Admin-Vorschau und
+Runtime denselben gespeicherten Hintergrund, ohne eine zweite Upload- oder
+Storage-Architektur.
+
+### Vollständige Sprint-26.1-Anforderungsmatrix
+
+`Ausgang` bezeichnet den Zustand auf `2097af2` vor dieser Korrektur. `Endstand`
+bezeichnet den tatsächlich implementierten und automatisiert geprüften Stand.
+Physische iPad-Prüfungen werden nicht als bestanden ausgegeben.
+
+| Anforderung | Ausgang | Endstand | Nachweis |
+|---|---|---|---|
+| Card Type `room` | PASS | PASS | Schema und Widget Factory |
+| Room Title | PASS | PASS | Validierung, Admin, Renderer |
+| optionale `areaId` | PASS | PASS | Schema und Missing-Area-Fallback |
+| Temperatur | PASS | PASS | Einzelrolle, Projektion, Primärwert |
+| Luftfeuchte | PASS | PASS | Einzelrolle, Projektion, Primärwert |
+| Climate | PASS | PASS | Einzelrolle, Status und sichere Controls |
+| Präsenz | PASS | PASS | Einzelrolle und Primärstatus |
+| Fenster/Öffnungen | PASS | PASS | Rollenliste, Zähler und Alerts |
+| Lights | PASS | PASS | Rollenliste und zentral autorisierte Controls |
+| Switches | PASS | PASS | Rollenliste, read-only |
+| Covers | PASS | PASS | Rollenliste, read-only |
+| Fans | PASS | PASS | Rollenliste, read-only |
+| Media Player | PASS | PASS | Rollenliste, read-only |
+| Locks | PASS | PASS | Rollenliste, read-only |
+| Batterie-/Alert-Entities | PASS | PASS | zentrale Issues plus Low-Battery-Projektion |
+| optionaler Hintergrund | BROKEN | PASS | dedizierte Runtime-Bildebene |
+| Collapsed-/Expanded-Konfiguration | PASS | PASS | `collapsible`, `defaultExpanded` |
+| Area-Auswahl im Admin | PASS | PASS | read-only Area-Selector |
+| vorhandene Area Registry | PASS | PASS | sanitisiertes System-Inventar |
+| Vorschläge ausschließlich aus gewählter Area | PASS | PASS | stabile `area_id`-Zuordnung |
+| Temperaturvorschlag | PASS | PASS | Device Class/Unit-Test |
+| Luftfeuchtevorschlag | PASS | PASS | Device Class-Test |
+| Climate-Vorschlag | PASS | PASS | Domain-Test |
+| Präsenzvorschlag | PASS | PASS | Presence/Occupancy/Motion |
+| Öffnungsvorschläge | PASS | PASS | Window/Door/Opening/Garage Door |
+| Light-Vorschläge | PASS | PASS | Domain-Test |
+| Switch-Vorschläge | PASS | PASS | Domain-Test |
+| Cover-Vorschläge | PASS | PASS | Domain-Test |
+| Fan-Vorschläge | PASS | PASS | Domain-Test |
+| Media-Player-Vorschläge | PASS | PASS | Domain-Test |
+| Lock-Vorschläge | PASS | PASS | Domain-Test |
+| Batterie-/Diagnostikvorschläge | PASS | PASS | Battery/Diagnostic-Metadaten |
+| manuelle Änderungen nach Auto-Setup | PASS | PASS | Editor-Entwurf bleibt editierbar |
+| kein stilles Überschreiben manueller Auswahl | PASS | PASS | explizite Bestätigung vor Ersetzen |
+| keine HA-Area-Writes | PASS | PASS | Security-Source-Regression |
+| nativer Room-Editor | PASS | PASS | geschützter Admin-Dialog |
+| durchsuchbare Entity-Selectoren | PASS | PASS | Einzel-/Mehrfachfelder |
+| Auto-Setup-Aktion | PASS | PASS | expliziter Admin-Button |
+| Collapse-/Expand-Optionen | PASS | PASS | Editor und Persistenz |
+| Background Upload/Preview/Replace/Remove | PASS | PASS | bestehender sicherer Bildspeicher |
+| Admin Live Preview | PASS | PASS | Room Preview mit gespeichertem Bild |
+| gespeicherte Konfiguration entspricht Public Payload | PASS | PASS | Persistenz-/Public-Paritätstest |
+| Default-Dashboard-Rendering | PASS | PASS | generischer Config-/State-Pfad |
+| Custom-Dashboard-Rendering | PASS | PASS | `/d/:id`-Config-/State-Pfad |
+| Section-Integration | PASS | PASS | abschnittslokales vorhandenes Grid |
+| Collapsed-Präsentation | PASS | PASS | Primärwerte/Alerts, Details verborgen |
+| Expanded-Präsentation | BROKEN | PASS | Detailhöhe > 0 und interner Scrollbereich |
+| Click/Tap-Eventziel | PASS | PASS | delegierter Button-Pfad über Kindknoten |
+| physischer iOS-9-Touch | NOT TESTED | NOT TESTED | reales iPad mini erforderlich |
+| Controls lösen Collapse nicht aus | PARTIAL | PASS | direkter Event-Regressionstest |
+| konsistenter Toggle-/ARIA-Zustand | PARTIAL | PASS | DOM-Test Expand und Collapse |
+| Runtime-Hintergrund | BROKEN | PASS | eigener Layer und Browser-Harness |
+| fehlender Hintergrund | PASS | PASS | Layer wird sicher ausgelassen |
+| lange Raumnamen | PASS | PASS | schrumpfbare Flex-Hierarchie/Ellipsis |
+| Unknown/Unavailable/Missing | PASS | PASS | sichere Fallback-States, Controls disabled |
+| Admin Upload bis gespeicherte `imageId` | PASS | PASS | bestehende atomare Upload-Route |
+| `imageId` bis Public `image_url` | PASS | PASS | expliziter Paritätstest |
+| Public URL bis Renderer | PASS | PASS | striktes Asset-URL-Muster |
+| Renderer bis CSS-Bildebene | BROKEN | PASS | `.room-background-image` |
+| Compact Collapsed/Expanded | BROKEN | PASS | Toggle nicht mehr ausgeblendet |
+| Standard Collapsed/Expanded | PARTIAL | PASS | Browser-Matrix prüft echte Höhe |
+| Wide Collapsed/Expanded | PARTIAL | PASS | Browser-Matrix prüft echte Höhe |
+| Large Collapsed/Expanded | BROKEN | PASS | real reproduzierte 0-Pixel-Ursache beseitigt |
+| Identity/Primärwerte/Alerts je Tier | PASS | PASS | Renderer- und Matrix-Tests |
+| Controls je Tier | PARTIAL | PASS | sichtbare Touch-Ziele im Expanded-Zustand |
+| Hintergrund je Tier | BROKEN | PASS | Browser-Matrix für vier Tiers |
+| Text-Overflow | PASS | PASS | Long-Name-/Horizontal-Overflow-Test |
+| zentrale Risk-/Alert-Semantik | PASS | PASS | Issues, Rules, Severity, Summary wiederverwendet |
+| bestehende explizite Control APIs | PASS | PASS | zentrale Sprint-26.2-Capabilities |
+| kein generischer Service-Proxy | PASS | PASS | Source-/Gateway-Security-Regression |
+| kein HA-Request pro Room Card | PASS | PASS | ein gecachter System-Snapshot |
+| kein N+1 für Area/Entities | PASS | PASS | einmalige normalisierte Projektion |
+| ES5/Safari-9-Syntax | PASS | PASS | `node --check` und verbotene Syntaxprüfung |
+| kein `fetch`/Promise/Modern-Modul | PASS | PASS | Legacy-Source-Regression |
+| kein CSS Grid | PASS | PASS | Flexbox-/CSS-Regression |
+| keine Lovelace-/HA-Frontend-Abhängigkeit | PASS | PASS | Source-Regression |
+| HA-/Supervisor-Token backend-only | PASS | PASS | vollständige Security-Suite |
+| kein Browser-HA-WebSocket | PASS | PASS | Security-Suite |
+| keine Area-/Registry-Writes | PASS | PASS | Admin-/Source-Regression |
+| sichere Hintergrundauslieferung | PASS | PASS | strikte Bild-ID und geschützte Asset-Route |
+| Rendering-Test | PASS | PASS | Markup plus Browser-DOM-Geometrie |
+| Area-Auto-Setup-Test | PASS | PASS | alle Rollen mit mehreren Domains |
+| manueller Override-Test | PASS | PASS | keine Mutation der manuellen Auswahl |
+| Collapsed → Expanded | PARTIAL | PASS | DOM-Klasse, ARIA, Symbol, sichtbarer Inhalt |
+| Expanded → Collapsed | MISSING | PASS | DOM-Klasse, ARIA, Symbol, Scrollreset |
+| Controls ändern Collapse nicht | MISSING | PASS | extrahierter echter Event-Handler |
+| Runtime-Hintergrund sichtbar | BROKEN | PASS | Browser-Harness und reale Public-URL-Strecke |
+| Preview-/Runtime-Hintergrundparität | MISSING | PASS | Persistenz-/Public- und Layer-Test |
+| fehlender Hintergrund | PASS | PASS | Renderer-Test |
+| Compact/Standard/Wide/Large | PARTIAL | PASS | vier echte Pixelgrößen im Browser-Harness |
+| Section, Dark/Light, HomeScreen | PASS | PASS | vorhandene Regression bleibt grün |
+| unavailable Entities | PASS | PASS | Renderer-/Control-Test |
+
+Der Browser-Harness rendert lange Namen, Primärwerte, Alerts, Light-/Climate-
+Controls, read-only Domains und einen Room-Hintergrund in Compact, Standard,
+Wide und Large. Er schaltet jede Karte Collapsed → Expanded → Collapsed,
+verlangt eine positive Detailhöhe, internen Scrollinhalt, sichtbaren
+Hintergrund, keine horizontale Überbreite und ungefähr 44 Pixel große
+Bedienelemente. Der vollständige physische iPad-Test bleibt offen: alle vier
+Tiers in Portrait und Landscape, Touch auf Plus/Minus, Scrollen langer
+Details, Controls ohne Toggle, Background Cover/Contain, Dark/Light und
+HomeScreen nach Cache-Neuladung.
+
+Nach der Korrektur bestanden 329 von 329 automatisierten Tests. Alle Dateien
+unter `src` und `test` bestanden `node --check`, alle Deployment-Shellskripte
+bestanden `sh -n`, und `git diff --check` blieb fehlerfrei. Der test-only
+Browser-Harness bestand zusätzlich bei 768 × 1024 und 1024 × 768 Pixeln mit
+jeweils vier Room-Card-Tiers und null Befunden.

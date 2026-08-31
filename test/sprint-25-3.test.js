@@ -299,7 +299,7 @@ test("Wall-Display nutzt ES5-Flexbox, Vollhöhe und optionale Titel ohne Systemn
     assert.match(html, /id="systemHealthLink"/);
     assert.match(html, /<footer id="updated"/);
     assert.doesNotMatch(html, /HA Legacy Dashboard v1\.0\.0<\/footer>/);
-    assert.match(html, /\/js\/app\.js\?v=50/);
+    assert.match(html, /\/js\/app\.js\?v=51/);
 
     assert.match(css, /\.app\s*\{[\s\S]*display: -webkit-flex;[\s\S]*-webkit-flex-direction: column;/);
     assert.match(css, /\.grid\s*\{[\s\S]*-webkit-flex: 1 0 auto;/);

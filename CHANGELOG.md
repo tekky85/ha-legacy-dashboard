@@ -41,6 +41,10 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 
 ### Fixed
 
+- Fixed Room Card expansion whose detail panel could shrink to zero height in
+  the fixed legacy grid, including Compact cards and long scrollable details.
+- Applied Room Card backgrounds through a dedicated inner layer and CSP-safe
+  controller path so runtime matches the working Admin preview.
 - Kept Climate target controls available while a supported thermostat is off,
   without powering it on, and restored the confirmed value after rejection.
 - Hid fake Climate Power controls when an entity has no real `off` mode and

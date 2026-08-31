@@ -219,7 +219,7 @@ RoomWidget.prototype.render = function (states, alerts, controlsDisabled) {
     var roomAlerts = alerts || [];
     var controlCount = 0;
     var background = this.room.background;
-    var backgroundStyle = "";
+    var backgroundMarkup = "";
     var expanded = !this.room.collapsible || this.expanded;
     var lists;
 
@@ -241,11 +241,14 @@ RoomWidget.prototype.render = function (states, alerts, controlsDisabled) {
         /^\/assets\/backgrounds\/bg-[a-f0-9]{32}\.(?:jpg|png)$/.test(
             background.image_url
         )) {
-        backgroundStyle = ' style="background-image:url(&quot;' +
+        backgroundMarkup = '<div class="room-background-image" ' +
+            'data-room-background-url="' +
             Legacy.html.escape(background.image_url) +
-            '&quot;);background-position:' +
+            '" data-room-background-position="' +
             Legacy.html.escape(background.position || "center center") +
-            ';background-size:' + Legacy.html.escape(background.size || "cover") + '"';
+            '" data-room-background-size="' +
+            Legacy.html.escape(background.size || "cover") +
+            '"></div>';
     }
 
     (entities.lights || []).forEach(function (entityId) {
@@ -268,14 +271,14 @@ RoomWidget.prototype.render = function (states, alerts, controlsDisabled) {
 
     return '<section class="card card-room ' + this.getSizeClass() +
         (expanded ? ' is-expanded' : ' is-collapsed') +
-        (backgroundStyle ? ' has-room-background' : '') + '"' +
+        (backgroundMarkup ? ' has-room-background' : '') + '"' +
         this.getLayoutAttribute() +
         ' data-card-density="' + (this.title.length > 24 ? "dense" : "normal") +
         '" data-card-controls="' + Math.min(3, controlCount) +
-        '" data-card-secondary="true" data-card-state="available"' +
-        backgroundStyle + '>' +
-        '<div class="room-background-overlay" style="opacity:' +
-            (background ? (Number(background.overlay) || 0) / 100 : 0) + '"></div>' +
+        '" data-card-secondary="true" data-card-state="available">' +
+        backgroundMarkup +
+        '<div class="room-background-overlay" data-room-background-overlay="' +
+            (background ? Number(background.overlay) || 0 : 0) + '"></div>' +
         '<div class="room-content"><div class="room-header"><div class="room-heading">' +
         '<span class="room-icon">' + this.getIcon() + '</span><div>' +
         '<h3 class="room-title">' + Legacy.html.escape(this.title) + '</h3>' +

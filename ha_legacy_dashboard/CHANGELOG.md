@@ -25,6 +25,8 @@
 
 ### Fixed
 
+- Fixed Room Card collapse/expand visibility and applied room backgrounds
+  through the CSP-safe runtime controller path.
 - Enabled supported off-state Climate setpoints without powering on, restored
   confirmed values after rejection, and hid fake Power controls without `off`.
 - Hardened JPEG background validation for baseline, progressive, JFIF, EXIF,

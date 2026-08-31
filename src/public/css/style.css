@@ -42,15 +42,25 @@ html {
     background-repeat: no-repeat;
 }
 
+.room-background-image,
 .room-background-overlay {
     position: absolute;
-    z-index: 0;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    background: #000;
     pointer-events: none;
+}
+
+.room-background-image {
+    z-index: 0;
+    background-repeat: no-repeat;
+}
+
+.room-background-overlay {
+    z-index: 1;
+    background: #000;
+    opacity: 0;
 }
 
 .room-content {
@@ -62,9 +72,19 @@ html {
     -webkit-flex-direction: column;
     flex-direction: column;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     min-width: 0;
     height: 100%;
+}
+
+.card-room.is-collapsed .room-content {
+    overflow: hidden;
+}
+
+.card-room.is-expanded .room-content {
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .has-room-background .room-content {
@@ -240,12 +260,12 @@ html {
     display: none;
     min-height: 0;
     margin-top: 9px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .card-room.is-expanded .room-expanded-content {
     display: block;
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
 }
 
 .room-detail-group {
@@ -317,11 +337,9 @@ html {
     font-size: 12px;
 }
 
-.card-room.card-presentation-compact .room-expand-control,
 .card-room.card-presentation-compact .room-humidity,
 .card-room.card-presentation-compact .room-target,
-.card-room.card-presentation-compact .room-presence,
-.card-room.card-presentation-compact .room-expanded-content {
+.card-room.card-presentation-compact .room-presence {
     display: none;
 }
 

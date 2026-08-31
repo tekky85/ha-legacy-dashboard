@@ -131,6 +131,13 @@ die ausklappbare Ansicht ergänzt Detailzustände und ausschließlich bereits
 explizit freigegebene Light-/Climate-Controls. Switches, Covers, Fans,
 Media Player und Locks bleiben read-only.
 
+Der Plus/Minus-Schalter klappt die Details direkt innerhalb der Karte auf oder
+zu, ohne das Dashboard-Raster neu aufzubauen. Auch Compact-Karten bleiben
+ausklappbar; lange Detailinhalte scrollen innerhalb der Karte. Ein optionaler
+Raumhintergrund liegt auf einer eigenen Bildschicht, sodass die Grid-Geometrie
+getrennt bleibt. Der Controller setzt die validierten Bildwerte CSP-konform
+per JavaScript, ohne die strenge `style-src`-Richtlinie zu lockern.
+
 Eine vorhandene Home-Assistant-Area kann im Room-Editor als read-only Quelle
 für überprüfbare Entity-Vorschläge verwendet werden. Vorschläge werden nur
 nach ausdrücklicher Bestätigung übernommen und können anschließend vollständig

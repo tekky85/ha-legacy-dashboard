@@ -383,5 +383,5 @@ test("Admin und Wall-Display erhalten Area-Read-only-, ES5- und Sicherheitsgrenz
 
     assert.doesNotMatch(wallCss, /display\s*:\s*grid/i);
     assert.match(wallCss, /\.dashboard-sections[\s\S]*flex-direction:\s*column/);
-    assert.match(read("src/public/index.html"), /\/js\/app\.js\?v=50/);
+    assert.match(read("src/public/index.html"), /\/js\/app\.js\?v=51/);
 });

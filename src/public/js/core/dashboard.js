@@ -372,6 +372,9 @@ var Dashboard = {
             html;
 
 
+        this.applyRoomAppearances(container);
+
+
         this.applyLayout();
 
         if (typeof LegacyFocus !== "undefined") {
@@ -466,16 +469,167 @@ var Dashboard = {
     },
 
 
+    applyRoomAppearances: function (container) {
+
+        var cards;
+        var layers;
+        var overlays;
+        var layer;
+        var overlay;
+        var url;
+        var position;
+        var size;
+        var overlayValue;
+        var allowedPositions = [
+            "center center",
+            "center top",
+            "center bottom",
+            "left center",
+            "right center"
+        ];
+        var allowedSizes = ["cover", "contain"];
+        var index;
+
+
+        if (
+            !container ||
+            typeof container.getElementsByClassName !== "function"
+        ) {
+            return;
+        }
+
+
+        cards = container.getElementsByClassName("card-room");
+
+
+        for (index = 0; index < cards.length; index++) {
+
+            if (
+                !cards[index] ||
+                typeof cards[index].getElementsByClassName !== "function"
+            ) {
+                continue;
+            }
+
+            layers = cards[index].getElementsByClassName(
+                "room-background-image"
+            );
+            overlays = cards[index].getElementsByClassName(
+                "room-background-overlay"
+            );
+            layer = layers.length ? layers[0] : null;
+            overlay = overlays.length ? overlays[0] : null;
+
+
+            if (!layer) {
+                continue;
+            }
+
+
+            url = layer.getAttribute("data-room-background-url") || "";
+            position = layer.getAttribute(
+                "data-room-background-position"
+            ) || "";
+            size = layer.getAttribute("data-room-background-size") || "";
+
+
+            if (
+                !/^\/assets\/backgrounds\/bg-[a-f0-9]{32}\.(?:jpg|png)$/.test(url) ||
+                allowedPositions.indexOf(position) === -1 ||
+                allowedSizes.indexOf(size) === -1
+            ) {
+                continue;
+            }
+
+
+            layer.style.backgroundImage = "url(\"" + url + "\")";
+            layer.style.backgroundPosition = position;
+            layer.style.backgroundSize = size;
+
+
+            if (overlay) {
+                overlayValue = Number(
+                    overlay.getAttribute("data-room-background-overlay")
+                );
+                overlay.style.opacity = String(
+                    Math.max(0, Math.min(50, overlayValue || 0)) / 100
+                );
+            }
+
+        }
+
+    },
+
+
     toggleRoom: function (widgetId) {
 
         var widget = this.getWidget(widgetId);
+        var container;
+        var cards;
+        var card;
+        var controls;
+        var control;
+        var content;
+        var expanded;
+        var index;
 
         if (!widget || widget.type !== "room") {
             return false;
         }
 
-        widget.toggleExpanded();
-        this.render(this.states);
+        expanded = widget.toggleExpanded();
+        container = document.getElementById("dashboard");
+
+        if (!container) {
+            return true;
+        }
+
+        cards = container.getElementsByClassName("card-room");
+
+        for (index = 0; index < cards.length; index++) {
+            if (cards[index].getAttribute("data-widget-id") === widgetId) {
+                card = cards[index];
+                break;
+            }
+        }
+
+        if (!card) {
+            return true;
+        }
+
+        card.className = (" " + card.className + " ")
+            .replace(/\s+is-expanded\s+/g, " ")
+            .replace(/\s+is-collapsed\s+/g, " ")
+            .replace(/^\s+|\s+$/g, "") +
+            (expanded ? " is-expanded" : " is-collapsed");
+
+        controls = card.getElementsByClassName("room-expand-control");
+        control = controls.length ? controls[0] : null;
+
+        if (control) {
+            control.setAttribute(
+                "aria-expanded",
+                expanded ? "true" : "false"
+            );
+            control.setAttribute(
+                "aria-label",
+                expanded
+                    ? "Raumdetails einklappen"
+                    : "Raumdetails ausklappen"
+            );
+
+            if (control.getElementsByTagName("span").length) {
+                control.getElementsByTagName("span")[0].innerHTML =
+                    expanded ? "−" : "+";
+            }
+        }
+
+        if (!expanded) {
+            content = card.getElementsByClassName("room-content");
+            if (content.length) {
+                content[0].scrollTop = 0;
+            }
+        }
 
         return true;
 
