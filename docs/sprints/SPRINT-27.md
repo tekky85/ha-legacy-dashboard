@@ -1,104 +1,139 @@
 # Sprint 27 – Full Sprint Audit & RC Readiness Review
 
 ## Status
-Planned
+Planned / Audit Program
 
-## Charakter des Sprints
+## Ziel
 
-Sprint 27 ist **kein Feature-Sprint**.
+Sprint 27 ist kein Feature-Sprint, sondern ein vollständiges Audit aller
+vorhandenen Sprint-Spezifikationen gegen den aktuellen Repository-Stand.
 
-Er ist ein vollständiger Audit aller bisher implementierten Sprints vor dem nächsten Release Candidate.
+Der Audit startet beim frühesten tatsächlich vorhandenen Sprint-Dokument.
 
-Ziel:
+Wenn `SPRINT-1.md` existiert, beginnt der Audit mit Sprint 1.
+Wenn nicht, beginnt er mit dem frühesten vorhandenen Sprint.
+
+Keine Anforderungen für nicht vorhandene Sprint-Dokumente erfinden.
+
+---
+
+# Audit-Workflow
 
 ```text
-Sprint-Spezifikationen
--> aktueller Repository-Stand
+Sprint Spec
+-> aktueller Repo-Stand
 -> Requirement-by-Requirement Audit
--> automatisierte Tests
--> Security / Legacy / HAOS Regression
--> manuelle Prüfungen markieren
--> Audit-Ergebnisse im Git dokumentieren
--> RC Readiness Entscheidung
+-> PASS / PARTIAL / MISSING / BROKEN / NOT TESTED
+-> Audit-Dokument im Git
+-> Repair Queue
+-> Re-Audit
+-> Final RC Review
 ```
 
-## Motivation
+---
 
-Einzelne Sprint-Läufe wurden teilweise unterbrochen und später ergänzt. Vor dem nächsten RC soll daher nicht allein auf `PROJECT_STATUS.md`, frühere Codex-Zusammenfassungen oder vorhandene Sprint-Dateien vertraut werden.
+# Warum chronologisch
 
-Maßgeblich sind:
+Frühere Architekturentscheidungen können spätere Sprints beeinflussen:
+
+- Dashboard data model
+- Persistence
+- Admin security
+- API routing
+- Legacy browser compatibility
+- Write authorization
+- Grid/layout architecture
+
+Spätere Sprints können frühere Anforderungen bewusst ersetzen. Solche Fälle
+nicht fälschlich als BROKEN markieren, sondern als superseded dokumentieren.
+
+---
+
+# Sprint Inventory
+
+Codex inventarisiert zuerst alle Dateien unter:
 
 ```text
-aktueller Code
-+ aktuelle Tests
-+ aktuelle Konfiguration
-+ aktuelle Runtime
-+ reale manuelle Tests, soweit erforderlich
+docs/sprints/
 ```
 
-## Statusschema Requirements
+Erfasst werden:
 
-Nur:
+- Sprint ID
+- Titel
+- Dateiname
+- relevante Komponenten
+- Abhängigkeiten
+- Audit-Part
+- Auditstatus
+
+Numerisch/logisch sortieren:
 
 ```text
-PASS
-PARTIAL
-MISSING
-BROKEN
-NOT TESTED
+1
+2
+...
+17
+17.1
+17.2
+...
+21
+21.1
+...
+26
+26.1
+26.2
 ```
 
-`NOT TESTED != PASS`.
+---
 
-## Sprint-Gesamtstatus
+# Persistente Audit-Struktur
 
-Nur:
-
-```text
-PASS
-PARTIAL
-FAIL
-BLOCKED
-NOT TESTED
-```
-
-## Persistente Audit-Dokumentation
-
-Neue Struktur:
+Anlegen:
 
 ```text
 docs/audits/
-├── README.md
-├── sprints/
-│   ├── SPRINT-17.1-AUDIT.md
-│   ├── ...
-│   └── SPRINT-26.2-AUDIT.md
-├── parts/
-│   ├── AUDIT-PART-A1.md
-│   ├── ...
-│   └── AUDIT-PART-A7.md
-└── RC-AUDIT-SUMMARY.md
+  AUDIT_INDEX.md
+  REPAIR_QUEUE.md
+  MANUAL_TEST_QUEUE.md
+  RC_AUDIT_SUMMARY.md
+  sprints/
+    SPRINT-1-AUDIT.md
+    SPRINT-2-AUDIT.md
+    ...
 ```
 
-## Sprint-Audit Template
+`RC_AUDIT_SUMMARY.md` wird erst am Ende vollständig befüllt.
 
-Jede `docs/audits/sprints/SPRINT-XX-AUDIT.md` enthält mindestens:
+---
 
-```markdown
-# Sprint XX Audit
+# Audit-Datei pro Sprint
+
+Jeder Sprint erhält:
+
+```text
+docs/audits/sprints/SPRINT-<ID>-AUDIT.md
+```
+
+Pflichtstruktur:
+
+```text
+# Sprint X Audit
 
 ## Audit Metadata
-Audit Date:
-Repository Commit:
-Sprint Specification:
-Auditor:
+- Sprint:
+- Sprint title:
+- Audit date:
+- Repository commit:
+- Spec file:
 
 ## Overall Result
 PASS / PARTIAL / FAIL / BLOCKED / NOT TESTED
 
 ## Requirement Matrix
+
 | ID | Requirement | Status | Evidence | Notes |
-|---|---|---|---|---|
+|----|-------------|--------|----------|-------|
 
 ## Automated Tests
 ...
@@ -106,466 +141,433 @@ PASS / PARTIAL / FAIL / BLOCKED / NOT TESTED
 ## Manual Tests
 ...
 
-## Security Regression
+## Security Review
 ...
 
-## Legacy Safari / iPad Status
+## Legacy Safari / iPad Review
 ...
 
-## Home Assistant App Status
+## Home Assistant App Review
 ...
 
-## Standalone Status
+## Standalone/LXC Review
 ...
 
-## Known Issues
+## Findings
 ...
 
-## Open Actions
+## Repair Required
 ...
 
 ## Final Assessment
 ...
 ```
 
-## Evidence Pflicht
+Nicht relevante Bereiche mit `N/A`.
 
-PASS möglichst mit konkretem Beleg:
+---
+
+# Requirement Status
+
+Nur:
 
 ```text
-src/... Datei
-test/... Test
-npm test Ergebnis
-realer iPad-Test
-realer HAOS-Test
+PASS
+PARTIAL
+MISSING
+BROKEN
+NOT TESTED
+N/A
 ```
 
-Nicht nur `implemented`.
+Bedeutung:
 
-## Audit Commit
+- PASS: im aktuellen Repo vorhanden und belegt
+- PARTIAL: nur teilweise umgesetzt
+- MISSING: fehlt
+- BROKEN: vorhanden, aber entspricht der Spec nicht
+- NOT TESTED: ohne reale/manuelle Prüfung nicht belastbar bestätigt
+- N/A: nachweislich nicht anwendbar
 
-Jede Audit-Datei dokumentiert den exakten Repository Commit, gegen den geprüft wurde.
+Overall Sprint:
 
-## Staleness
+```text
+PASS
+PARTIAL
+FAIL
+BLOCKED
+NOT TESTED
+```
 
-Wenn nach einem Audit zentrale Dateien eines Sprints geändert werden, muss der Final Consolidation Pass prüfen, ob das Audit veraltet ist.
+---
+
+# Evidence Pflicht
+
+PASS/PARTIAL/BROKEN möglichst mit konkreter Evidence:
+
+- Source file
+- Function
+- Route
+- Config key
+- Test file / test name
+- Manual test reference
+
+Nicht nur „looks implemented“.
+
+---
+
+# Keine künstlichen PASS-Werte
+
+Insbesondere reale Punkte nicht als PASS markieren, wenn nicht tatsächlich
+getestet:
+
+- iPad mini
+- HAOS App installation
+- HomeScreen behavior
+- Guided Access
+- reale HA Integration
+- reale Write Controls
+
+Dann `NOT TESTED` und in die Manual Test Queue.
+
+---
+
+# Manual Test Queue
+
+Datei:
+
+```text
+docs/audits/MANUAL_TEST_QUEUE.md
+```
+
+Erfasst:
+
+- Sprint
+- Requirement
+- Device/System
+- Test steps
+- Status
+
+Beispiele:
+
+- iPad mini
+- HAOS
+- HomeScreen
+- Guided Access
+- real Light
+- real Climate
+
+---
+
+# Repair Queue
+
+Datei:
+
+```text
+docs/audits/REPAIR_QUEUE.md
+```
+
+Alle actionable:
+
+- PARTIAL
+- MISSING
+- BROKEN
+
+Punkte aufnehmen.
+
+---
+
+# Audit und Repair trennen
+
+Bevorzugter Ablauf:
+
+```text
+Audit Part
+-> Review
+-> Commit Audit Docs
+-> Repair Pass
+-> Commit Repair
+-> Re-Audit betroffene Requirements
+```
+
+Nicht große Reparaturen während des Baseline-Audits vermischen.
+
+---
+
+# Re-Audit
+
+Nach Repair Audit-Datei nicht einfach überschreiben.
+
+Dokumentieren:
+
+```text
+Initial: BROKEN
+Repair commit: abc123
+Re-test: PASS
+```
+
+---
 
 # Audit Parts
 
-## A1 – Core Foundation
+Sprint 27 wird wegen Token-/Zeitlimit in mehrere Codex-Läufe geteilt.
 
-Prüft:
+Bevorzugt:
 
 ```text
-Sprint 18
-Sprint 19
-Sprint 20
-Sprint 21
+3–5 normale Sprints pro Part
 ```
 
-## A2 – Legacy UI & Dashboard Hardening
+oder weniger bei großen Specs.
 
-Prüft:
+Ein Part lieber zu klein als zu groß.
+
+Ziel:
 
 ```text
-Sprint 17.1
-Sprint 17.2
-Sprint 17.3
-Sprint 17.4
-Sprint 17.5
-Sprint 17.6
-Sprint 17.7
+ein Codex-Lauf < 5h Limit
 ```
 
-## A3 – System Dashboard Evolution
+mit Reserve für Review.
 
-Prüft:
+---
+
+# Part-Planung
+
+Codex erstellt nach Inventory selbst einen konkreten Plan auf Basis der
+tatsächlich vorhandenen Sprint-Dateien.
+
+Beispiel:
 
 ```text
-Sprint 21.1
-Sprint 21.2
-Sprint 21.3
-Sprint 21.4
-Sprint 21.5
+Part 01 – Sprints 1–4
+Part 02 – Sprints 5–8
+Part 03 – Sprints 9–12
+...
 ```
 
-## A4 – Rules & Diagnostics
+Sub-Sprints normalerweise direkt nach dem Hauptsprint.
 
-Prüft:
+---
+
+# Security Audit
+
+Bei relevanten Sprints prüfen:
+
+- HA token backend-only
+- SUPERVISOR_TOKEN backend-only
+- Admin security
+- explicit write endpoints
+- no generic service proxy
+- no arbitrary browser service calls
+- secret redaction
+- input validation
+- path traversal
+- upload validation
+- open redirect protection
+
+---
+
+# Legacy Compatibility Audit
+
+Bei Frontend-Sprints:
+
+- ES5
+- iOS 9 Safari
+- kein fetch
+- kein Promise
+- keine arrow functions
+- kein let/const
+- kein optional chaining
+- kein CSS Grid
+- kein Flexbox gap als Voraussetzung
+- Touch targets
+- HomeScreen behavior
+
+---
+
+# Standalone Audit
+
+Bei relevanten Sprints:
+
+- Startup
+- HA URL/token handling
+- REST
+- WebSocket metadata
+- DATA_DIR
+- Admin
+- Dashboard
+
+---
+
+# HA App Audit
+
+Bei relevanten Sprints:
+
+- App packaging
+- Supervisor token
+- REST proxy
+- WebSocket proxy
+- /data
+- port
+- direct LAN access
+- permissions
+- restart persistence
+
+---
+
+# PROJECT_STATUS
+
+`docs/PROJECT_STATUS.md` bleibt kompakte Übersicht und verlinkt auf:
 
 ```text
-Sprint 22
-Sprint 23
+docs/audits/AUDIT_INDEX.md
+docs/audits/RC_AUDIT_SUMMARY.md
 ```
 
-## A5 – App / Release / RC Hardening
+---
 
-Prüft:
+# Final RC Summary
+
+Nach allen Parts:
 
 ```text
-Sprint 24
-Sprint 25
-Sprint 25.1
-Sprint 25.2
-Sprint 25.3
-Sprint 25.4
-Sprint 25.5
-Sprint 25.6
-Sprint 25.7
+docs/audits/RC_AUDIT_SUMMARY.md
 ```
 
-Bei Bedarf teilen:
+Enthält:
+
+- audited commit
+- audited sprints
+- Sprint status overview
+- open repair items
+- manual test status
+- security status
+- Standalone status
+- HA App status
+- Legacy iPad status
+- known limitations
+- RC blockers
+- RC recommendation
+
+---
+
+# Final RC Gate
+
+RC kann empfohlen werden, wenn:
+
+- keine offenen RC-kritischen MISSING/BROKEN Requirements
+- keine Security FAILs
+- Standalone Kernpfad PASS
+- HA App Kernpfad PASS
+- iPad Kernpfad PASS
+- Write Controls PASS
+- Persistence PASS
+- HomeScreen Navigation PASS
+- relevante Manual Tests PASS
+
+---
+
+# Run 1
+
+Der erste Codex-Lauf macht NUR:
+
+1. vollständiges Sprint Inventory
+2. Audit-Struktur anlegen
+3. token-sicheren Part-Plan erzeugen
+4. nur Part 01 abarbeiten
+
+Nicht Part 02 starten.
+
+---
+
+# Run 1 Deliverables
+
+Mindestens:
 
 ```text
-A5.1 – App Packaging & Release
-A5.2 – RC UI/Navigation/Background
-A5.3 – RC Network/Card/Kiosk
+docs/audits/AUDIT_INDEX.md
+docs/audits/REPAIR_QUEUE.md
+docs/audits/MANUAL_TEST_QUEUE.md
+docs/audits/sprints/<erste Audit-Dateien>
 ```
 
-## A6 – Sections / Room / Controls
+---
 
-Prüft:
+# Definition of Done – Sprint 27
 
-```text
-Sprint 26
-Sprint 26.1
-Sprint 26.2
-```
+Sprint 27 ist komplett, wenn:
 
-## A7 – Final RC Consolidation
+- alle vorhandenen Sprint-Specs inventarisiert
+- jeder Sprint eine Audit-Datei besitzt
+- Requirements klassifiziert
+- Evidence dokumentiert
+- Repair Queue abgearbeitet oder bewusst akzeptiert
+- Manual Test Queue abgearbeitet oder klar NOT TESTED
+- Security Review abgeschlossen
+- Standalone Review abgeschlossen
+- Home Assistant App Review abgeschlossen
+- Legacy iPad Review abgeschlossen
+- RC_AUDIT_SUMMARY.md erstellt
+- RC Blocker dokumentiert
+- finale RC-Entscheidung möglich
 
-A7 liest alle Sprint-Audits und Part-Summaries und erstellt:
+---
 
-```text
-docs/audits/RC-AUDIT-SUMMARY.md
-```
-
-# Token-/Zeitlimit-Regel
-
-Nicht alle Sprints in einem Lauf auditieren.
-
-Wenn ein Part zu groß wird:
-
-```text
-STOP before token/time exhaustion
-```
-
-und bereits abgeschlossene Audit-Dateien persistieren.
-
-Nach jedem geprüften Sprint sofort dessen Audit-Datei schreiben.
-
-# Audit Part Summary
-
-Jeder Part erzeugt:
+# Codex Prompt – Run 1
 
 ```text
-docs/audits/parts/AUDIT-PART-AX.md
-```
+Start Sprint 27 – Full Sprint Audit & RC Readiness Review.
 
-mit:
-
-```text
-Base Commit
-Audited Sprints
-PASS
-PARTIAL
-FAIL
-BLOCKED
-NOT TESTED
-Open Issues
-Suggested Fix Order
-```
-
-# Audit first, fix second
-
-Bei:
-
-```text
-MISSING
-BROKEN
-PARTIAL
-```
-
-zunächst dokumentieren.
-
-Danach gezielter Completion/Fix Pass.
-
-Kleine zwingende Audit-Fixes dürfen als `FIXED DURING AUDIT` dokumentiert werden.
-
-# Security Baseline
-
-Jeder relevante Sprint prüft:
-
-```text
-HA token backend-only
-SUPERVISOR_TOKEN backend-only
-kein generic HA service proxy
-kein browser-to-HA WebSocket
-keine Registry Writes
-keine Label Writes
-keine Area Writes
-keine unnötigen App Privileges
-keine Secrets in Logs
-```
-
-# Standalone Baseline
-
-Prüfen:
-
-```text
-Node.js / Express
-HA REST
-HA WebSocket backend
-Long-Lived Token server-side
-Default Dashboard
-Custom Dashboard
-Admin
-Summary
-Errors
-```
-
-# Home Assistant App Baseline
-
-Prüfen soweit relevant:
-
-```text
-App Packaging
-Supervisor Token
-Core REST Proxy
-Core WebSocket Proxy
-/data Persistenz
-Direct LAN Port
-Restart
-```
-
-# Legacy Safari Baseline
-
-Für UI-Sprints:
-
-```text
-ES5
-iOS 9
-kein fetch
-kein Promise
-kein let/const
-keine arrow functions
-kein CSS Grid
-kein Flexbox gap
-kein ResizeObserver
-```
-
-# Manual Tests
-
-Reale iPad-/HAOS-Anforderungen bleiben `NOT TESTED`, bis echte manuelle Evidence vorhanden ist.
-
-Code Review allein ist kein Real-Device-PASS.
-
-# Existing RC Checklist
-
-Falls `docs/RC_CHECKLIST.md` existiert, nicht ersetzen. Sprint 27 referenziert und konsolidiert sie.
-
-# Priorisierung offener Findings
-
-```text
-P0 – Security / Data Loss
-P1 – RC Blocker
-P2 – Functional Defect
-P3 – Visual / Documentation
-```
-
-# Feature Scope
-
-Da Sprint 26/26.1/26.2 bereits im aktuellen Branch enthalten sind, muss A7 explizit entscheiden, ob diese Features Teil des nächsten RC sind.
-
-Wenn ja, relevante P1/BROKEN Findings blockieren RC.
-
-# Final RC Audit Summary
-
-`docs/audits/RC-AUDIT-SUMMARY.md` enthält mindestens:
-
-```text
-Audit Base Commit
-Audit Date
-Target RC Version
-Sprint Coverage
-Overall RC Status
-PASS Sprints
-PARTIAL Sprints
-FAIL Sprints
-BLOCKED Sprints
-NOT TESTED Sprints
-Security Status
-Standalone Status
-HA App Status
-iPad Status
-Open P0
-Open P1
-Open P2
-Open P3
-Required Manual Tests
-Known Limitations
-Final Recommendation
-```
-
-Final Recommendation nur:
-
-```text
-RC READY
-RC READY WITH DOCUMENTED NON-BLOCKING LIMITATIONS
-NOT RC READY
-```
-
-# Keine Release-Aktion
-
-Sprint 27 darf nicht automatisch:
-
-```text
-Git Tag erstellen
-GitHub Release veröffentlichen
-GHCR Image veröffentlichen
-```
-
-# Deliverables
-
-## A1
-```text
-docs/audits/sprints/SPRINT-18-AUDIT.md
-docs/audits/sprints/SPRINT-19-AUDIT.md
-docs/audits/sprints/SPRINT-20-AUDIT.md
-docs/audits/sprints/SPRINT-21-AUDIT.md
-docs/audits/parts/AUDIT-PART-A1.md
-```
-
-## A2
-```text
-SPRINT-17.1-AUDIT.md
-SPRINT-17.2-AUDIT.md
-SPRINT-17.3-AUDIT.md
-SPRINT-17.4-AUDIT.md
-SPRINT-17.5-AUDIT.md
-SPRINT-17.6-AUDIT.md
-SPRINT-17.7-AUDIT.md
-AUDIT-PART-A2.md
-```
-
-## A3
-```text
-SPRINT-21.1-AUDIT.md
-SPRINT-21.2-AUDIT.md
-SPRINT-21.3-AUDIT.md
-SPRINT-21.4-AUDIT.md
-SPRINT-21.5-AUDIT.md
-AUDIT-PART-A3.md
-```
-
-## A4
-```text
-SPRINT-22-AUDIT.md
-SPRINT-23-AUDIT.md
-AUDIT-PART-A4.md
-```
-
-## A5
-```text
-SPRINT-24-AUDIT.md
-SPRINT-25-AUDIT.md
-SPRINT-25.1-AUDIT.md
-SPRINT-25.2-AUDIT.md
-SPRINT-25.3-AUDIT.md
-SPRINT-25.4-AUDIT.md
-SPRINT-25.5-AUDIT.md
-SPRINT-25.6-AUDIT.md
-SPRINT-25.7-AUDIT.md
-AUDIT-PART-A5.md
-```
-
-## A6
-```text
-SPRINT-26-AUDIT.md
-SPRINT-26.1-AUDIT.md
-SPRINT-26.2-AUDIT.md
-AUDIT-PART-A6.md
-```
-
-## A7
-```text
-docs/audits/RC-AUDIT-SUMMARY.md
-```
-
-# Definition of Done
-
-Sprint 27 ist abgeschlossen, wenn:
-
-- `docs/audits/README.md` existiert
-- alle vorgesehenen Sprint-Audits existieren
-- jeder Audit einen Repository Commit enthält
-- jeder Requirement Status besitzt
-- Evidence dokumentiert ist
-- automatisierte Tests dokumentiert sind
-- manuelle Tests nicht fälschlich PASS sind
-- Security Regression dokumentiert ist
-- Legacy Safari Status dokumentiert ist
-- Standalone Status dokumentiert ist
-- HA App Status dokumentiert ist
-- alle Audit Parts abgeschlossen sind
-- Part Summaries existieren
-- offene Findings priorisiert sind
-- stale Audits im Final Pass erkannt wurden
-- alle P0/P1 Findings geklärt sind
-- RC Audit Summary existiert
-- finale RC Empfehlung dokumentiert ist
-- PROJECT_STATUS aktualisiert wurde
-- SPRINT_ROADMAP aktualisiert wurde
-
-# Empfohlene Reihenfolge
-
-```text
-A1
--> A2
--> A3
--> A4
--> A5
--> A6
--> Fix Passes für P0/P1/P2
--> A7 Final RC Consolidation
-```
-
-# Sprint 27 Master Prompt
-
-```text
 Read:
-
 - AGENTS.md
 - docs/SPRINT_ROADMAP.md
 - docs/PROJECT_STATUS.md
-- docs/RC_CHECKLIST.md if present
-- docs/sprints/
-- docs/sprints/SPRINT-27.md
+- all files under docs/sprints/
 
 Inspect the actual repository state first.
 
-Sprint 27 is a full historical sprint-compliance audit before the next release
-candidate.
-
+IMPORTANT:
 Do NOT try to audit every sprint in one run.
 
-Use the audit-part structure defined in docs/sprints/SPRINT-27.md.
+This first run has four tasks only:
+
+1. Inventory every existing sprint specification under docs/sprints/
+2. Build the persistent audit structure
+3. Create a token-safe chronological Audit Part plan
+4. Execute only the FIRST audit part, starting with the earliest existing
+   sprint specification
+
+If SPRINT-1.md exists, begin with Sprint 1.
+
+If Sprint 1 does not exist, begin with the earliest actual sprint spec.
+
+Do not invent requirements for missing sprint documents.
 
 Create:
 
-docs/audits/README.md
+docs/audits/AUDIT_INDEX.md
+docs/audits/REPAIR_QUEUE.md
+docs/audits/MANUAL_TEST_QUEUE.md
 docs/audits/sprints/
-docs/audits/parts/
 
-Use these requirement statuses only:
+For each sprint audited, create:
+
+docs/audits/sprints/SPRINT-<ID>-AUDIT.md
+
+Every audit must compare the sprint specification against the CURRENT actual
+repository implementation.
+
+Use requirement statuses only:
 
 PASS
 PARTIAL
 MISSING
 BROKEN
 NOT TESTED
+N/A
 
-Use these sprint statuses only:
+For overall sprint status use:
 
 PASS
 PARTIAL
@@ -573,106 +575,51 @@ FAIL
 BLOCKED
 NOT TESTED
 
-Every sprint audit must record the exact repository commit used as its audit
-baseline.
+Every PASS/PARTIAL/BROKEN result should include concrete evidence where
+practical:
+- source file
+- function
+- route
+- config key
+- test file/test name
+- manual test reference
 
-Do not rely on PROJECT_STATUS or previous Codex reports as proof.
+Do not rely only on docs/PROJECT_STATUS.md.
 
-Verify actual code, configuration, routes, frontend, persistence, automated
-tests, security boundaries and runtime behavior where available.
+Do not mark real-device/runtime requirements PASS if they were not actually
+tested.
 
-For requirements that need a real iPad or real HAOS instance, use NOT TESTED
-until actual manual evidence exists.
+Put such checks into docs/audits/MANUAL_TEST_QUEUE.md.
 
-Write each sprint audit file immediately after that sprint has been audited so
-progress survives an interrupted Codex run.
+Put actionable PARTIAL/MISSING/BROKEN findings into
+docs/audits/REPAIR_QUEUE.md.
 
-Audit first, fix second.
+Do not perform broad repair work during this baseline audit run.
 
-For PARTIAL/MISSING/BROKEN findings, document priority:
+If later sprints intentionally supersede an earlier requirement, document that
+explicitly rather than falsely marking it broken.
 
-P0 – Security/Data Loss
-P1 – RC Blocker
-P2 – Functional Defect
-P3 – Visual/Documentation
+Audit chronologically.
 
-Do not perform large unplanned refactors during the audit.
-
-After each audit part, create its Part Summary.
-
-After A1–A6 and all required fix passes, execute A7 and create:
-
-docs/audits/RC-AUDIT-SUMMARY.md
-
-Final recommendation must be one of:
-
-RC READY
-RC READY WITH DOCUMENTED NON-BLOCKING LIMITATIONS
-NOT RC READY
-
-Do not create a Git tag, GitHub Release or publish a container image.
-
-Do not commit or push until I review the result.
-```
-
-# Codex Prompt – Audit Part A1
-
-```text
-Execute Sprint 27 Audit Part A1 as defined in:
-
-docs/sprints/SPRINT-27.md
-
-Audit only:
-
-- Sprint 18
-- Sprint 19
-- Sprint 20
-- Sprint 21
-
-Inspect the current repository first and record the exact base commit.
-
-Read each original sprint specification and compare every requirement against
-the actual current implementation.
-
-Create:
-
-docs/audits/README.md if it does not yet exist
-docs/audits/sprints/SPRINT-18-AUDIT.md
-docs/audits/sprints/SPRINT-19-AUDIT.md
-docs/audits/sprints/SPRINT-20-AUDIT.md
-docs/audits/sprints/SPRINT-21-AUDIT.md
-docs/audits/parts/AUDIT-PART-A1.md
-
-Use only:
-
-PASS
-PARTIAL
-MISSING
-BROKEN
-NOT TESTED
-
-for requirements.
-
-Audit actual code/config/tests. Do not trust PROJECT_STATUS alone.
-
-Run relevant automated tests.
-
-For real-device/runtime tests that cannot be executed, mark NOT TESTED.
-
-Include security regression and Standalone/App implications where relevant.
-
-Do not perform unrelated feature development.
-
-Do not start A2.
+Choose the first Audit Part small enough to fit comfortably within the usage
+limit. Prefer roughly 3–5 normal sprints, fewer if the specs are large.
 
 At the end report:
-- base commit
-- sprint statuses
-- P0/P1/P2/P3 findings
-- automated test results
-- manual tests still needed
-- files created
-- recommended next action
+
+1. repository commit audited
+2. complete sprint inventory
+3. proposed Audit Part plan
+4. which sprints were audited in Part 01
+5. overall result per audited sprint
+6. PARTIAL/MISSING/BROKEN findings
+7. manual tests queued
+8. repair items queued
+9. security findings
+10. test results
+11. next Audit Part
+12. recommended commit message
+
+Do not start Audit Part 02 in this run.
 
 Do not commit or push until I review the result.
 ```
