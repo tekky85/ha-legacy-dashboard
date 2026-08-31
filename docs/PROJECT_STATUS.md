@@ -11,6 +11,15 @@ HAOS-Persistenzabnahmen bleiben offen.
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 
+## Sprint-27-Auditprogramm
+
+Das chronologische RC-Audit läuft separat in
+[`docs/audits/AUDIT_INDEX.md`](audits/AUDIT_INDEX.md). Die noch vorläufige
+Gesamtbewertung steht in
+[`docs/audits/RC_AUDIT_SUMMARY.md`](audits/RC_AUDIT_SUMMARY.md). Part 01 und
+Part 02 auditieren auf Commit `8d2295a` die Sprints 12–16; Sprint 17 und
+spätere Sprints wurden noch nicht bewertet.
+
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
