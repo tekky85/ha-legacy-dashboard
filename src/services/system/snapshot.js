@@ -27,10 +27,15 @@ const NUMBER_ATTRIBUTES = [
     ["min_temp", "minimumTemperature"],
     ["max_temp", "maximumTemperature"],
     ["target_temp_step", "targetTemperatureStep"],
+    ["supported_features", "supportedFeatures"],
     ["current_position", "currentPosition"],
     ["battery_level", "batteryLevel"],
     ["current", "currentRuns"],
     ["max", "maxRuns"]
+];
+
+const ARRAY_ATTRIBUTES = [
+    ["hvac_modes", "hvacModes", 32]
 ];
 
 
@@ -109,6 +114,29 @@ function normalizeAttributes(attributes) {
 
         if (value !== null) {
             normalized[definition[1]] = value;
+        }
+
+    });
+
+
+    ARRAY_ATTRIBUTES.forEach(function (definition) {
+
+        const values = Array.isArray(source[definition[0]])
+            ? source[definition[0]]
+            : [];
+
+        const normalizedValues = values
+            .filter(function (value, index) {
+                return (
+                    typeof value === "string" &&
+                    /^[a-z0-9_]+$/.test(value) &&
+                    values.indexOf(value) === index
+                );
+            })
+            .slice(0, definition[2]);
+
+        if (normalizedValues.length > 0) {
+            normalized[definition[1]] = normalizedValues;
         }
 
     });

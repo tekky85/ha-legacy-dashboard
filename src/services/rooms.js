@@ -43,6 +43,10 @@ function rawAttributes(entity) {
         min_temp: source.minimumTemperature,
         max_temp: source.maximumTemperature,
         target_temp_step: source.targetTemperatureStep,
+        supported_features: source.supportedFeatures,
+        hvac_modes: Array.isArray(source.hvacModes)
+            ? source.hvacModes.slice(0)
+            : undefined,
         hvac_action: source.hvacAction || undefined,
         current_position: source.currentPosition,
         battery_level: source.batteryLevel

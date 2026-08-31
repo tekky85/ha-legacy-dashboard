@@ -132,6 +132,22 @@ dashboard section hold independent `areaId` references. Each Room Card may
 also use its own optional background stored through the same secure JPEG/PNG
 architecture.
 
+Visibility and write authorization are separate. Light, Climate, and Room
+Cards expose a persistent **Allow controls** option in Admin. Only this
+explicit grant enables the existing narrow server endpoints for Light power,
+Climate power, and Climate target temperature; adding a visible entity alone
+does not grant writes. Room Cards use exactly the same authorization model and
+do not maintain a separate allowlist.
+
+Climate power is derived per entity from its actual `hvac_modes`. A Power
+button appears only when `off` and at least one supported non-off mode exist.
+Power-on uses the last known, an explicitly selected, or a deterministic
+supported mode; it never forces unsupported `heat`. When the integration
+supports off-state setpoints, Minus/Plus remain available without turning the
+thermostat on. Minimum, maximum, and step always come from the specific
+entity. If an integration rejects an off-state setpoint, the UI restores the
+last confirmed value and displays an understandable error.
+
 ### iPad mini as a Wall Display
 
 For one iPad mini 1 running iOS 9.3.5, **Guided Access** is the recommended
@@ -164,6 +180,8 @@ Features include:
 - optionally reference existing Home Assistant Areas read-only
 - browse entities
 - add and edit widgets
+- explicitly allow Light/Climate controls and optionally choose an actually
+  supported Climate power-on mode
 - create native Room Cards, review Area suggestions, and manually override
   entity assignments
 - securely upload, preview, replace, or remove Room Card backgrounds

@@ -75,6 +75,7 @@ test("System-Snapshot normalisiert nur erlaubte HA-State-Felder", function () {
         friendlyName: "Wohnzimmer",
         deviceClass: "light",
         icon: "mdi:lamp",
+        supportedFeatures: 999,
         batteryLevel: 87
     });
     assert.equal(snapshot.entities[0].attributes.entityPicture, undefined);

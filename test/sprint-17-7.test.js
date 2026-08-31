@@ -134,6 +134,7 @@ test("Climate Focus zentriert Step-Gruppe und Power in eigenen Rows", function (
             },
             gateway_capabilities: {
                 can_set_temperature: true,
+                supports_power: true,
                 can_power_off: true
             }
         }
@@ -215,8 +216,9 @@ test("Sprint 17.7 bleibt ES5, Grid-frei und ohne neue Write-Fläche", function (
 
     assert.doesNotMatch(css, /display:\s*grid|\bgap\s*:/);
     assert.doesNotMatch(css, /margin-left:\s*37px/);
-    assert.match(api, /"climate\.esszimmer_thermostate"/);
-    assert.match(api, /"light\.esszimmer_lampen"/);
+    assert.match(api, /controlAuthorization\.climateCapabilities/);
+    assert.match(api, /controlAuthorization\.lightCapabilities/);
+    assert.doesNotMatch(api, /ALLOWED_(?:LIGHT|CLIMATE)_ENTITIES/);
     assert.doesNotMatch(api, /body\.(?:domain|service|service_data)/);
     assert.doesNotMatch(
         legacyFiles.map(read).join("\n"),

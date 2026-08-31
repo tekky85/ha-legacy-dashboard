@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>HA Legacy Dashboard – Administration</title>
-    <link rel="stylesheet" href="/admin/css/admin.css?v=49">
+    <link rel="stylesheet" href="/admin/css/admin.css?v=50">
 </head>
 <body>
     <a class="skip-link" href="#adminMain">Zum Inhalt springen</a>
@@ -350,6 +350,19 @@
                 <span>Im Wall-Display sichtbar</span>
             </label>
 
+            <fieldset id="widgetControlFields" class="room-behavior-fields" hidden>
+                <legend>Steuerung</legend>
+                <label class="checkbox-row" for="widgetControlEnabledInput">
+                    <input id="widgetControlEnabledInput" type="checkbox">
+                    <span>Steuerung für diese Entity erlauben</span>
+                </label>
+                <div id="widgetPreferredOnModeField" hidden>
+                    <label for="widgetPreferredOnModeInput">Bevorzugter Einschaltmodus</label>
+                    <select id="widgetPreferredOnModeInput"></select>
+                    <small>Es werden nur aktuell von der Climate-Entity gemeldete Modi angeboten.</small>
+                </div>
+            </fieldset>
+
             <p id="widgetFormError" class="form-error" role="alert"></p>
             <div class="button-row end">
                 <button class="button secondary" type="button" data-close-dialog="widgetDialog">Abbrechen</button>
@@ -418,6 +431,19 @@
                 </label>
             </fieldset>
 
+            <fieldset class="room-behavior-fields">
+                <legend>Steuerung</legend>
+                <label class="checkbox-row" for="roomControlEnabledInput">
+                    <input id="roomControlEnabledInput" type="checkbox">
+                    <span>Explizite Light-/Climate-Steuerung erlauben</span>
+                </label>
+                <div id="roomPreferredOnModeField" hidden>
+                    <label for="roomPreferredOnModeInput">Bevorzugter Climate-Einschaltmodus</label>
+                    <select id="roomPreferredOnModeInput"></select>
+                </div>
+                <small>Die Freigabe gilt nur für die zugeordneten Light- und Climate-Entities und nutzt dieselben sicheren Endpunkte wie normale Karten.</small>
+            </fieldset>
+
             <section id="roomBackgroundEditor" class="room-background-editor"></section>
             <p id="roomFormError" class="form-error" role="alert"></p>
             <div class="button-row end">
@@ -427,19 +453,19 @@
         </form>
     </dialog>
 
-    <script src="/admin/js/auth.js?v=49" defer></script>
-    <script src="/admin/js/api.js?v=49" defer></script>
-    <script src="/admin/js/state.js?v=49" defer></script>
-    <script src="/admin/js/layout.js?v=49" defer></script>
-    <script src="/admin/js/sections.js?v=49" defer></script>
-    <script src="/admin/js/dashboards.js?v=49" defer></script>
-    <script src="/admin/js/widgets.js?v=49" defer></script>
-    <script src="/admin/js/rooms.js?v=49" defer></script>
-    <script src="/admin/js/entities.js?v=49" defer></script>
-    <script src="/admin/js/system-dashboards.js?v=49" defer></script>
-    <script src="/admin/js/entity-rules.js?v=49" defer></script>
-    <script src="/js/core/icons.js?v=49" defer></script>
-    <script src="/js/core/presentation.js?v=49" defer></script>
-    <script src="/admin/js/app.js?v=49" defer></script>
+    <script src="/admin/js/auth.js?v=50" defer></script>
+    <script src="/admin/js/api.js?v=50" defer></script>
+    <script src="/admin/js/state.js?v=50" defer></script>
+    <script src="/admin/js/layout.js?v=50" defer></script>
+    <script src="/admin/js/sections.js?v=50" defer></script>
+    <script src="/admin/js/dashboards.js?v=50" defer></script>
+    <script src="/admin/js/widgets.js?v=50" defer></script>
+    <script src="/admin/js/rooms.js?v=50" defer></script>
+    <script src="/admin/js/entities.js?v=50" defer></script>
+    <script src="/admin/js/system-dashboards.js?v=50" defer></script>
+    <script src="/admin/js/entity-rules.js?v=50" defer></script>
+    <script src="/js/core/icons.js?v=50" defer></script>
+    <script src="/js/core/presentation.js?v=50" defer></script>
+    <script src="/admin/js/app.js?v=50" defer></script>
 </body>
 </html>

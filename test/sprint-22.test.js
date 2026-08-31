@@ -582,8 +582,9 @@ test("Sprint 22 bleibt read-only und fragt keine HA-History ab", function () {
 
     assert.doesNotMatch(ruleSource, /history\/period|history\/state|recorder/);
     assert.doesNotMatch(systemRoutes, /router\.(post|put|patch|delete)\s*\(/i);
-    assert.match(apiSource, /ALLOWED_LIGHT_ENTITIES/);
-    assert.match(apiSource, /ALLOWED_CLIMATE_ENTITIES/);
+    assert.match(apiSource, /controlAuthorization\.lightCapabilities/);
+    assert.match(apiSource, /controlAuthorization\.climateCapabilities/);
+    assert.doesNotMatch(apiSource, /ALLOWED_(?:LIGHT|CLIMATE)_ENTITIES/);
     assert.match(adminSource, /Expected Offline/);
     assert.match(adminSource, /allowCriticalExpectedOffline/);
 });

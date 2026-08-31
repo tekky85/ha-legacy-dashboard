@@ -60,6 +60,10 @@ function roomWidget(overrides) {
         visible: true,
         sectionId: null,
         size: "large",
+        control: {
+            enabled: false,
+            preferredOnMode: null
+        },
         room: {
             areaId: null,
             collapsible: true,
@@ -209,7 +213,7 @@ test("Schema 11 ergänzt Room Cards und migriert Sections aus Schema 10 verlustf
     const result = DashboardConfig.migrateConfiguration(previous);
 
     assert.equal(result.migrated, true);
-    assert.equal(result.configuration.schemaVersion, 11);
+    assert.equal(result.configuration.schemaVersion, 12);
     assert.equal(result.configuration.dashboards[0].sections[0].id, "ground-floor");
     assert.equal(
         result.configuration.dashboards[0].widgets[0].sectionId,
@@ -360,6 +364,7 @@ test("Collapsed und Expanded rendern Primärwerte, Alerts und nur sichere Contro
     };
     states["climate.main"].gateway_capabilities = {
         can_set_temperature: true,
+        supports_power: true,
         can_power_off: true
     };
 
@@ -496,7 +501,7 @@ test("Unknown, unavailable und Offline degradieren ohne aktive Room Controls", f
         "sensor.unavailable": rawState("sensor.unavailable", "unavailable"),
         "climate.unavailable": Object.assign(
             rawState("climate.unavailable", "unavailable"),
-            {gateway_capabilities: {can_set_temperature: true, can_power_off: true}}
+            {gateway_capabilities: {can_set_temperature: true, supports_power: true, can_power_off: true}}
         ),
         "light.allowed": Object.assign(
             rawState("light.allowed", "on"),

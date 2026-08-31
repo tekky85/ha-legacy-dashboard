@@ -299,7 +299,7 @@ test("Wall-Display nutzt ES5-Flexbox, Vollhöhe und optionale Titel ohne Systemn
     assert.match(html, /id="systemHealthLink"/);
     assert.match(html, /<footer id="updated"/);
     assert.doesNotMatch(html, /HA Legacy Dashboard v1\.0\.0<\/footer>/);
-    assert.match(html, /\/js\/app\.js\?v=49/);
+    assert.match(html, /\/js\/app\.js\?v=50/);
 
     assert.match(css, /\.app\s*\{[\s\S]*display: -webkit-flex;[\s\S]*-webkit-flex-direction: column;/);
     assert.match(css, /\.grid\s*\{[\s\S]*-webkit-flex: 1 0 auto;/);
@@ -341,14 +341,9 @@ test("Admin-Oberfläche bietet Upload, Vorschau, Ersetzen, Entfernen und Batch-E
 test("Hintergrundfunktion erweitert keine Home-Assistant-Schreibrechte", function () {
     const routes = read("src/routes/api.js");
 
-    assert.match(
-        routes,
-        /const ALLOWED_CLIMATE_ENTITIES = \[[\s\S]*"climate\.esszimmer_thermostate"[\s\S]*\];/
-    );
-    assert.match(
-        routes,
-        /const ALLOWED_LIGHT_ENTITIES = \[[\s\S]*"light\.esszimmer_lampen"[\s\S]*\];/
-    );
+    assert.match(routes, /controlAuthorization\.climateCapabilities/);
+    assert.match(routes, /controlAuthorization\.lightCapabilities/);
+    assert.doesNotMatch(routes, /ALLOWED_(?:LIGHT|CLIMATE)_ENTITIES/);
     assert.doesNotMatch(
         read("src/services/dashboard-backgrounds.js"),
         /HA_TOKEN|SUPERVISOR_TOKEN|callService/

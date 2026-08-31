@@ -7,6 +7,10 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 
 ### Changed
 
+- Replaced test-entity-specific Light/Climate authorization with persistent,
+  server-validated control grants shared by Grid, Focus, and Room Cards.
+- Derived Climate Power and target-temperature eligibility from each entity's
+  actual HVAC modes, supported features, and temperature constraints.
 - Added five dimension-aware wall-card presentation tiers and a deliberate
   large Climate layout across every valid portrait and landscape grid size.
 - Hardened long sensor values, units, binary states, and Climate controls
@@ -28,13 +32,19 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 
 ### Security
 
-- Room Card controls reuse only the existing Light and Climate allowlists and
-  explicit service routes; all other displayed domains remain read-only.
+- Visibility no longer implies writes: Light, Climate, and Room Card controls
+  require an explicit persisted grant and still use only narrow service routes.
+- Removed production authorization dependencies on fixed test entity IDs;
+  no generic Home Assistant service proxy was added.
 - Room Cards use the cached normalized system snapshot and central issue/risk
   rules without exposing HA credentials, registries, or generic services.
 
 ### Fixed
 
+- Kept Climate target controls available while a supported thermostat is off,
+  without powering it on, and restored the confirmed value after rejection.
+- Hid fake Climate Power controls when an entity has no real `off` mode and
+  avoided forcing unsupported `heat` modes.
 - Accept normal baseline and progressive JPEG backgrounds with JFIF, EXIF,
   orientation, embedded metadata thumbnails, and ICC profiles while retaining
   structural validation and atomic rollback behavior.

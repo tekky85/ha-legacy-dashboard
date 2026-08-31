@@ -219,6 +219,7 @@ Bedeutung von „fest“:
 | 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; reale iOS-9-Abnahme offen |
 | 26 | Persistent Dashboard Sections | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
 | 26.1 | Native Room Card MVP | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
+| 26.2 | Controllable Entity Authorization & Climate Capability Hardening | umgesetzt und automatisiert validiert; Mehrgeräte-iPad-Abnahme offen |
 
 ---
 
@@ -1996,17 +1997,46 @@ HA-Abfragen pro Raum.
 
 Collapsed und Expanded sowie Compact, Standard, Wide, Tall und Large besitzen
 bewusste Darstellungen. Alerts verwenden die zentrale Risk-/Severity-/Grace-/
-Flapping-/Recovery-Semantik. Nur die vorhandenen, explizit allowlist-basierten
+Flapping-/Recovery-Semantik. Nur die vorhandenen, explizit abgesicherten
 Light- und Climate-Endpunkte werden als Controls wiederverwendet. Andere
 Raum-Entities bleiben read-only. Optionale Raumhintergründe nutzen denselben
 sicheren JPEG-/PNG-Speicher wie Dashboard-Hintergründe.
 
 ---
 
+# Sprint 26.2 – Controllable Entity Authorization & Climate Capability Hardening
+
+Sprint 26.2 ersetzt die produktive Abhängigkeit von fest codierten Esszimmer-
+Test-IDs durch persistente, serverseitig validierte Control Grants pro Light-,
+Climate- oder Room-Widget. Sichtbarkeit bleibt von Schreibrechten getrennt;
+neue und migrierte Custom-Widgets werden nicht automatisch steuerbar. Die
+historisch vorhandenen Standard-Light-/Climate-Widgets behalten ihre Freigabe
+bei der Schema-11-zu-12-Migration.
+
+Light Power arbeitet weiterhin ausschließlich über `POST /api/light/state`.
+Climate Power und Sollwert verwenden ausschließlich `POST /api/climate/power`
+beziehungsweise `POST /api/climate/temperature`. Authorization und
+Capabilities werden zentral serverseitig projiziert und von Grid, Focus und
+Room Card gemeinsam konsumiert. Es gibt keinen generischen Home-Assistant-
+Service-Proxy.
+
+Climate Power erscheint nur bei einem echten `off`-Modus plus mindestens einem
+unterstützten Nicht-Off-Modus. Die sichere Einschaltwahl priorisiert letzten
+bekannten Modus, konfigurierte Präferenz, aktuellen Modus und deterministischen
+unterstützten Fallback. Sollwerte sind bei vorhandener Capability auch in
+`off` änderbar, ohne das Gerät einzuschalten; `min_temp`, `max_temp`,
+`target_temp_step` und `supported_features` werden entity-spezifisch geprüft.
+Lehnt eine Integration den Off-State-Sollwert ab, stellt das Legacy-Frontend
+den letzten bestätigten Wert wieder her.
+
+---
+
 # Nächster Schritt
 
-Als nächster Produktschritt bietet sich eine reale iPad-/HAOS-Abnahme der
-Room-Card-Größen, Hintergründe und Touch-Controls an. Danach können weitere
+Als nächster Produktschritt bietet sich eine reale iPad-/HAOS-Abnahme mit
+mindestens zwei unterschiedlichen Lights und zwei unterschiedlichen
+Thermostaten sowie der Room-Card-Größen, Hintergründe und Touch-Controls an.
+Danach können weitere
 Room-Card-Komfortfunktionen auf demselben nativen Modell ergänzt werden, ohne
 Lovelace-, Custom-Card- oder generische Service-Abhängigkeiten einzuführen.
 Parallel bleiben die physischen Sprint-25.6-/25.7-/26-Abnahmen und der

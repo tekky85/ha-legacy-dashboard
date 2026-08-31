@@ -171,6 +171,18 @@
                     ? Number(fields.order)
                     : maxOrder + 10,
             visible: Boolean(fields.visible),
+            control: {
+                enabled:
+                    (suggestion.type === "light" ||
+                        suggestion.type === "climate") &&
+                    fields.controlEnabled === true,
+                preferredOnMode:
+                    suggestion.type === "climate" &&
+                    typeof fields.preferredOnMode === "string" &&
+                    fields.preferredOnMode
+                        ? fields.preferredOnMode
+                        : null
+            },
             sectionId: validateSectionId(
                 dashboard,
                 fields.sectionId
@@ -209,6 +221,18 @@
         widget.unit = String(fields.unit || "");
         widget.order = order;
         widget.visible = Boolean(fields.visible);
+        widget.control = {
+            enabled:
+                (widget.type === "light" ||
+                    widget.type === "climate") &&
+                fields.controlEnabled === true,
+            preferredOnMode:
+                widget.type === "climate" &&
+                typeof fields.preferredOnMode === "string" &&
+                fields.preferredOnMode
+                    ? fields.preferredOnMode
+                    : null
+        };
         widget.size = size;
 
         const nextSectionId = validateSectionId(

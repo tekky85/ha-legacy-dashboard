@@ -23,6 +23,9 @@ const writeRateLimit =
 const climatePower =
     require("../services/climate-power");
 
+const controlAuthorization =
+    require("../services/control-authorization");
+
 const System =
     require("../services/system");
 
@@ -31,79 +34,6 @@ const Rooms =
 
 const projectPackage =
     require("../../package.json");
-
-
-/*
- * Nur diese Climate-Entitäten dürfen über
- * das Gateway gesteuert werden.
- */
-
-const ALLOWED_CLIMATE_ENTITIES = [
-
-    "climate.esszimmer_thermostate"
-
-];
-
-
-/*
- * Nur diese Licht-Entitäten dürfen über
- * das Gateway geschaltet werden.
- */
-
-const ALLOWED_LIGHT_ENTITIES = [
-
-    "light.esszimmer_lampen"
-
-];
-
-
-function addControlCapabilities(entities) {
-
-    Object.keys(entities).forEach(function (entityId) {
-
-        const state = entities[entityId];
-
-        if (!state || typeof state !== "object") {
-            return;
-        }
-
-        if (
-            ALLOWED_LIGHT_ENTITIES.indexOf(entityId) !== -1
-        ) {
-            const available =
-                state.state === "on" ||
-                state.state === "off";
-
-            state.gateway_capabilities = {
-                can_light_power_on: available,
-                can_light_power_off: available
-            };
-        }
-
-        if (
-            ALLOWED_CLIMATE_ENTITIES.indexOf(entityId) !== -1
-        ) {
-            const power = climatePower.capabilities(
-                entityId,
-                state
-            );
-
-            state.gateway_capabilities = {
-                can_set_temperature: Boolean(
-                    state.state !== "off" &&
-                    state.state !== "unknown" &&
-                    state.state !== "unavailable"
-                ),
-                can_power_on: power.canPowerOn,
-                can_power_off: power.canPowerOff
-            };
-        }
-
-    });
-
-    return entities;
-
-}
 
 
 router.use("/admin", adminRoutes);
@@ -286,7 +216,7 @@ async function sendDashboardState(
 
         return res.json(
             addDashboardMeta(
-                addControlCapabilities(entities),
+                controlAuthorization.addCapabilities(entities),
                 dashboardEntities
             )
         );
@@ -540,7 +470,10 @@ router.post(
         if (
             typeof entityId !== "string" ||
             entityId.split(".")[0] !== "climate" ||
-            ALLOWED_CLIMATE_ENTITIES.indexOf(entityId) === -1
+            !controlAuthorization.authorization(
+                entityId,
+                "climate"
+            )
         ) {
             return res.status(403).json({
                 error:
@@ -554,6 +487,17 @@ router.post(
         ) {
             return res.status(400).json({
                 error: "Der Klimazustand ist ungültig"
+            });
+        }
+
+        if (
+            Object.prototype.hasOwnProperty.call(body, "hvac_mode") ||
+            Object.prototype.hasOwnProperty.call(body, "mode") ||
+            Object.prototype.hasOwnProperty.call(body, "preferred_on_mode")
+        ) {
+            return res.status(400).json({
+                error:
+                    "Der Einschaltmodus wird ausschließlich serverseitig bestimmt"
             });
         }
 
@@ -574,10 +518,10 @@ router.post(
                 await ha.getEntity(entityId);
 
             const powerCapabilities =
-                climatePower.capabilities(
+                controlAuthorization.climateCapabilities(
                     entityId,
                     currentState
-                );
+                ).details;
 
             let targetMode;
 
@@ -595,7 +539,11 @@ router.post(
             if (requestedState === "on") {
                 targetMode = climatePower.resolvePowerOnMode(
                     entityId,
-                    currentState
+                    currentState,
+                    controlAuthorization.authorization(
+                        entityId,
+                        "climate"
+                    ).preferredOnMode
                 );
 
                 if (!powerCapabilities.canPowerOn || !targetMode) {
@@ -642,6 +590,15 @@ router.post(
             });
 
         } catch (error) {
+
+            if (
+                error.response &&
+                error.response.status === 404
+            ) {
+                return res.status(404).json({
+                    error: "Die Klima-Entität wurde nicht gefunden"
+                });
+            }
 
             logger.error(
                 "climate_power_failed",
@@ -810,6 +767,8 @@ router.post(
 
             );
 
+        let attemptedWhileOff = false;
+
 
         /*
          * Keine beliebigen Entity-IDs aus dem
@@ -819,9 +778,11 @@ router.post(
         if (
 
             typeof entityId !== "string" ||
-
-            ALLOWED_CLIMATE_ENTITIES
-                .indexOf(entityId) === -1
+            entityId.split(".")[0] !== "climate" ||
+            !controlAuthorization.authorization(
+                entityId,
+                "climate"
+            )
 
         ) {
 
@@ -853,8 +814,14 @@ router.post(
             const currentState =
                 await ha.getEntity(entityId);
 
-            const attributes =
-                currentState.attributes || {};
+            attemptedWhileOff =
+                currentState.state === "off";
+
+            const capabilities =
+                controlAuthorization.climateCapabilities(
+                    entityId,
+                    currentState
+                ).details;
 
 
             if (
@@ -878,54 +845,26 @@ router.post(
             }
 
 
-            const minimumValue =
-                toFiniteNumber(
+            if (!capabilities.canSetTemperature) {
 
-                    attributes.min_temp
+                return res.status(409).json({
 
-                );
+                    error:
+                        "Das Thermostat unterstützt keine sicher validierbare Zieltemperatur"
 
-            const maximumValue =
-                toFiniteNumber(
+                });
 
-                    attributes.max_temp
-
-                );
-
-            const stepValue =
-                toFiniteNumber(
-
-                    attributes.target_temp_step
-
-                );
+            }
 
 
             const minimum =
-
-                minimumValue !== null
-
-                    ? minimumValue
-
-                    : 5;
-
+                capabilities.temperature.minimum;
 
             const maximum =
-
-                maximumValue !== null
-
-                    ? maximumValue
-
-                    : 35;
-
+                capabilities.temperature.maximum;
 
             const step =
-
-                stepValue !== null &&
-                stepValue > 0
-
-                    ? stepValue
-
-                    : 0.5;
+                capabilities.temperature.step;
 
 
             if (
@@ -1085,6 +1024,13 @@ return res
                     : null;
 
 
+            if (upstreamStatus === 404) {
+                return res.status(404).json({
+                    error: "Die Klima-Entität wurde nicht gefunden"
+                });
+            }
+
+
             logger.error(
                 "climate_target_failed",
                 {
@@ -1099,8 +1045,9 @@ return res
 
                 error:
 
-                    "Home Assistant konnte " +
-                    "den Befehl nicht ausführen"
+                    attemptedWhileOff
+                        ? "Die Climate-Integration hat die Zieltemperatur im ausgeschalteten Zustand abgelehnt"
+                        : "Home Assistant konnte den Befehl nicht ausführen"
 
             });
 
@@ -1134,9 +1081,11 @@ router.post(
         if (
 
             typeof entityId !== "string" ||
-
-            ALLOWED_LIGHT_ENTITIES
-                .indexOf(entityId) === -1
+            entityId.split(".")[0] !== "light" ||
+            !controlAuthorization.authorization(
+                entityId,
+                "light"
+            )
 
         ) {
 
@@ -1173,11 +1122,16 @@ router.post(
             const currentState =
                 await ha.getEntity(entityId);
 
+            const capabilities =
+                controlAuthorization.lightCapabilities(
+                    entityId,
+                    currentState
+                );
+
 
             if (
 
-                currentState.state === "unavailable" ||
-                currentState.state === "unknown"
+                !capabilities.available
 
             ) {
 
@@ -1252,6 +1206,13 @@ router.post(
                     ? error.response.status
 
                     : null;
+
+
+            if (upstreamStatus === 404) {
+                return res.status(404).json({
+                    error: "Die Licht-Entität wurde nicht gefunden"
+                });
+            }
 
 
             logger.error(

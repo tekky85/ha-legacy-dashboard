@@ -7,12 +7,27 @@ const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
 
+const DashboardConfig = require("../src/config/dashboard");
+const Layout = require("../src/services/layout");
+
 
 const CLIMATE_ENTITY =
     "climate.esszimmer_thermostate";
 
 const LIGHT_ENTITY =
     "light.esszimmer_lampen";
+
+const SECOND_LIGHT_ENTITY =
+    "light.kitchen_ceiling";
+
+const THIRD_LIGHT_ENTITY =
+    "light.hall_ceiling";
+
+const SECOND_CLIMATE_ENTITY =
+    "climate.office";
+
+const THIRD_CLIMATE_ENTITY =
+    "climate.bedroom";
 
 const TEMPERATURE_ENTITY =
     "sensor.badezimmer_smart_indoor_module_temperatur";
@@ -166,8 +181,70 @@ test(
             )
         );
 
+        const configPath = path.join(
+            temporaryDirectory,
+            "dashboards.json"
+        );
+        const integrationConfiguration =
+            DashboardConfig.cloneConfiguration(
+                DashboardConfig.DEFAULT_CONFIGURATION
+            );
+        const integrationDashboard =
+            integrationConfiguration.dashboards[0];
+
+        [
+            {
+                id: "integration-light-kitchen",
+                entity: SECOND_LIGHT_ENTITY,
+                type: "light",
+                control: {enabled: true, preferredOnMode: null}
+            },
+            {
+                id: "integration-light-hall",
+                entity: THIRD_LIGHT_ENTITY,
+                type: "light",
+                control: {enabled: true, preferredOnMode: null}
+            },
+            {
+                id: "integration-climate-office",
+                entity: SECOND_CLIMATE_ENTITY,
+                type: "climate",
+                control: {enabled: true, preferredOnMode: "auto"}
+            },
+            {
+                id: "integration-climate-bedroom",
+                entity: THIRD_CLIMATE_ENTITY,
+                type: "climate",
+                control: {enabled: true, preferredOnMode: null}
+            }
+        ].forEach(function (definition, index) {
+            integrationDashboard.widgets.push({
+                id: definition.id,
+                entity: definition.entity,
+                type: definition.type,
+                title: definition.id,
+                subtitle: "",
+                icon: definition.type,
+                iconClass: definition.type,
+                unit: definition.type === "climate" ? "°C" : "",
+                order: 100 + index * 10,
+                visible: false,
+                sectionId: null,
+                size: "normal",
+                control: definition.control
+            });
+        });
+        integrationDashboard.layouts =
+            Layout.createLayouts(integrationDashboard.widgets);
+        fs.writeFileSync(
+            configPath,
+            JSON.stringify(integrationConfiguration),
+            "utf8"
+        );
+
         const mock = {
             authorizationHeaders: [],
+            additionalStates: {},
             websocketAuthorizationHeaders: [],
             confirmationMode: "immediate",
             climatePowerCalls: [],
@@ -204,6 +281,40 @@ test(
         };
 
         function resetMock() {
+            mock.additionalStates = {
+                "light.kitchen_ceiling": {
+                    state: "off",
+                    attributes: {}
+                },
+                "light.hall_ceiling": {
+                    state: "on",
+                    attributes: {}
+                },
+                "climate.office": {
+                    state: "off",
+                    attributes: {
+                        current_temperature: 21,
+                        temperature: 20,
+                        min_temp: 8,
+                        max_temp: 28,
+                        target_temp_step: 0.5,
+                        supported_features: 1,
+                        hvac_modes: ["off", "auto", "cool"]
+                    }
+                },
+                "climate.bedroom": {
+                    state: "off",
+                    attributes: {
+                        current_temperature: 19,
+                        temperature: 19.5,
+                        min_temp: 10,
+                        max_temp: 25,
+                        target_temp_step: 0.5,
+                        supported_features: 1,
+                        hvac_modes: ["off", "cool", "dry"]
+                    }
+                }
+            };
             mock.confirmationMode = "immediate";
             mock.climatePowerCalls = [];
             mock.climateState = "heat";
@@ -297,10 +408,17 @@ test(
                         data: serviceData
                     });
 
-                    mock.lightState =
+                    const nextLightState =
                         req.url.indexOf("turn_on") !== -1
                             ? "on"
                             : "off";
+
+                    if (mock.additionalStates[serviceData.entity_id]) {
+                        mock.additionalStates[serviceData.entity_id].state =
+                            nextLightState;
+                    } else {
+                        mock.lightState = nextLightState;
+                    }
 
                     res.end("[]");
                     return;
@@ -325,7 +443,12 @@ test(
                         JSON.parse(requestBody || "{}");
 
                     mock.climatePowerCalls.push(serviceData);
-                    mock.climateState = serviceData.hvac_mode;
+                    if (mock.additionalStates[serviceData.entity_id]) {
+                        mock.additionalStates[serviceData.entity_id].state =
+                            serviceData.hvac_mode;
+                    } else {
+                        mock.climateState = serviceData.hvac_mode;
+                    }
                     res.end("[]");
                     return;
 
@@ -353,6 +476,13 @@ test(
                         serviceData.temperature;
                     mock.postServiceReads = 0;
                     mock.serviceIssued = true;
+
+                    if (mock.additionalStates[serviceData.entity_id]) {
+                        mock.additionalStates[
+                            serviceData.entity_id
+                        ].attributes.temperature =
+                            mock.pendingTemperature;
+                    }
 
                     if (
                         mock.confirmationMode ===
@@ -422,6 +552,16 @@ test(
                             mock.targetTemperature =
                                 mock.pendingTemperature;
                         }
+                    }
+
+                    if (mock.additionalStates[entityId]) {
+                        res.end(JSON.stringify({
+                            entity_id: entityId,
+                            state: mock.additionalStates[entityId].state,
+                            attributes:
+                                mock.additionalStates[entityId].attributes
+                        }));
+                        return;
                     }
 
                     const attributes =
@@ -499,10 +639,7 @@ test(
                             "http://127.0.0.1:" +
                             mockPort,
                         DASHBOARD_CONFIG_PATH:
-                            path.join(
-                                temporaryDirectory,
-                                "dashboards.json"
-                            ),
+                            configPath,
                         NODE_ENV: "test",
                         PORT: String(gatewayPort)
                     }),
@@ -630,7 +767,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=49"/
+                /src="\/js\/app\.js\?v=50"/
             );
 
             const manifest = await request(
@@ -649,7 +786,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=49"
+                "/js/app.js?v=50"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -675,7 +812,7 @@ test(
             );
             assert.match(
                 adminPage.text,
-                /src="\/admin\/js\/app\.js\?v=49"/
+                /src="\/admin\/js\/app\.js\?v=50"/
             );
             assert.doesNotMatch(
                 adminPage.text,
@@ -1312,6 +1449,34 @@ test(
 
         });
 
+        await t.test("mehrere konfigurierte Light-IDs verwenden denselben engen Endpunkt", async function () {
+
+            resetMock();
+
+            const kitchen = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {entity_id: SECOND_LIGHT_ENTITY, state: "on"}
+            );
+            const hall = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {entity_id: THIRD_LIGHT_ENTITY, state: "off"}
+            );
+
+            assert.equal(kitchen.status, 202);
+            assert.equal(hall.status, 202);
+            assert.deepEqual(
+                mock.lightServiceCalls.map(function (call) {
+                    return call.data.entity_id;
+                }),
+                [SECOND_LIGHT_ENTITY, THIRD_LIGHT_ENTITY]
+            );
+
+        });
+
         await t.test("nicht erlaubte Licht-Entity", async function () {
 
             resetMock();
@@ -1327,6 +1492,31 @@ test(
             );
 
             assert.equal(response.status, 403);
+            assert.equal(mock.lightServiceCalls.length, 0);
+
+        });
+
+        await t.test("Light lehnt falsche Domain ab und meldet konfigurierte unbekannte Entity", async function () {
+
+            resetMock();
+
+            const wrongDomain = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {entity_id: CLIMATE_ENTITY, state: "on"}
+            );
+
+            mock.missingEntity = SECOND_LIGHT_ENTITY;
+            const missing = await request(
+                gatewayPort,
+                "POST",
+                "/api/light/state",
+                {entity_id: SECOND_LIGHT_ENTITY, state: "on"}
+            );
+
+            assert.equal(wrongDomain.status, 403);
+            assert.equal(missing.status, 404);
             assert.equal(mock.lightServiceCalls.length, 0);
 
         });
@@ -1466,6 +1656,30 @@ test(
             assert.equal(belowMinimum.status, 400);
             assert.equal(aboveMaximum.status, 400);
             assert.equal(mock.serviceCalls.length, 0);
+
+        });
+
+        await t.test("exakte entity-spezifische Temperaturgrenzen werden akzeptiert", async function () {
+
+            resetMock();
+
+            const minimum = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/temperature",
+                {entity_id: CLIMATE_ENTITY, temperature: 10}
+            );
+            const maximum = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/temperature",
+                {entity_id: CLIMATE_ENTITY, temperature: 30}
+            );
+
+            assert.equal(minimum.status, 200);
+            assert.equal(minimum.json.temperature, 10);
+            assert.equal(maximum.status, 200);
+            assert.equal(maximum.json.temperature, 30);
 
         });
 
@@ -1614,7 +1828,100 @@ test(
 
         });
 
-        await t.test("Climate Power weist ungültige oder uneindeutige Wünsche ab", async function () {
+        await t.test("mehrere Climate-IDs nutzen reale Modi und Off-Setpoints", async function () {
+
+            resetMock();
+
+            const officePower = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {entity: SECOND_CLIMATE_ENTITY, state: "on"}
+            );
+            const bedroomPower = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {entity: THIRD_CLIMATE_ENTITY, state: "on"}
+            );
+            const selectedModes = mock.climatePowerCalls.slice();
+
+            resetMock();
+
+            const officeTemperature = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/temperature",
+                {entity_id: SECOND_CLIMATE_ENTITY, temperature: 21.3}
+            );
+
+            assert.equal(officePower.status, 202);
+            assert.equal(bedroomPower.status, 202);
+            assert.deepEqual(
+                [officePower.json.state, bedroomPower.json.state],
+                ["on", "on"]
+            );
+            assert.deepEqual(selectedModes, [
+                {
+                    entity_id: SECOND_CLIMATE_ENTITY,
+                    hvac_mode: "auto"
+                },
+                {
+                    entity_id: THIRD_CLIMATE_ENTITY,
+                    hvac_mode: "cool"
+                }
+            ]);
+            assert.equal(officeTemperature.status, 200);
+            assert.equal(officeTemperature.json.temperature, 21.5);
+            assert.equal(mock.additionalStates[SECOND_CLIMATE_ENTITY].state, "off");
+            assert.equal(mock.climatePowerCalls.length, 0);
+            assert.deepEqual(mock.serviceCalls, [{
+                entity_id: SECOND_CLIMATE_ENTITY,
+                temperature: 21.5
+            }]);
+
+        });
+
+        await t.test("Climate unavailable und Off-State-Servicefehler bleiben kontrolliert", async function () {
+
+            resetMock();
+            mock.additionalStates[SECOND_CLIMATE_ENTITY].state =
+                "unavailable";
+
+            const unavailablePower = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {entity: SECOND_CLIMATE_ENTITY, state: "on"}
+            );
+            const unavailableTarget = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/temperature",
+                {entity_id: SECOND_CLIMATE_ENTITY, temperature: 21}
+            );
+
+            resetMock();
+            mock.serviceError = true;
+            const rejectedOffTarget = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/temperature",
+                {entity_id: SECOND_CLIMATE_ENTITY, temperature: 21}
+            );
+
+            assert.equal(unavailablePower.status, 503);
+            assert.equal(unavailableTarget.status, 503);
+            assert.equal(rejectedOffTarget.status, 502);
+            assert.equal(
+                rejectedOffTarget.json.error,
+                "Die Climate-Integration hat die Zieltemperatur im ausgeschalteten Zustand abgelehnt"
+            );
+            assert.equal(mock.climatePowerCalls.length, 0);
+
+        });
+
+        await t.test("Climate Power weist ungültige Wünsche ab und wählt nur unterstützte Modi", async function () {
 
             resetMock();
 
@@ -1651,7 +1958,17 @@ test(
             mock.climateState = "off";
             mock.climateModes = ["off", "cool", "dry"];
 
-            const ambiguous = await request(
+            const unsupportedMode = await request(
+                gatewayPort,
+                "POST",
+                "/api/climate/power",
+                {
+                    entity: CLIMATE_ENTITY,
+                    state: "on",
+                    hvac_mode: "fan_only"
+                }
+            );
+            const deterministic = await request(
                 gatewayPort,
                 "POST",
                 "/api/climate/power",
@@ -1664,8 +1981,12 @@ test(
             assert.equal(denied.status, 403);
             assert.equal(wrongDomain.status, 403);
             assert.equal(invalidState.status, 400);
-            assert.equal(ambiguous.status, 409);
-            assert.equal(mock.climatePowerCalls.length, 0);
+            assert.equal(unsupportedMode.status, 400);
+            assert.equal(deterministic.status, 202);
+            assert.deepEqual(mock.climatePowerCalls, [{
+                entity_id: CLIMATE_ENTITY,
+                hvac_mode: "cool"
+            }]);
 
         });
 

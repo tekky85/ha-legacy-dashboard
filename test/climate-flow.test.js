@@ -677,6 +677,10 @@ test("Climate-Fehler bleibt sichtbar und löst Refresh aus", function () {
     });
 
     assert.equal(
+        harness.display.innerHTML,
+        "22.0<small>°C</small>"
+    );
+    assert.equal(
         harness.status.innerHTML,
         "Fehler: Netzwerkfehler"
     );
@@ -688,6 +692,38 @@ test("Climate-Fehler bleibt sichtbar und löst Refresh aus", function () {
     harness.advanceTo(4000);
     harness.runLatestTimer(3000);
     assert.equal(harness.gets.length, 3);
+
+});
+
+
+test("Climate-Fehler nach schnellem Folgeclick stellt letzten bestätigten Wert her", function () {
+
+    const harness = createHarness();
+
+    harness.completeConfiguration();
+    harness.gets[1].success({});
+    harness.click(harness.plus);
+    harness.click(harness.plus);
+    harness.runLatestTimer(500);
+
+    harness.click(harness.plus);
+    harness.posts[0].success({
+        temperature: 23,
+        confirmed: true
+    });
+    harness.runLatestTimer(500);
+    harness.posts[1].error({
+        message: "Off-State-Sollwert abgelehnt"
+    });
+
+    assert.equal(
+        harness.display.innerHTML,
+        "23.0<small>°C</small>"
+    );
+    assert.equal(
+        harness.status.innerHTML,
+        "Fehler: Off-State-Sollwert abgelehnt"
+    );
 
 });
 

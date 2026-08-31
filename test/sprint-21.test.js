@@ -649,7 +649,8 @@ test("Security-Regression enthält keine Proxy- oder Write-Commands", function (
     assert.doesNotMatch(diagnosticSource, /config\/entity_registry\/(?:update|remove)|config\/device_registry\/(?:update|remove)|config\/area_registry\/(?:update|delete)/);
     assert.doesNotMatch(diagnosticSource, /config_entries\/(?:update|disable|delete|reload)|repairs\/(?:ignore_issue|get_issue_data)|matter\//);
     assert.doesNotMatch(diagnosticSource, /call_service|commission|fabric|pairing|thread_credentials|wifi_credentials/i);
-    assert.match(apiSource, /"climate\.esszimmer_thermostate"/);
-    assert.match(apiSource, /"light\.esszimmer_lampen"/);
+    assert.match(apiSource, /controlAuthorization\.climateCapabilities/);
+    assert.match(apiSource, /controlAuthorization\.lightCapabilities/);
+    assert.doesNotMatch(apiSource, /ALLOWED_(?:LIGHT|CLIMATE)_ENTITIES/);
     assert.doesNotMatch(apiSource, /system-diagnostics.*post/i);
 });

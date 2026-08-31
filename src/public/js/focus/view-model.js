@@ -251,7 +251,6 @@ var LegacyFocusViewModel = (function () {
 
         temperatureAvailable =
             !model.controlsDisabled &&
-            model.state !== "off" &&
             target !== null &&
             capabilities.can_set_temperature === true;
 
@@ -275,8 +274,7 @@ var LegacyFocusViewModel = (function () {
             temperatureAvailable &&
             target + step <= maximum + 0.000001;
         model.powerVisible =
-            capabilities.can_power_on === true ||
-            capabilities.can_power_off === true;
+            capabilities.supports_power === true;
         model.powerAvailable =
             !model.controlsDisabled &&
             (

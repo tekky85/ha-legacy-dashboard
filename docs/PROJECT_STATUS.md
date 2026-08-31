@@ -1,8 +1,8 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 31. August 2026, Sprint 26.1 auf Basis des sauberen, mit `origin/main`
-identischen Commits `0878769` implementiert und repositoryseitig validiert.
-Sprint 26 wurde mit `0878769` abgeschlossen.
+Stand: 31. August 2026, Sprint 26.2 auf Basis des sauberen, mit `origin/main`
+identischen Commits `7bc0abc` implementiert und repositoryseitig validiert.
+Sprint 26.1 wurde zuvor mit `8789ee3` abgeschlossen.
 Release Candidate `1.0.0-rc.1` ist veröffentlicht; die JPEG-Härtung aus Sprint
 25.5 und die Kartenkorrekturen aus Sprint 25.6 gehören zum noch nicht neu
 getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/Safari- und verbleibende
@@ -14,6 +14,8 @@ Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-26.2-Ausgangscommit: `7bc0abc`
+- Sprint-26.1-Implementierungscommit: `8789ee3`
 - Sprint-26-Ausgangscommit: `6e94ea8`
 - Sprint-25.7-Ausgangscommit: `2cf2d23`
 - Sprint-25.6-Ausgangscommit: `91045b8`
@@ -138,6 +140,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 25.7 | Legacy iPad Kiosk Deployment & Guided Access Validation | Betriebsanleitung und Checkliste erstellt; physische iPad-mini-Abnahme offen |
 | 26 | Persistent Dashboard Sections | implementiert; physische iPad-mini-Abnahme offen |
 | 26.1 | Native Room Card MVP | implementiert; physische iPad-mini-Abnahme offen |
+| 26.2 | Controllable Entity Authorization & Climate Capability Hardening | implementiert und automatisiert validiert; Mehrgeräte-iPad-Abnahme offen |
 
 Benutzerdashboards unterstützen weiterhin Sensor-, Binary-, Light- und
 Climate-Widgets, mehrere persistente Profile, feste URLs, fünf Größenpresets,
@@ -559,18 +562,17 @@ vollbreite Rows für Minus/Plus und Power. Portrait, Landscape und Short Focus
 `-webkit-appearance: none`, `border-box`, feste 46/48/52/54/56-Pixel-
 Touchziele und die Sprint-17.6-SVG-Komponente bleiben erhalten. Weder
 CSS Grid, Flexbox-`gap`, Transform-Zentrierung noch gerätespezifische Pixel-
-Margins wurden ergänzt. Summary, Errors, Critical Detection und alle Write-
-Allowlists bleiben unverändert.
+Margins wurden ergänzt. Summary, Errors, Critical Detection und die damals
+bestehenden Write-Grenzen blieben in diesem Korrektursprint unverändert.
 
 ## 9. Sicherheitsgrenzen
 
-Sprint 17.3 ergänzt als einzige Schreibfunktion den engen Climate-Power-Pfad;
-es gibt weiterhin keinen generischen Service-Proxy und keine automatische
-Berechtigung. Die bestehenden Write-Allowlists in `src/routes/api.js` bleiben
-getrennt und inhaltlich unverändert:
-
-- Climate: `climate.esszimmer_thermostate`
-- Light: `light.esszimmer_lampen`
+Es gibt weiterhin nur die engen domain-spezifischen Endpunkte für Light Power,
+Climate Power und Climate-Sollwert; keinen generischen Service-Proxy und keine
+automatische Berechtigung aus Sichtbarkeit. Seit Sprint 26.2 stammen die
+serverseitigen Write-Freigaben aus validierten persistenten Widget-Control-
+Grants. Keine produktive Authorization hängt mehr von festen Test-Entity-IDs
+ab.
 
 Summary-/Error-Erkennung, Security-/Ignorierlisten, Dashboard-Sichtbarkeit,
 Admin-Inventar, Preview und Focus erteilen keinerlei Schreibrecht. HA-Token
@@ -829,8 +831,8 @@ werden mit Critical/Error/Warning beziehungsweise defensiv Info normalisiert;
 Der geschützte Read-only-Endpunkt
 `GET /api/admin/system-diagnostics/status` liefert ausschließlich Source-
 Status, Capabilities und TTLs. Es gibt keine Raw-Registry-, WebSocket-Proxy-,
-Repair-, Reload-, Reauth-, Registry- oder Matter-Schreibroute. Climate- und
-Light-Allowlists bleiben unverändert.
+Repair-, Reload-, Reauth-, Registry- oder Matter-Schreibroute. Die damaligen
+Climate-/Light-Write-Grenzen wurden in diesem read-only Sprint nicht erweitert.
 
 ## 16. Sprint 21.1 – Error Dashboard Device Aggregation & Navigation
 
@@ -908,9 +910,9 @@ Sprint-21.1-Gruppen übernehmen weiterhin die höchste Child-Severity, und nur
 eine echte `device_id` darf Entity-Issues zusammenfassen.
 
 Filter, Spaltenansicht und Risk Class fügen keine Route, keine Home-Assistant-
-Abfrage, keine Serviceaktion und keine Write-Berechtigung hinzu. Climate- und
-Light-Allowlists sowie Admin-, Registry-, Repair- und Matter-Sicherheitsgrenzen
-bleiben unverändert.
+Abfrage, keine Serviceaktion und keine Write-Berechtigung hinzu. Die damaligen
+Climate-/Light-Grenzen sowie Admin-, Registry-, Repair- und Matter-
+Sicherheitsgrenzen blieben in diesem Sprint unverändert.
 
 ## 18. Sprint 21.3 – Error-Filter und Critical Detection
 
@@ -2004,9 +2006,9 @@ zusätzlich die vorhandenen Summary-, Risk-, Severity-, Grace-, Flapping- und
 Recovery-Regeln. Dadurch gibt es weder N+1-HA-Abfragen noch eine zweite
 Security Engine.
 
-Direkt bedienbar sind ausschließlich Lights und Climate-Entities, die bereits
-von den bestehenden expliziten Backend-Endpunkten und unveränderten
-Write-Allowlists freigegeben sind. Switches, Covers, Fans, Media Player und
+Direkt bedienbar sind ausschließlich Lights und Climate-Entities, die über
+denselben expliziten persistenten Control Grant und die bestehenden engen
+Backend-Endpunkte freigegeben sind. Switches, Covers, Fans, Media Player und
 Locks erscheinen read-only. Es wurden keine neue HA-Schreibaktion, keine
 generische Service-Route, kein Browser-WebSocket zu HA und keine zusätzlichen
 Home-Assistant-App-Berechtigungen ergänzt. Room Cards werden inline erweitert
@@ -2043,3 +2045,129 @@ HA-Frontend-Editor und generische Actions wurden bewusst nicht übernommen.
 Künftige Erweiterungen können zusätzliche read-only Darstellungen oder neue
 explizit abgesicherte Domain-Endpunkte auf diesem nativen Modell ergänzen,
 ohne die aktuelle Sicherheits- oder Legacy-Grenze zu umgehen.
+
+## 29. Sprint 26.2 – Control Authorization und Climate Capability Hardening
+
+Sprint 26.2 startete auf dem sauberen, mit `origin/main` identischen Commit
+`7bc0abc`. Die Root Cause bestand aus drei voneinander unabhängigen
+Sonderfällen: `src/routes/api.js` autorisierte ausschließlich die fest
+codierten Esszimmer-Test-IDs; nur diese Entities erhielten deshalb öffentliche
+Gateway-Capabilities. `src/services/climate-power.js` kannte außerdem nur für
+das Esszimmer-Thermostat einen festen sicheren Einschaltmodus `heat`, während
+andere Mehrmodus-Thermostate keinen Power-Support bekamen. Schließlich
+verknüpften Backend, Grid, Focus und Room Card die Sollwertfähigkeit zusätzlich
+mit `state !== "off"` statt mit den echten Entity-Capabilities.
+
+Das Dashboardkonfigurationsschema ist additiv von 11 auf 12 erweitert. Jedes
+Widget besitzt nun serverseitig ein persistentes `control`-Objekt:
+
+```json
+{
+  "enabled": false,
+  "preferredOnMode": null
+}
+```
+
+Nur Light-, Climate- und Room-Widgets dürfen `enabled: true` verwenden. Ein
+Room-Grant gilt ausschließlich für seine explizit ausgewählten Lights und die
+einzelne Climate-Entity; er eröffnet keinen getrennten Write-Stack. Ein
+optionaler `preferredOnMode` muss ein sicher geformter Nicht-Off-Modus sein und
+wird nur für Climate ausgewertet. Widersprüchliche Präferenzen derselben
+Climate-Entity werden abgewiesen. Das öffentliche Dashboardpayload enthält
+den Grant nicht. Neue Widgets und Custom-Widgets aus Schema 11 bleiben nach
+Migration read-only. Nur die historischen Standard-Light-/Climate-Widgets
+behalten ihre bisherige Steuerbarkeit, anhand ihrer vollständigen statischen
+integrierte stabile Widget-ID plus Widget-Typ und nicht durch eine produktive
+API-Sonderbehandlung oder einen Vergleich fester Entity-IDs.
+
+Der Admin zeigt für direkte Light-/Climate-Cards und Room Cards die explizite
+Option „Steuerung erlauben“. Für Climate kann er aus den sanitisierten
+`hvac_modes` der vorhandenen Preview-Daten einen bevorzugten Einschaltmodus
+auswählen. Speichern und Vorschau verwenden das vorhandene Draft-/Batch-Modell.
+Die normale Entity-Sichtbarkeit, Area-Auswahl und Room-Auto-Setup erteilen
+keine Schreibberechtigung.
+
+`src/services/control-authorization.js` ist nun die gemeinsame serverseitige
+Quelle für Authorization und öffentliche Capabilities. Lights sind nur bei
+passendem Grant, Domain `light` und tatsächlichem Zustand `on`/`off`
+schaltbar. Climate Power benötigt einen Grant, Verfügbarkeit, einen echten
+`off`-Modus und mindestens einen tatsächlich unterstützten Nicht-Off-Modus.
+Die Einschaltwahl priorisiert den letzten beobachteten Nicht-Off-Modus, die
+konfigurierte Präferenz, den aktuellen Nicht-Off-Modus und danach einen
+deterministischen Modus aus der echten `hvac_modes`-Liste. Ein unsupported
+`heat` wird nie gesendet; Thermostate ohne `off` zeigen keinen falschen
+Power-Button.
+
+Climate-Sollwerte werden unabhängig vom Zustand `off` freigegeben, sofern der
+Grant, die Verfügbarkeit, `supported_features` sowie ein vollständiger Satz
+aus `temperature`, `min_temp`, `max_temp` und positivem
+`target_temp_step` dies erlauben. Der enge Endpoint sendet weiterhin
+ausschließlich `climate.set_temperature`; er ruft niemals zusätzlich
+`set_hvac_mode` auf. Minimum, Maximum und Schritt werden pro Entity geprüft.
+Lehnt eine HA-Integration einen Off-State-Sollwert ab, liefert der Gateway eine
+verständliche kontrollierte Fehlermeldung und das ES5-Frontend stellt sofort
+den zuletzt bestätigten Sollwert wieder her.
+
+Grid, Sprint-17.5-Focus und Sprint-26.1-Room Card konsumieren dieselben vier
+Climate-Capabilities `can_set_temperature`, `supports_power`, `can_power_on`
+und `can_power_off` sowie die gemeinsamen Light-Capabilities. Snapshot und
+Room-Projektion übernehmen dafür nur die benötigten sanitisierten Felder
+`supported_features` und `hvac_modes`. Es wurden weder ein generischer
+Service-Proxy noch eine Browser-HA-WebSocket-Verbindung, neue Domains,
+Registry-/Area-/Label-Writes oder zusätzliche Home-Assistant-App-Rechte
+eingeführt. HA- und Supervisor-Tokens bleiben backend-only; Write-Rate-Limits,
+Payload-/Domainprüfung und die drei vorhandenen engen Endpunkte bleiben
+erhalten.
+
+### Sprint-26.2-Abschlussmatrix
+
+Die Matrix wurde aus dem tatsächlichen Code und den ausführbaren Tests erstellt,
+nicht aus dem vorherigen Projektstatus. `NOT TESTED` wird bewusst für physisch
+nicht verfügbare Geräte-/Integrationsprüfungen verwendet.
+
+| Anforderung | Status | Nachweis |
+|---|---|---|
+| A – Root Cause: Hardcodes, Allowlists und UI-Gates | PASS | Git-Diff, API, Climate-Service und Grid-/Focus-/Room-Renderer |
+| B – Sichtbarkeit bleibt von Write Authorization getrennt | PASS | Schema 12; öffentlicher Payload entfernt `control` |
+| C – persistente Admin-Option „Steuerung erlauben“ | PASS | direkter Widget-Editor, Room-Editor und geschützte Admin-API |
+| D – keine Runtime-Sonderfälle für Test-Entity-IDs | PASS | zentrale Grant-Auflösung; Migration nutzt integrierte Widget-ID plus Typ |
+| E – nur vorhandene explizite Write-Domains | PASS | Light Power, Climate Power, Climate Target; keine weitere Domain |
+| F/G – autorisierte verfügbare Lights unabhängig von ID On/Off | PASS | Original-Light plus zwei zusätzliche Light-IDs im localhost-Gateway-Test |
+| Light unavailable / unauthorized / falsche Domain / unbekannt | PASS | 503 / 403 / 403 / 404 ohne Serviceaufruf |
+| H – Climate Capability Audit | PASS | `hvac_modes`, `supported_features`, Temperaturgrenzen und `hvac_action` sanitisiert; Range-only sicher read-only |
+| I – Power nur mit `off` plus Nicht-Off-Modus | PASS | Capability-Matrix und bedingtes Grid-/Focus-/Room-Rendering |
+| J – sichere On-Mode-Auflösung | PASS | letzter Modus, Präferenz, aktueller Modus, deterministischer echter Fallback |
+| K – Preferred On Mode aus tatsächlichen Preview-Modi | PASS | Admin-Auswahl ohne `off`; stale/unsupported Präferenz wird nie gesendet |
+| Browser fordert unsupported On-Mode an | PASS | 400; der Browser darf keinen HVAC-Modus vorgeben |
+| L/M – Sollwert in `off` capability-basiert | PASS | Backend und alle drei Oberflächen ohne Off-Gate |
+| Off-State-Sollwert schaltet nicht ein | PASS | Integrationstest bestätigt ausschließlich `climate.set_temperature` |
+| N – Integration lehnt Off-State-Sollwert ab | PASS | kontrollierter 502-Fehler und Rollback auf letzten bestätigten Wert |
+| O – entity-spezifische Min/Max/Step-Validierung | PASS | exakte Grenzen, Unter-/Überschreitung und Step-Normalisierung getestet |
+| P – `off` verfügbar, unknown/unavailable sicher deaktiviert | PASS | Capability- und Gateway-Tests |
+| Q – gemeinsames Modell für Grid, Focus und Room | PASS | zentrale Serverprojektion; Room nutzt denselben Grant/Capabilities-Payload |
+| R – Server validiert Entity, Domain, Intent, Payload und Capability | PASS | enge Routes, Grant-, Werte-, Modus- und Range-Prüfung plus Rate Limits |
+| S – kein generischer Service-Proxy | PASS | Source-/Security-Regression; Browser kann Domain/Service nicht wählen |
+| HA-/Supervisor-Token backend-only, kein Browser-HA-WebSocket | PASS | vollständige Security-, App- und Standalone-Regression |
+| Safari iOS 9 / ES5 und Sprint-25/26-Regression | PASS | Syntax-/ES5-Prüfung und vollständige Suite |
+| Sprint-26.1-Room-Integration innerhalb des vorhandenen Integrationspunkts | PASS | keine zweite Permission-Logik; vorhandene Room-Control-Tests grün |
+| vollständiger separater Sprint-26.1-Audit | NOT TESTED | ausdrücklich außerhalb dieses Sprint-26.2-Auftrags |
+| reales iPad mini mit zwei Lights und zwei Thermostaten | NOT TESTED | physische Abnahme weiterhin erforderlich |
+
+Die automatisierten Tests verwenden neben den historischen Entities zwei
+weitere unterschiedliche Lights und zwei weitere Thermostate. Der
+localhost-HA-Mock bestätigt On/Off für beide Lights, `auto` beziehungsweise
+`cool` als unterschiedliche sichere Climate-Einschaltmodi sowie einen
+Off-State-Sollwert ohne Power-Aufruf. Migration, verweigerte Custom-Grants,
+Room-Grant-Wiederverwendung, unavailable/unauthorized, echte Temperaturgrenzen,
+optimistischer Rollback, ES5, fehlender generischer Service-Proxy und die
+vollständige bestehende Regression werden ebenfalls geprüft. Alle 326 Tests
+bestanden; alle geänderten JavaScript-Dateien bestanden `node --check`.
+
+Auf dem echten iPad mini bleiben mindestens folgende Tests offen: zwei
+unterschiedliche Lights jeweils ein- und ausschalten; zwei unterschiedliche
+Thermostate jeweils aus- und einschalten; bei beiden Thermostaten Sollwert
+Minus/Plus im ausgeschalteten und eingeschalteten Zustand; sicherstellen, dass
+der Off-State-Sollwert nicht einschaltet; Power und Sollwert zusätzlich in
+Grid, Focus und einer Room Card prüfen. Integrationen, die Sollwerte in `off`
+grundsätzlich ablehnen, bleiben bewusst nicht erzwingbar und müssen den
+kontrollierten Fehler samt Wert-Rollback zeigen.

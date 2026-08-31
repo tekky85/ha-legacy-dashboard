@@ -165,6 +165,7 @@
                     },
                     gateway_capabilities: {
                         can_set_temperature: true,
+                        supports_power: true,
                         can_power_off: true
                     }
                 }
@@ -186,6 +187,7 @@
                     },
                     gateway_capabilities: {
                         can_set_temperature: true,
+                        supports_power: true,
                         can_power_off: true
                     }
                 }
@@ -207,6 +209,7 @@
                     },
                     gateway_capabilities: {
                         can_set_temperature: true,
+                        supports_power: true,
                         can_power_off: true
                     }
                 }
@@ -227,6 +230,7 @@
                         hvac_action: "off"
                     },
                     gateway_capabilities: {
+                        supports_power: true,
                         can_power_on: true
                     }
                 }

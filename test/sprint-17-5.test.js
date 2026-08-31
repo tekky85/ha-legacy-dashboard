@@ -81,12 +81,12 @@ test("Focus besitzt View Model und typgetrennte native Renderer", function () {
     assert.match(renderer, /function renderClimateFocus/);
     assert.match(html, /class="focus-panel"/);
     assert.ok(
-        html.indexOf("/js/focus/view-model.js?v=49") <
-            html.indexOf("/js/focus/renderer.js?v=49")
+        html.indexOf("/js/focus/view-model.js?v=50") <
+            html.indexOf("/js/focus/renderer.js?v=50")
     );
     assert.ok(
-        html.indexOf("/js/focus/renderer.js?v=49") <
-            html.indexOf("/js/focus/focus.js?v=49")
+        html.indexOf("/js/focus/renderer.js?v=50") <
+            html.indexOf("/js/focus/focus.js?v=50")
     );
 });
 
@@ -173,6 +173,7 @@ test("Climate Focus hält Ist, Soll und autorisierte Controls bedienbar", functi
             },
             gateway_capabilities: {
                 can_set_temperature: true,
+                supports_power: true,
                 can_power_off: true,
                 can_power_on: false
             }
@@ -211,6 +212,7 @@ test("Unavailable Focus bleibt groß und deaktiviert alle Writes", function () {
             attributes: {},
             gateway_capabilities: {
                 can_set_temperature: true,
+                supports_power: true,
                 can_power_on: true
             }
         }
@@ -291,8 +293,9 @@ test("Sprint 17.5 bleibt ES5 und verändert keine Backend-Write-Fläche", functi
         });
     });
 
-    assert.match(api, /"climate\.esszimmer_thermostate"/);
-    assert.match(api, /"light\.esszimmer_lampen"/);
+    assert.match(api, /controlAuthorization\.climateCapabilities/);
+    assert.match(api, /controlAuthorization\.lightCapabilities/);
+    assert.doesNotMatch(api, /ALLOWED_(?:LIGHT|CLIMATE)_ENTITIES/);
     assert.doesNotMatch(api, /body\.(?:domain|service|service_data)/);
     assert.doesNotMatch(
         read("src/public/js/focus/focus.js") +

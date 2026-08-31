@@ -138,6 +138,24 @@ geändert werden. Room Card und Dashboard-Abschnitt besitzen voneinander
 unabhängige `areaId`-Referenzen. Optional verwendet jede Room Card ein eigenes,
 über dieselbe sichere JPEG-/PNG-Architektur gespeichertes Hintergrundbild.
 
+Sichtbarkeit und Schreibberechtigung sind getrennt. Light-, Climate- und Room-
+Cards erhalten im Admin die persistente Option **Steuerung erlauben**. Nur
+diese explizite Freigabe aktiviert serverseitig die vorhandenen engen
+Endpunkte für Light Power, Climate Power und Climate-Zieltemperatur; das
+Hinzufügen einer sichtbaren Entity allein erteilt keine Schreibrechte. Room
+Cards verwenden exakt dasselbe Freigabemodell und keine eigene Allowlist.
+
+Climate Power wird pro Entity aus den tatsächlichen `hvac_modes` abgeleitet.
+Ein Power-Button erscheint nur, wenn `off` und mindestens ein unterstützter
+Nicht-Off-Modus vorhanden sind. Beim Einschalten wird der letzte bekannte,
+ein ausdrücklich gewählter oder ein deterministisch unterstützter Modus
+verwendet; ein nicht unterstütztes `heat` wird niemals erzwungen. Unterstützt
+die Integration Sollwerte im Off-Zustand, bleiben Minus/Plus bedienbar, ohne
+das Thermostat einzuschalten. Minimum, Maximum und Schritt stammen immer von
+der konkreten Entity. Lehnt eine Integration Off-State-Sollwerte ab, wird der
+letzte bestätigte Wert wiederhergestellt und eine verständliche Fehlermeldung
+angezeigt.
+
 ### iPad mini als Wall-Display
 
 Für ein einzelnes iPad mini 1 mit iOS 9.3.5 ist **Geführter Zugriff** der
@@ -171,6 +189,8 @@ Dazu gehören unter anderem:
 - optional vorhandene Home-Assistant-Areas read-only referenzieren
 - Entities auswählen
 - Widgets hinzufügen und bearbeiten
+- Light-/Climate-Steuerung ausdrücklich erlauben und für Climate optional
+  einen tatsächlich unterstützten Einschaltmodus wählen
 - native Room Cards erstellen, Area-Vorschläge prüfen und Entity-Zuordnungen
   manuell überschreiben
 - Room-Card-Hintergründe sicher hochladen, voranzeigen, ersetzen oder entfernen

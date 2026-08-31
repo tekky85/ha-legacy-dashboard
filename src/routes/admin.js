@@ -209,6 +209,26 @@ function findWidgetIndex(
 }
 
 
+function normalizeIncomingWidget(widget) {
+
+    const normalized = Object.assign({}, widget);
+
+    if (
+        !normalized.control ||
+        typeof normalized.control !== "object" ||
+        Array.isArray(normalized.control)
+    ) {
+        normalized.control = {
+            enabled: false,
+            preferredOnMode: null
+        };
+    }
+
+    return normalized;
+
+}
+
+
 function persistConfiguration(res, candidate) {
 
     try {
@@ -472,6 +492,17 @@ function sanitizePreviewEntity(state) {
         finiteOrNull(attributes.max_temp);
     entity.target_temperature_step =
         finiteOrNull(attributes.target_temp_step);
+    entity.supported_features =
+        finiteOrNull(attributes.supported_features);
+    entity.hvac_modes = Array.isArray(attributes.hvac_modes)
+        ? attributes.hvac_modes.filter(function (mode, index, modes) {
+            return (
+                typeof mode === "string" &&
+                /^[a-z0-9_]+$/.test(mode) &&
+                modes.indexOf(mode) === index
+            );
+        }).slice(0, 32)
+        : [];
     entity.hvac_action =
         typeof attributes.hvac_action === "string"
             ? attributes.hvac_action
@@ -562,7 +593,9 @@ router.post("/dashboards", function (req, res) {
                 : [],
         widgets:
             Array.isArray(body.widgets)
-                ? body.widgets
+                ? body.widgets.map(
+                    normalizeIncomingWidget
+                )
                 : []
     };
 
@@ -647,7 +680,13 @@ router.put("/dashboards/:dashboardId", function (req, res) {
                 : current.sections,
         widgets:
             typeof body.widgets !== "undefined"
-                ? body.widgets
+                ? (
+                    Array.isArray(body.widgets)
+                        ? body.widgets.map(
+                            normalizeIncomingWidget
+                        )
+                        : body.widgets
+                )
                 : current.widgets,
         layouts:
             typeof body.layouts !== "undefined"
@@ -1091,6 +1130,13 @@ router.post(
                 dashboardConfig.DEFAULT_WIDGET_SIZE;
         }
 
+        if (typeof widget.control === "undefined") {
+            widget.control = {
+                enabled: false,
+                preferredOnMode: null
+            };
+        }
+
         const dashboard =
             candidate.dashboards[dashboardIndex];
 
@@ -1228,6 +1274,10 @@ router.put(
                 typeof body.size !== "undefined"
                     ? body.size
                     : current.size,
+            control:
+                typeof body.control !== "undefined"
+                    ? body.control
+                    : current.control,
             room:
                 typeof body.room !== "undefined"
                     ? body.room

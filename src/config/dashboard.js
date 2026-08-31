@@ -2,7 +2,7 @@
  * Versioned dashboard configuration.
  *
  * Dashboard visibility controls display and read access only. Writable
- * entities remain separately allowlisted in src/routes/api.js.
+ * entities require a separate, explicit and persisted widget control grant.
  */
 
 const path = require("path");
@@ -21,7 +21,8 @@ const IssueRules =
 const DashboardBackgrounds =
     require("../services/dashboard-backgrounds");
 
-const SCHEMA_VERSION = 11;
+const SCHEMA_VERSION = 12;
+const CONTROL_SCHEMA_VERSION = 12;
 const ROOM_SCHEMA_VERSION = 11;
 const SECTION_SCHEMA_VERSION = 10;
 const APPEARANCE_SCHEMA_VERSION = 9;
@@ -56,6 +57,9 @@ const AREA_ID_PATTERN =
     /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
 
 const DOMAIN_PATTERN =
+    /^[a-z0-9_]+$/;
+
+const HVAC_MODE_PATTERN =
     /^[a-z0-9_]+$/;
 
 const RISK_CLASSES = [
@@ -288,6 +292,15 @@ const DEFAULT_CONFIGURATION = {
 
 
 DEFAULT_CONFIGURATION.dashboards.forEach(function (dashboard) {
+    dashboard.widgets.forEach(function (widget) {
+        widget.control = {
+            enabled:
+                widget.type === "light" ||
+                widget.type === "climate",
+            preferredOnMode: null
+        };
+    });
+
     dashboard.layouts =
         Layout.createLayouts(dashboard.widgets);
 });
@@ -316,6 +329,7 @@ function validateConfigurationVersion(candidate, schemaVersion) {
 
     const dashboardIds = Object.create(null);
     const widgetIds = Object.create(null);
+    const controlGrants = Object.create(null);
 
 
     if (
@@ -501,6 +515,13 @@ function validateConfigurationVersion(candidate, schemaVersion) {
                 throw error;
             }
 
+            if (schemaVersion >= CONTROL_SCHEMA_VERSION) {
+                validateWidgetControl(
+                    widget,
+                    controlGrants
+                );
+            }
+
         });
 
 
@@ -531,6 +552,141 @@ function validateConfigurationVersion(candidate, schemaVersion) {
 
 
     return true;
+
+}
+
+
+function controllableWidgetEntities(widget) {
+
+    const entities = [];
+
+    if (widget.type === "light") {
+        entities.push({
+            entityId: widget.entity,
+            domain: "light"
+        });
+    } else if (widget.type === "climate") {
+        entities.push({
+            entityId: widget.entity,
+            domain: "climate"
+        });
+    } else if (widget.type === "room" && widget.room) {
+        (widget.room.entities.lights || []).forEach(function (entityId) {
+            entities.push({
+                entityId: entityId,
+                domain: "light"
+            });
+        });
+
+        if (widget.room.entities.climate) {
+            entities.push({
+                entityId: widget.room.entities.climate,
+                domain: "climate"
+            });
+        }
+    }
+
+    return entities;
+
+}
+
+
+function validateWidgetControl(widget, controlGrants) {
+
+    const control = widget.control;
+    const supportsControl =
+        widget.type === "light" ||
+        widget.type === "climate" ||
+        widget.type === "room";
+
+    if (
+        !control ||
+        typeof control !== "object" ||
+        Array.isArray(control) ||
+        typeof control.enabled !== "boolean" ||
+        (
+            control.preferredOnMode !== null &&
+            (
+                typeof control.preferredOnMode !== "string" ||
+                !HVAC_MODE_PATTERN.test(control.preferredOnMode) ||
+                control.preferredOnMode === "off"
+            )
+        )
+    ) {
+        throw new Error(
+            "Widget-Steuerfreigabe ist ungültig: " + widget.id
+        );
+    }
+
+    if (!supportsControl && control.enabled) {
+        throw new Error(
+            "Widget-Typ darf nicht steuerbar sein: " + widget.id
+        );
+    }
+
+    if (
+        widget.type === "light" &&
+        control.preferredOnMode !== null
+    ) {
+        throw new Error(
+            "Light-Steuerfreigabe enthält einen HVAC-Modus: " + widget.id
+        );
+    }
+
+    if (
+        widget.type === "room" &&
+        !widget.room.entities.climate &&
+        control.preferredOnMode !== null
+    ) {
+        throw new Error(
+            "Room-Steuerfreigabe enthält ohne Climate einen HVAC-Modus: " +
+            widget.id
+        );
+    }
+
+    if (!control.enabled) {
+        return;
+    }
+
+    controllableWidgetEntities(widget).forEach(function (definition) {
+        const actualDomain = definition.entityId.split(".")[0];
+        const preferredOnMode =
+            definition.domain === "climate"
+                ? control.preferredOnMode
+                : null;
+        const existing = controlGrants[definition.entityId];
+
+        if (actualDomain !== definition.domain) {
+            throw new Error(
+                "Steuerbare Entity hat die falsche Domain: " +
+                definition.entityId
+            );
+        }
+
+        if (
+            existing &&
+            existing.preferredOnMode !== null &&
+            preferredOnMode !== null &&
+            existing.preferredOnMode !== preferredOnMode
+        ) {
+            throw new Error(
+                "Climate-Einschaltmodus ist widersprüchlich: " +
+                definition.entityId
+            );
+        }
+
+        if (!existing) {
+            controlGrants[definition.entityId] = {
+                domain: definition.domain,
+                preferredOnMode: preferredOnMode
+            };
+        } else if (
+            existing.preferredOnMode === null &&
+            preferredOnMode !== null
+        ) {
+            existing.preferredOnMode = preferredOnMode;
+        }
+    });
 
 }
 
@@ -1103,7 +1259,8 @@ function cloneWidget(widget) {
         size:
             typeof widget.size === "string"
                 ? widget.size
-                : DEFAULT_WIDGET_SIZE
+                : DEFAULT_WIDGET_SIZE,
+        control: cloneWidgetControl(widget.control)
     };
 
     if (widget.type === "room" && widget.room) {
@@ -1111,6 +1268,47 @@ function cloneWidget(widget) {
     }
 
     return cloned;
+
+}
+
+
+function cloneWidgetControl(control) {
+
+    const source = control || {};
+
+    return {
+        enabled: source.enabled === true,
+        preferredOnMode:
+            typeof source.preferredOnMode === "string"
+                ? source.preferredOnMode
+                : null
+    };
+
+}
+
+
+function legacyWidgetControl(widget) {
+
+    let matched = null;
+
+    DEFAULT_CONFIGURATION.dashboards.some(function (dashboard) {
+        return dashboard.widgets.some(function (defaultWidget) {
+            if (
+                defaultWidget.id === widget.id &&
+                defaultWidget.type === widget.type
+            ) {
+                matched = cloneWidgetControl(defaultWidget.control);
+                return true;
+            }
+
+            return false;
+        });
+    });
+
+    return matched || {
+        enabled: false,
+        preferredOnMode: null
+    };
 
 }
 
@@ -1192,7 +1390,8 @@ function migrateConfiguration(candidate) {
             candidate.schemaVersion !== CRITICAL_DETECTION_SCHEMA_VERSION &&
             candidate.schemaVersion !== RULES_SCHEMA_VERSION &&
             candidate.schemaVersion !== APPEARANCE_SCHEMA_VERSION &&
-            candidate.schemaVersion !== SECTION_SCHEMA_VERSION
+            candidate.schemaVersion !== SECTION_SCHEMA_VERSION &&
+            candidate.schemaVersion !== ROOM_SCHEMA_VERSION
         )
     ) {
         return {
@@ -1233,6 +1432,10 @@ function migrateConfiguration(candidate) {
         dashboard.widgets.forEach(function (widget) {
             if (candidate.schemaVersion < SECTION_SCHEMA_VERSION) {
                 widget.sectionId = null;
+            }
+
+            if (candidate.schemaVersion < CONTROL_SCHEMA_VERSION) {
+                widget.control = legacyWidgetControl(widget);
             }
         });
 
@@ -1699,11 +1902,59 @@ function publicWidget(widget) {
 
     const cloned = cloneWidget(widget);
 
+    delete cloned.control;
+
     if (cloned.type === "room") {
         cloned.room = publicRoomConfiguration(widget.room);
     }
 
     return cloned;
+
+}
+
+
+function getControlAuthorization(entityId) {
+
+    let authorization = null;
+
+    if (
+        typeof entityId !== "string" ||
+        !ENTITY_ID_PATTERN.test(entityId)
+    ) {
+        return null;
+    }
+
+    ensureConfiguration().dashboards.forEach(function (dashboard) {
+        dashboard.widgets.forEach(function (widget) {
+            if (!widget.control || widget.control.enabled !== true) {
+                return;
+            }
+
+            controllableWidgetEntities(widget).forEach(function (definition) {
+                if (definition.entityId !== entityId) {
+                    return;
+                }
+
+                if (!authorization) {
+                    authorization = {
+                        entityId: entityId,
+                        domain: definition.domain,
+                        preferredOnMode: null
+                    };
+                }
+
+                if (
+                    definition.domain === "climate" &&
+                    typeof widget.control.preferredOnMode === "string"
+                ) {
+                    authorization.preferredOnMode =
+                        widget.control.preferredOnMode;
+                }
+            });
+        });
+    });
+
+    return authorization;
 
 }
 
@@ -1845,6 +2096,7 @@ module.exports = {
     getDirectVisibleEntityIds: getDirectVisibleEntityIds,
     getRoomWidgets: getRoomWidgets,
     roomEntityIds: roomEntityIds,
+    getControlAuthorization: getControlAuthorization,
     getRefreshIntervalMs: getRefreshIntervalMs,
     validateConfiguration: validateConfiguration,
     cloneConfiguration: cloneConfiguration,

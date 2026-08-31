@@ -348,8 +348,12 @@ ClimateWidget.prototype.render =
         var temperatureAvailable =
 
             available &&
-            state !== "off" &&
             capabilities.can_set_temperature === true;
+
+
+        var powerVisible =
+
+            capabilities.supports_power === true;
 
 
         var canPower =
@@ -752,16 +756,20 @@ ClimateWidget.prototype.render =
                     '</button>' +
 
 
-                    LegacyControls.powerButton({
-                        className: "climate-power-control",
-                        entity: this.entity,
-                        state: state === "off" ? "off" : "on",
-                        available: canPower,
-                        disabled: !canPower,
-                        label: state === "off"
-                            ? "Thermostat einschalten"
-                            : "Thermostat ausschalten"
-                    }) +
+                    (
+                        powerVisible
+                            ? LegacyControls.powerButton({
+                                className: "climate-power-control",
+                                entity: this.entity,
+                                state: state === "off" ? "off" : "on",
+                                available: canPower,
+                                disabled: !canPower,
+                                label: state === "off"
+                                    ? "Thermostat einschalten"
+                                    : "Thermostat ausschalten"
+                            })
+                            : ""
+                    ) +
 
 
                     '</div>' +

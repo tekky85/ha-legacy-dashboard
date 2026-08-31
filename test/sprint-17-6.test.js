@@ -89,6 +89,7 @@ test("Power Control verwendet in Grid und Focus denselben SVG-Renderer", functio
             },
             gateway_capabilities: {
                 can_set_temperature: true,
+                supports_power: true,
                 can_power_off: true
             }
         }
@@ -202,8 +203,9 @@ test("Sprint 17.6 bleibt ES5 und erweitert keine Write-Fläche", function () {
         });
     });
 
-    assert.match(api, /"climate\.esszimmer_thermostate"/);
-    assert.match(api, /"light\.esszimmer_lampen"/);
+    assert.match(api, /controlAuthorization\.climateCapabilities/);
+    assert.match(api, /controlAuthorization\.lightCapabilities/);
+    assert.doesNotMatch(api, /ALLOWED_(?:LIGHT|CLIMATE)_ENTITIES/);
     assert.doesNotMatch(api, /body\.(?:domain|service|service_data)/);
     assert.doesNotMatch(
         read("src/public/js/controls/power.js") +

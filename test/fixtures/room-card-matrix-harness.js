@@ -57,7 +57,7 @@
         return {
             "sensor.temperature": state("sensor.temperature", "21.5", {unit_of_measurement: "°C"}),
             "sensor.humidity": state("sensor.humidity", "48", {unit_of_measurement: "%"}),
-            "climate.main": state("climate.main", "heat", {temperature: 22.5, min_temp: 5, max_temp: 35, target_temp_step: 0.5}, {can_set_temperature: true, can_power_off: true}),
+            "climate.main": state("climate.main", "heat", {temperature: 22.5, min_temp: 5, max_temp: 35, target_temp_step: 0.5}, {can_set_temperature: true, supports_power: true, can_power_off: true}),
             "binary_sensor.presence": state("binary_sensor.presence", "on"),
             "binary_sensor.window_one": state("binary_sensor.window_one", "on"),
             "binary_sensor.window_two": state("binary_sensor.window_two", "off"),

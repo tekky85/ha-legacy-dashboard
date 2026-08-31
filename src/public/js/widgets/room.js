@@ -126,15 +126,17 @@ RoomWidget.prototype.climateControls = function (state, entityId) {
     var maximum = parseFloat(attributes.max_temp);
     var available;
     var powerAvailable;
+    var powerVisible;
 
     if (isNaN(step) || step <= 0) { step = 0.5; }
     if (isNaN(minimum)) { minimum = 5; }
     if (isNaN(maximum)) { maximum = 35; }
 
     available = !this.controlsDisabled &&
-        state.state !== "off" && state.state !== "unknown" &&
+        state.state !== "unknown" &&
         state.state !== "unavailable" && !isNaN(target) &&
         capabilities.can_set_temperature === true;
+    powerVisible = capabilities.supports_power === true;
     powerAvailable = !this.controlsDisabled && (state.state === "off"
         ? capabilities.can_power_on === true
         : capabilities.can_power_off === true);
@@ -151,16 +153,18 @@ RoomWidget.prototype.climateControls = function (state, entityId) {
             entityId, 1, target, step, minimum, maximum,
             available && target + step <= maximum + 0.000001
         ) +
-        LegacyControls.powerButton({
-            className: "climate-power-control room-climate-power-control",
-            entity: entityId,
-            state: state.state === "off" ? "off" : "on",
-            available: powerAvailable,
-            disabled: !powerAvailable,
-            label: state.state === "off"
-                ? "Thermostat einschalten"
-                : "Thermostat ausschalten"
-        }),
+        (powerVisible
+            ? LegacyControls.powerButton({
+                className: "climate-power-control room-climate-power-control",
+                entity: entityId,
+                state: state.state === "off" ? "off" : "on",
+                available: powerAvailable,
+                disabled: !powerAvailable,
+                label: state.state === "off"
+                    ? "Thermostat einschalten"
+                    : "Thermostat ausschalten"
+            })
+            : ""),
         {className: "room-climate-control-row", groupClassName: "room-climate-control-group"}
     );
 };
@@ -213,13 +217,25 @@ RoomWidget.prototype.render = function (states, alerts, controlsDisabled) {
     var presence = this.stateFor(states, entities.presence);
     var openWindows = this.openWindowCount(states);
     var roomAlerts = alerts || [];
-    var controlCount = entities.climate ? 3 : 0;
+    var controlCount = 0;
     var background = this.room.background;
     var backgroundStyle = "";
     var expanded = !this.room.collapsible || this.expanded;
     var lists;
 
     this.controlsDisabled = Boolean(controlsDisabled);
+
+    if (entities.climate) {
+        var climateCapabilities =
+            climate && climate.gateway_capabilities || {};
+
+        if (climateCapabilities.can_set_temperature === true) {
+            controlCount += 2;
+        }
+        if (climateCapabilities.supports_power === true) {
+            controlCount += 1;
+        }
+    }
 
     if (background && typeof background.image_url === "string" &&
         /^\/assets\/backgrounds\/bg-[a-f0-9]{32}\.(?:jpg|png)$/.test(

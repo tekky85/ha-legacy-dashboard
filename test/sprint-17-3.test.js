@@ -48,22 +48,52 @@ test("Climate-Power-Capability ist serverseitig eindeutig", function () {
             "climate.ambiguous",
             {state: "off", attributes: {hvac_modes: ["off", "cool", "dry"]}}
         ),
-        null
+        "cool"
     );
-    assert.deepEqual(
-        climatePower.capabilities(
+    const offCapabilities = climatePower.capabilities(
             "climate.esszimmer_thermostate",
-            {state: "off", attributes: {hvac_modes: ["off", "heat", "cool"]}}
-        ),
-        {canPowerOn: true, canPowerOff: false}
-    );
-    assert.deepEqual(
-        climatePower.capabilities(
+            {
+                state: "off",
+                attributes: {
+                    hvac_modes: ["off", "heat", "cool"],
+                    supported_features: 1,
+                    temperature: 20,
+                    min_temp: 10,
+                    max_temp: 30,
+                    target_temp_step: 0.5
+                }
+            },
+            {
+                entityId: "climate.esszimmer_thermostate",
+                domain: "climate",
+                preferredOnMode: null
+            }
+        );
+    const onCapabilities = climatePower.capabilities(
             "climate.esszimmer_thermostate",
-            {state: "heat", attributes: {hvac_modes: ["off", "heat", "cool"]}}
-        ),
-        {canPowerOn: false, canPowerOff: true}
+            {
+                state: "heat",
+                attributes: {
+                    hvac_modes: ["off", "heat", "cool"],
+                    supported_features: 1,
+                    temperature: 20,
+                    min_temp: 10,
+                    max_temp: 30,
+                    target_temp_step: 0.5
+                }
+            },
+            {
+                entityId: "climate.esszimmer_thermostate",
+                domain: "climate",
+                preferredOnMode: null
+            }
     );
+
+    assert.equal(offCapabilities.canPowerOn, true);
+    assert.equal(offCapabilities.canPowerOff, false);
+    assert.equal(offCapabilities.canSetTemperature, true);
+    assert.equal(onCapabilities.canPowerOn, false);
+    assert.equal(onCapabilities.canPowerOff, true);
 });
 
 
@@ -223,8 +253,9 @@ test("Sprint-17.3 wahrt ES5 und die Write-Sicherheitsgrenzen", function () {
     const api = read("src/routes/api.js");
     const adminRoute = read("src/routes/admin.js");
 
-    assert.match(api, /"climate\.esszimmer_thermostate"/);
-    assert.match(api, /"light\.esszimmer_lampen"/);
+    assert.match(api, /controlAuthorization\.climateCapabilities/);
+    assert.match(api, /controlAuthorization\.lightCapabilities/);
+    assert.doesNotMatch(api, /ALLOWED_(?:LIGHT|CLIMATE)_ENTITIES/);
     assert.match(api, /"set_hvac_mode"/);
     assert.doesNotMatch(api, /body\.(?:domain|service|service_data)/);
     assert.match(adminRoute, /router\.get\("\/preview"/);

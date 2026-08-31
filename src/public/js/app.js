@@ -232,6 +232,9 @@ var dashboardRefreshBlockedUntil =
 var pendingClimateUpdate =
     null;
 
+var climateRollbackTargets =
+    {};
+
 var climateUpdateTimer =
     null;
 
@@ -896,15 +899,6 @@ function sendPendingClimateTemperature() {
                 false;
 
 
-            if (pendingClimateUpdate !== null) {
-
-                scheduleClimateTemperatureUpdate();
-
-                return;
-
-            }
-
-
             if (
 
                 response &&
@@ -924,6 +918,19 @@ function sendPendingClimateTemperature() {
             }
 
 
+            if (pendingClimateUpdate !== null) {
+
+                climateRollbackTargets[
+                    update.entityId
+                ] = acceptedTemperature;
+
+                scheduleClimateTemperatureUpdate();
+
+                return;
+
+            }
+
+
             dashboardRefreshBlockedUntil =
 
                 new Date().getTime() +
@@ -939,6 +946,11 @@ function sendPendingClimateTemperature() {
                 update.step
 
             );
+
+
+            delete climateRollbackTargets[
+                update.entityId
+            ];
 
 
             if (status) {
@@ -985,6 +997,26 @@ function sendPendingClimateTemperature() {
 
                 new Date().getTime() +
                 3000;
+
+
+            if (
+                Object.prototype.hasOwnProperty.call(
+                    climateRollbackTargets,
+                    update.entityId
+                )
+            ) {
+                updateClimateTargetDisplay(
+                    update.entityId,
+                    climateRollbackTargets[
+                        update.entityId
+                    ],
+                    update.step
+                );
+
+                delete climateRollbackTargets[
+                    update.entityId
+                ];
+            }
 
 
             if (status) {
@@ -1175,6 +1207,17 @@ function setClimateTemperature(
         decimalPlaces(step)
 
     );
+
+
+    if (
+        !Object.prototype.hasOwnProperty.call(
+            climateRollbackTargets,
+            entityId
+        )
+    ) {
+        climateRollbackTargets[entityId] =
+            target;
+    }
 
 
     updateClimateTargetDisplay(

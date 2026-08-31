@@ -206,6 +206,14 @@
             unit: "",
             order: maxOrder + 10,
             visible: fields.visible !== false,
+            control: {
+                enabled: fields.controlEnabled === true,
+                preferredOnMode:
+                    typeof fields.preferredOnMode === "string" &&
+                    fields.preferredOnMode
+                        ? fields.preferredOnMode
+                        : null
+            },
             sectionId: validateSection(dashboard, fields.sectionId),
             size: validateSize(fields.size || "large"),
             room: {
@@ -240,6 +248,14 @@
 
         widget.title = title;
         widget.visible = fields.visible !== false;
+        widget.control = {
+            enabled: fields.controlEnabled === true,
+            preferredOnMode:
+                typeof fields.preferredOnMode === "string" &&
+                fields.preferredOnMode
+                    ? fields.preferredOnMode
+                    : null
+        };
         widget.size = validateSize(fields.size);
         widget.room.areaId = fields.areaId || null;
         widget.room.collapsible = fields.collapsible !== false;

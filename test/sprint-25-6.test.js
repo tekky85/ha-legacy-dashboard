@@ -295,11 +295,17 @@ test("Representative States rendern genau die erwarteten Inhalte und Controls", 
             assert.equal(stepCount, 0);
             assert.equal(powerCount, 1);
         } else {
+            const capabilities =
+                entry.state.data.gateway_capabilities || {};
+
             assert.match(html, /class="climate-current-value"/);
             assert.match(html, /class="climate-target-value"/);
             assert.match(html, /class="climate-state /);
             assert.equal(stepCount, 2);
-            assert.equal(powerCount, 1);
+            assert.equal(
+                powerCount,
+                capabilities.supports_power === true ? 1 : 0
+            );
         }
     });
 });
@@ -384,7 +390,8 @@ test("Sprint 25.6 bleibt ES5, CSS-Grid-frei und ohne neue Write-Fläche", functi
     });
 
     assert.doesNotMatch(css, /display:\s*grid|\bgap\s*:/);
-    assert.match(api, /"climate\.esszimmer_thermostate"/);
-    assert.match(api, /"light\.esszimmer_lampen"/);
+    assert.match(api, /controlAuthorization\.climateCapabilities/);
+    assert.match(api, /controlAuthorization\.lightCapabilities/);
+    assert.doesNotMatch(api, /ALLOWED_(?:LIGHT|CLIMATE)_ENTITIES/);
     assert.doesNotMatch(api, /body\.(?:domain|service|service_data)/);
 });

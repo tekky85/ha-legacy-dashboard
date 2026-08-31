@@ -281,12 +281,7 @@ test("Sprint 25.5 erweitert weder Browser- noch Home-Assistant-Schreibfläche", 
         backgrounds,
         /HA_TOKEN|SUPERVISOR_TOKEN|callService|Authorization/
     );
-    assert.match(
-        routes,
-        /const ALLOWED_CLIMATE_ENTITIES = \[[\s\S]*"climate\.esszimmer_thermostate"[\s\S]*\];/
-    );
-    assert.match(
-        routes,
-        /const ALLOWED_LIGHT_ENTITIES = \[[\s\S]*"light\.esszimmer_lampen"[\s\S]*\];/
-    );
+    assert.match(routes, /controlAuthorization\.climateCapabilities/);
+    assert.match(routes, /controlAuthorization\.lightCapabilities/);
+    assert.doesNotMatch(routes, /ALLOWED_(?:LIGHT|CLIMATE)_ENTITIES/);
 });

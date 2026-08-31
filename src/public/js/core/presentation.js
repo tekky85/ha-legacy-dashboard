@@ -165,18 +165,13 @@ var LegacyPresentation = (function () {
 
             if (
                 available &&
-                state !== "off" &&
                 target !== null &&
                 capabilities.can_set_temperature === true
             ) {
                 controlCount += 2;
             }
 
-            if (
-                state === "off"
-                    ? capabilities.can_power_on === true
-                    : capabilities.can_power_off === true
-            ) {
+            if (capabilities.supports_power === true) {
                 controlCount += 1;
             }
         }

@@ -234,6 +234,49 @@
         select.appendChild(option);
     }
 
+    function populatePreferredOnModes(select, entityId, selectedMode) {
+        const preview = admin.State.getPreviewEntity(entityId) || {};
+        const modes = Array.isArray(preview.hvac_modes)
+            ? preview.hvac_modes.filter(function (mode) {
+                return mode !== "off";
+            })
+            : [];
+
+        select.textContent = "";
+        appendSelectOption(
+            select,
+            "",
+            "Automatisch aus unterstützten Modi wählen",
+            selectedMode || ""
+        );
+
+        modes.forEach(function (mode) {
+            appendSelectOption(select, mode, mode, selectedMode || "");
+        });
+
+        if (selectedMode && modes.indexOf(selectedMode) === -1) {
+            appendSelectOption(
+                select,
+                selectedMode,
+                "Aktuell nicht unterstützt (" + selectedMode + ")",
+                selectedMode
+            );
+        }
+    }
+
+    function renderRoomPreferredOnModes() {
+        const climateEntity =
+            roomEditorEntities && roomEditorEntities.climate;
+        const selected = elements.roomPreferredOnModeInput.value;
+
+        elements.roomPreferredOnModeField.hidden = !climateEntity;
+        populatePreferredOnModes(
+            elements.roomPreferredOnModeInput,
+            climateEntity,
+            selected
+        );
+    }
+
     function renderBackgroundEditor(dashboard) {
         const section = createElement("section", "background-settings");
         const heading = createElement("div", "section-heading");
@@ -697,6 +740,9 @@
             "admin-preview-mode",
             mode + " · " + item.w + "×" + item.h
         );
+        const controlAuthorized = Boolean(
+            widget.control && widget.control.enabled === true
+        );
         const state = entity.state || "unknown";
 
         if (
@@ -728,6 +774,21 @@
         header.appendChild(icon);
         header.appendChild(identity);
         header.appendChild(modeLabel);
+        if (
+            widget.type === "light" ||
+            widget.type === "climate" ||
+            widget.type === "room"
+        ) {
+            header.appendChild(createElement(
+                "span",
+                controlAuthorized
+                    ? "admin-preview-control-state is-enabled"
+                    : "admin-preview-control-state",
+                controlAuthorized
+                    ? "Steuerung freigegeben"
+                    : "Nur Anzeige"
+            ));
+        }
         card.appendChild(header);
 
         if (widget.type === "sensor") {
@@ -1623,6 +1684,13 @@
 
     function openWidgetForm(widget, mode, entity) {
         const dashboard = admin.State.getSelectedDashboard();
+        const control = widget.control || {
+            enabled: false,
+            preferredOnMode: null
+        };
+        const supportsControl =
+            widget.type === "light" ||
+            widget.type === "climate";
 
         pendingEntity = entity || null;
         elements.widgetDialogMode.value = mode;
@@ -1654,6 +1722,16 @@
             );
         });
         elements.widgetVisibleInput.checked = widget.visible;
+        elements.widgetControlFields.hidden = !supportsControl;
+        elements.widgetControlEnabledInput.checked =
+            supportsControl && control.enabled === true;
+        elements.widgetPreferredOnModeField.hidden =
+            widget.type !== "climate";
+        populatePreferredOnModes(
+            elements.widgetPreferredOnModeInput,
+            widget.type === "climate" ? widget.entity : null,
+            control.preferredOnMode
+        );
         elements.widgetFormError.textContent = "";
         openDialog(elements.widgetDialog);
         elements.widgetTitleInput.focus();
@@ -1904,9 +1982,21 @@
         elements.roomCollapsibleInput.checked = room.collapsible !== false;
         elements.roomDefaultExpandedInput.checked = room.defaultExpanded === true;
         elements.roomVisibleInput.checked = widget ? widget.visible : true;
+        elements.roomControlEnabledInput.checked = Boolean(
+            widget && widget.control && widget.control.enabled === true
+        );
         elements.roomEntitySearch.value = "";
         elements.roomFormError.textContent = "";
         roomEditorEntities = admin.Rooms.normalizeEntities(room.entities);
+        populatePreferredOnModes(
+            elements.roomPreferredOnModeInput,
+            roomEditorEntities.climate,
+            widget && widget.control
+                ? widget.control.preferredOnMode
+                : null
+        );
+        elements.roomPreferredOnModeField.hidden =
+            !roomEditorEntities.climate;
         renderRoomEntityFields();
         renderRoomBackgroundEditor(widget || {id: "", room: room});
         openDialog(elements.roomDialog);
@@ -2713,7 +2803,14 @@
             order: elements.widgetOrderInput.value,
             size: elements.widgetSizeInput.value,
             sectionId: elements.widgetSectionInput.value || null,
-            visible: elements.widgetVisibleInput.checked
+            visible: elements.widgetVisibleInput.checked,
+            controlEnabled:
+                !elements.widgetControlFields.hidden &&
+                elements.widgetControlEnabledInput.checked,
+            preferredOnMode:
+                elements.widgetPreferredOnModeField.hidden
+                    ? null
+                    : elements.widgetPreferredOnModeInput.value || null
         };
     }
 
@@ -2782,6 +2879,12 @@
             collapsible: elements.roomCollapsibleInput.checked,
             defaultExpanded: elements.roomDefaultExpandedInput.checked,
             visible: elements.roomVisibleInput.checked,
+            controlEnabled:
+                elements.roomControlEnabledInput.checked,
+            preferredOnMode:
+                elements.roomPreferredOnModeField.hidden
+                    ? null
+                    : elements.roomPreferredOnModeInput.value || null,
             background: background,
             entities: admin.State.clone(roomEditorEntities)
         };
@@ -2844,6 +2947,13 @@
         elements.roomAreaWarning.textContent =
             "Vorschläge übernommen. Bitte alle Zuordnungen prüfen und anschließend bestätigen.";
         renderRoomEntityFields();
+        populatePreferredOnModes(
+            elements.roomPreferredOnModeInput,
+            roomEditorEntities.climate,
+            null
+        );
+        elements.roomPreferredOnModeField.hidden =
+            !roomEditorEntities.climate;
     }
 
     async function handleRoomBackgroundFile(event) {
@@ -2917,12 +3027,16 @@
             "widgetTitleInput", "widgetSubtitleInput", "widgetIconInput",
             "widgetUnitInput", "widgetOrderInput", "widgetSizeInput",
             "widgetSectionInput", "widgetVisibleInput",
+            "widgetControlFields", "widgetControlEnabledInput",
+            "widgetPreferredOnModeField", "widgetPreferredOnModeInput",
             "widgetFormError", "summaryShowMediaTitles",
             "roomDialog", "roomForm", "roomDialogTitle", "roomWidgetId",
             "roomTitleInput", "roomAreaInput", "roomSectionInput",
             "roomSizeInput", "roomAutoSetupButton", "roomAreaWarning",
             "roomEntitySearch", "roomEntityFields", "roomCollapsibleInput",
             "roomDefaultExpandedInput", "roomVisibleInput",
+            "roomControlEnabledInput", "roomPreferredOnModeField",
+            "roomPreferredOnModeInput",
             "roomBackgroundEditor", "roomFormError",
             "entityRulesConfiguredCount", "openEntityRulesButton",
             "entityRulesDialog", "entityRuleSearch",
@@ -3090,7 +3204,10 @@
             syncRoomEntityFields();
             renderRoomEntityFields();
         });
-        elements.roomEntityFields.addEventListener("change", syncRoomEntityFields);
+        elements.roomEntityFields.addEventListener("change", function () {
+            syncRoomEntityFields();
+            renderRoomPreferredOnModes();
+        });
         elements.roomAreaInput.addEventListener("change", function () {
             const areaId = elements.roomAreaInput.value;
             const exists = admin.State.getAreas().some(function (area) {

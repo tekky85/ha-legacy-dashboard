@@ -567,6 +567,68 @@ test(
 
                 assert.equal(persistedWidget.size, "large");
 
+                const invalidSensorGrant = await request(
+                    gateway.port,
+                    "PUT",
+                    "/api/admin/dashboards/default/widgets/" +
+                        widget.id,
+                    {
+                        control: {
+                            enabled: true,
+                            preferredOnMode: null
+                        }
+                    },
+                    auth
+                );
+                assert.equal(invalidSensorGrant.status, 400);
+
+                const controllableLight = Object.assign(
+                    {},
+                    widget,
+                    {
+                        id: "control-light-test",
+                        entity: "light.control_test",
+                        type: "light",
+                        title: "Testlicht",
+                        icon: "light",
+                        iconClass: "light",
+                        order: 80,
+                        control: {
+                            enabled: true,
+                            preferredOnMode: null
+                        }
+                    }
+                );
+                const createdLight = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/widgets",
+                    controllableLight,
+                    auth
+                );
+                assert.equal(createdLight.status, 201);
+                assert.deepEqual(createdLight.json.control, {
+                    enabled: true,
+                    preferredOnMode: null
+                });
+
+                const publicConfiguration = await request(
+                    gateway.port,
+                    "GET",
+                    "/api/dashboard/config"
+                );
+                const publicLight =
+                    publicConfiguration.json.widgets.find(function (entry) {
+                        return entry.id === controllableLight.id;
+                    });
+                assert.equal(
+                    Object.prototype.hasOwnProperty.call(
+                        publicLight,
+                        "control"
+                    ),
+                    false
+                );
+
                 await stopChild(gateway.child);
 
             }
