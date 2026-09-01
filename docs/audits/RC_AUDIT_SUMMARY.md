@@ -10,19 +10,27 @@ Abnahmen vollständig befüllt.
 
 ## Aktueller Fortschritt
 
-- Auditierte Baseline: Commit `8d2295a`
-- Abgeschlossene Parts: 02 von 19
-- Auditierte Implementierungssprints: 5 von 37
+- Auditierter aktueller Repository-Stand: Commit `8d5b4bd`
+- Ursprüngliche Audit-Baseline: Commit `8d2295a`
+- Abgeschlossene Parts: 05 von 19
+- Auditierte Implementierungssprints: 11 von 37
 - Ergebnisse: Sprint 12 `PARTIAL`, Sprint 13 `PARTIAL`, Sprint 14 `PASS`,
-  Sprint 15 `PARTIAL`, Sprint 16 `PARTIAL`
-- Offene Code-Reparaturen aus Part 01–02: keine
-- Offene manuelle Prüfungen aus Part 01–02: 7
+  Sprint 15 `PARTIAL`, Sprint 16 `PARTIAL`, Sprint 17 `PARTIAL`, Sprint 17.1
+  `PARTIAL`, Sprint 17.2 `PARTIAL`, Sprint 17.3 `PARTIAL`, Sprint 17.4
+  `PARTIAL`, Sprint 17.5 `PARTIAL`
+- Offene Code-/Dokumentationsreparaturen aus Part 01–05: 1
+- Offene manuelle Prüfungen aus Part 01–05: 20
 
 ## Vorläufige RC-Bewertung
 
-Eine RC-Empfehlung oder RC-Ablehnung ist nach Part 02 nicht belastbar. Die
+Eine RC-Empfehlung oder RC-Ablehnung ist nach Part 05 nicht belastbar. Die
 späteren Security-, Standalone-, Home-Assistant-App-, HomeScreen-, Write-
 Control- und iPad-Kernpfade wurden noch nicht vollständig auditiert.
+
+Der erste aktuelle Reparaturpunkt ist RQ-04-01: gemeinsam genutzte Legacy-
+Assets werden auf Dashboard- und Systemseiten mit unterschiedlichen
+Cacheparametern referenziert. Die Reparatur erfolgt erst nach Review des
+Baseline-Parts.
 
 ## Finale Pflichtfelder
 

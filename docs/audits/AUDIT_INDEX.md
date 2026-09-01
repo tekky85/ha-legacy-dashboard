@@ -3,9 +3,10 @@
 ## Audit-Baseline
 
 - Auditprogramm: Sprint 27 – Full Sprint Audit & RC Readiness Review
-- Auditdatum: 31. August 2026
+- Auditzeitraum: 31. August bis 1. September 2026
 - Branch: `main`
 - Auditierter Ausgangscommit: `8d2295a`
+- Aktuell auditierter Repository-Commit: `8d5b4bd`
 - Arbeitsbaum zu Beginn: sauber
 - Vorhandene Sprint-Spezifikationen: 38
 - Auditgegenstände: 37 (Sprint 27 steuert das Audit und wird nicht als eigener
@@ -36,12 +37,12 @@ Home-Assistant-Prüfungen werden nur nach tatsächlicher Durchführung als
 | 14 | Persistent Configuration & Admin API Foundation | [`SPRINT-14.md`](../sprints/SPRINT-14.md) | Schema, Dateispeicher, Admin API, Authentifizierung | 13 | 01 | PASS |
 | 15 | Admin Configuration UI | [`SPRINT-15.md`](../sprints/SPRINT-15.md) | Admin-Frontend, Editor, Preview | 14 | 02 | PARTIAL |
 | 16 | Configurable Tile Sizes | [`SPRINT-16.md`](../sprints/SPRINT-16.md) | Größenmodell, Admin, Legacy-Layout | 15 | 02 | PARTIAL |
-| 17 | Drag-and-Drop Grid Layout | [`SPRINT-17.md`](../sprints/SPRINT-17.md) | Grid-Koordinaten, Drag-and-drop, Persistenz | 16 | 03 | NOT TESTED |
-| 17.1 | Grid Refinement + Responsive Card Content | [`SPRINT-17.1.md`](../sprints/SPRINT-17.1.md) | Grid, responsive Inhalte, Legacy-CSS | 17 | 03 | NOT TESTED |
-| 17.2 | Card Identity, Proportional Geometry & Theme Persistence | [`SPRINT-17.2.md`](../sprints/SPRINT-17.2.md) | Kartenidentität, Geometrie, Theme | 17.1 | 04 | NOT TESTED |
-| 17.3 | Live Card Preview, Unified Controls & Focus Mode | [`SPRINT-17.3.md`](../sprints/SPRINT-17.3.md) | Preview, Controls, Focus | 17.2 | 04 | NOT TESTED |
-| 17.4 | Focus Overlay Layout Stabilization | [`SPRINT-17.4.md`](../sprints/SPRINT-17.4.md) | Focus-Overlay, Mobile Safari | 17.3 | 05 | NOT TESTED |
-| 17.5 | Native Focus Renderer & Mobile Safari Stabilization | [`SPRINT-17.5.md`](../sprints/SPRINT-17.5.md) | separater Focus-Renderer, iPad | 17.4 | 05 | NOT TESTED |
+| 17 | Drag-and-Drop Grid Layout | [`SPRINT-17.md`](../sprints/SPRINT-17.md) | Grid-Koordinaten, Drag-and-drop, Persistenz | 16 | 03 | PARTIAL |
+| 17.1 | Grid Refinement + Responsive Card Content | [`SPRINT-17.1.md`](../sprints/SPRINT-17.1.md) | Grid, responsive Inhalte, Legacy-CSS | 17 | 03 | PARTIAL |
+| 17.2 | Card Identity, Proportional Geometry & Theme Persistence | [`SPRINT-17.2.md`](../sprints/SPRINT-17.2.md) | Kartenidentität, Geometrie, Theme | 17.1 | 04 | PARTIAL |
+| 17.3 | Live Card Preview, Unified Controls & Focus Mode | [`SPRINT-17.3.md`](../sprints/SPRINT-17.3.md) | Preview, Controls, Focus | 17.2 | 04 | PARTIAL |
+| 17.4 | Focus Overlay Layout Stabilization | [`SPRINT-17.4.md`](../sprints/SPRINT-17.4.md) | Focus-Overlay, Mobile Safari | 17.3 | 05 | PARTIAL |
+| 17.5 | Native Focus Renderer & Mobile Safari Stabilization | [`SPRINT-17.5.md`](../sprints/SPRINT-17.5.md) | separater Focus-Renderer, iPad | 17.4 | 05 | PARTIAL |
 | 17.6 | Power Control Alignment & Icon Stabilization | [`SPRINT-17.6.md`](../sprints/SPRINT-17.6.md) | gemeinsamer Power-Control, SVG | 17.5 | 06 | NOT TESTED |
 | 17.7 | Legacy Safari Control Alignment Hardening | [`SPRINT-17.7.md`](../sprints/SPRINT-17.7.md) | Control-Hierarchie, iPad mini | 17.6 | 06 | NOT TESTED |
 | 18 | System Dashboard Foundation | [`SPRINT-18.md`](../sprints/SPRINT-18.md) | Systemrouten, gemeinsame Modelle | 17.x | 07 | NOT TESTED |
@@ -76,9 +77,9 @@ Home-Assistant-Prüfungen werden nur nach tatsächlicher Durchführung als
 |---:|---|---|---|
 | 01 | 12–14 | UI-/Release-Baseline, Multi-Dashboard und Persistenz-/Admin-API-Fundament | abgeschlossen |
 | 02 | 15–16 | zusammengehöriger Admin-Editor und Größenmodell | abgeschlossen |
-| 03 | 17, 17.1 | Grid-Grundlage und erste responsive Verfeinerung | geplant |
-| 04 | 17.2–17.3 | Geometrie/Theme und Preview/Focus | geplant |
-| 05 | 17.4–17.5 | beide Focus-/Mobile-Safari-Stabilisierungen | geplant |
+| 03 | 17, 17.1 | Grid-Grundlage und erste responsive Verfeinerung | abgeschlossen |
+| 04 | 17.2–17.3 | Geometrie/Theme und Preview/Focus | abgeschlossen |
+| 05 | 17.4–17.5 | beide Focus-/Mobile-Safari-Stabilisierungen | abgeschlossen |
 | 06 | 17.6–17.7 | gemeinsame Controls und Safari-Alignment | geplant |
 | 07 | 18–19 | System-Grundlage und Summary MVP | geplant |
 | 08 | 20, D1 | Error MVP und dazugehörige Dokumentationsbaseline | geplant |
@@ -95,7 +96,7 @@ Home-Assistant-Prüfungen werden nur nach tatsächlicher Durchführung als
 | 19 | 26–26.2 | Sections, Room Card und zentrale Controls gemeinsam | geplant |
 | Abschluss | alle | Repair-Re-Audits und finale RC-Gate-Entscheidung | geplant |
 
-Part 02 ist abgeschlossen. Part 03 wurde ausdrücklich nicht begonnen.
+Parts 01 bis 05 sind abgeschlossen. Part 06 wurde ausdrücklich nicht begonnen.
 
 Zu Beginn von Part 02 lagen ausschließlich die noch nicht committeten
 Dokumentationsänderungen aus Part 01 im Arbeitsbaum; Anwendungscode war nicht
@@ -132,17 +133,107 @@ die allein durch Presets bestimmte Sprint-16-Flexgeometrie (ersetzt durch die
 persistenten Layouts aus Sprint 17/17.1). Die beabsichtigten Endzustände bleiben
 im aktuellen System erfüllt.
 
+## Part-03-Ergebnis
+
+| Sprint | Ergebnis | Auditdatei |
+|---|---|---|
+| 17 | PARTIAL | [`SPRINT-17-AUDIT.md`](sprints/SPRINT-17-AUDIT.md) |
+| 17.1 | PARTIAL | [`SPRINT-17.1-AUDIT.md`](sprints/SPRINT-17.1-AUDIT.md) |
+
+Das persistente Raster, 6-/12-Spalten-Migration, Backendvalidierung,
+Admin-Editor, Legacy-Renderer und die responsive Präsentationsarchitektur sind
+im aktuellen Code vorhanden. Part 03 fand keine aktuelle `MISSING`- oder
+`BROKEN`-Anforderung. Die beiden `PARTIAL`-Ergebnisse beruhen ausschließlich
+auf fehlenden realen Pointer-/Safari-, iPad-mini-/iOS-9- und produktiven
+LXC-Neustartabnahmen.
+
+Bewusst superseded sind die 3-/6-Spalten-Ausgangsauflösung aus Sprint 17
+(Sprint 17.1: 6/12), die ursprüngliche Zeilenformel (Sprint 17.2), die
+Grid-internen Controls (Sprint 17.3/17.5–17.7: native Focus-Ansicht) und die
+drei Presentation Modes (Sprint 25.6: fünf pixel-/inhaltsabhängige Tiers). Die
+beabsichtigten Endzustände bleiben im aktuellen System erfüllt.
+
+Zum Abschluss von Part 03 war Part 04 ausdrücklich noch nicht begonnen; sein
+verbindlicher Planumfang war ausschließlich Sprint 17.2 und 17.3.
+
+## Part-04-Ergebnis
+
+| Sprint | Ergebnis | Auditdatei |
+|---|---|---|
+| 17.2 | PARTIAL | [`SPRINT-17.2-AUDIT.md`](sprints/SPRINT-17.2-AUDIT.md) |
+| 17.3 | PARTIAL | [`SPRINT-17.3-AUDIT.md`](sprints/SPRINT-17.3-AUDIT.md) |
+
+Kartenidentität, proportionale Rastergeometrie, globale Theme-Persistenz,
+geschützte Admin-Live-Preview, gemeinsame Controls, enge Climate-Power-API und
+die aktuelle native Focus-Architektur sind implementiert. Die beiden
+`PARTIAL`-Ergebnisse berücksichtigen die ausstehende physische iPad-/iOS-9-
+Abnahme und die reale Safari-/Pointer-Abnahme.
+
+Part 04 fand mit RQ-04-01 außerdem den ersten umsetzbaren Baseline-Befund:
+`src/public/index.html` referenziert gemeinsam genutzte Wall-Assets mit `v=51`,
+`src/public/system.html` dieselben Dateien noch mit `v=44`. Da diese Assets
+immutable ausgeliefert werden, ist die frühere Aussage einer einheitlichen
+Cacheversion nicht mehr korrekt. Part 04 dokumentiert den Defekt, repariert ihn
+gemäß Baseline-Regel aber nicht.
+
+Bewusst superseded sind die drei Presentation Modes (Sprint 25.6: fünf Tiers),
+vollständige Controls in der kleinsten Climate-Gridkarte (Sprint 17.3/17.5:
+native Focus-Ansicht), der Focus-Clone (Sprint 17.5: eigener Renderer), das
+damalige Power-Markup (Sprint 17.6/17.7: gemeinsames SVG-Control) und die
+ursprüngliche mehrdeutige HVAC-On-Auswahl (Sprint 26.2: zentrale sichere
+Capability-/Autorisierungslogik).
+
+Part 04 ist abgeschlossen. Part 05 wurde anschließend ausschließlich im
+festgelegten Umfang Sprint 17.4 und 17.5 durchgeführt.
+
+## Part-05-Ergebnis
+
+| Sprint | Ergebnis | Auditdatei |
+|---|---|---|
+| 17.4 | PARTIAL | [`SPRINT-17.4-AUDIT.md`](sprints/SPRINT-17.4-AUDIT.md) |
+| 17.5 | PARTIAL | [`SPRINT-17.5-AUDIT.md`](sprints/SPRINT-17.5-AUDIT.md) |
+
+Viewportgeometrie, Scroll-Lock, Rotation, priorisierte Focus-Inhalte und die
+native Trennung von Grid und Focus sind im aktuellen Code vorhanden. Der
+kontrollierte lokale Browserlauf bestätigte Sensor, Binary, Light und Climate
+in Portrait und Landscape ohne Overflow; Climate blieb zusätzlich bei
+320×460 vollständig bedienbar. Part 05 fand keinen aktuellen `MISSING`- oder
+`BROKEN`-Befund und erzeugte keinen neuen Reparaturauftrag.
+
+Beide Sprints bleiben `PARTIAL`, weil die Spezifikationen reale Abnahmen auf
+iPad mini/iOS 9, iPad Air 2/iPadOS 15.8.5 und macOS Safari verlangen. Diese
+Prüfungen wurden gemäß Part-05-Regel nicht physisch ausgeführt und stehen als
+MT-18 bis MT-20 in der manuellen Warteschlange. Sprint 17.5 supersediert den
+17.4-Clone; Sprint 17.6/17.7 supersedieren Power-Glyph und Control-Hierarchie,
+ohne die native Focus/Grid-Trennung zurückzunehmen.
+
+Part 05 ist abgeschlossen. Part 06 wurde ausdrücklich nicht begonnen und ist
+laut Plan ausschließlich auf Sprint 17.6 und 17.7 begrenzt.
+
 ## Verifikation der Audit-Baseline
 
 - Vollständige Testsuite: 329 von 329 Tests bestanden, 0 fehlgeschlagen.
-- Part-02-Fokustests: 92 von 92 Tests bestanden, 0 fehlgeschlagen.
-- Kontrollierter Chromium-Lauf: Admin-Login/-Logout, Dashboard-
-  Erstellen/Speichern/Reload, Entity-Suche, Größenänderung/Verwerfen und fünf
-  Größenklassen ohne horizontalen Overflow bei 768×1024 und 1024×768 geprüft.
-- JavaScript-Syntax: 119 Dateien aus `src/`, `test/` und `release/` mit
+- Part-03-Fokustests: 114 von 114 Tests bestanden, 0 fehlgeschlagen.
+- Part-04-Fokustests: 127 von 127 Tests bestanden, 0 fehlgeschlagen.
+- Part-05-Fokustests: 99 von 99 Tests bestanden, 0 fehlgeschlagen.
+  Ein erster Versuch traf ausschließlich auf ein sandboxbedingtes
+  `listen EPERM`; der identische Lauf mit erlaubtem localhost-Bind war grün.
+- Kontrollierter Chromium-Lauf für Part 04: Wall-Display 768×1024 ohne
+  horizontalen Overflow, sichtbare Card Identity, Focus ohne Grid-Reflow,
+  56×56-px-Climate-Step-Controls, 54-px-Power-Control, Theme über Reload und
+  Summary sowie schreibfreie Admin-Live-Preview geprüft.
+- Kontrollierter Browserlauf für Part 05: native Focus-DOMs für Sensor,
+  Binary, Light und Climate; 768×1024, 1024×768 sowie Climate bei 320×460 ohne
+  Focus-Overflow; Rotation, Control-Ereignistrennung, Außenklick, Body-Lock und
+  Dark Theme geprüft. Keine Console-Warnung und kein Console-Fehler.
+- JavaScript-Syntax: alle 21 Legacy-Dateien unter `src/public/**/*.js` mit
   `node --check` geprüft, ohne Fehler.
+- Legacy-Scan: kein CSS Grid, kein Flexbox-`gap`, kein `ResizeObserver`, keine
+  Container Query und keine verbotene moderne JavaScript-Syntax im
+  Wall-Frontend.
 - Testkommunikation: lokale Mock-Dienste und Fake-Credentials; kein produktives
   Home Assistant kontaktiert.
 - Lokale Runtime: Node.js `v22.15.0`, npm `10.9.2`.
-- Frontend-Assets: einheitlicher Cacheparameter `v=51`.
+- Frontend-Assets: Dashboard `v=51`, Systemseiten `v=44`; als RQ-04-01
+  dokumentiert, nicht in diesem Baseline-Audit repariert.
 - Auditlauf änderte keinen Anwendungscode.
