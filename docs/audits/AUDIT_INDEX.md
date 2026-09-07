@@ -6,8 +6,10 @@
 - Auditzeitraum: 31. August bis 7. September 2026
 - Branch: `main`
 - Auditierter Ausgangscommit: `8d2295a`
-- Aktuell auditierter Repository-Commit: `09422e0`
-- Arbeitsbaum zu Beginn: sauber
+- Aktuell auditierter Repository-Commit: `bbc30fa`
+- Arbeitsbaum zu Beginn von Part 11: Anwendungscode unverändert; offene
+  Auditdokumente aus Parts 09/10 sowie die bereitgestellten Part-09-/10-/11-
+  Prompts waren nicht committet und wurden vollständig bewahrt
 - Vorhandene Sprint-Spezifikationen: 38
 - Auditgegenstände: 37 (Sprint 27 steuert das Audit und wird nicht als eigener
   Implementierungssprint auditiert)
@@ -49,12 +51,12 @@ Home-Assistant-Prüfungen werden nur nach tatsächlicher Durchführung als
 | 19 | Summary Dashboard MVP | [`SPRINT-19.md`](../sprints/SPRINT-19.md) | Summary-Dashboard, Zustandsauswertung | 18 | 07 | PARTIAL |
 | 20 | Error Dashboard MVP | [`SPRINT-20.md`](../sprints/SPRINT-20.md) | Fehler-Dashboard, Severity | 18, 19 | 08 | PARTIAL |
 | D1 | Bilingual Documentation & Screenshot Baseline | [`SPRINT-D1.md`](../sprints/SPRINT-D1.md) | README DE/EN, Screenshots, Wartungsregel | sichtbarer Stand bis 20 | 08 | PARTIAL |
-| 21 | Registry & Diagnostic Enrichment | [`SPRINT-21.md`](../sprints/SPRINT-21.md) | HA WebSocket Backend, Registries, Repairs, Matter | 20 | 09 | NOT TESTED |
-| 21.1 | Error Dashboard Device Aggregation & Navigation | [`SPRINT-21.1.md`](../sprints/SPRINT-21.1.md) | Geräteaggregation, Filter, Layout | 21 | 09 | NOT TESTED |
-| 21.2 | System Dashboard Filters, Column Views & Risk Severity | [`SPRINT-21.2.md`](../sprints/SPRINT-21.2.md) | Summary-/Fehlerfilter, Spalten, Risiko | 21.1 | 10 | NOT TESTED |
-| 21.3 | Error Filtering & Critical Device Detection Modes | [`SPRINT-21.3.md`](../sprints/SPRINT-21.3.md) | Severity/State, Device Class/Labels | 21.2 | 10 | NOT TESTED |
-| 21.4 | System Dashboard Configuration & Header Simplification | [`SPRINT-21.4.md`](../sprints/SPRINT-21.4.md) | Entity Rule Manager, Header | 21.3 | 11 | NOT TESTED |
-| 21.5 | System Dashboard Navigation & Global Health Indicator | [`SPRINT-21.5.md`](../sprints/SPRINT-21.5.md) | Navigation, Health, Return-Ziel | 21.4 | 11 | NOT TESTED |
+| 21 | Registry & Diagnostic Enrichment | [`SPRINT-21.md`](../sprints/SPRINT-21.md) | HA WebSocket Backend, Registries, Repairs, Matter | 20 | 09 | PARTIAL |
+| 21.1 | Error Dashboard Device Aggregation & Navigation | [`SPRINT-21.1.md`](../sprints/SPRINT-21.1.md) | Geräteaggregation, Filter, Layout | 21 | 09 | PARTIAL |
+| 21.2 | System Dashboard Filters, Column Views & Risk Severity | [`SPRINT-21.2.md`](../sprints/SPRINT-21.2.md) | Summary-/Fehlerfilter, Spalten, Risiko | 21.1 | 10 | PARTIAL |
+| 21.3 | Error Filtering & Critical Device Detection Modes | [`SPRINT-21.3.md`](../sprints/SPRINT-21.3.md) | Severity/State, Device Class/Labels | 21.2 | 10 | PARTIAL |
+| 21.4 | System Dashboard Configuration & Header Simplification | [`SPRINT-21.4.md`](../sprints/SPRINT-21.4.md) | Entity Rule Manager, Header | 21.3 | 11 | PARTIAL |
+| 21.5 | System Dashboard Navigation & Global Health Indicator | [`SPRINT-21.5.md`](../sprints/SPRINT-21.5.md) | Navigation, Health, Return-Ziel | 21.4 | 11 | PARTIAL |
 | 22 | Rules, Grace Periods & Device Aggregation | [`SPRINT-22.md`](../sprints/SPRINT-22.md) | Regelengine, Flapping, Recovery | 21.x | 12 | NOT TESTED |
 | 23 | Automation Impact & Advanced Diagnostics | [`SPRINT-23.md`](../sprints/SPRINT-23.md) | Automation-Inventar, Referenzen, Traces | 22 | 12 | NOT TESTED |
 | 24 | Home Assistant App Packaging | [`SPRINT-24.md`](../sprints/SPRINT-24.md) | App, Supervisor REST/WS, `/data`, Container | 23 | 13 | NOT TESTED |
@@ -83,9 +85,9 @@ Home-Assistant-Prüfungen werden nur nach tatsächlicher Durchführung als
 | 06 | 17.6–17.7 | gemeinsame Controls und Safari-Alignment | abgeschlossen |
 | 07 | 18–19 | System-Grundlage und Summary MVP | abgeschlossen |
 | 08 | 20, D1 | Error MVP und dazugehörige Dokumentationsbaseline | abgeschlossen |
-| 09 | 21–21.1 | Registry-Anreicherung und erste Geräteaggregation | geplant |
-| 10 | 21.2–21.3 | Filter, Spalten, Risiko- und Kritikalitätsmodi | geplant |
-| 11 | 21.4–21.5 | Konfiguration, Header, Navigation und Health | geplant |
+| 09 | 21–21.1 | Registry-Anreicherung und erste Geräteaggregation | abgeschlossen |
+| 10 | 21.2–21.3 | Filter, Spalten, Risiko- und Kritikalitätsmodi | abgeschlossen |
+| 11 | 21.4–21.5 | Konfiguration, Header, Navigation und Health | abgeschlossen |
 | 12 | 22–23 | Regelengine und Automation/Diagnostik | geplant |
 | 13 | 24 | umfangreiche HA-App-Verpackung separat | geplant |
 | 14 | 25 | umfangreiche Release-/Distributionspipeline separat | geplant |
@@ -96,7 +98,7 @@ Home-Assistant-Prüfungen werden nur nach tatsächlicher Durchführung als
 | 19 | 26–26.2 | Sections, Room Card und zentrale Controls gemeinsam | geplant |
 | Abschluss | alle | Repair-Re-Audits und finale RC-Gate-Entscheidung | geplant |
 
-Parts 01 bis 08 sind abgeschlossen. Part 09 wurde ausdrücklich nicht begonnen.
+Parts 01 bis 11 sind abgeschlossen. Part 12 wurde ausdrücklich nicht begonnen.
 
 Zu Beginn von Part 02 lagen ausschließlich die noch nicht committeten
 Dokumentationsänderungen aus Part 01 im Arbeitsbaum; Anwendungscode war nicht
@@ -289,8 +291,122 @@ Sections-/Room-Card-Nachweis und vier JPEG-Dateien unter `.png`-Namen stehen
 in `RQ-08-02`. Der veraltete Kopf von `PROJECT_STATUS.md` (Schema 11 statt 12,
 Auditfortschritt nur bis Part 02) steht in `RQ-08-03`.
 
-Part 08 änderte keinen Anwendungscode. Part 09 wurde nicht begonnen; sein
-verbindlicher Planumfang ist ausschließlich Sprint 21 und Sprint 21.1.
+Part 08 änderte keinen Anwendungscode. Part 09 wurde anschließend
+ausschließlich im verbindlichen Umfang Sprint 21 und Sprint 21.1 durchgeführt.
+
+## Part-09-Ergebnis
+
+| Sprint | Ergebnis | Auditdatei |
+|---|---|---|
+| 21 | PARTIAL | [`SPRINT-21-AUDIT.md`](sprints/SPRINT-21-AUDIT.md) |
+| 21.1 | PARTIAL | [`SPRINT-21.1-AUDIT.md`](sprints/SPRINT-21.1-AUDIT.md) |
+
+Der serverseitige HA-WebSocket, die festen read-only Registry-/Config-/Repair-
+Adapter, unabhängigen TTL-/Stale-Caches, der angereicherte gemeinsame Snapshot
+und die reduzierte Browserausgabe sind vorhanden. Matter bleibt mangels
+belastbarer read-only API kontrolliert `unsupported`. Standalone verwendet
+backend-only `HA_TOKEN`; der spätere Sprint-24-App-Transport verwendet
+backend-only `SUPERVISOR_TOKEN`. Der Browser erhält weder WebSocket-Zugriff
+noch Rohregistries oder Secrets.
+
+Sprint 21.1 gruppiert ausschließlich Entity-State-Issues mit echter
+`device_id`, bewahrt Children und leitet Severity, Security, ältesten Start,
+Counts und Sortierung deterministisch ab. Entities ohne Device-ID sowie
+System-, Config-, Repair- und Matter-Issues bleiben Standalone. Spätere Sprints
+21.2/21.3/25.1 ersetzen die einfache Kategorienavigation durch exakte
+Severity-/State-Filter und ergänzen 1/2/3-Spaltenansichten, ohne die
+Device-ID-Regel oder read-only Grenze zu ändern.
+
+Part 09 fand einen neuen funktionalen P2-Robustheitsbefund: Ein isoliertes
+WebSocket-`error`-Event ohne nachfolgendes `close` plant keinen automatischen
+Reconnect (`RQ-09-01`). Ein späterer Source-Abruf kann neu verbinden und der
+REST-State-Snapshot bleibt erhalten, dennoch ist die Error-only-Erholung nicht
+vollständig. `RQ-09-02` erfasst die fehlende explizite Zuordnung aller 93/77
+Testanforderungen. Der bestehende Cache-Buster `RQ-04-01` betrifft nun
+ausdrücklich auch Sprint-21-Enrichment und Sprint-21.1-Device-Cards;
+`RQ-08-02` bleibt für veraltete System-/Adminbilder maßgeblich.
+
+Beide Sprints bleiben wegen dieser Befunde und der ausstehenden realen
+Safari-/HA-/iPad-Abnahmen `PARTIAL`. MT-30 bis MT-32 enthalten vollständige
+Abnahmeanleitungen. Part 09 änderte keinen Anwendungscode und führte keine
+physische Geräteprüfung aus. Part 10 wurde anschließend ausschließlich im
+verbindlichen Umfang Sprint 21.2 und Sprint 21.3 durchgeführt.
+
+## Part-10-Ergebnis
+
+| Sprint | Ergebnis | Auditdatei |
+|---|---|---|
+| 21.2 | PARTIAL | [`SPRINT-21.2-AUDIT.md`](sprints/SPRINT-21.2-AUDIT.md) |
+| 21.3 | PARTIAL | [`SPRINT-21.3-AUDIT.md`](sprints/SPRINT-21.3-AUDIT.md) |
+
+Summary- und Error-Filter arbeiten auf dem bereits geladenen reduzierten
+Payload; die getrennten Spaltenpräferenzen verwenden sichere Storage-Fallbacks
+und einen responsiven 1/2/3-Spalten-Cap. Safety-/Security-Risk und Severity
+sind zentral und fail-safe. Die aktuelle, durch Sprint 25.1 gehärtete Error-
+Filterung ist exakt: Severity und State verwenden AND auf demselben Child,
+Device Children werden zuerst gefiltert, und nur daraus entsteht die sichtbare
+Gruppenseverity. Der globale Error-/Health-Status bleibt unverändert.
+
+Die Modi `device_class` und `ha_label` sind persistiert und validiert. Labels
+werden backendseitig read-only aus Entity-/Device-Registryzuweisungen
+ausgewertet; Areas vererben keine Kritikalität. Last-known/stale, unsupported,
+missing und Mode-Isolation verhindern einen stillen Device-Class-Fallback.
+Der aktuelle Sprint-21.4-Entity-Rule-Manager und die Sprint-22-Regelengine
+supersedieren historische UI-/Prioritätsdetails, erhalten aber den beabsichtigten
+21.2/21.3-Endzustand.
+
+Kein neuer fachlicher Laufzeitdefekt wurde gefunden. `RQ-10-01` dokumentiert
+die nicht vollständig einzeln rückverfolgbare 92-/96-Punkte-Testmatrix.
+`RQ-09-01` betrifft zusätzlich die Recovery der Labelquelle bei einem
+isolierten WebSocket-Error; `RQ-04-01` und `RQ-08-02` bleiben für Cache bzw.
+Screenshots maßgeblich. MT-33 bis MT-36 enthalten vollständige reale
+Abnahmeanleitungen. Part 10 änderte keinen Anwendungscode und führte keine
+physische iPad- oder reale HA-Prüfung aus. Part 11 wurde nicht begonnen; sein
+verbindlicher Umfang ist ausschließlich Sprint 21.4 und Sprint 21.5.
+
+## Part-11-Ergebnis
+
+| Sprint | Ergebnis | Auditdatei |
+|---|---|---|
+| 21.4 | PARTIAL | [`SPRINT-21.4-AUDIT.md`](sprints/SPRINT-21.4-AUDIT.md) |
+| 21.5 | PARTIAL | [`SPRINT-21.5-AUDIT.md`](sprints/SPRINT-21.5-AUDIT.md) |
+
+Der Entity Rule Manager verwendet einen einmal aufgebauten, clientseitigen
+Index und kombiniert Friendly-Name-/Entity-ID-/Device-/Area-/Domain-Suche,
+Area-/Domain-/Device-Filter und „Nur konfigurierte“. Jede Entity bearbeitet
+Summary Ignore, Security Relevant und Error Ignore in einem gemeinsamen
+lokalen Draft. Save sendet genau einen geschützten Konfigurationswrite;
+Discard stellt den gespeicherten Zustand wieder her. Die aktuelle Sprint-22-
+Erweiterung nutzt dieselbe Karte und ändert diese drei historischen Regeln
+nicht.
+
+Summary und Errors teilen den kompakten Header und zeigen die dominante
+Gesamtzahl nur einmal. Der kleine read-only Status-Endpunkt berechnet Health
+aus der globalen ungefilterten Issue-Menge: Fresh Healthy und Info-only blenden
+den Alarm aus; Warning/Error/Critical, stale, unknown und API-Fehler bleiben
+sichtbar. Filter und Spalten sind rein lokale Präsentation und können Health
+nicht verändern.
+
+Returnziele werden client- und serverseitig auf `/` oder eine vorhandene
+`/d/<id>`-Route begrenzt. Sprint 25.2 supersediert den damaligen Linkmechanismus
+mit dem heutigen validierten Same-Window-/Same-Origin-Helper, ohne die Sprint-
+21.5-Semantik zu ändern. Absolute, protocol-relative, `javascript:`, `data:`,
+malformed und unbekannte Ziele bleiben abgewiesen; direkter Aufruf fällt auf
+`/` zurück.
+
+Kein neuer fachlicher oder Security-Laufzeitdefekt wurde gefunden. Der
+bestehende P1-Cache-Buster `RQ-04-01` betrifft Part 11 direkt, weil
+`system-navigation.js` und `style.css` auf normalen Dashboards mit `v=51`, auf
+Systemseiten jedoch mit `v=44` geladen werden. `RQ-11-01` erfasst die nicht
+vollständig einzeln rückverfolgbaren 75-/73-Punkte-Testmatrizen; `RQ-08-02`
+bleibt für veraltete Screenshots maßgeblich. MT-37 bis MT-42 enthalten
+vollständige reale Safari-/Tablet-/iPad-Abnahmeanleitungen.
+
+Beide Sprints bleiben deshalb `PARTIAL`. Part 11 änderte keinen Anwendungscode,
+kontaktierte kein reales Home Assistant und führte keine physische
+Geräteprüfung aus. Die komplette Sprint-21-/21.x-Auditfolge Parts 09 bis 11 ist
+damit baseline-seitig abgeschlossen. Part 12 wurde nicht begonnen; sein
+verbindlicher Umfang ist ausschließlich Sprint 22 und Sprint 23.
 
 ## Verifikation der Audit-Baseline
 
@@ -311,6 +427,18 @@ verbindlicher Planumfang ist ausschließlich Sprint 21 und Sprint 21.1.
   Ein erster eingeschränkter Lauf traf bei zwei lokalen Mockservern
   ausschließlich auf `listen EPERM`; der identische Lauf mit erlaubtem
   127.0.0.1-Bind war vollständig grün.
+- Part-09-Fokustests: 153 von 153 Tests bestanden, 0 fehlgeschlagen.
+  Ein erster eingeschränkter Lauf traf bei vier lokalen Mockservern
+  ausschließlich auf `listen EPERM`; der identische Lauf mit freigegebenem
+  127.0.0.1-Bind war vollständig grün.
+- Part-10-Fokustests: 142 von 142 Tests bestanden, 0 fehlgeschlagen.
+  Ein erster eingeschränkter Lauf traf bei zwei lokalen Mockservern
+  ausschließlich auf `listen EPERM`; der identische Lauf mit freigegebenem
+  127.0.0.1-Bind war vollständig grün.
+- Part-11-Fokustests: 165 von 165 Tests bestanden, 0 fehlgeschlagen.
+  Ein erster eingeschränkter Lauf traf bei zwei lokalen Mockservern
+  ausschließlich auf `listen EPERM`; der identische Lauf mit freigegebenem
+  127.0.0.1-Bind war vollständig grün.
 - Kontrollierter Chromium-Lauf für Part 04: Wall-Display 768×1024 ohne
   horizontalen Overflow, sichtbare Card Identity, Focus ohne Grid-Reflow,
   56×56-px-Climate-Step-Controls, 54-px-Power-Control, Theme über Reload und
@@ -324,10 +452,9 @@ verbindlicher Planumfang ist ausschließlich Sprint 21 und Sprint 21.1.
   Light-/Climate-Focus-Power über Row, Group, Button, Content und SVG vermessen.
   Alle jeweiligen Innenmittelpunkte stimmten überein, Touchziele lagen bei
   46–56 px, es entstand kein horizontaler Overflow und die Konsole blieb leer.
-- JavaScript-Syntax: für Part 08 wurden alle relevanten Issue-, System-,
-  System-Wall-, Config- und Admin-Rule-Dateien mit `node --check` geprüft,
-  ohne Fehler; der vorherige Vollscan aller 21 Legacy-Dateien bleibt als
-  Part-06-Evidenz erhalten.
+- JavaScript-Syntax: für Part 11 wurden 14 relevante Admin-, Navigation-,
+  Status-, Return-, Server- und System-Wall-Dateien mit `node --check` geprüft,
+  ohne Fehler; frühere vollständige Legacy-Scans bleiben als Evidenz erhalten.
 - Legacy-Scan: kein CSS Grid, kein Flexbox-`gap`, kein `ResizeObserver`, keine
   Container Query und keine verbotene moderne JavaScript-Syntax im
   Wall-Frontend.
@@ -340,4 +467,5 @@ verbindlicher Planumfang ist ausschließlich Sprint 21 und Sprint 21.1.
 - D1-Link-/Screenshotprüfung: Root 1/1, Deutsch 14/14 und Englisch 14/14
   Bildpfade vorhanden; alle 14 Bilder visuell geprüft; vier
   Dateiendung-/Formatabweichungen und mehrere veraltete Aufnahmen gefunden.
-- Auditlauf änderte keinen Anwendungscode. Part 09 wurde nicht begonnen.
+- Auditlauf änderte keinen Anwendungscode. Part 11 ist abgeschlossen; Part 12
+  wurde nicht begonnen und umfasst verbindlich nur Sprint 22 und Sprint 23.

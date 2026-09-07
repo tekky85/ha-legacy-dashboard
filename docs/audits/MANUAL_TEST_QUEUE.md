@@ -35,6 +35,19 @@ Prüfung tatsächlich durchgeführt und mit Datum/System dokumentiert wurde.
 | MT-27 | 20 | Error MVP, Adminregeln, stale/offline/Recovery und Theme im modernen Safari | macOS 13.7.8 Safari plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-28 | 20 | Error Dashboard auf realem Legacy-Zielgerät in Portrait/Landscape und HomeScreen | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-29 | D1 | Aktuelle, reale Produkt-Screenshot-Galerie einschließlich Sections und Room Card | macOS-Browser plus kontrollierter lokaler Real-App-Mock | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-30 | 21 | Registry-/Diagnoseanreicherung, Partial Failure und Admin-Quellenstatus gegen reales Test-HA | macOS Safari plus Standalone-LXC/kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-31 | 21.1 | Echte Device-ID-Gruppierung, Filter, Details und responsive Cards im modernen Safari | macOS 13.7.8 Safari plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-32 | 21, 21.1 | Registry-Kontext und Device Groups auf realem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-33 | 21.2 | Summary-Filter und persistente 1/2/3-Spaltenansicht auf dem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-34 | 21.2, 21.3 | Exakte Error-Severity-/State-Filter, child-first Device Groups und Spalten auf dem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-35 | 21.3 | Device-Class- und HA-Label-Kritikalitätsmodi gegen ein kontrolliertes reales HA | macOS Safari plus Standalone-LXC/kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-36 | 21.3 | Label-Rename, stale/unsupported, Löschung und Recovery ohne stillen Fallback | macOS Safari plus Standalone-LXC/kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-37 | 21.4 | Entity Rule Manager, kombinierte Filter und Batch Save/Discard im Desktop-Safari | aktuelle macOS-Safari-Version plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-38 | 21.4 | Entity Rule Manager, Touchziele und große Inventare auf modernem Touch-Tablet | iPad Air 2, iPadOS 15.8.5, Safari | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-39 | 21.4 | Vereinfachte Summary-/Error-Header und Count-Semantik auf der Legacy-Zielhardware | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-40 | 21.5 | Globale Health-/Summary-Navigation und sichere Rückkehr im Legacy-HomeScreen | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-41 | 21.5 | Same-Window-Systemnavigation und Return-Nichtregression auf iPad Air 2 | iPad Air 2, iPadOS 15.8.5, Safari/HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-42 | 21.5 | Healthzustände, Filterunabhängigkeit, Failure-Fallback und Langzeitlauf in Desktop-Safari | aktuelle macOS-Safari-Version plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
 
 ## Detaillierte Anleitungen aus Audit Part 04
 
@@ -88,6 +101,1006 @@ keine privaten Namen auf dem späteren Beweisfoto.
 
 - Je ein Foto/Screenshot in Portrait und Landscape sowie Notiz zu Light/Dark.
 - Notiere Dashboard-ID, verwendete Kartengrößen, iOS-Version und Zeitpunkt.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 11
+
+## MT-37
+
+Sprint: 21.4
+Requirement: Entity Rule Manager mit vollständiger Metadatensuche,
+kombinierten Filtern, drei Regeln je Entity und gemeinsamem Save/Discard.
+Device: Mac mit aktueller macOS-Safari-Version.
+Preconditions: Aktueller Build; Admin API aktiviert; separater Test-Admin-
+Token; kontrolliertes Test-HA mit mindestens 30 Entities aus mehreren Domains,
+Areas und Devices; je eine bereits gesetzte Summary-Ignore-, Security- und
+Error-Ignore-Regel; keine Produktions-Credentials im Browserbild.
+Exact route/page: `/admin`, Dialog „Entity Rules“.
+Required dashboard/system state: Eine gültige gespeicherte Konfiguration und
+erreichbares sanitisiertes Admin-Entity-Inventar.
+Required severity/state setup: Mindestens eine `unknown`- und eine
+`unavailable`-Entity; diese Zustände dürfen die Regelbearbeitung nicht blockieren.
+Orientation/mode: Desktopfenster einmal breit und einmal auf etwa Tabletbreite;
+normaler Safari-Tab.
+
+### Steps
+
+1. Öffne `/admin`, melde dich mit dem separaten Admin-Token an und öffne
+   „Entity Rules“.
+2. Prüfe bei drei Entities Friendly Name, Entity-ID, Area, Device und Domain;
+   kontrolliere, dass keine MAC, Seriennummer, Registry-Identifier oder rohe
+   Attribute erscheinen.
+3. Suche nacheinander nach Friendly Name, vollständiger Entity-ID, Device,
+   Area und Domain und lösche zwischen den Suchen das Feld vollständig.
+4. Kombiniere eine Suche mit Area-, Domain- und Device-Filter und vergleiche
+   jeden Treffer mit den vorbereiteten Metadaten.
+5. Aktiviere „Nur konfigurierte“ und bestätige, dass jede Entity mit mindestens
+   einer der drei Regeln erscheint und unkonfigurierte Entities verschwinden.
+6. Setze an drei unterschiedlichen Entities je eine der Regeln „In Summary
+   ignorieren“, „Sicherheitsrelevant“ und „In Errors ignorieren“; entferne
+   zusätzlich eine bereits gespeicherte Regel.
+7. Prüfe den sichtbaren Dirty-State und kontrolliere in Safaris Netzwerkansicht,
+   dass noch kein Speicherequest gesendet wurde.
+8. Klicke „Änderungen verwerfen“ und bestätige die vollständige Rückkehr zum
+   gespeicherten Stand.
+9. Wiederhole die vier Änderungen, klicke einmal „Speichern“ und bestätige
+   genau einen geschützten Konfigurationsrequest.
+10. Lade `/admin` neu und prüfe alle vier persistierten Ergebnisse. Provoziere
+    anschließend in einer kontrollierten Testinstanz einen Save-Fehler,
+    bestätige verständliche Fehlermeldung und erfolgreichen Retry.
+
+### Expected Result
+
+- Suche und Filter sind case-insensitive, kombinierbar und arbeiten ohne
+  Request pro Tastendruck.
+- Jede Entity erscheint einmal und bietet alle drei klar beschrifteten Regeln.
+- Änderungen bleiben bis Save lokal; Discard und Fehler bewahren den letzten
+  gespeicherten Stand; Retry funktioniert.
+- Speichern sendet genau einen authentifizierten Konfigurationswrite und
+  erzeugt weder HA-Service- noch Registry-/Label-Write.
+- Das schmalere Fenster erzeugt keine horizontale Seitenscrollbar und behält
+  sichtbare Fokuszustände.
+
+### Fail If
+
+- Metadatensuche/-filter liefert falsche Treffer oder eine Entity erscheint
+  mehrfach.
+- Regelklick schreibt sofort, Discard verliert den gespeicherten Stand oder
+  Save sendet mehrere Konfigurationsrequests.
+- Secrets/Rohregistries erscheinen oder „Sicherheitsrelevant“ erteilt eine
+  Control-Freigabe.
+- Save-Fehler löscht Änderungen, meldet Erfolg oder verhindert Retry.
+
+### Evidence
+
+- Screenshots von kombinierter Suche, Dirty-State und gespeichertem Stand.
+- Safari-Version und Netzwerkrequest-Zahl; keine Tokenwerte aufnehmen.
+- Ergebnis je Suchdimension und je Regel notieren.
+
+### Result
+
+NOT TESTED
+
+## MT-38
+
+Sprint: 21.4
+Requirement: Touchbedienbarer Entity Rule Manager ohne Massendropdowns bei
+großem Inventar.
+Device: iPad Air 2, iPadOS 15.8.5, Safari.
+Preconditions: Aktueller Build und `RQ-04-01` vor finaler Abnahme behoben;
+separater Test-Admin-Token; kontrolliertes Inventar mit 3000 Entities, ungefähr
+500 Devices und 50 Areas; mindestens zehn konfigurierte Entities.
+Exact route/page: `/admin`, Dialog „Entity Rules“.
+Required dashboard/system state: Gültige Admin-Konfiguration; erster ungefilterter
+Trefferumfang größer als 100.
+Required severity/state setup: Nicht relevant für die Regelwirkung; gemischte
+available/unknown/unavailable Entities im Inventar.
+Orientation/mode: Safari, Portrait und Landscape; kein Legacy-HomeScreen-Zwang
+für die moderne Admin UI.
+
+### Steps
+
+1. Öffne den Rule Manager im Portraitmodus und prüfe, dass die ungefilterte
+   Ansicht höchstens 100 vollständige Karten plus einen verständlichen
+   Begrenzungshinweis rendert.
+2. Tippe Suchfeld, Area-, Domain- und Device-Filter nacheinander und prüfe
+   Reaktion, Fokus und Bildschirmtastatur.
+3. Kombiniere alle Filter, scrolle vom ersten bis zum letzten Treffer und
+   kontrolliere Seiten- und Kartengeometrie.
+4. Tippe jede der drei Checkboxzeilen mittig und nahe am Labelrand; bestätige,
+   dass jeweils genau die beabsichtigte Regel umschaltet.
+5. Aktiviere „Nur konfigurierte“, ändere fünf Regeln und prüfe Dirty-State,
+   Discard und erneutes Setzen mit einem einzigen Save.
+6. Drehe nach Landscape und zurück nach Portrait; wiederhole Suche, Scrollen
+   und einen Checkbox-Tap.
+
+### Expected Result
+
+- Kein großes Device-/Entity-Massendropdown und höchstens 100 gerenderte
+  Treffer; Suche/Filter bleiben ohne spürbare Mehrsekundenblockade nutzbar.
+- Checkboxzeilen sind ungefähr 44 px hoch, eindeutig beschriftet und mit einem
+  Tap bedienbar.
+- Keine horizontale Seitenscrollbar, abgeschnittene Controls oder verlorener
+  Dirty-State bei Rotation.
+- Save/Discard entspricht MT-37 und löst keine HA-Schreibaktion aus.
+
+### Fail If
+
+- Tausende Vollkarten werden gleichzeitig gerendert, Safari friert ein oder
+  Filter erzeugen Requests pro Tastendruck.
+- Touchziel ist zu klein, falsche Checkbox schaltet oder Doppeltap ist nötig.
+- Rotation verursacht horizontales Scrollen, überlappende Karten oder verliert
+  ungespeicherte Änderungen.
+
+### Evidence
+
+- Fotos/Screenshots Portrait und Landscape, Trefferhinweis und Touchzeilen.
+- Beobachtete Reaktionszeit, Trefferzahl und Safari/iPadOS-Version notieren.
+
+### Result
+
+NOT TESTED
+
+## MT-39
+
+Sprint: 21.4
+Requirement: Kompakte gemeinsame Summary-/Error-Header mit genau einer
+dominanten Gesamtzahl, klaren Filterdimensionen und responsiver Toolbar.
+Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
+Preconditions: Aktueller Build; `RQ-04-01` behoben und Cache erneuert;
+kontrollierter Snapshot mit 12 Summary-Items und 10 Error-Issues aus mehreren
+Severity-/State-Klassen einschließlich Device Group.
+Exact route/page: `/system/summary?returnTo=%2F` und
+`/system/errors?returnTo=%2F`.
+Required dashboard/system state: Fresh/online; Summary- und Error-Listen nicht
+leer; Filtercounts vorab dokumentiert.
+Required severity/state setup: Mindestens je ein critical, error, warning,
+info, unavailable und unknown Issue; mindestens eine Gruppe mit mehreren
+Children.
+Orientation/mode: HomeScreen, Portrait und Landscape, Hell und Dunkel.
+
+### Steps
+
+1. Öffne Summary im Portraitmodus und zähle alle Stellen, an denen die
+   Gesamtzahl 12 prominent erscheint.
+2. Prüfe Titel, Back-Link, qualitative Online-/Stale-Anzeige, Teilfiltercounts
+   und 1/2/3-Spaltensteuerung; „Alle“ darf 12 nicht erneut anzeigen.
+3. Wähle zwei Teilfilter und jede Spaltenoption; prüfe Filter-Empty-State und
+   unveränderte Headergesamtzahl.
+4. Öffne Errors und wiederhole die Count-Prüfung für 10 Issues.
+5. Prüfe getrennte Zeilen für Severity und State, überlappende Counts sowie
+   erhaltene Device Groups; wähle kombinierte Filter.
+6. Drehe beide Seiten nach Landscape, wechsle Hell/Dunkel und prüfe Toolbar,
+   Back-Link, Filter und Karten auf Überlauf.
+7. Wiederhole mit leerem Summary-/Error-Snapshot und bestätige einen einzigen
+   verständlichen Empty State sowie qualitativen Error-Status `OK`.
+8. Unterbrich die Datenquelle kontrolliert und bestätige, dass Stale-/Offline-
+   Hinweise trotz Filter erhalten bleiben.
+
+### Expected Result
+
+- Pro Seite erscheint die dominante Gesamtsumme genau einmal; „Alle“ und eine
+  redundante Statuszeile wiederholen sie nicht.
+- Teilfiltercounts bleiben korrekt; Severity und State werden nicht künstlich
+  zu einer Summe vermischt.
+- Toolbar bricht ohne horizontale Seitenscrollbar um; Back, Filter und Columns
+  bleiben ungefähr 44 px hoch und bedienbar.
+- Empty, Stale und Offline bleiben verständlich und werden nicht durch die
+  Headervereinfachung entfernt.
+
+### Fail If
+
+- Gesamtzahl erscheint mehrfach prominent oder relevante Counts fehlen/falsch
+  sind.
+- Toolbar, Titel oder Controls überlaufen/überlappen in einer Orientierung.
+- Filter verstecken Stale/Offline oder Empty zeigt mehrfach Nullsummen.
+
+### Evidence
+
+- Je ein Foto Summary/Errors in Portrait und Landscape; zusätzlich Empty und
+  Stale/Offline.
+- Erwartete und sichtbare Counts tabellarisch notieren.
+
+### Result
+
+NOT TESTED
+
+## MT-40
+
+Sprint: 21.5
+Requirement: Summary-/Health-Navigation, fail-safe Healthzustände, exaktes
+Return Target und Erhalt des HomeScreen-Kontexts auf der Legacy-Zielhardware.
+Device: iPad mini 1, iOS 9.3.5, als vom HomeScreen gestartete Web-App.
+Preconditions: Aktueller Build; `RQ-04-01` behoben und Cache erneuert; ein
+Default- und ein Custom-Dashboard `/d/health-audit`; kontrollierbare Testdaten
+für healthy, info-only, warning, error, critical, stale und API-Ausfall; keine
+Admin-Credentials auf dem iPad.
+Exact route/page: `/`, `/d/health-audit`, `/system/summary` und
+`/system/errors` mit generiertem `returnTo`.
+Required dashboard/system state: Für jeden Schritt exakt der genannte globale
+Healthzustand; sichtbare Errorfilter dürfen den Backendstatus nicht verändern.
+Required severity/state setup: Je ein isolierter warning-, error-, critical-
+und info-Fall; stale healthy; stale last-known critical; nie gültiger/unknown
+Status; kontrollierter Status-API-Fehler.
+Orientation/mode: HomeScreen-Vollbild, kompletter Ablauf in Portrait und die
+Custom-/Critical-/Stale-Schritte zusätzlich in Landscape.
+
+### Steps
+
+1. Starte die App vom HomeScreen auf `/` bei fresh healthy: Summary muss
+   sichtbar, Health verborgen sein. Tippe Summary und danach `Zurück`.
+2. Wiederhole fresh info-only; es darf weiterhin kein Alarmindikator erscheinen.
+3. Stelle warning her, prüfe sichtbaren Indicator inklusive Symbol/zugänglicher
+   Bedeutung und tippe ihn; Errors muss im selben Vollbildfenster öffnen.
+4. Filtere auf der Error-Seite das Warning-Issue aus und wechsle die Spalten;
+   kehre zurück. Der globale Indicator darf dadurch nicht verschwinden.
+5. Wiederhole mit error und critical und bestätige die jeweilige höhere
+   Darstellung sowie die Navigation zu Errors.
+6. Öffne `/d/health-audit`, tippe Summary, wechsle dort zu Errors und tippe
+   `Zurück`; bestätige exakt `/d/health-audit`. Lade Summary und Errors jeweils
+   vor dem Back-Tap neu und wiederhole.
+7. Stelle stale healthy und stale last-known critical her; beide müssen sichtbar
+   bleiben und Errors öffnen. Prüfe danach no-initial/unknown.
+8. Unterbrich nur den kleinen Status-Endpunkt bis zum Timeout bzw. Fehler und
+   bestätige Unknown oder Last-known Stale statt Healthy; stelle ihn wieder her
+   und prüfe Recovery ohne Seitenreload.
+9. Drehe im Custom Dashboard mit critical Indicator nach Landscape und zurück;
+   wiederhole Health-Tap und Back.
+10. Prüfe nach jedem Navigationsschritt, dass keine normale Safari-Adress-/Tab-
+    Ansicht geöffnet wurde und die HomeScreen-App dieselbe Instanz bleibt.
+
+### Expected Result
+
+- Summary ist immer neutral sichtbar; fresh healthy und info-only haben keinen
+  Alarmindikator.
+- Warning/Error/Critical sind sichtbar und unterscheidbar; stale/unknown/API-
+  Fehler können niemals als unsichtbares Healthy erscheinen.
+- Indicator öffnet Errors; Filter und Columns verändern den globalen Health-
+  Zustand nicht.
+- Default kehrt zu `/`, Custom exakt zu `/d/health-audit` zurück, auch nach
+  Reload; alle Schritte bleiben im HomeScreen-Fenster.
+- Touchziele sind ungefähr 44 × 44 px, kein Headerüberlauf in Portrait oder
+  Landscape.
+
+### Fail If
+
+- Summary fehlt, Info-only alarmiert oder ein relevanter/stale/unknown Zustand
+  zeigt keinen Indicator.
+- Ausgefiltertes Critical/Warning macht den globalen Header fälschlich healthy.
+- Back landet auf `/` statt Custom, auf externer URL oder öffnet normales Safari.
+- API-Fehler löscht Last-known Critical oder zeigt falsche Entwarnung.
+
+### Evidence
+
+- Kurzes Video des vollständigen HomeScreen-Ablaufs; Fotos aller sieben
+  Healthklassen und beider Orientierungen.
+- Vor/nach jeder Navigation exakten sichtbaren Pfad und Zustand notieren, ohne
+  private Entitynamen oder Tokens aufzunehmen.
+
+### Result
+
+NOT TESTED
+
+## MT-41
+
+Sprint: 21.5
+Requirement: Same-window-/same-origin-Navigation und Return-Nichtregression auf
+dem bekannten iPad-Air-2-Safari-Ziel.
+Device: iPad Air 2, iPadOS 15.8.5, Safari sowie optional dieselbe Seite als
+HomeScreen-Web-App.
+Preconditions: Aktueller Build; `/` und `/d/health-audit` vorhanden; fresh
+warning und critical testbar; Cache erneuert.
+Exact route/page: `/`, `/d/health-audit`, `/system/summary`, `/system/errors`.
+Required dashboard/system state: Fresh warning, anschließend critical.
+Required severity/state setup: Je mindestens ein warning und critical Issue.
+Orientation/mode: Portrait und Landscape; normaler Safari-Tab, anschließend
+HomeScreen falls installiert.
+
+### Steps
+
+1. Öffne `/d/health-audit` in Safari und notiere Tabanzahl und Origin.
+2. Tippe Summary, wechsle zu Errors und `Zurück`; prüfe denselben Tab, Origin
+   und exakten Custom-Pfad.
+3. Tippe bei warning den Health Indicator und kehre zurück; wiederhole bei
+   critical.
+4. Wiederhole Schritte 2 und 3 in Landscape.
+5. Falls HomeScreen installiert ist, starte die App dort und wiederhole den
+   Custom→Summary→Errors→Back-Ablauf.
+6. Rufe Summary direkt ohne `returnTo` auf und prüfe den sicheren Fallback `/`.
+
+### Expected Result
+
+- Kein neuer Tab/Fenster und kein Origin-/Host-/Portwechsel.
+- Summary/Errors wechseln im selben Kontext und kehren exakt zum Custom-
+  Dashboard zurück; Direktaufruf fällt auf `/` zurück.
+- Warning/Critical bleiben sichtbar und bedienbar; Layout bleibt in beiden
+  Orientierungen stabil.
+
+### Fail If
+
+- Navigation öffnet einen neuen Tab, normales Safari aus HomeScreen, einen
+  anderen Origin oder verliert das Custom-Return-Ziel.
+- Back hängt in einer Systemroute fest oder der Indicator ist nicht bedienbar.
+
+### Evidence
+
+- Bildschirmaufnahme mit sichtbarem Tab-/HomeScreen-Kontext sowie Portrait-
+  und Landscape-Screenshots.
+- Safari-/iPadOS-Version und exakte Routenfolge notieren.
+
+### Result
+
+NOT TESTED
+
+## MT-42
+
+Sprint: 21.5
+Requirement: Globale Healthberechnung, Failure-Fallback,
+Filterunabhängigkeit, Open-Redirect-Abwehr und stabiler Langzeitbetrieb im
+Desktop-Safari.
+Device: Mac mit aktueller macOS-Safari-Version und kontrolliertem lokalen
+Test-HA/Gateway.
+Preconditions: Aktueller Build; Default/Custom Dashboard; kontrollierte
+Snapshots für alle Severities; Möglichkeit, ausschließlich den Status-Endpunkt
+mit Timeout, leerer und malformed Antwort zu simulieren; DevTools geöffnet.
+Exact route/page: `/`, `/d/health-audit`, `/system/summary`, `/system/errors`.
+Required dashboard/system state: nacheinander fresh healthy, info-only,
+warning, error, critical, stale healthy, stale critical, unknown sowie API-
+Timeout/empty/malformed.
+Required severity/state setup: Mindestens eine Device Group mit critical Child,
+das durch UI-Filter ausblendbar ist, während der globale Snapshot unverändert
+bleibt.
+Orientation/mode: Normaler Safari-Tab, Desktopbreite und schmales Fenster.
+
+### Steps
+
+1. Durchlaufe alle genannten Healthzustände und protokolliere Sichtbarkeit,
+   Klasse, Symbol, Titel/zugänglichen Namen und Ziel des Indicators.
+2. Bei critical öffne Errors, filtere das critical Child vollständig aus und
+   ändere die Spaltenpräferenz; kehre zum Dashboard zurück und prüfe weiterhin
+   critical Health.
+3. Simuliere nacheinander Timeout, leere JSON-Antwort, syntaktisch gültige aber
+   unvollständige Antwort und HTTP-Fehler. Prüfe bei initialem sowie last-known
+   critical Zustand den fail-safe Fallback.
+4. Stelle den Endpunkt wieder her und prüfe automatische Recovery ohne
+   kompletten Browserreload.
+5. Teste manuell Return-Queries mit externer URL, `//host`, `javascript:`,
+   `data:`, unbekannter Dashboard-ID und malformed Encoding; keine Anfrage darf
+   zu einem externen Origin navigieren.
+6. Lass das Dashboard mindestens 60 Minuten mit normalem Refresh laufen,
+   wechsle mehrfach warning→critical→healthy und beobachte CPU, Speicher,
+   Requestzahl, doppelte Handler sowie Headerflackern.
+7. Wiederhole Navigation und Headerprüfung bei schmalem Fenster und Dark Mode.
+
+### Expected Result
+
+- Sichtbarkeit folgt exakt globaler Severity; Info-only alarmiert nicht;
+  stale/unknown/alle API-Fehler bleiben fail-safe sichtbar.
+- Lokale Filter/Columns verändern weder globalen Status noch Serverdaten.
+- Alle unsicheren Return Targets fallen intern zurück; kein Open Redirect.
+- Nach 60 Minuten bleibt genau ein vorhandener Dashboard-Refresh aktiv, keine
+  anwachsenden parallelen Requests/Handler und kein merklicher ungebremster
+  Speicheranstieg.
+- Recovery aktualisiert den Indicator ohne Seitenreload.
+
+### Fail If
+
+- irgendein Failure als Healthy verschwindet, Filter den globalen Health-
+  Indicator ändert oder externe Navigation gelingt.
+- Requests/Handler vervielfachen sich, Speicher wächst kontinuierlich ohne
+  Stabilisierung oder Header flackert bei unverändertem Zustand.
+- schmale/Dark-Darstellung verdeckt Navigation oder Fokus.
+
+### Evidence
+
+- Screenshots aller Statusklassen und unsicherer Return-Fallbacks.
+- Safari-Netzwerk-/Speicheraufzeichnung zu Beginn und nach 60 Minuten;
+  Requestanzahl und beobachtete Recovery notieren.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 09
+
+## MT-30
+
+Sprint: 21
+Requirement: Reale read-only Registry-/Diagnoseanreicherung, Quellenstatus,
+Partial Failure, stale Metadaten und Recovery über den Standalone-Transport.
+Device: Mac mit macOS 13.7.8 und der dort installierten Safari-Version;
+Standalone-LXC `ha-legacy-dashboard` gegen ein kontrolliertes Test-Home-
+Assistant.
+Preconditions: Auditstand ist auf einem separaten Test-/LXC-Dienst ausgerollt;
+`RQ-04-01` und `RQ-09-01` sind vor der finalen Abnahme behoben; eigener
+Test-Admin-Token; keine Produktions-`.env` oder Secrets im Browser/Screenshot;
+ein Proxy oder Testnetz kann den HA-WebSocket getrennt von REST unterbrechen.
+Exact route/page: `/system/errors`, `/system/summary`, `/admin` und
+`/api/admin/system-diagnostics/status` derselben LXC-Origin.
+Required Home Assistant state/data: eine verfügbare primäre Entity, je eine
+`unavailable`- und `unknown`-Entity, eine `diagnostic`- und eine
+`config`-Entity, ein `setup_error`- und ein `setup_retry`-Config Entry sowie
+eine Repair-Warnung, falls die installierte HA-Version Repairs read-only
+bereitstellt.
+Required device/entity setup: mindestens zwei Testentities mit derselben
+echten Device-ID; Device mit `name_by_user`, Area und Config Entry; zweite
+Entity mit Entity-Area, die bewusst von der Device-Area abweicht; eine
+disabled Entity; ein Registry-only-Eintrag ohne State.
+Orientation: breites und schmales Safari-Fenster; Orientierung ist am Mac nur
+als Viewportsimulation relevant.
+
+### Steps
+
+1. Öffne `/admin`, authentifiziere dich mit dem separaten Admin-Token und
+   notiere Commit, LXC-URL, HA-Version und Safari-Version ohne Secrets.
+2. Öffne den Bereich `Diagnostic Sources`. Prüfe Entity Registry, Device
+   Registry, Area Registry und Config Entries auf `Verfügbar`; prüfe Repairs
+   auf `Verfügbar` oder nachvollziehbar `Nicht unterstützt` und Matter auf
+   kontrolliert `Nicht unterstützt`.
+3. Öffne `/system/errors`. Prüfe bei den Testissues Device-Name, Area,
+   Integration, Entity-ID, State und Dauer. Die explizite Entity-Area muss vor
+   der Device-Area erscheinen; es darf keine Area aus einem Namen geraten
+   werden.
+4. Öffne `/system/summary`. Bestätige, dass primäre Aktivitäten unverändert
+   erscheinen und `diagnostic`/`config` die normale Summary nicht stören.
+5. Prüfe, dass disabled und Registry-only kein künstliches unavailable- oder
+   orphaned-Issue erzeugen. Hidden darf allein kein Issue erzeugen; ein echter
+   unknown/unavailable-State bleibt unabhängig davon auswertbar.
+6. Prüfe Config Entry `setup_error` als Error, `setup_retry` kontrolliert als
+   Warning und `loaded` ohne Issue. Falls Repairs verfügbar sind, prüfe
+   Severity und den rein informativen Fixable-Hinweis; es darf keinen Fix-
+   Button geben.
+7. Unterbrich ausschließlich den HA-WebSocket, während REST `/api/states`
+   erreichbar bleibt. Warte einen Diagnose-TTL-Zyklus und lade Errors,
+   Summary sowie Adminstatus erneut.
+8. Prüfe, dass State-Issues weiterlaufen, letzte gültige Metadaten als stale
+   erhalten bleiben, ausgefallene Quellen gekennzeichnet sind und kein API-500
+   oder falsches gesundes Ergebnis entsteht.
+9. Stelle den WebSocket wieder her. Warte den nächsten kontrollierten Refresh
+   ab und bestätige `Verfügbar`, aktualisierte Metadaten und entfernten stale-
+   Zustand ohne Dienstneustart.
+10. Öffne die Browser-Netzwerkanalyse nur für Gatewayantworten und prüfe, dass
+    weder HA-/Supervisor-/Admin-Token noch Raw Registry, MAC, Seriennummer,
+    Connections oder freie WebSocket-Commands enthalten sind.
+
+### Expected Visual Result
+
+- Diagnostic Sources unterscheiden Available, Unsupported, Stale und Error
+  durch Text/Status, nicht nur Farbe.
+- Error und Summary bleiben bei Teilfehlern lesbar; fehlende Area/Integration
+  erzeugt weder kaputte Cards noch leere technische Platzhalter.
+- Device-/Area-/Integration-Kontext ist korrekt und kompakt; Dark/Light bleibt
+  beim Wechsel der Systemseiten konsistent.
+
+### Expected Functional Result
+
+- REST-State-Auswertung bleibt bei WebSocket-Ausfall aktiv; stale Metadaten
+  werden erhalten und Recovery erfolgt automatisch.
+- Config-/Repair-/Registry-Daten sind ausschließlich read-only und sanitisiert.
+- Disabled/Registry-only erzeugen keine falschen Issues; keine Sichtbarkeit
+  verändert einen Control Grant.
+
+### Fail If
+
+- WebSocket-Ausfall erzeugt API-500, leert bestehende State-Issues, behauptet
+  gesund oder erholt sich nach der Reparatur nicht automatisch.
+- Entity-Area verliert gegen Device-Area, Namen werden zur Area-/Device-
+  Zuordnung benutzt oder gleichnamige Fremdgeräte werden vermischt.
+- Token, Raw Registry, Identifier/Connection, Stacktrace oder Registry-/Repair-
+  Aktion erscheint im Browser.
+- Disabled/Registry-only wird als unavailable/orphaned gemeldet.
+
+### Evidence
+
+- Screenshots von Diagnostic Sources normal/stale/recovered sowie Errors und
+  Summary vor/während/nach Partial Failure.
+- Sanitisiertes Protokoll mit Commit, HA-/Safari-Version, Source-Status,
+  Test-Entity-/Device-/Area-IDs und Zeitpunkten; keine Tokens oder privaten
+  Produktionsdaten.
+
+### Result
+
+NOT TESTED
+
+## MT-31
+
+Sprint: 21.1
+Requirement: Device-Gruppierung ausschließlich über echte `device_id`,
+Standalone-Regeln, Filter/Counts, collapsed Childdetails und responsives
+Layout im realen modernen Safari.
+Device: Mac mit macOS 13.7.8 und der dort installierten Safari-Version gegen
+ein kontrolliertes Test-Home-Assistant oder einen Real-App-Mock.
+Preconditions: Aktueller Auditstand ausgerollt; `RQ-04-01` behoben und
+Browsercache danach kontrolliert erneuert; keine privaten Namen/IDs in
+Screenshots; System-Snapshot frisch.
+Exact route/page: `/system/errors` derselben Origin, Rücknavigation zu einem
+gültigen `/d/<device-group-test-dashboard-id>`.
+Required Home Assistant state/data: mindestens ein critical, ein error, ein
+warning und ein info Child; mindestens je ein unavailable und unknown;
+frischer Empty-State-Datensatz.
+Required device/entity setup: Device A mit vier problematischen Entities und
+derselben realen Device-ID; Device B mit gleichem Friendly Name, aber anderer
+Device-ID; eine Entity ohne Device-ID; je ein Config-Entry-, Repair- und
+System-Issue; langer Device- und Child-Name.
+Orientation: breites Desktopfenster und schmales Fenster unter 700 px.
+
+### Steps
+
+1. Öffne `/system/errors` breit und notiere Commit, Safari-/Assetversion und
+   erwartete Child-/Gruppenzahlen.
+2. Bestätige genau eine Device Group für die vier Children von Device A und
+   eine getrennte Group für Device B trotz gleichen Namens. Prüfe, dass die
+   Entity ohne Device-ID und System-/Config-/Repair-Issues Standalone bleiben.
+3. Prüfe für Device A Titelpriorität, Area · Integration, `4 Entities
+   betroffen`, höchste Child-Severity, propagiertes Security-Flag und Dauer
+   des ältesten aktiven Child-Issues.
+4. Prüfe den initial eingeklappten Zustand. Öffne `Details anzeigen` einmal,
+   prüfe für alle vier Children Name/Entity-ID, State, Severity und Dauer und
+   schließe mit genau einem Klick wieder. Beobachte `aria-expanded` in den
+   Safari-Entwicklerwerkzeugen, falls verfügbar.
+5. Betätige nacheinander Alle, jede Severity und Unknown/Unavailable. Prüfe
+   Text/Active State, Counts, exakte sichtbare Children und einen echten Empty
+   Filter State. Setze anschließend alle Filter zurück.
+6. Verkleinere das Fenster unter 700 px. Prüfe eine Spalte, lange Namen,
+   geöffnete Details, Scrollen bis zum Footer sowie fehlenden horizontalen
+   Overflow. Verbreitere wieder und prüfe mindestens zwei Spalten.
+7. Schalte Light/Dark, lade neu und prüfe dieselben Gruppen/Details. Öffne
+   Summary und kehre über das validierte Return-Ziel exakt zum Testdashboard
+   zurück.
+8. Lade den frischen Datensatz ohne Issues und bestätige echten Empty State;
+   anschließend stelle die Gruppenfixture wieder her.
+
+### Expected Visual Result
+
+- Gleiches `device_id` ergibt eine kompakte Group, gleiche Namen mit
+  verschiedenen IDs bleiben sichtbar getrennt.
+- Details starten eingeklappt, wachsen innerhalb der Card und enthalten nur
+  reduzierte Childfelder; lange Namen überlappen keine Badge/Card/Footer.
+- Schmales Fenster ist einspaltig, breites mindestens zweispaltig; keine
+  horizontale Scrollbar, keine Überlappung oder künstlich riesige Mindesthöhe.
+- Aktiver Filter ist auch ohne Farbwahrnehmung erkennbar.
+
+### Expected Functional Result
+
+- Jeder Filter-/Detailklick reagiert genau einmal und ohne Reload/HA-Abfrage.
+- Gruppenseverity/Counts werden aus den passenden Children abgeleitet;
+  Standalone-Issues gehen nicht verloren.
+- Theme und same-origin/same-window-Rücknavigation bleiben erhalten.
+
+### Fail If
+
+- Gruppierung erfolgt über Name/Area/Integration oder trennt identische echte
+  Device-IDs.
+- Child fehlt, Count/Severity/Dauer ist falsch oder Filter matcht ein anderes
+  Child derselben Group quer.
+- Details reagieren doppelt/nicht, rohe Registrydaten erscheinen oder Layout
+  scrollt horizontal/überlappt.
+- Filter/Details lösen eine HA-Schreibaktion oder zusätzliche Registryabfrage
+  pro Klick aus.
+
+### Evidence
+
+- Screenshots breit/schmal, collapsed/expanded, je Filterdimension, Empty und
+  Light/Dark; kurzes Video der Detail-/Filterbedienung.
+- Tabelle mit erwarteten/realen Device-IDs, Childzahlen, Severity/State-Counts
+  und Safari-/Assetversion, ohne private Produktionsdaten.
+
+### Result
+
+NOT TESTED
+
+## MT-32
+
+Sprint: 21, 21.1
+Requirement: Registry-Kontext, echte Device Groups, Filter/Details, Theme,
+Scroll und Partial-Failure-Verhalten auf Safari iOS 9 im HomeScreen-Modus.
+Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
+Preconditions: Aktueller Build ausgerollt; `RQ-04-01` und `RQ-09-01` behoben;
+HomeScreen-Link verwendet dieselbe HTTP-Origin; kontrollierte Testdaten aus
+MT-30/31; kein Admin-Token auf dem iPad; Cache nach Rollout erneuert.
+Exact route/page: `/d/<device-group-test-dashboard-id>`, `/system/errors` und
+`/system/summary` innerhalb derselben HomeScreen-Web-App.
+Required Home Assistant state/data: frischer Snapshot, Device Group mit vier
+Children (critical/error/warning/info und unavailable/unknown), Standalone-
+Issue, langer Name, sicher simulierbarer Metadaten-WebSocket-Ausfall bei
+weiterhin erreichbaren REST-States.
+Required device/entity setup: zwei reale Device-IDs mit gleichem Anzeigenamen,
+vier Entities auf Device A, eine Entity auf Device B, eine Entity ohne
+Device-ID; Area und Integration vorhanden.
+Orientation: Portrait und Landscape.
+
+### Steps
+
+1. Starte das Testdashboard über das HomeScreen-Icon im Portraitmodus und
+   öffne Errors über die interne Systemnavigation. Prüfe, dass normales Safari
+   nicht geöffnet wird.
+2. Warte auf frische Daten und prüfe Device A als eine Group mit vier
+   Children, Device B als getrennte Group und die Entity ohne Device-ID als
+   Standalone. Vergleiche Titel, Area, Integration, Severity, Count und Dauer
+   mit der vorbereiteten Fixture.
+3. Öffne und schließe die Details je einmal per Tap. Prüfe alle Childwerte,
+   lange Namen, Touchziel, einmalige Reaktion und flüssiges Scrollen bis zum
+   Footer.
+4. Nutze Alle, Severity- und State-Filter nacheinander. Prüfe Active State,
+   korrekte sichtbare Children/Group-Severity, Empty Filter State und Reset.
+5. Schalte Dark, lade die HomeScreen-Web-App neu und navigiere Errors →
+   Summary → Errors → Zurück. Prüfe Theme, dasselbe Fenster/dieselbe Origin
+   und das exakte Rückziel. Wiederhole kurz in Light.
+6. Drehe auf Landscape. Wiederhole Gruppen-, Detail-, Filter-, Long-Name-,
+   Scroll- und Overflowprüfung; drehe anschließend zurück auf Portrait.
+7. Unterbrich nur die Backend-Metadaten-/Registry-WebSocket-Verbindung, nicht
+   REST-States. Warte mindestens einen Diagnose-TTL-Zyklus und prüfe, dass
+   State-Issues sichtbar bleiben, letzter Kontext stale bleibt oder fehlender
+   Kontext sicher entfällt und kein falsches OK erscheint.
+8. Stelle den WebSocket wieder her und bestätige automatische Recovery der
+   Quellen/Metadaten ohne HomeScreen-Neustart.
+
+### Expected Visual Result
+
+- Portrait zeigt eine sichere einspaltige bzw. zur realen Breite passende
+  Ansicht; Landscape zeigt mindestens zwei nutzbare Spalten entsprechend der
+  aktuellen Spaltenwahl.
+- Cards, Filter, lange Namen, Details, Footer und Hintergrund überlappen nicht
+  und erzeugen keine horizontale Seitenscrollbar.
+- Status, Severity und Active Filter sind durch Text/Symbol/Zustand und nicht
+  nur Farbe verständlich; Light/Dark bleibt konsistent.
+
+### Expected Functional Result
+
+- Touch reagiert genau einmal; Details und Filter benötigen keinen Reload und
+  keine zusätzliche HA-Abfrage.
+- Echte Device-IDs bestimmen die Gruppen; missing/stale Metadaten ändern nicht
+  still die Child-Severity und zerstören keine REST-State-Auswertung.
+- HomeScreen, gleiche Origin und exaktes Return-Ziel bleiben erhalten; keine
+  Schreibaktion und kein Credential erscheint.
+
+### Fail If
+
+- Normales Safari öffnet sich, Origin/Port/Rückziel ändert sich oder Theme geht
+  beim Routenwechsel verloren.
+- Gleichnamige verschiedene Devices werden vermischt, gleiche Device-ID wird
+  getrennt oder Child/Severity/Count verschwindet.
+- Tap reagiert doppelt/nicht, Details/Filter sind unbedienbar, horizontaler
+  Overflow/Overlap oder JavaScriptabbruch tritt auf.
+- Metadatenfehler leert Issues, meldet gesund, senkt Security-Severity still
+  ab oder erholt sich nicht.
+
+### Evidence
+
+- Fotos/Screenshots Portrait/Landscape, collapsed/expanded, Filter, Light/Dark,
+  stale und recovered; kurzes Video von HomeScreen-Navigation und Touch.
+- Notiere iOS-Version, Dashboard-ID, Commit, Assetversion, erwartete IDs/
+  Counts und Zeitpunkte ohne private Namen oder Tokens.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 10
+
+## MT-33
+
+Sprint: 21.2
+Requirement: Summary-Kategoriefilter, eigener Empty State, stale/offline-
+Sichtbarkeit und getrennt persistierte responsive Spalten auf Safari iOS 9.
+Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
+Preconditions: Aktueller Build ist ausgerollt; `RQ-04-01` ist vor der finalen
+Abnahme behoben und der Safari-Cache wurde kontrolliert erneuert; kein
+Admin-Token auf dem iPad; ein gültiges internes Rückziel ist vorbereitet.
+Exact route/page: `/d/<system-test-dashboard-id>` und
+`/system/summary?returnTo=%2Fd%2F<system-test-dashboard-id>` derselben Origin.
+Test data/entity/card required: je mindestens ein Summary-Item für `open`,
+`powered`, eine Aktivkategorie (`running`, `cleaning` oder `movement`),
+`climate`, `media` und `security`; außerdem ein Filter ohne Treffer sowie ein
+sicher simulierbarer stale/offline-Snapshot.
+
+### Steps
+
+1. Starte das Dashboard über das HomeScreen-Icon in Portrait und öffne
+   Summary über die interne Navigation; normales Safari darf sich nicht
+   öffnen.
+2. Prüfe Gesamtzahl, alle sieben Filtertexte/Counts und dass `Alle` aktiv ist.
+3. Wähle nacheinander `Offen`, `Eingeschaltet`, `Aktiv`, `Klima`, `Medien` und
+   `Sicherheit`. Vergleiche jedes sichtbare Item mit der Fixture; beobachte,
+   dass kein Seitenreload und kein zweiter HA-/Gateway-Datenabruf erfolgt.
+4. Wähle den vorbereiteten Filter ohne Treffer. Prüfe den eigenen Filter-
+   Empty-State; der globale Systemstatus darf dadurch nicht zu gesund werden.
+5. Wähle eine Spalte, drehe nach Landscape und wähle dort nacheinander zwei
+   und drei Spalten. Prüfe Cardbreiten, lange Namen, Footer und horizontalen
+   Overflow.
+6. Lass drei Spalten ausgewählt, drehe nach Portrait. Prüfe den sicheren
+   einspaltigen Cap. Drehe zurück: die gespeicherte Drei-Spaltenpräferenz muss
+   wieder wirksam werden.
+7. Lade Summary neu, öffne Errors, kehre zu Summary zurück und prüfe, dass die
+   Summary-Spaltenpräferenz erhalten und von der Error-Präferenz getrennt ist.
+8. Schalte Light/Dark, wiederhole Reload und Rücknavigation und prüfe Theme
+   sowie Filterbedienung.
+9. Simuliere stale und anschließend offline. Wähle erneut einen Filter ohne
+   Treffer und prüfe, dass stale/offline-Banner und Zeitpunkt sichtbar bleiben.
+10. Stelle frische Daten wieder her, wähle `Alle` und kehre über das exakte
+    Rückziel zum Dashboard zurück.
+
+### Expected Visual Result
+
+- Aktive Filter und Spalten sind durch Text/ARIA-Zustand erkennbar, nicht nur
+  durch Farbe; Touchziele sind ungefähr 44 px groß.
+- Portrait bleibt ohne horizontales Scrollen einspaltig; Landscape erlaubt
+  nutzbare zwei/drei Spalten, ohne Cards, Footer oder Hintergrund zu brechen.
+- Filter-Empty, stale und offline bleiben visuell unterscheidbar.
+- Light/Dark und lange Texte bleiben lesbar.
+
+### Expected Functional Result
+
+- Filterung und Spaltenwechsel arbeiten ausschließlich clientseitig auf dem
+  geladenen Payload und lösen keine HA-Schreibaktion aus.
+- Summary-Kategorien entsprechen der Serverklassifikation; die UI
+  klassifiziert States nicht erneut.
+- Präferenz überlebt Reload/Routewechsel und wird responsiv nur begrenzt,
+  nicht überschrieben.
+- HomeScreen, Origin und validiertes Rückziel bleiben erhalten.
+
+### Fail If
+
+- Ein Filter zeigt eine falsche Kategorie, ändert den globalen Status oder
+  benötigt einen Reload/neuen Datenabruf.
+- Stale/offline verschwindet im Filter-Empty-State.
+- Portrait versucht zwei/drei Spalten, erzeugt Overflow oder überschreibt die
+  gespeicherte Landscape-Präferenz.
+- Theme geht verloren oder normales Safari öffnet sich.
+
+### Evidence
+
+- Fotos/Screenshots Portrait/Landscape für alle Filter, 1/2/3 Spalten,
+  Filter-Empty, stale/offline und Light/Dark.
+- Kurzes Video von Filter-/Spaltenwechsel und HomeScreen-Rücknavigation.
+- Notiere Commit, Assetversion, iOS-Version, erwartete Kategorien/Counts und
+  Ergebnis ohne private Namen oder Tokens.
+
+### Result
+
+NOT TESTED
+
+## MT-34
+
+Sprint: 21.2, 21.3
+Requirement: Exakte Severity- und State-Filter mit AND auf demselben Child,
+child-first Geräteaggregation, sichtbare Gruppenseverity und responsive
+1/2/3-Spaltenansicht auf Safari iOS 9.
+Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
+Preconditions: Aktueller Build; `RQ-04-01` vor Abnahme behoben; Cache erneuert;
+kein Admin-Token auf dem iPad; frischer kontrollierter Snapshot.
+Exact route/page: `/system/errors?returnTo=%2Fd%2F<system-test-dashboard-id>`
+innerhalb derselben HomeScreen-Web-App.
+Test data/entity/card required: eine Device Group mit genau vier Children:
+`critical+unavailable`, `error+unknown`, `warning+unknown` und
+`info+unavailable`; je ein Standalone-Issue pro Severity soweit möglich;
+langer Device-/Childname; erwartete Counts schriftlich vorbereitet.
+
+### Steps
+
+1. Öffne Errors in Portrait und prüfe unveränderten globalen Gesamtstatus,
+   Gesamtzahl sowie getrennte Severity-/State-Filtercounts.
+2. Öffne die Device-Details und vergleiche alle vier Children samt Severity,
+   State und Anzahl mit der Fixture.
+3. Wähle einzeln `Critical`, `Error`, `Warning` und `Info`. Bei jeder Auswahl
+   darf ausschließlich die exakt gleiche Severity erscheinen; öffne jeweils
+   die Details und prüfe die sichtbare Gruppenseverity.
+4. Wähle `Alle` Severity und nacheinander `Unavailable` sowie `Unknown` State.
+   Prüfe ausschließlich passende Children und Counts.
+5. Prüfe die Kombinationen `Critical + Unknown` (kein Child), `Error +
+   Unknown` (genau Error-Child), `Warning + Unavailable` (kein Child) und
+   `Info + Unavailable` (genau Info-Child). Damit darf kein Cross-Child-Match
+   innerhalb derselben Device Group entstehen.
+6. Erzeuge den Filter-Empty-State und bestätige, dass der globale Status oben
+   weiterhin der ungefilterten serverseitigen Lage entspricht.
+7. Prüfe Standalone-Issues mit denselben Severity-/State-Kombinationen.
+8. Wähle in Landscape drei Spalten, dann zwei und eine; öffne Details in jeder
+   Ansicht und prüfe Cardhöhe, Footer, lange Texte und Overflow.
+9. Drehe mit Drei-Spaltenpräferenz nach Portrait. Prüfe den einspaltigen Cap
+   und nach Rückkehr zu Landscape die wiederhergestellte Präferenz.
+10. Schalte Light/Dark, lade neu und prüfe Filter-/Spaltenpersistenz,
+    HomeScreen-Verbleib und Rücknavigation.
+
+### Expected Visual Result
+
+- Severity links und State rechts sind als getrennte Dimensionen verständlich;
+  aktiver Zustand ist nicht nur farblich markiert.
+- Device Card zeigt nur gematchte Children und daraus abgeleitete Severity,
+  Counts und State; leere Groups verschwinden.
+- Portrait, Landscape, Details, lange Namen und Footer bleiben ohne Overlap
+  oder horizontale Scrollbar.
+
+### Expected Functional Result
+
+- Severity ist exakt, nicht kumulativ; Severity und State verwenden AND auf
+  demselben Child.
+- Filter verändern weder Source-Payload noch globalen Error-/Health-Status
+  und lösen keine HA-Abfrage oder Write-Aktion aus.
+- Spaltenpräferenz bleibt getrennt von Summary und responsiv erhalten.
+
+### Fail If
+
+- `Critical` enthält Error/Warning/Info oder eine andere Severity enthält
+  Nachbarstufen.
+- Eine Group matcht Severity auf Child A und State auf Child B.
+- Sichtbare Group-Severity/Counts kommen aus ausgeblendeten Children oder der
+  globale Status sinkt wegen eines Filters.
+- Touch reagiert doppelt/nicht, Layout läuft horizontal über oder die
+  HomeScreen-Web-App wird verlassen.
+
+### Evidence
+
+- Screenshot jeder Severity, beider States und der vier genannten
+  Kombinationen mit geöffneten Details; Portrait/Landscape sowie 1/2/3
+  Spalten und Light/Dark.
+- Kurzes Video der Touchfolge; Tabelle erwartete/angezeigte Children,
+  Gruppenseverity, Counts und Gesamtstatus.
+- Notiere Commit, Assetversion und iOS-Version ohne private IDs oder Tokens.
+
+### Result
+
+NOT TESTED
+
+## MT-35
+
+Sprint: 21.3
+Requirement: Kritikalitätsmodi Device Classes und Home Assistant Labels,
+stabile Entity-/Device-Zuweisungen, Mode-Isolation und persistente Admin-
+Konfiguration gegen ein kontrolliertes reales Home Assistant.
+Device: macOS 13.7.8 Safari, Standalone-LXC und kontrolliertes Test-HA.
+Preconditions: Separater Test-Admin-Token; `RQ-04-01` behoben; Test-HA besitzt
+ein vorab angelegtes Label mit stabiler ID; keine Produktions-Secrets oder
+privaten Namen in Screenshots; Änderungen dürfen gespeichert und anschließend
+auf Ausgangswert zurückgesetzt werden.
+Exact route/page: `/admin` im Bereich System Dashboards sowie
+`/system/errors` derselben LXC-Origin.
+Test data/entity/card required: Safety-Entities smoke/CO/gas/moisture,
+Security-Entities door/window/opening/garage_door/lock, Cover door/garage/gate/
+window sowie shade/shutter/problem/tamper; ein Device mit Label, eine einzelne
+Entity mit Label, ein ungelabeltes Window und eine nur über Area gelabelte
+Entity; unknown und unavailable Zustände.
+
+### Steps
+
+1. Authentifiziere `/admin`, öffne System Dashboards und notiere aktuellen
+   Modus/Labelstatus ohne den Token aufzuzeichnen.
+2. Wähle `Home Assistant Device Classes`, speichere, lade Admin neu und prüfe
+   die Persistenz.
+3. Öffne Errors. Bestätige Safety-/Security-/definierte Cover-Varianten als
+   critical bei unknown/unavailable; shade, shutter, problem und tamper dürfen
+   ohne explizite Regel nicht automatisch critical werden.
+4. Prüfe, dass Namen oder Entity-IDs mit Wörtern wie smoke/leak/window allein
+   keine Kritikalität erzeugen.
+5. Kehre zu Admin zurück, wähle `Home Assistant Labels`, wähle das vorbereitete
+   Label über Name/ID, speichere und lade neu.
+6. Prüfe Errors: Entity-Label und Device-Label machen ihre jeweiligen Issues
+   critical; die übrigen Children desselben gelabelten Devices folgen der
+   Device-Zuweisung.
+7. Prüfe das ungelabelte Window: seine Device Class darf im Labelmodus nicht
+   still greifen. Prüfe die ausschließlich Area-gelabelte Entity: Area-
+   Vererbung darf nicht stattfinden.
+8. Markiere eine ungelabelte Entity über die bestehende explizite
+   Security-Rule, speichere und prüfe, dass diese höhere Priorität besitzt;
+   verifiziere gleichzeitig, dass kein Control Grant entsteht.
+9. Stelle die Ausgangskonfiguration über den Admin wieder her und prüfe Save,
+   Reload und Error-Ausgabe.
+10. Kontrolliere Browser-Netzwerkantworten: nur sanitisierte Label-ID/-Name und
+    Source-Status; keine Raw Registry, Tokens oder Label-Write-Requests.
+
+### Expected Visual Result
+
+- Beide Modi und das ausgewählte Label sind eindeutig beschriftet und nach
+  Reload identisch.
+- Risk-/Severity-Badges entsprechen exakt der vorbereiteten Policy; Mode-
+  Wechsel erzeugt keine versteckte Mischklassifikation.
+- Labelauswahl zeigt sanitisierte Namen; fehlende optionale Metadaten brechen
+  weder Admin noch Errors.
+
+### Expected Functional Result
+
+- Device Class und Label Mode sind gegenseitig isoliert.
+- Label gilt direkt für Entity oder echtes Device, niemals automatisch über
+  Area; explizite Security-Rule bleibt vorrangig.
+- Es wird ausschließlich der feste read-only Label-Registry-Command genutzt;
+  keine HA-Area-/Label-/Registry-Schreibaktion und kein Control Grant entsteht.
+
+### Fail If
+
+- Ungelabelte Device-Class-Entity wird im Labelmodus critical oder Area-Label
+  vererbt sich.
+- problem/tamper oder shade/shutter wird ohne explizite Regel critical.
+- Modus/Label geht nach Save/Reload verloren, Admin akzeptiert ungültige ID
+  oder Browser sieht Raw Registry/Token/Write-Request.
+- Kritikalitätsauswahl autorisiert ein Light-/Climate-Control.
+
+### Evidence
+
+- Screenshots Admin beider Modi sowie Errors mit Policy-, Entity-, Device- und
+  Area-Isolationsfällen.
+- Sanitisiertes Testprotokoll mit Commit, HA-/Safari-Version, stabilen
+  Test-IDs, erwarteter/realer Severity und Netzwerk-Requesttypen.
+
+### Result
+
+NOT TESTED
+
+## MT-36
+
+Sprint: 21.3
+Requirement: Stabile Label-ID bei Rename, Last-known-Verhalten, sichtbarer
+unsupported/error/missing-Zustand und automatische Recovery ohne stillen
+Device-Class-Fallback.
+Device: macOS 13.7.8 Safari, Standalone-LXC und kontrolliertes Test-HA.
+Preconditions: Separater Test-Admin-Token; HA-Label und Labelmodus aus MT-35;
+ein gelabeltes Testdevice mit kritischem unknown/unavailable Child; Möglichkeit,
+Label-Registry-WebSocket getrennt von REST-States zu unterbrechen; `RQ-09-01`
+ist vor der finalen Recovery-Abnahme behoben.
+Exact route/page: `/admin`, `/system/errors` und
+`/api/admin/system-diagnostics/status` derselben Origin.
+Test data/entity/card required: stabiles Label `critical-test` mit sichtbarem
+Ausgangsnamen; gelabeltes Device/Entity; ungelabelte Security-Device-Class-
+Entity als Fallback-Kontrolle; dokumentierter Source-TTL.
+
+### Steps
+
+1. Prüfe im Normalzustand Label-ID/Name, Source `available` und critical Issue
+   der gelabelten Entity.
+2. Benenne das bestehende Label im Test-HA um, ohne seine ID zu ändern. Warte
+   einen TTL-Refresh und prüfe: Auswahl bleibt erhalten, neuer Name erscheint,
+   Kritikalität bleibt identisch.
+3. Unterbrich nur den Registry-WebSocket. Warte einen TTL-Refresh und prüfe
+   Adminstatus und Errors auf `stale`; letzte bekannte Zuweisung und critical
+   Severity müssen erhalten bleiben.
+4. Starte den Dienst in einem separaten kontrollierten Durchlauf mit einer
+   nicht unterstützten/unerreichbaren Labelquelle und ohne Last-known-Daten.
+   Prüfe sichtbaren unsupported/error-Zustand und dass das ungelabelte Window
+   nicht still per Device Class critical wird.
+5. Stelle WebSocket/Labelquelle wieder her und prüfe automatische Recovery
+   auf `available`, aktualisierten Namen/Zuweisung und entfernte Warnung ohne
+   Dienstneustart.
+6. Lösche das Testlabel im kontrollierten HA. Warte einen TTL-Refresh und
+   prüfe `missing`: Admin und Errors müssen warnen; es darf kein anderes Label
+   automatisch gewählt und kein Device-Class-Fallback aktiviert werden.
+7. Lege das Label mit derselben Test-ID nur wieder an, falls das Testsystem
+   dies zuverlässig erlaubt; andernfalls wähle über Admin bewusst ein neues
+   Testlabel. Prüfe Recovery und stelle anschließend die Ausgangskonfiguration
+   her.
+8. Kontrolliere Logs und Browserantworten auf fehlende Tokens, Raw Registries,
+   Stacktraces und Label-Write-Funktionen der Dashboard-Anwendung.
+
+### Expected Visual Result
+
+- `available`, `stale`, `unsupported/error` und `missing` sind in Admin/Errors
+  als Textstatus unterscheidbar, nicht nur als Farbe.
+- Rename aktualisiert nur den Namen; stabile Auswahl/Kritikalität bleibt.
+- Fehlende Quelle oder gelöschtes Label wird sichtbar und niemals als gesund
+  verschwiegen.
+
+### Expected Functional Result
+
+- Last-known Labeldaten bleiben bei stale aktiv; erster unsupported/error und
+  missing erzeugen einen sichtbaren Fail-Safe-Hinweis.
+- Recovery erfolgt nach Reparatur selbständig; kein stiller Device-Class-
+  Fallback im Labelmodus.
+- Das Dashboard selbst führt keine Label-/Registry-Schreibaktion aus.
+
+### Fail If
+
+- Rename verliert die Auswahl oder Severity.
+- Stale verwirft letzte Zuweisungen; unsupported/error/missing wird verborgen
+  oder meldet gesund.
+- Ein ungelabeltes Security-Device-Class-Issue wird im Labelmodus critical.
+- Recovery erfordert Dienstneustart oder Token/Raw Registry/Write erscheint.
+
+### Evidence
+
+- Screenshots Admin/Errors für available, renamed, stale, unsupported/error,
+  missing und recovered.
+- Sanitisiertes Zeitprotokoll mit Commit, HA-/Safari-Version, TTL, stabiler
+  Label-ID, Source-Status und Severity; keine Secrets erfassen.
 
 ### Result
 
