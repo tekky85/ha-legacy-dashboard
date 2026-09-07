@@ -3,10 +3,10 @@
 ## Audit-Baseline
 
 - Auditprogramm: Sprint 27 – Full Sprint Audit & RC Readiness Review
-- Auditzeitraum: 31. August bis 1. September 2026
+- Auditzeitraum: 31. August bis 7. September 2026
 - Branch: `main`
 - Auditierter Ausgangscommit: `8d2295a`
-- Aktuell auditierter Repository-Commit: `8d5b4bd`
+- Aktuell auditierter Repository-Commit: `09422e0`
 - Arbeitsbaum zu Beginn: sauber
 - Vorhandene Sprint-Spezifikationen: 38
 - Auditgegenstände: 37 (Sprint 27 steuert das Audit und wird nicht als eigener
@@ -43,12 +43,12 @@ Home-Assistant-Prüfungen werden nur nach tatsächlicher Durchführung als
 | 17.3 | Live Card Preview, Unified Controls & Focus Mode | [`SPRINT-17.3.md`](../sprints/SPRINT-17.3.md) | Preview, Controls, Focus | 17.2 | 04 | PARTIAL |
 | 17.4 | Focus Overlay Layout Stabilization | [`SPRINT-17.4.md`](../sprints/SPRINT-17.4.md) | Focus-Overlay, Mobile Safari | 17.3 | 05 | PARTIAL |
 | 17.5 | Native Focus Renderer & Mobile Safari Stabilization | [`SPRINT-17.5.md`](../sprints/SPRINT-17.5.md) | separater Focus-Renderer, iPad | 17.4 | 05 | PARTIAL |
-| 17.6 | Power Control Alignment & Icon Stabilization | [`SPRINT-17.6.md`](../sprints/SPRINT-17.6.md) | gemeinsamer Power-Control, SVG | 17.5 | 06 | NOT TESTED |
-| 17.7 | Legacy Safari Control Alignment Hardening | [`SPRINT-17.7.md`](../sprints/SPRINT-17.7.md) | Control-Hierarchie, iPad mini | 17.6 | 06 | NOT TESTED |
-| 18 | System Dashboard Foundation | [`SPRINT-18.md`](../sprints/SPRINT-18.md) | Systemrouten, gemeinsame Modelle | 17.x | 07 | NOT TESTED |
-| 19 | Summary Dashboard MVP | [`SPRINT-19.md`](../sprints/SPRINT-19.md) | Summary-Dashboard, Zustandsauswertung | 18 | 07 | NOT TESTED |
-| 20 | Error Dashboard MVP | [`SPRINT-20.md`](../sprints/SPRINT-20.md) | Fehler-Dashboard, Severity | 18, 19 | 08 | NOT TESTED |
-| D1 | Bilingual Documentation & Screenshot Baseline | [`SPRINT-D1.md`](../sprints/SPRINT-D1.md) | README DE/EN, Screenshots, Wartungsregel | sichtbarer Stand bis 20 | 08 | NOT TESTED |
+| 17.6 | Power Control Alignment & Icon Stabilization | [`SPRINT-17.6.md`](../sprints/SPRINT-17.6.md) | gemeinsamer Power-Control, SVG | 17.5 | 06 | PARTIAL |
+| 17.7 | Legacy Safari Control Alignment Hardening | [`SPRINT-17.7.md`](../sprints/SPRINT-17.7.md) | Control-Hierarchie, iPad mini | 17.6 | 06 | PARTIAL |
+| 18 | System Dashboard Foundation | [`SPRINT-18.md`](../sprints/SPRINT-18.md) | Systemrouten, gemeinsame Modelle | 17.x | 07 | PARTIAL |
+| 19 | Summary Dashboard MVP | [`SPRINT-19.md`](../sprints/SPRINT-19.md) | Summary-Dashboard, Zustandsauswertung | 18 | 07 | PARTIAL |
+| 20 | Error Dashboard MVP | [`SPRINT-20.md`](../sprints/SPRINT-20.md) | Fehler-Dashboard, Severity | 18, 19 | 08 | PARTIAL |
+| D1 | Bilingual Documentation & Screenshot Baseline | [`SPRINT-D1.md`](../sprints/SPRINT-D1.md) | README DE/EN, Screenshots, Wartungsregel | sichtbarer Stand bis 20 | 08 | PARTIAL |
 | 21 | Registry & Diagnostic Enrichment | [`SPRINT-21.md`](../sprints/SPRINT-21.md) | HA WebSocket Backend, Registries, Repairs, Matter | 20 | 09 | NOT TESTED |
 | 21.1 | Error Dashboard Device Aggregation & Navigation | [`SPRINT-21.1.md`](../sprints/SPRINT-21.1.md) | Geräteaggregation, Filter, Layout | 21 | 09 | NOT TESTED |
 | 21.2 | System Dashboard Filters, Column Views & Risk Severity | [`SPRINT-21.2.md`](../sprints/SPRINT-21.2.md) | Summary-/Fehlerfilter, Spalten, Risiko | 21.1 | 10 | NOT TESTED |
@@ -80,9 +80,9 @@ Home-Assistant-Prüfungen werden nur nach tatsächlicher Durchführung als
 | 03 | 17, 17.1 | Grid-Grundlage und erste responsive Verfeinerung | abgeschlossen |
 | 04 | 17.2–17.3 | Geometrie/Theme und Preview/Focus | abgeschlossen |
 | 05 | 17.4–17.5 | beide Focus-/Mobile-Safari-Stabilisierungen | abgeschlossen |
-| 06 | 17.6–17.7 | gemeinsame Controls und Safari-Alignment | geplant |
-| 07 | 18–19 | System-Grundlage und Summary MVP | geplant |
-| 08 | 20, D1 | Error MVP und dazugehörige Dokumentationsbaseline | geplant |
+| 06 | 17.6–17.7 | gemeinsame Controls und Safari-Alignment | abgeschlossen |
+| 07 | 18–19 | System-Grundlage und Summary MVP | abgeschlossen |
+| 08 | 20, D1 | Error MVP und dazugehörige Dokumentationsbaseline | abgeschlossen |
 | 09 | 21–21.1 | Registry-Anreicherung und erste Geräteaggregation | geplant |
 | 10 | 21.2–21.3 | Filter, Spalten, Risiko- und Kritikalitätsmodi | geplant |
 | 11 | 21.4–21.5 | Konfiguration, Header, Navigation und Health | geplant |
@@ -96,7 +96,7 @@ Home-Assistant-Prüfungen werden nur nach tatsächlicher Durchführung als
 | 19 | 26–26.2 | Sections, Room Card und zentrale Controls gemeinsam | geplant |
 | Abschluss | alle | Repair-Re-Audits und finale RC-Gate-Entscheidung | geplant |
 
-Parts 01 bis 05 sind abgeschlossen. Part 06 wurde ausdrücklich nicht begonnen.
+Parts 01 bis 08 sind abgeschlossen. Part 09 wurde ausdrücklich nicht begonnen.
 
 Zu Beginn von Part 02 lagen ausschließlich die noch nicht committeten
 Dokumentationsänderungen aus Part 01 im Arbeitsbaum; Anwendungscode war nicht
@@ -207,8 +207,90 @@ MT-18 bis MT-20 in der manuellen Warteschlange. Sprint 17.5 supersediert den
 17.4-Clone; Sprint 17.6/17.7 supersedieren Power-Glyph und Control-Hierarchie,
 ohne die native Focus/Grid-Trennung zurückzunehmen.
 
-Part 05 ist abgeschlossen. Part 06 wurde ausdrücklich nicht begonnen und ist
-laut Plan ausschließlich auf Sprint 17.6 und 17.7 begrenzt.
+Part 05 ist abgeschlossen. Part 06 wurde anschließend ausschließlich im
+festgelegten Umfang Sprint 17.6 und 17.7 durchgeführt.
+
+## Part-06-Ergebnis
+
+| Sprint | Ergebnis | Auditdatei |
+|---|---|---|
+| 17.6 | PARTIAL | [`SPRINT-17.6-AUDIT.md`](sprints/SPRINT-17.6-AUDIT.md) |
+| 17.7 | PARTIAL | [`SPRINT-17.7-AUDIT.md`](sprints/SPRINT-17.7-AUDIT.md) |
+
+Der gemeinsame echte Power-Button, sein festes Inline-SVG und die vollständige
+Hierarchie `Row → Group → Button → Content → SVG/Icon → Label` sind im
+aktuellen Code vorhanden. Der kontrollierte Lauf der echten Anwendung mit
+lokalem Fake-HA bestätigte in Grid und Focus die interne Zentrierung aller
+Ebenen, die vorgesehenen Touchgrößen sowie fehlenden horizontalen Overflow in
+Portrait und Landscape. Part 06 fand keinen aktuellen `MISSING`- oder
+`BROKEN`-Befund und erzeugte keinen neuen Reparaturauftrag.
+
+Beide Sprints bleiben `PARTIAL`, weil ihre Spezifikationen reale Abnahmen auf
+iPad mini/iOS 9.3.5, iPad Air 2/iPadOS 15.8.5 und macOS Safari verlangen. Diese
+Prüfungen wurden gemäß Part-06-Regel nicht physisch ausgeführt und stehen als
+MT-21 bis MT-23 in der manuellen Warteschlange. Sprint 17.7 supersediert die
+direkte Flexzentrierung nativer Buttons aus Sprint 17.6 durch ein separates
+Content-Element; Sprint 25.6 supersediert die alten Größenmodi, Sprint 26.2 die
+damalige Autorisierungs-/Capability-Auswahl. Der beabsichtigte gemeinsame und
+sichere Control-Endzustand bleibt jeweils erfüllt.
+
+Part 06 ist abgeschlossen. Part 07 wurde anschließend ausschließlich im
+festgelegten Umfang Sprint 18 und Sprint 19 durchgeführt.
+
+## Part-07-Ergebnis
+
+| Sprint | Ergebnis | Auditdatei |
+|---|---|---|
+| 18 | PARTIAL | [`SPRINT-18-AUDIT.md`](sprints/SPRINT-18-AUDIT.md) |
+| 19 | PARTIAL | [`SPRINT-19-AUDIT.md`](sprints/SPRINT-19-AUDIT.md) |
+
+Die externe System-Dashboard-Architektur, festen Routen, Sammelabfrage,
+normalisierten Snapshots, der gemeinsame Cache, Stale-/Offline-/Recovery-
+Semantik und die getrennten Summary-/Issue-Engines sind vorhanden. Das
+Summary MVP wertet die spezifizierten Domainzustände serverseitig aus, liefert
+reduzierte priorisierte Items und Gruppen und rendert sie über die gemeinsame
+ES5-System-Shell. Spätere 21.x-/25.x-Sprints erweitern Filter, Header, Theme
+und Navigation, ohne das Fundament oder die read-only Grenze aufzuheben.
+
+Beide Sprints bleiben `PARTIAL`, weil die moderne Safari- und reale
+iPad-mini-/iOS-9-Abnahme aussteht (MT-24 bis MT-26). Der bekannte
+Cache-Buster-Befund `RQ-04-01` bleibt P1 und erhielt zusätzliche Evidenz aus
+dem Admin-Entry-Point. Neu ist `RQ-07-01` (P2): Die Summary-Regeln sind
+implementiert, aber mehrere in Sprint 19 ausdrücklich nummerierte
+Zustandsvarianten besitzen keine gezielte Regression.
+
+Part 07 fand kein aktuelles `MISSING` oder `BROKEN` und änderte keinen
+Anwendungscode. Part 08 wurde nicht begonnen; sein verbindlicher Planumfang
+ist ausschließlich Sprint 20 und Sprint D1.
+
+## Part-08-Ergebnis
+
+| Sprint | Ergebnis | Auditdatei |
+|---|---|---|
+| 20 | PARTIAL | [`SPRINT-20-AUDIT.md`](sprints/SPRINT-20-AUDIT.md) |
+| D1 | PARTIAL | [`D1-AUDIT.md`](sprints/D1-AUDIT.md) |
+
+Die Sprint-20-Issue-Basis ist fachlich vorhanden: getrennte unavailable-/
+unknown-Zustände, zentrale Severity/Sortierung, stale/offline/Recovery,
+reduzierte API, persistente Security-/Ignore-Regeln und read-only Legacy-UI.
+Spätere Sprints 21 bis 23 erweitern denselben Datenfluss absichtlich um
+Registry-Kontext, Geräteaggregation, Regeln und Automation-Diagnostik.
+
+Sprint 20 bleibt wegen der nicht vollständig expliziten historischen
+82-Punkte-Testmatrix (`RQ-08-01`), des auch die Error-Seite betreffenden
+Cache-Busters (`RQ-04-01`) und der ausstehenden realen Safari-/iPad-Abnahmen
+`PARTIAL`. Part 08 fand keinen aktuellen fachlichen Sprint-20-Laufzeitdefekt.
+
+D1 besitzt das dreiteilige README-Modell, semantisch parallele Sprachfassungen,
+funktionierende Bildlinks, Datenschutzregeln und die dauerhafte AGENTS-Regel.
+Die Galerie wurde aber nach späteren sichtbaren Sprints nicht vollständig
+aktualisiert: alte Admin-/Compact-/Focus-Aufnahmen, fehlender aktueller
+Sections-/Room-Card-Nachweis und vier JPEG-Dateien unter `.png`-Namen stehen
+in `RQ-08-02`. Der veraltete Kopf von `PROJECT_STATUS.md` (Schema 11 statt 12,
+Auditfortschritt nur bis Part 02) steht in `RQ-08-03`.
+
+Part 08 änderte keinen Anwendungscode. Part 09 wurde nicht begonnen; sein
+verbindlicher Planumfang ist ausschließlich Sprint 21 und Sprint 21.1.
 
 ## Verifikation der Audit-Baseline
 
@@ -218,6 +300,17 @@ laut Plan ausschließlich auf Sprint 17.6 und 17.7 begrenzt.
 - Part-05-Fokustests: 99 von 99 Tests bestanden, 0 fehlgeschlagen.
   Ein erster Versuch traf ausschließlich auf ein sandboxbedingtes
   `listen EPERM`; der identische Lauf mit erlaubtem localhost-Bind war grün.
+- Part-06-Fokustests: 99 von 99 Tests bestanden, 0 fehlgeschlagen.
+  Ein erster Versuch traf ausschließlich auf ein sandboxbedingtes
+  `listen EPERM`; der identische Lauf mit erlaubtem localhost-Bind war grün.
+- Part-07-Fokustests: 104 von 104 Tests bestanden, 0 fehlgeschlagen.
+  Ein erster Versuch traf bei den lokalen Gateway-/Admin-Mocks ausschließlich
+  auf `listen EPERM`; der identische Lauf mit erlaubtem localhost-Bind war
+  vollständig grün.
+- Part-08-Fokustests: 147 von 147 Tests bestanden, 0 fehlgeschlagen.
+  Ein erster eingeschränkter Lauf traf bei zwei lokalen Mockservern
+  ausschließlich auf `listen EPERM`; der identische Lauf mit erlaubtem
+  127.0.0.1-Bind war vollständig grün.
 - Kontrollierter Chromium-Lauf für Part 04: Wall-Display 768×1024 ohne
   horizontalen Overflow, sichtbare Card Identity, Focus ohne Grid-Reflow,
   56×56-px-Climate-Step-Controls, 54-px-Power-Control, Theme über Reload und
@@ -226,14 +319,25 @@ laut Plan ausschließlich auf Sprint 17.6 und 17.7 begrenzt.
   Binary, Light und Climate; 768×1024, 1024×768 sowie Climate bei 320×460 ohne
   Focus-Overflow; Rotation, Control-Ereignistrennung, Außenklick, Body-Lock und
   Dark Theme geprüft. Keine Console-Warnung und kein Console-Fehler.
-- JavaScript-Syntax: alle 21 Legacy-Dateien unter `src/public/**/*.js` mit
-  `node --check` geprüft, ohne Fehler.
+- Kontrollierter Browserlauf für Part 06: echte Anwendung mit lokalem Fake-HA
+  bei 768×1024 und 1024×768; Grid-Light, Grid-Climate-Power, Focus ± sowie
+  Light-/Climate-Focus-Power über Row, Group, Button, Content und SVG vermessen.
+  Alle jeweiligen Innenmittelpunkte stimmten überein, Touchziele lagen bei
+  46–56 px, es entstand kein horizontaler Overflow und die Konsole blieb leer.
+- JavaScript-Syntax: für Part 08 wurden alle relevanten Issue-, System-,
+  System-Wall-, Config- und Admin-Rule-Dateien mit `node --check` geprüft,
+  ohne Fehler; der vorherige Vollscan aller 21 Legacy-Dateien bleibt als
+  Part-06-Evidenz erhalten.
 - Legacy-Scan: kein CSS Grid, kein Flexbox-`gap`, kein `ResizeObserver`, keine
   Container Query und keine verbotene moderne JavaScript-Syntax im
   Wall-Frontend.
 - Testkommunikation: lokale Mock-Dienste und Fake-Credentials; kein produktives
   Home Assistant kontaktiert.
 - Lokale Runtime: Node.js `v22.15.0`, npm `10.9.2`.
-- Frontend-Assets: Dashboard `v=51`, Systemseiten `v=44`; als RQ-04-01
-  dokumentiert, nicht in diesem Baseline-Audit repariert.
-- Auditlauf änderte keinen Anwendungscode.
+- Frontend-Assets: Dashboard `v=51`, Systemseiten `v=44`; Admin lädt zusätzlich
+  geteilte Public-Assets mit `v=50`. Als P1-Befund RQ-04-01 dokumentiert und
+  nicht in diesem Baseline-Audit repariert.
+- D1-Link-/Screenshotprüfung: Root 1/1, Deutsch 14/14 und Englisch 14/14
+  Bildpfade vorhanden; alle 14 Bilder visuell geprüft; vier
+  Dateiendung-/Formatabweichungen und mehrere veraltete Aufnahmen gefunden.
+- Auditlauf änderte keinen Anwendungscode. Part 09 wurde nicht begonnen.

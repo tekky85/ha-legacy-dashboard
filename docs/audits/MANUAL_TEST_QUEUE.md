@@ -26,6 +26,15 @@ Prüfung tatsächlich durchgeführt und mit Datum/System dokumentiert wurde.
 | MT-18 | 17.4, 17.5 | Focus-Viewport, Scroll, Rotation und native Renderer auf Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-19 | 17.5 | Bestätigte Focus-Kompressionsregression auf iPad Air 2 | iPad Air 2, iPadOS 15.8.5, Safari | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-20 | 17.5 | Native-Focus-Nichtregression in macOS Safari | macOS 13.7.8 Safari | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-21 | 17.6, 17.7 | Vollständige Power-/Climate-Control-Hierarchie auf dem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-22 | 17.6, 17.7 | Power-/Climate-Control-Nichtregression auf iPad Air 2 | iPad Air 2, iPadOS 15.8.5, Safari | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-23 | 17.6, 17.7 | Power-/Climate-Control-Nichtregression in Desktop Safari | macOS 13.7.8 Safari | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-24 | 18, 19 | Systemrouten, Summary, Stale/Offline/Recovery, Theme und sichere Navigation im modernen Browser | macOS 13.7.8 Safari | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-25 | 18, 19 | System-Shell und Summary MVP auf realer Legacy-Zielhardware | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-26 | 19 | Persistente Summary-Ignore-/Media-Privacy-Konfiguration und Write-Trennung | macOS 13.7.8 Safari plus Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-27 | 20 | Error MVP, Adminregeln, stale/offline/Recovery und Theme im modernen Safari | macOS 13.7.8 Safari plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-28 | 20 | Error Dashboard auf realem Legacy-Zielgerät in Portrait/Landscape und HomeScreen | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-29 | D1 | Aktuelle, reale Produkt-Screenshot-Galerie einschließlich Sections und Room Card | macOS-Browser plus kontrollierter lokaler Real-App-Mock | Vollständige Anleitung weiter unten. | NOT TESTED |
 
 ## Detaillierte Anleitungen aus Audit Part 04
 
@@ -79,6 +88,747 @@ keine privaten Namen auf dem späteren Beweisfoto.
 
 - Je ein Foto/Screenshot in Portrait und Landscape sowie Notiz zu Light/Dark.
 - Notiere Dashboard-ID, verwendete Kartengrößen, iOS-Version und Zeitpunkt.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 08
+
+## MT-27
+
+Sprint: 20
+Requirement: Error Dashboard MVP mit getrennter unavailable-/unknown-
+Darstellung, Severity, Security-/Ignore-Konfiguration, stale/offline/Recovery,
+Theme und unveränderter Write-Autorisierung im modernen Browser.
+Device: Mac mit macOS 13.7.8 und der dort aktuell installierten Safari-Version.
+Preconditions: Aktueller Auditstand ist auf einem Test-/LXC-System ausgerollt;
+`RQ-04-01` wurde vor der endgültigen Abnahme behoben und Cacheversionen wurden
+kontrolliert aktualisiert; geschützter Admin mit eigenem Test-Admin-Token;
+kontrolliertes Test-HA oder localhost-Mock, dessen Erreichbarkeit sicher
+unterbrochen werden kann. Keine Produktionssecrets im Browser oder Screenshot.
+Exact route/page: `/admin`, `/system/errors`, `/system/summary`, `/` und ein
+gültiges `/d/<error-test-dashboard-id>` derselben Origin.
+Test data/entity/card required: normale verfügbare Entity; normale
+`unavailable`; normale `unknown`; explizit sicherheitsrelevante
+`unavailable` und `unknown`; eine zu ignorierende Entity; sehr langer
+Friendly Name; autorisiertes und nicht autorisiertes Test-Light/Climate;
+mindestens 205 reduzierte Test-Issues für die Listenbegrenzung.
+
+### Steps
+
+1. Öffne `/system/errors` direkt in Safari und notiere Safari-Version, Route,
+   Build-/Assetversion sowie den sichtbaren Loading State.
+2. Lade einen frischen Snapshot ohne Issues. Prüfe `OK`, Text und Symbol sowie
+   den Empty State mit letzter Prüfung; es darf kein stale/offline-Hinweis
+   sichtbar sein.
+3. Aktiviere die normale unavailable- und unknown-Testentity. Prüfe getrennte
+   State-Anzeige, Warning/Info, Titel, Beschreibung, Dauer und eindeutige
+   Filtercounts.
+4. Markiere im Entity Rule Manager die beiden Security-Testentities als
+   sicherheitsrelevant, speichere und lade Admin neu. Prüfe in Errors die
+   erhöhte Severity; markiere eine weitere Entity als „In Errors ignorieren“
+   und bestätige ihr Verschwinden nach dem nächsten Poll.
+5. Öffne das Testdashboard und prüfe, dass Security-/Ignore-Regeln weder
+   Sichtbarkeit noch Control Grants verändert haben. Das nicht autorisierte
+   Light/Climate muss weiterhin nicht schreibbar sein.
+6. Schalte zwischen Light und Dark, lade Errors neu, wechsle zu Summary und
+   über das validierte Return-Ziel zurück. Prüfe dasselbe Theme und dasselbe
+   Fenster/dieselbe Origin.
+7. Unterbrich nach einem erfolgreichen Issue-Snapshot den HA-Zugriff. Warte
+   mindestens einen Pollzyklus und prüfe stale/offline, letzten erfolgreichen
+   Zeitpunkt und unverändert sichtbare letzte Issues; ein grünes OK oder
+   echter Empty State ist unzulässig.
+8. Stelle HA wieder her. Prüfe die Recovery-Meldung, anschließenden frischen
+   Status und das automatische Verschwinden behobener Issues ohne Reload.
+9. Lade die 205-Issue-Testmenge, scrolle bis zum Ende der gerenderten Liste
+   und prüfe die Begrenzungsanzeige, lange Namen, Footer und fehlenden
+   horizontalen Overflow in schmalem sowie breitem Safari-Fenster.
+10. Verwirf/entferne alle Testregeln und bestätige den gesicherten
+    Ausgangszustand.
+
+### Expected Visual Result
+
+- Loading, OK, Warning/Info/Critical, stale/offline und Recovery sind durch
+  Text und Symbol unterscheidbar, nicht nur durch Farbe.
+- `unavailable` und `unknown` bleiben sichtbar getrennt; lange Namen und große
+  Listen überlappen weder Cards noch Footer und erzeugen keine horizontale
+  Seitenscrollbar.
+- Light/Dark bleibt über Errors, Summary und Rückkehr konsistent.
+
+### Expected Functional Result
+
+- Security und Ignore überleben Save/Reload und ändern keine Write Grants.
+- HA-Ausfall bewahrt letzte Issues, behauptet keine Gesundheit, und Recovery
+  aktualisiert automatisch.
+- Interne Navigation bleibt same-window/same-origin; keine Systemansicht
+  bietet eine HA-Schreibaktion.
+
+### Fail If
+
+- Ein State wird als off/anderer State angezeigt oder Severity/Count ist
+  falsch.
+- Stale/offline leert Issues, meldet OK oder erholt sich nur nach Reload.
+- Adminregel erteilt Schreibrecht, geht nach Reload verloren oder Discard
+  schreibt trotzdem.
+- Token, Rohattribute, Stacktrace, horizontaler Overflow oder veralteter
+  routeabhängiger Stil erscheint.
+
+### Evidence
+
+- Screenshots von Loading, OK, unavailable/unknown, Security, stale und
+  Recovery in Light/Dark sowie großer Liste.
+- Bildschirmaufnahme der Admin-Save-/Reload-/Return-Navigation; notiere
+  Safari-Version, Test-IDs, Assetversion und Pollzeiten ohne Secrets.
+
+### Result
+
+NOT TESTED
+
+## MT-28
+
+Sprint: 20
+Requirement: Reale iPad-mini-/iOS-9-Abnahme des Error Dashboards in
+Portrait/Landscape, Light/Dark und HomeScreen mit Touch, Scrollen und
+stale/offline/Recovery.
+Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
+Preconditions: Aktueller Build ist ausgerollt; `RQ-04-01` ist behoben und der
+Legacy-Safari-Cache kontrolliert erneuert; HomeScreen-Link nutzt dieselbe
+HTTP-Origin; separates Testdashboard und kontrollierbare Testdaten; kein
+Admin-Token auf dem iPad.
+Exact route/page: `/d/<error-test-dashboard-id>`, `/system/errors` und
+`/system/summary` innerhalb derselben HomeScreen-Web-App.
+Test data/entity/card required: mindestens je ein normales und
+sicherheitsrelevantes `unavailable`/`unknown`, lange Namen und Dauern,
+frischer leerer Zustand, sicher simulierbarer HA-Ausfall, mindestens 205
+reduzierte Issues; Light und Dark.
+Orientation: Portrait und Landscape.
+
+### Steps
+
+1. Starte das Testdashboard über das HomeScreen-Icon im Portraitmodus und
+   öffne den Health-/Systemstatus-Link mit einem Tap.
+2. Beobachte Loading und warte auf frische Daten. Prüfe Gesamtstatus, Text,
+   Symbol, Counts, unavailable-/unknown-Unterscheidung, Severity-Badges,
+   Entity-ID/Kontext und Dauer.
+3. Nutze nacheinander alle Severity- und State-Filter. Prüfe, dass jeder Tap
+   genau einmal reagiert und nur passende Issues sichtbar sind; öffne und
+   schließe vorhandene Details mit einem Tap.
+4. Lade den frischen leeren Zustand und bestätige den echten Empty State.
+5. Lade die 205-Issue-Testmenge, scrolle vom Header bis zum letzten sichtbaren
+   Eintrag/Footer und prüfe lange Namen, Begrenzung und Touchreaktion.
+6. Schalte Dark ein, lade die Web-App neu, wechsle Errors → Summary → Errors →
+   Zurück und bestätige Theme, exaktes Return-Ziel und Verbleib im
+   HomeScreen-Vollbild. Wiederhole kurz in Light.
+7. Drehe nach Landscape und wiederhole Status-, Filter-, Detail-, Scroll- und
+   Overflowprüfung; drehe danach zurück nach Portrait.
+8. Unterbrich nach einem erfolgreichen Snapshot kontrolliert den HA-Zugriff.
+   Prüfe nach Polling stale/offline mit erhaltenen letzten Issues und letztem
+   Erfolgszeitpunkt.
+9. Stelle HA wieder her und prüfe Recovery sowie frische Neuberechnung ohne
+   manuelles Reload.
+
+### Expected Visual Result
+
+- Alle Statusstufen sind in beiden Orientierungen lesbar und zusätzlich zu
+  Farbe durch Text/Symbol erkennbar.
+- Keine Card, Filterleiste, lange Entity oder große Liste überlappt, wird
+  unbrauchbar abgeschnitten oder erzeugt horizontales Seitenscrolling.
+- Footer und Hintergrund bleiben korrekt; Light/Dark wird früh und konsistent
+  angewendet.
+
+### Expected Functional Result
+
+- HomeScreen-Modus bleibt bei Errors, Summary, Zurück, Filterung und Rotation
+  erhalten.
+- Touch reagiert genau einmal; Polling, stale-Erhalt und Recovery funktionieren
+  ohne Browser-HA-Verbindung.
+- Es gibt keine Schreibaktion oder implizite Control-Autorisierung.
+
+### Fail If
+
+- Normales Safari öffnet sich, Origin/Port oder Return-Ziel ändert sich.
+- Filter/Details reagieren doppelt, falsch oder nicht; State/Severity wird
+  verwechselt.
+- Stale/offline zeigt OK/leer, Recovery bleibt hängen oder die Web-App stürzt
+  bei der großen Liste ab.
+- Horizontaler Overflow, überdeckter Footer, Themeblitz oder JavaScriptfehler
+  erscheint.
+
+### Evidence
+
+- Fotos/Screenshots in Portrait und Landscape für Light/Dark, Empty, aktive
+  Issues, große Liste, stale und Recovery.
+- Kurzes Video der HomeScreen-Navigation, Filterung und Rotation; notiere
+  iOS-Version, Dashboard-ID, Assetversion und Ergebnis ohne private Daten.
+
+### Result
+
+NOT TESTED
+
+## MT-29
+
+Sprint: D1
+Requirement: Aktuelle Produkt-Screenshot-Galerie aus der real laufenden
+Anwendung oder einem kontrollierten Real-App-Mock, semantisch synchron in
+README DE/EN und frei von privaten/sensitiven Daten.
+Device: macOS-Browser mit reproduzierbarer Screenshot-Funktion; optional reale
+iPad-Aufnahme nur für einen ausdrücklich als solchen beschrifteten
+Legacy-Nachweis.
+Preconditions: Aktueller Build inklusive Sections und Room Card läuft gegen
+einen kontrollierten localhost-HA-Mock mit ausschließlich Fake-Credentials und
+generischen Demo-IDs/-Namen; keine Produktions-`.env`; `RQ-04-01` ist behoben,
+damit keine alten routeabhängigen Assets aufgenommen werden.
+Exact route/page: `/`, `/d/<demo-dashboard-id>`, `/admin`,
+`/system/summary`, `/system/errors` derselben kontrollierten Origin.
+Test data/entity/card required: generische Sensor/Binary/Light/Climate-/Room-
+Cards; mindestens zwei Sections; Background; Admin-Sections-/Room-Editor;
+Summary- und Error-Demodaten inklusive Device Group und Automation Impact.
+
+### Steps
+
+1. Starte die unveränderte reale Anwendung gegen den kontrollierten Mock und
+   dokumentiere Commit, Startbefehl, Mockfixture und Browser/Viewport, ohne
+   Secrets in die Dokumentation zu kopieren.
+2. Prüfe vor jeder Aufnahme DOM/UI auf Produktionsnamen, interne IPs, Tokens,
+   Medieninformationen, Standortdaten und sicherheitskritische Entity-Namen;
+   ersetze Testdaten im Mock, nicht nachträglich im Bild.
+3. Nimm User-Dashboard Light/Dark, Background, Compact Landscape und Focus im
+   aktuellen Stand neu auf. Achte auf Summary/Health-Navigation und den
+   aktuellen Footer ohne Versionszeile.
+4. Nimm mindestens einen aktuellen Sections-/Room-Card-Nachweis auf, der
+   Sectiontitel, Collapsed/Expanded Room Card und optionalen Room-Hintergrund
+   fachlich verständlich zeigt.
+5. Nimm Admin Dashboard Management, Layout Editor, Live Preview, Background,
+   Entity Rule Manager, Diagnostic Sources sowie Sections-/Room-Editor auf.
+   Kein Admin-Token darf sichtbar sein.
+6. Nimm Summary und Errors mit aktuellem Header, Filtern, Device Group und
+   Automation Impact/Advanced Diagnostics auf.
+7. Speichere Dateien mit klein geschriebenen, bindestrichbasierten Namen und
+   echter zur Endung passender PNG- oder JPEG-Codierung. Korrigiere insbesondere
+   die vier derzeit als `.png` benannten JPEG-Dateien.
+8. Öffne jede Datei aus dem Repository erneut, prüfe Abmessung/Lesbarkeit und
+   führe einen Metadaten-/Stringscan auf interne URLs, Tokens, GPS und private
+   Namen aus.
+9. Aktualisiere README.de.md und README.en.md semantisch parallel sowie die
+   kompakte Root-README nur soweit nötig. Prüfe jeden Bildlink lokal.
+10. Lass eine zweite Sichtprüfung oder explizite Nutzerfreigabe dokumentieren
+    und notiere für jedes Bild Herkunft, Commit, Route und Ergebnis.
+
+### Expected Visual Result
+
+- Galerie zeigt die aktuelle Anwendung einschließlich Sections, Room Cards,
+  aktuellem Entity Rule Manager, Navigation, Footer und System-Dashboards.
+- Keine Aufnahme enthält alte entfernte Controls oder UI, abgeschnittene
+  Inhalte, private Daten oder sichtbar veraltete Assets.
+- Bildformat und Dateiendung stimmen überein; alle README-Bilder rendern.
+
+### Expected Functional Result
+
+- Aufnahmen stammen nachweisbar aus der unveränderten Anwendung/dem
+  kontrollierten Real-App-Mock, nicht aus generierten Mockups.
+- Deutsch und Englisch referenzieren dieselben fachlich gleichwertigen Bilder
+  und Beschreibungen; alle Links sind gültig.
+
+### Fail If
+
+- Ein Bild wurde generiert/nachgebaut statt aus der Anwendung aufgenommen.
+- Token, Adminsecret, interne IP, Produktionsname, private Medien-/Standortinfo
+  oder sicherheitskritische Entity wird sichtbar oder bleibt in Metadaten.
+- Ein Screenshot zeigt den entfernten Versionsfooter/alten Editor oder lässt
+  Sections/Room Cards trotz Dokumentation ohne aktuellen Nachweis.
+- Dateiendung und tatsächliches Format oder DE-/EN-Verweise weichen ab.
+
+### Evidence
+
+- Tabelle je Screenshot mit Pfad, Commit, Route, Browser/Viewport,
+  Mockfixture, Datenschutzprüfung und Freigabe.
+- Kontaktbogen oder PR-/Reviewansicht aller finalen Bilder; keine Secrets in
+  Logs oder Anhängen.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 07
+
+## MT-24
+
+Sprint: 18, 19
+Requirement: System-Dashboard-Routen, gemeinsamer Online-/Stale-/Offline-/
+Recovery-Zustand, Summary-Darstellung, Theme und sichere interne Navigation im
+modernen Browser.
+Device: Mac mit macOS 13.7.8 und der dort aktuell installierten Safari-Version.
+Preconditions: Aktueller Part-07-Build auf einem Test-/LXC-System; lokales Mock-
+HA oder gefahrloses Test-HA mit mindestens einem aktiven Summary Item;
+`RQ-04-01` ist vor der endgültigen Abnahme behoben und ausgerollt; Browsercache
+wurde danach kontrolliert aktualisiert. Keine Secrets im Browser oder in
+Screenshots öffnen.
+Exact route/page: `/system/summary`, `/system/errors`, `/` und ein gültiges
+`/d/<summary-test-dashboard-id>` derselben Origin.
+Test data/entity/card required: mindestens Light `on`, Window `on`, Climate mit
+`hvac_action=heating`, ein `unavailable`-Objekt für Errors und ein sicher
+simulierbarer HA-Ausfall; Light und Dark Theme.
+Orientation: schmales/hohes und breites/flaches Safari-Fenster.
+
+### Steps
+
+1. Öffne `/system/summary` direkt und notiere URL, Safari-Version,
+   Assetversion und sichtbaren Loading State vor der ersten Antwort.
+2. Warte auf frische Daten. Prüfe Titel `Summary`, Onlineanzeige, Gesamtzahl,
+   die nichtleeren Gruppen Offen, Klima aktiv und Eingeschaltet sowie je Item
+   Icon, Name, Beschreibung und Dauer.
+3. Öffne `/system/errors` über die interne Navigation. Bestätige, dass dieselbe
+   Seite/Origin/Fensterinstanz verwendet wird und der Errorinhalt unabhängig
+   von Summary dargestellt wird.
+4. Navigiere zurück zu Summary und danach über das validierte Rückkehrziel zum
+   Ausgangsdashboard. Prüfe, dass der exakte interne `/d/...`-Pfad erhalten
+   bleibt und kein neuer Tab/Fenster geöffnet wird.
+5. Schalte auf Dark, lade Summary neu, wechsle zu Errors und zurück zum
+   Dashboard. Wiederhole danach in Light.
+6. Unterbrich im kontrollierten Testsystem den HA-Zugriff nach einem
+   erfolgreichen Snapshot. Warte mindestens einen Pollzyklus und prüfe, dass
+   letzte Summary Items sichtbar bleiben, aber Stale/Offline und letzter
+   erfolgreicher Zeitpunkt eindeutig erscheinen.
+7. Stelle HA wieder her und warte auf den nächsten Poll. Prüfe die sichtbare
+   Recovery-Meldung und anschließend wieder frischen Onlinezustand.
+8. Wiederhole die Layoutprüfung mit schmalem/hohem und breitem/flachem Fenster;
+   scrolle von Header bis Footer und achte auf horizontalen Overflow.
+9. Öffne `/system/does-not-exist` und bestätige einen kontrollierten 404 ohne
+   Stacktrace oder sensible Daten.
+
+### Expected Visual Result
+
+- Loading, Online, Stale/Offline und Recovery sind unterscheidbar; stale Daten
+  verschwinden nicht fälschlich.
+- Summary zeigt nur nichtleere Gruppen; Items, Dauer und lange Namen bleiben
+  lesbar, ohne horizontales Scrolling oder überlappenden Footer.
+- Light/Dark gilt auf Dashboard, Summary und Errors ohne auffälligen
+  routeabhängigen Stilwechsel.
+
+### Expected Functional Result
+
+- Alle internen Links bleiben same-window/same-origin und das validierte
+  Rückkehrziel führt exakt zum Ausgangsdashboard.
+- Polling erholt sich automatisch; keine manuelle Seitenaktualisierung ist für
+  Recovery nötig.
+- Unbekannte Systemroute liefert kontrolliert 404.
+
+### Fail If
+
+- Summary/Errors öffnen einen neuen Tab, wechseln Origin/Port oder verlieren
+  das Rückkehrziel.
+- HA-Ausfall leert die Seite oder behauptet einen frischen gesunden Zustand.
+- Recovery bleibt dauerhaft stale/offline, Theme wechselt unerwartet oder
+  eine Route lädt sichtbar alte Assets.
+- JavaScriptfehler, horizontaler Overflow, Stacktrace oder Secret erscheint.
+
+### Evidence
+
+- Screenshots von Loading, frischem Summary, stale Summary, Recovery und Error
+  in Light/Dark; Bildschirmaufnahme der Navigationsfolge.
+- Notiere Safari-/macOS-Version, Route, Assetversion, Pollzeiten und Ergebnis;
+  keine Tokens, privaten Namen oder internen Adressen erfassen.
+
+### Result
+
+NOT TESTED
+
+## MT-25
+
+Sprint: 18, 19
+Requirement: Reale Legacy-Abnahme der System-Shell und des Summary MVP auf
+iPad mini 1/iOS 9.3.5 in HomeScreen-Web-App, Portrait und Landscape.
+Device: iPad mini 1, iOS 9.3.5, Safari/HomeScreen-Web-App.
+Preconditions: Aktueller Part-07-Build ist ausgerollt; `RQ-04-01` ist behoben;
+HomeScreen-Link zeigt auf dieselbe HTTP-Origin; ein separates Testdashboard und
+sichere Testdaten sind vorbereitet. Kein Admin-Token auf dem iPad speichern.
+Exact route/page: `/d/<summary-test-dashboard-id>`, `/system/summary` und
+`/system/errors` innerhalb der HomeScreen-Web-App.
+Test data/entity/card required: Light on/off, Switch on, Window und Door on,
+Cover open/opening/closing, Vacuum cleaning/returning/paused, Climate heating
+und cooling, Media playing ohne/mit erlaubtem Titel, Fan on, Lock unlocked,
+Alarm armed; zusätzlich inaktive, unknown/unavailable, lange Namen und
+mindestens 50 sichtbare Summary Items für Scrollprüfung.
+Orientation: Portrait und Landscape; Light und Dark Theme.
+
+### Steps
+
+1. Starte das Testdashboard über das HomeScreen-Icon im Portraitmodus und
+   öffne den immer sichtbaren Summary-Link. Beobachte Loading und warte auf
+   `Online`.
+2. Prüfe Header, Gesamtzahl und die Gruppen Sicherheit, Offen, In Bewegung,
+   Reinigung, Klima aktiv, Medien und Eingeschaltet. Vergleiche jede
+   vorbereitete aktive Entity mit der erwarteten Gruppe.
+3. Bestätige, dass off/closed/docked/idle/locked, numerische Sensoren,
+   Motion sowie unknown/unavailable nicht als normale Aktivität erscheinen.
+4. Prüfe lange Namen, Einheiten/Beschreibungen und Dauern auf lesbare Kürzung
+   oder Umbruch. Scrolle bei der großen Liste bis zum letzten Item und Footer.
+5. Wechsle über die interne Navigation zu Errors und zurück zu Summary. Nutze
+   anschließend `Zurück` und bestätige den exakten Ausgangspfad sowie den
+   Verbleib in der HomeScreen-Web-App.
+6. Schalte auf Dark, lade die Web-App neu und wiederhole Summary → Errors →
+   Zurück. Wiederhole die Sichtprüfung in Light.
+7. Drehe in Landscape, wiederhole Gruppen-, Scroll-, Header- und
+   Navigationsprüfung; drehe danach zurück nach Portrait.
+8. Unterbrich nach einem erfolgreichen Snapshot kontrolliert den HA-Zugriff.
+   Prüfe nach Polling Stale/Offline mit erhaltenen letzten Items und Zeitpunkt.
+9. Stelle HA wieder her; prüfe Recovery und frische Neuberechnung ohne Reload.
+10. Wiederhole einen kurzen Wechsel Summary ↔ Errors und stelle sicher, dass
+    Touchziele mit einem Tap reagieren und keine doppelten Navigationsereignisse
+    auftreten.
+
+### Expected Visual Result
+
+- Summary ist in beiden Orientierungen modern, lesbar und touchfreundlich;
+  keine überlappenden Gruppen, abgeschnittenen Items, horizontale Scrollbar,
+  Hintergrundlücke oder Footer-Verschiebung.
+- Nur aktive, fachlich passende Zustände erscheinen; unknown/unavailable sind
+  nicht als normale Summary-Aktivität dargestellt.
+- Stale/Offline/Recovery und Light/Dark bleiben eindeutig lesbar.
+
+### Expected Functional Result
+
+- HomeScreen-Vollbild bleibt bei Summary, Errors, Zurück und Rotation erhalten.
+- Navigation reagiert genau einmal; Polling, Stale-Erhalt und Recovery
+  funktionieren ohne Browser-HA-Verbindung.
+- Keine Systemseite bietet eine Schreibaktion oder verändert Control Grants.
+
+### Fail If
+
+- Normales Safari öffnet sich, Origin/Port wechselt oder Rückkehrpfad geht
+  verloren.
+- Eine spezifizierte aktive Entity fehlt/falsch gruppiert ist oder ein klar
+  inaktiver/unknown/unavailable Zustand als Aktivität erscheint.
+- Lange/große Liste verursacht Absturz, unbedienbares Scrollen, Überlauf oder
+  Footer-/Header-Fehler.
+- Polling stoppt, stale Daten werden geleert, Recovery verlangt Reload oder
+  ein JavaScriptfehler erscheint.
+
+### Evidence
+
+- Fotos/Screenshots je Gruppe in Portrait und Landscape, jeweils Light/Dark;
+  zusätzlich große Liste, stale und Recovery.
+- Kurzes Video der HomeScreen-Navigation und Rotation; notiere iOS-Version,
+  Dashboard-ID, Assetversion und beobachtete Pollzeiten ohne private Daten.
+
+### Result
+
+NOT TESTED
+
+## MT-26
+
+Sprint: 19
+Requirement: Reale Admin-Konfiguration von Summary Ignore und Media-Privacy
+einschließlich persistiertem Reload, manueller Überschreibung und Trennung von
+normalen Dashboard-/Write-Rechten.
+Device: Mac mit macOS 13.7.8 und der dort aktuell installierten Safari-Version.
+Preconditions: Admin API nur im Testsystem aktiviert; eigenes Test-Admin-Token;
+sanitiertes Inventar mit einem aktiven Switch und Media Player; mindestens ein
+explizit autorisiertes und ein nicht autorisiertes Test-Light. Vorherige
+Konfiguration gesichert; Änderungen werden nach Evidenz zurückgesetzt.
+Exact route/page: `/admin`, `/system/summary` und
+`/d/<summary-test-dashboard-id>` derselben Origin.
+Test data/entity/card required: `switch.summary_ignore_test=on`,
+`media_player.summary_media_test=playing` mit unkritischem Testtitel,
+autorisiertes/nicht autorisiertes Light; keine produktionskritischen Geräte.
+Orientation: normales Desktopfenster.
+
+### Steps
+
+1. Melde dich auf `/admin` mit dem Testtoken an und öffne den Entity Rule
+   Manager. Suche den Test-Switch nach ID/Friendly Name.
+2. Aktiviere `In Summary ignorieren`, speichere den Batch und öffne Summary.
+   Prüfe, dass der Switch fehlt, andere aktive Items aber bleiben.
+3. Lade `/admin` vollständig neu, melde dich falls nötig erneut an und prüfe,
+   dass die Ignore-Regel weiterhin ausgewählt ist.
+4. Entferne die Ignore-Regel, speichere und prüfe, dass der Switch nach dem
+   nächsten Summary-Poll wieder erscheint.
+5. Aktiviere die Medientitel-Option zunächst nicht. Prüfe beim spielenden
+   Media Player, dass der Testtitel weder in DOM noch sichtbarer Beschreibung
+   erscheint.
+6. Aktiviere Medientitel explizit, speichere, lade Admin neu und prüfe Summary:
+   Der harmlose Testtitel darf nun erscheinen. Deaktiviere anschließend wieder
+   und speichere.
+7. Öffne das normale Testdashboard und prüfe, dass Karten, Sichtbarkeit und
+   vorhandene Light-Controls unverändert sind. Das nicht autorisierte Light
+   darf durch keine Summary-Einstellung schreibbar werden.
+8. Ändere eine Regel, wähle vor dem Speichern `Verwerfen` und bestätige, dass
+   Summary und persistierte Konfiguration unverändert bleiben.
+9. Stelle die gesicherte Ausgangskonfiguration wieder her und verifiziere den
+   finalen Summaryzustand.
+
+### Expected Visual Result
+
+- Entity Rule Manager zeigt Suchtreffer und lokalen Dirty-/Save-/Discard-
+  Zustand eindeutig; Summary aktualisiert nur die betroffenen Items.
+- Medientitel bleibt standardmäßig verborgen und erscheint nur nach bewusstem
+  Opt-in.
+
+### Expected Functional Result
+
+- Ignore und Privacy überleben Save plus Reload; Discard schreibt nichts.
+- Summary-Einstellungen verändern weder normale Dashboards noch serverseitige
+  Light-/Climate-Control-Grants.
+- Admin-Token bleibt nur in der Adminsitzung und erscheint nicht in Summary.
+
+### Fail If
+
+- Regel geht nach Reload verloren, überschreibt andere Entityregeln oder
+  Discard persistiert versehentlich.
+- Medientitel erscheint ohne Opt-in oder bleibt nach Deaktivierung sichtbar.
+- Ein nicht autorisiertes Gerät wird schreibbar, normales Dashboard ändert
+  sich fachlich oder Token/Secret erscheint im Browserinhalt/Log.
+
+### Evidence
+
+- Screenshots Entity Rule vor/nach Save und nach Reload; Summary mit verborgenem
+  und bewusst sichtbarem Testtitel; Notiz der Control-Grant-Nichtänderung.
+- Erfasse nur Test-IDs/-Titel, Safari-Version, Zeitpunkt und Resultat; keine
+  Tokens oder privaten Entities.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 06
+
+## MT-21
+
+Sprint: 17.6, 17.7
+Requirement: Gemeinsames SVG-Power-Control und vollständige Hierarchie
+`Row → Group → Button → Content → SVG/Icon → Label` für Light und Climate in
+Grid und Focus auf dem primären Legacy-Zielgerät.
+Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
+Preconditions: Aktueller Part-06-Build ist ausgerollt und der HomeScreen-Link
+zeigt auf dieselbe Origin; Safari-Cache wurde nach dem Rollout kontrolliert
+aktualisiert. Ein separates Testdashboard enthält je ein verfügbares und ein
+`unavailable` Light sowie ein Climate mit `off` und mindestens einem sicheren
+Nicht-Off-Modus. Light und Climate sind ausdrücklich serverseitig für Writes
+freigegeben; keine produktionskritischen Geräte verwenden.
+Exact route/page: `/d/<control-alignment-test-dashboard-id>` in der
+HomeScreen-Web-App.
+Test data/entity/card required: Light in `on` und `off`; Climate in `off` und
+aktiv mit Ist-/Solltemperatur, Minus, Plus und Power; lange Kartenbezeichnung;
+mindestens eine Compact- und eine Standard-/Wide-Karte; Light und Dark Theme.
+
+### Steps
+
+1. Starte das Testdashboard über das HomeScreen-Icon im Portraitmodus und
+   warte auf den frischen Status `Online`.
+2. Prüfe die normale Light-Karte: Der Power-Button muss innerhalb seiner
+   vorgesehenen Control-Zone horizontal und vertikal zentriert erscheinen.
+   SVG und gegebenenfalls Label dürfen nicht links- oder nach oben versetzt
+   sein.
+3. Tippe Light Power einmal von `off` nach `on` und einmal von `on` nach
+   `off`. Beobachte Normal-, Busy- und bestätigten Endzustand; Buttonmaß und
+   Mittelpunkt dürfen sich zwischen den Zuständen nicht verändern.
+4. Öffne den Light-Focus über eine nicht interaktive Kartenfläche. Prüfe Row,
+   Power-Gruppe, Button und den gemeinsamen Inhalt aus SVG plus Label optisch
+   auf denselben Mittelpunkt. Betätige Power einmal; der Focus muss offen
+   bleiben.
+5. Schließe den Focus und prüfe die normale Climate-Karte. Wenn die Capability
+   Power erlaubt, muss das Power-SVG in seiner Control-Zone intern zentriert
+   sein; fehlende Capability darf keinen künstlichen Button erzeugen.
+6. Öffne Climate Focus. Prüfe, dass Minus und Plus in einer gemeinsamen,
+   zentrierten Zeile symmetrisch links/rechts liegen. In jedem 56×56-px-
+   Touchziel muss das 26×26-px-SVG horizontal und vertikal mittig sitzen.
+7. Prüfe die separate Power-Zeile darunter. Button sowie SVG-plus-Label müssen
+   auf der horizontalen Focus-Mitte liegen und dürfen nicht von der ±-Zeile
+   nach links gezogen werden.
+8. Tippe Minus und Plus je einmal und Power einmal im sicheren Testsystem.
+   Prüfe Busy/Disabled, dass kein Tap den Focus schließt oder einen zweiten
+   Focus öffnet und dass jede Aktion höchstens einmal ausgelöst wird.
+9. Prüfe das `unavailable` Light und Climate in Grid und Focus. Die Controls
+   müssen an derselben Position bleiben, klar deaktiviert sein und dürfen
+   keinen Write senden.
+10. Wiederhole Schritte 2 bis 9 nach Drehung in Landscape. Prüfe zusätzlich,
+    dass keine horizontale Seitenscrollbar, Kartenüberlappung oder
+    Footer-Verschiebung entsteht.
+11. Wiederhole die reine Sichtprüfung in Light und Dark sowie mit der langen
+    Kartenbezeichnung. Label darf ellipsieren, aber SVG, Touchziel und
+    Control-Gruppe nicht verschieben.
+12. Kehre nach Portrait zurück, schließe Focus und bestätige unveränderte
+    Gridpositionen sowie Verbleib in der HomeScreen-Web-App.
+
+### Expected Visual Result
+
+- Grid-Light, Grid-Climate-Power, Light-Focus-Power, Climate-Focus-Power und
+  Climate-Focus-± sind in ihrer jeweiligen Control-Zone vollständig zentriert.
+- Icon-only sowie Icon-plus-Label verwenden dieselbe sichtbare SVG-Geometrie;
+  es erscheint kein Unicode-Powerglyph und kein fontabhängiger Baselineversatz.
+- Zustände und lange Labels ändern weder Buttonmaß noch Mittelpunkt.
+- Portrait und Landscape bleiben ohne horizontalen Overflow, Clipping,
+  Control-Überlappung, Kartenverschiebung oder Footer-Sprung.
+
+### Expected Functional Result
+
+- Jedes erlaubte Control reagiert mit genau einem Tap; Busy verhindert
+  Doppelauslösung und Focus bleibt bei Control-Taps offen.
+- Touchziele sind mindestens ungefähr 44×44 px; Focus ± ungefähr 56×56 px.
+- `unavailable`/nicht autorisiert bleibt deaktiviert und sendet keinen Write.
+- Das Dashboard verbleibt in derselben HomeScreen-Web-App und Origin.
+
+### Fail If
+
+- Row oder Group füllt/zentriert die vorgesehene Zone nicht, Buttoninhalt oder
+  SVG sitzt sichtbar links/oben oder ± sind nicht symmetrisch.
+- Normal-, Busy-, Disabled- oder unavailable-Zustand verschiebt oder verkleinert
+  ein Control.
+- Ein Control ist abgeschnitten, überlappt Text, benötigt Mehrfachtaps, löst
+  doppelt aus oder öffnet/schließt Focus unbeabsichtigt.
+- Unicode statt SVG, horizontales Scrolling, Karten-/Footer-Reflow oder ein
+  Verlassen der HomeScreen-Web-App tritt auf.
+
+### Evidence
+
+- Fotos/Screenshots von Light Grid, Climate Grid, Light Focus und Climate
+  Focus jeweils Portrait und Landscape; Climate Focus mit ± und Power.
+- Kurzes Video für Light Power, Climate Minus/Plus/Power und Busy-Zustand.
+- Notiere iPad-Modell, iOS-Version, Dashboard-ID, Kartenformate, Theme,
+  Zeitpunkt und Ergebnis; keine Tokens, privaten Namen oder Standortdaten.
+
+### Result
+
+NOT TESTED
+
+## MT-22
+
+Sprint: 17.6, 17.7
+Requirement: Nichtregression des gemeinsamen SVG-Power-Controls und der
+vollständigen Control-Hierarchie auf der Plattform der bestätigten Focus-
+Kompressions- und Alignment-Regressionsserie.
+Device: iPad Air 2, iPadOS 15.8.5, Safari.
+Preconditions: Aktueller Part-06-Build; Safari-Cache kontrolliert aktualisiert;
+dasselbe sichere Testdashboard und dieselben explizit autorisierten Light-/
+Climate-Testentities wie MT-21. Keine produktionskritischen Geräte verwenden.
+Exact route/page: `/d/<control-alignment-test-dashboard-id>` direkt in Safari.
+Test data/entity/card required: verfügbares Light on/off, Climate off/aktiv
+mit ± und Power, unavailable-Fälle, lange Bezeichnung, Compact und
+Standard/Wide, Light/Dark, Portrait/Landscape.
+
+### Steps
+
+1. Öffne die Route in Safari im Portraitmodus und notiere Safari-Version sowie
+   sichtbare Viewportgröße einschließlich Browserleisten.
+2. Prüfe und schalte Light Power in der normalen Karte. Vergleiche optisch
+   Control-Zone, Buttonrahmen, SVG und Label in off, busy und on.
+3. Öffne Light Focus, prüfe die gemeinsame Mittellinie von Row, Group, Button
+   und SVG-plus-Label und schalte einmal. Focus muss offen bleiben.
+4. Prüfe Climate Grid mit sichtbarem Power-Control. Das SVG muss innerhalb des
+   Buttons zentriert sein; die gesamte Control-Zone darf je Presentation-Tier
+   bewusst positioniert, aber nicht intern linksbündig sein.
+5. Öffne Climate Focus und prüfe die separate ±-Zeile: Minus/Plus symmetrisch,
+   Inhalte in den Touchzielen zentriert. Prüfe danach die separate Power-Zeile
+   einschließlich SVG-plus-Label auf Focus-Mitte.
+6. Betätige Minus, Plus und Power je einmal. Beobachte Busy/Disabled und
+   bestätige, dass kein Tap Focus öffnet, schließt oder dupliziert.
+7. Drehe mit offenem Climate Focus nach Landscape und zurück. Blende die
+   Safari-Leisten durch normales Scrollverhalten ein/aus, soweit möglich, und
+   prüfe nach jeder Viewportänderung erneut alle Mittelpunkte und Panelgrenzen.
+8. Prüfe unavailable Light/Climate und eine lange Bezeichnung; Geometrie muss
+   stabil bleiben, Writes müssen deaktiviert sein.
+9. Wiederhole die Sichtprüfung in Dark und schließe Focus per Button sowie
+   Außenklick; Gridposition und Scrollposition müssen erhalten bleiben.
+
+### Expected Visual Result
+
+- Der historische Eindruck eines linksbündigen Buttons/Icons tritt weder im
+  Grid noch im Focus auf; jede Ebene bleibt in ihrer vorgesehenen Zone mittig.
+- Climate ± sind symmetrisch und Power ist unabhängig davon separat zentriert.
+- Browserleisten, Rotation, Statusklasse, Theme und lange Labels verändern
+  weder Touchzielgröße noch interne Zentrierung.
+- Kein Overlay ist gestaucht; kein horizontaler Overflow oder Grid-Reflow.
+
+### Expected Functional Result
+
+- Light und Climate reagieren mit einem Tap und genau einer Aktion.
+- Controls schließen/öffnen Focus nicht versehentlich; Busy blockiert
+  Doppelauslösung; unavailable sendet keinen Write.
+- Rotation hält genau einen funktionsfähigen Focus offen.
+
+### Fail If
+
+- Power oder Climate ± erscheinen linksbündig, intern versetzt, asymmetrisch,
+  abgeschnitten oder kleiner als ungefähr 44×44 px.
+- Rotation/Browserleisten verursachen Kompression, Überlauf oder unbedienbare
+  Controls.
+- Ein Tap löst doppelt aus, benötigt Wiederholung, verändert Focus oder sendet
+  aus unavailable einen Write.
+
+### Evidence
+
+- Screenshots der vier Control-Surfaces in Portrait und Climate Focus in
+  Landscape; zusätzlich unavailable und Dark.
+- Kurzes Video für Control-Taps plus Rotation/Browserleistenänderung.
+- Notiere iPadOS-/Safari-Version, Viewport, Dashboard-ID, Kartenformate,
+  Cacheversion und Ergebnis ohne Zugangsdaten.
+
+### Result
+
+NOT TESTED
+
+## MT-23
+
+Sprint: 17.6, 17.7
+Requirement: Desktop-Safari-Nichtregression der gemeinsamen SVG-/Control-
+Hierarchie sowie Vergleichsbasis für die beiden mobilen Safari-Geräte.
+Device: Mac mit macOS 13.7.8 und der dort aktuell installierten Safari-Version.
+Preconditions: Aktueller Part-06-Build; dasselbe sichere Testdashboard wie
+MT-21/MT-22; explizit autorisierte Light-/Climate-Testentities; Cacheversion
+kontrolliert aktualisiert.
+Exact route/page: `/d/<control-alignment-test-dashboard-id>` in Safari.
+Test data/entity/card required: Light on/off, Climate off/aktiv, unavailable,
+lange Bezeichnung, Compact und Standard/Wide, Light/Dark; schmales/hohes und
+breites/flaches Browserfenster.
+
+### Steps
+
+1. Öffne das Testdashboard in Safari in einem schmalen, hohen Fenster und
+   notiere macOS-, Safari-, Fenster- und Assetversion.
+2. Prüfe normale Light- und Climate-Karten: Control-Zone, Buttonrahmen, SVG
+   und gegebenenfalls Label müssen jeweils intern zentriert sein.
+3. Schalte Light off→on→off und beobachte off, busy, on sowie Buttonmaße.
+4. Öffne Light Focus, prüfe Row/Group/Button/Content/SVG-plus-Label und
+   betätige Power einmal.
+5. Öffne Climate Focus, prüfe die symmetrische ±-Zeile sowie die separate,
+   zentrierte Power-Zeile. Betätige Minus, Plus und Power je einmal.
+6. Ändere bei offenem Climate Focus die Fensterform von schmal/hoch zu
+   breit/flach und zurück. Prüfe nach jeder Änderung Control-Mittelpunkte,
+   Touchgrößen, Panelgrenzen und fehlenden Overflow.
+7. Wiederhole die Sichtprüfung für unavailable, lange Bezeichnung und Dark.
+8. Schließe per Close-Button und Außenklick; Grid und Scrollposition müssen
+   unverändert bleiben.
+
+### Expected Visual Result
+
+- Desktop Safari zeigt dieselbe stabile Hierarchie wie die kontrollierte
+  lokale Messung: keine fontabhängige Power-Glyphe, kein Baselineversatz und
+  kein linksbündiger anonymer Buttoninhalt.
+- Grid- und Focus-Controls bleiben in allen Zuständen und Fensterformen
+  intern zentriert; ± sind symmetrisch, Power mit Label als Einheit mittig.
+- Kein Clipping, horizontaler Overflow oder Grid-/Footer-Reflow.
+
+### Expected Functional Result
+
+- Erlaubte Controls reagieren genau einmal und halten Focus offen; Busy
+  verhindert Doppelauslösung.
+- Resize hält genau einen Focus offen; unavailable bleibt schreibgeschützt.
+
+### Fail If
+
+- Desktop Safari weicht sichtbar von den erwarteten Mittelpunkten ab, SVG oder
+  Label verschiebt sich zwischen Zuständen oder ein Control schrumpft.
+- Resize erzeugt Overflow, Kompression, Doppel-Focus oder abgeschnittene
+  Controls.
+- Control-Tap beeinflusst Focus unerwartet oder unavailable sendet Writes.
+
+### Evidence
+
+- Screenshots Light/Climate Grid und Focus in beiden Fensterformen, plus Dark
+  und unavailable; kurzes Video der Controls während Resize.
+- Notiere macOS-/Safari-Version, Fenstermaße, Assetversion, Dashboard-ID und
+  Ergebnis ohne Tokens oder private Gerätedaten.
 
 ### Result
 
