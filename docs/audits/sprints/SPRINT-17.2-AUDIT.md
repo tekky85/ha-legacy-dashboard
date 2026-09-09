@@ -22,12 +22,11 @@ Anordnung bewusst weiterentwickelt. Der aktuelle Endzustand erfüllt das
 ursprüngliche Bedienziel über fünf Presentation-Tiers und die native Focus-
 Ansicht.
 
-Part 04 fand einen aktuellen umsetzbaren Defekt: `index.html` lädt die
-gemeinsam genutzten Legacy-Assets mit `v=51`, `system.html` dieselben Dateien
-weiterhin mit `v=44`. Wegen `immutable`-Caching kann ein altes Safari dadurch
-auf Summary/Errors veraltetes `theme.js` oder `style.css` behalten. Zusätzlich
-fehlt die physische iPad-mini-/iOS-9-Abnahme. Deshalb ist Sprint 17.2 nicht
-vollständig `PASS`.
+Part 04 fand einen umsetzbaren Defekt: `index.html` lud die gemeinsam genutzten
+Legacy-Assets mit `v=51`, `system.html` dieselben Dateien mit `v=44`. Sprint
+27.1-B schließt diesen Codepfad mit einheitlichem v52 und automatisiertem
+Gleichheitstest. Die physische iPad-mini-/iOS-9-Abnahme fehlt weiterhin;
+deshalb bleibt Sprint 17.2 insgesamt `PARTIAL`.
 
 ## Requirement Matrix
 
@@ -56,7 +55,7 @@ vollständig `PASS`.
 | 17.2-TH2 | Theme überlebt Reload und Navigation | PASS | `theme.js`: `readStoredTheme()`, `persistTheme()`; Sprint-17.2-Tests; kontrollierter Browserlauf | Light blieb nach Reload und Navigation zu `/system/summary` aktiv. |
 | 17.2-TH3 | LocalStorage-Fehler und ungültige Werte werden sicher behandelt | PASS | `theme.js`: Try/Catch und Cookie-Fallback; Tests „Storage-Fehlern …“, „Ungültige Theme-Werte …“ | Kein Startabbruch bei eingeschränktem Safari-Storage. |
 | 17.2-TH4 | Theme wird vor sichtbarem Seitenaufbau angewendet | PASS | `index.html` und `system.html`: `theme.js` vor Styles; `theme.js`: frühe Root-Klasse | CSP bleibt ohne Inline-Script intakt. |
-| 17.2-TH5 | Gemeinsame Theme-/Style-Assets tragen routenübergreifend denselben Cache-Buster | PARTIAL | `src/public/index.html`: `theme.js`/`style.css?v=51`; `src/public/system.html`: dieselben Dateien mit `v=44`; `setStaticHeaders()` setzt Assets immutable | Reparatur RQ-04-01. Der vorhandene Test prüft frühes Laden, aber akzeptiert die Versionsabweichung und deckt die Regression nicht ab. |
+| 17.2-TH5 | Gemeinsame Theme-/Style-Assets tragen routenübergreifend denselben Cache-Buster | PASS | Dashboard, Systemseite, Admin und Manifest referenzieren `v=52`; `test/asset-version.test.js` erzwingt die gemeinsame, gegenüber v51 erhöhte Version. | RQ-04-01 ist in Sprint 27.1-B code-seitig geschlossen; reale Cache-/iPad-Abnahme bleibt `NOT TESTED`. |
 | 17.2-A1 | Admin-Layouteditor behält Drag/Resize, Minimum, Bounds und Kollision | PASS | `src/admin/js/app.js`, `src/admin/js/layout.js`; Part-03-Audit; `test/admin-ui.test.js` | Part 04 änderte keinen Anwendungscode. |
 | 17.2-A2 | Backend validiert Raster weiterhin autoritativ und persistiert atomar | PASS | `src/services/layout.js`; `src/services/dashboard-config-store.js`; Admin-/Persistenztests | Ungültige Konfiguration wird vor dem Schreiben abgewiesen. |
 | 17.2-SEC1 | Keine Änderung von HA-Schreibrechten, Allowlist oder System-Businesslogik | PASS | `src/services/control-authorization.js`; `src/routes/api.js`; Security-/Systemtests | Geometrie, Identität und Theme sind rein präsentational. |
@@ -66,7 +65,7 @@ vollständig `PASS`.
 | 17.2-TST1 | Identity-, Geometrie-, Presentation-, Theme- und Regressionstests | PASS | `test/sprint-17-2.test.js`, `test/legacy-layout.test.js`, `test/system-frontend.test.js`, `test/sprint-25-6.test.js` | Part-04-Fokuslauf 127/127; Gesamtsuite 329/329. |
 | 17.2-MAN1 | Reale iPad-Abnahme für kompakte Karten und Proportionen | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-11 und MT-12 | Part 04 führte ausdrücklich keinen physischen iPad-Test durch. |
 | 17.2-MAN2 | Reale iPad-Abnahme für Theme über Routen, Reload und Neustart der Web-App | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-13 | Kontrolliertes Chromium ist keine iOS-9-Abnahme. |
-| 17.2-DOC1 | Status/Roadmap und Assetversion dokumentieren | PARTIAL | `docs/PROJECT_STATUS.md`, `docs/SPRINT_ROADMAP.md`; aktuelle HTML-Dateien | Die Dokumentation beschreibt den Sprint, aber die aktuelle Cacheversion ist zwischen Wall- und Systemseite inkonsistent. Mit RQ-04-01 gemeinsam zu korrigieren. |
+| 17.2-DOC1 | Status/Roadmap und Assetversion dokumentieren | PASS | `docs/PROJECT_STATUS.md`, `docs/audits/AUDIT_INDEX.md`, `src/public/index.html`, `src/public/system.html`, `src/admin/index.html` | Sprint 27.1-B dokumentiert und regressiert den gemeinsamen Stand v52. |
 
 ## Automated and Controlled Browser Evidence
 

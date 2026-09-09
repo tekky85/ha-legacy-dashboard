@@ -81,7 +81,7 @@ Zustandsvarianten explizit abgesichert (`RQ-07-01`).
 | 19-T2 | API-, Admin-, Legacy- und Regressionstests | PASS | Gateway-, Admin-UI/API-, Persistenz-, System-Frontend-, Security- und Layouttests | 104/104 Fokuslauf und 329/329 Gesamtsuite. |
 | 19-MAN1 | Manuelle Abnahme im modernen Browser einschließlich Adminsettings | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-24 und MT-26 | Keine aktuelle manuelle Safari-Abnahme. |
 | 19-MAN2 | Reale iPad-mini-Abnahme Portrait/Landscape, Themes, lange/große Listen | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-25 | Gemäß Part-07-Regel nicht physisch ausgeführt. |
-| 19-CACHE1 | Nach Frontendänderungen einheitlich erhöhte Cacheversion | PARTIAL | `system.html` v44 versus Dashboard v51; immutable Public-Assets | Bestehender P1-Befund `RQ-04-01`. |
+| 19-CACHE1 | Nach Frontendänderungen einheitlich erhöhte Cacheversion | PASS | System, Dashboard, Admin und Manifest verwenden einheitlich v52; `test/asset-version.test.js`; immutable Header unverändert. | RQ-04-01 code-seitig geschlossen. |
 | 19-DOC1 | README, Projektstatus und Roadmap dokumentieren Regeln, Datenschutz, Route und Error-Abgrenzung | PASS – superseded by Sprint D1 | README DE/EN; Projektstatus; Roadmap | Root-README ist seit D1 Sprach-/Projekt-Landingpage; D1 wird erst in Part 08 auditiert. |
 | 19-N1 | Keine Error-Fachlogik, Registryanalyse, Historie, Templates, neuen Writes oder generische Automation | N/A – replaced by later Sprints | Sprint 20–23 | Historische Nicht-Ziele waren erfüllt; spätere geplante Erweiterungen bleiben read-only. |
 
@@ -153,8 +153,8 @@ Der erste eingeschränkte Sandboxlauf scheiterte ausschließlich viermal an
 ## Findings
 
 - Kein aktuelles `MISSING` oder `BROKEN`.
-- `PARTIAL`: `RQ-04-01` (P1 Cacheversion) und `RQ-07-01` (P2 explizite
-  Summary-Testmatrix).
+- `PARTIAL`: `RQ-07-01` (P2 explizite Summary-Testmatrix); `RQ-04-01` ist
+  code-seitig geschlossen.
 - `NOT TESTED`: MT-24 bis MT-26.
 
 ## Final Assessment

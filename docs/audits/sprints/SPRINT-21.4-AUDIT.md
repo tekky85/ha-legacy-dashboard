@@ -85,7 +85,7 @@ neuer fachlicher Laufzeit- oder Sicherheitsdefekt wurde gefunden.
 | 21.4-MAN3 | Summary-/Error-Header auf iPad mini/iOS 9 | NOT TESTED | MT-39 | Kein physischer Legacy-Gerätetest. |
 | 21.4-SHOT1 | Aktuelle echte Admin-/Summary-/Error-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Aufnahmen belegen den heutigen Entity-Rule-/Headerstand nicht zuverlässig. |
 | 21.4-DOC1 | README DE/EN, Roadmap und Projektstatus dokumentieren die Funktion | PASS | `README.de.md`; `README.en.md`; `docs/SPRINT_ROADMAP.md`; `docs/PROJECT_STATUS.md` | Die Sprint-21.4-Fachbeschreibung ist semantisch vorhanden. |
-| 21.4-CACHE1 | Geänderte gemeinsam genutzte Assets besitzen eine konsistente Cacheversion | PARTIAL | Dashboard `v=51`, System `v=44`, Admin-Public-Assets `v=50`; immutable Static Cache | Bestehender P1-Befund `RQ-04-01`. |
+| 21.4-CACHE1 | Geänderte gemeinsam genutzte Assets besitzen eine konsistente Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js`; immutable Static Cache unverändert. | RQ-04-01 code-seitig geschlossen. |
 
 ## Current Entity Rule Flow
 
@@ -132,7 +132,7 @@ Autorisierung und löst beim Suchen oder Umschalten keinen HA-Aufruf aus.
 
 ## Repair Mapping
 
-- `RQ-04-01` – inkonsistente immutable Cache-Buster;
+- `RQ-04-01` – in Sprint 27.1-B code-seitig geschlossen;
 - `RQ-08-02` – veraltete bzw. formatinkonsistente Produktbilder;
 - `RQ-11-01` – fehlende vollständige Einzelzuordnung der 75-/73-Punkte-
   Testmatrizen.
@@ -148,4 +148,5 @@ Lauf ist nicht Teil dieses Parts.
 ## Remaining Sprint 21.4 Gaps
 
 Keine bestätigte fachliche Laufzeitlücke. Vor einer finalen RC-Freigabe sind
-`RQ-04-01`, `RQ-08-02`, `RQ-11-01` sowie MT-37 bis MT-39 abzuarbeiten.
+`RQ-08-02`, `RQ-11-01` sowie MT-37 bis MT-39 abzuarbeiten; `RQ-04-01` ist
+code-seitig geschlossen.

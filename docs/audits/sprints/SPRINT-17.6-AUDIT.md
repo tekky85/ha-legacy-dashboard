@@ -102,11 +102,17 @@ Trennung von Grid- und Focus-Geometrie aufzuheben.
 - Kein aktuelles `MISSING` oder `BROKEN`.
 - Kein neuer umsetzbarer Reparaturpunkt.
 - `NOT TESTED`: MT-21 bis MT-23 für die drei geforderten Safari-Geräte.
-- RQ-04-01 aus Part 04 bleibt separat offen und betrifft Cache-Buster, nicht
-  die Power-Control-Implementierung.
+- RQ-04-01 aus Part 04 betraf Cache-Buster, nicht die Power-Control-
+  Implementierung, und ist seit Sprint 27.1-B code-seitig geschlossen.
 
 ## Final Assessment
 
 Sprint 17.6 ist im aktuellen Code implementiert und automatisiert grün. Wegen
 der ausdrücklich geforderten, noch nicht durchgeführten realen Safari-
 Abnahmen bleibt der Sprint-27-Baselinestatus `PARTIAL`.
+
+## Sprint-27.1-B-Re-Audit
+
+Power-SVG, gemeinsame Presentation-Assets und alle Entry Points tragen v52.
+`test/asset-version.test.js` und 331/331 Regressionen sind grün. RQ-04-01 ist
+code-seitig geschlossen; physische Control-Abnahme bleibt `NOT TESTED`.

@@ -25,8 +25,8 @@ ersetzen. Keine aktuelle funktionale Anforderung ist `MISSING` oder `BROKEN`.
 
 Der Gesamtstatus bleibt `PARTIAL`, weil die ausdrücklich verlangten manuellen
 Abnahmen im modernen Browser und auf dem realen iPad mini nicht durchgeführt
-wurden. Zusätzlich bleibt der bereits in Part 04 gefundene inkonsistente
-Cache-Buster gemeinsam genutzter Wall-Assets als `RQ-04-01` offen.
+wurden. Der in Part 04 gefundene Cache-Buster `RQ-04-01` ist seit Sprint
+27.1-B code-seitig geschlossen.
 
 ## Requirement Matrix
 
@@ -70,7 +70,7 @@ Cache-Buster gemeinsam genutzter Wall-Assets als `RQ-04-01` offen.
 | 18-T1 | Geforderte Collector-/Cache-/API-/Routing-/Legacy-/Performance-Tests | PASS | `test/system-foundation.test.js`, `test/gateway.test.js`, `test/system-frontend.test.js`; Fokuslauf 104/104; Gesamtsuite 329/329 | Die 42 spezifizierten Fundamentfälle sind direkt oder in äquivalenten aktuellen Regressionen abgedeckt. |
 | 18-MAN1 | Manuelle Abnahme im modernen Browser | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-24 | Kein aktueller manueller Safari-/Browserlauf in Part 07. |
 | 18-MAN2 | Reale iPad-mini-/iOS-9-Abnahme in Portrait/Landscape und Light/Dark | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-25 | Gemäß Part-07-Regel keine physische Abnahme. |
-| 18-CACHE-V | Geänderte Legacy-Assets werden konsistent versioniert | PARTIAL | `index.html` v51, `system.html` v44, Admin-shared assets v50; `setStaticHeaders()` liefert immutable | Bestehender Befund `RQ-04-01`; Part 07 erweitert nur die Evidenz und repariert nicht. |
+| 18-CACHE-V | Geänderte Legacy-Assets werden konsistent versioniert | PASS | Dashboard, System, Admin und Manifest verwenden v52; `setStaticHeaders()` bleibt immutable; `test/asset-version.test.js` verhindert erneute Abweichungen. | Sprint 27.1-B schließt RQ-04-01 code-seitig. |
 | 18-DOC1 | README, Projektstatus und Roadmap dokumentieren Routen, Snapshot und read-only Semantik | PASS – superseded by Sprint D1 | README DE/EN; `docs/PROJECT_STATUS.md`; `docs/SPRINT_ROADMAP.md` | Root-README wurde in D1 bewusst zur Sprachauswahl; semantischer Inhalt lebt in DE/EN. D1 selbst gehört Part 08. |
 | 18-N1 | Keine vollständige Summary-/Error-/Registry-/Repair-/Matter-/Automation-Fachlogik in Sprint 18 | N/A – replaced by later Sprints | Sprint 19, 20–23 | Historisches Scope-Limit war erfüllt; spätere geplante Sprints implementierten diese Funktionen read-only. |
 
@@ -93,8 +93,8 @@ angehängt. Der Browser erhält weder Registries noch rohe Diagnosepayloads.
 
 ## Shared Asset and Cache Finding
 
-`RQ-04-01` bleibt gültig und ist jetzt mit allen drei relevanten Entry Points
-belegt:
+Der historische Ausgangsbefund `RQ-04-01` war mit allen drei relevanten Entry
+Points belegt:
 
 - Dashboard: gemeinsame Assets `theme.js`, `style.css`, `compat.js` und
   `system-navigation.js` mit `v=51`;
@@ -102,9 +102,9 @@ belegt:
 - Admin: die aus dem Public-Baum geteilten `icons.js` und `presentation.js`
   mit `v=50`, im Dashboard mit `v=51`.
 
-Es gibt keinen zentralen Assetversions-Mechanismus. Weil Public-JS/CSS mit
-`max-age=31536000, immutable` ausgeliefert wird, ist dies ein aktueller
-Release-Korrektheitsbefund mit Priorität P1. Part 07 ändert den Code nicht.
+Sprint 27.1-B setzt alle genannten Referenzen und das Manifest auf v52 und
+ergänzt `test/asset-version.test.js`. Die immutable Header bleiben korrekt;
+der Codebefund ist geschlossen, der reale Cachewechsel bleibt `NOT TESTED`.
 
 ## Automated Evidence
 
@@ -124,7 +124,7 @@ Testfehler.
 ## Findings
 
 - Kein aktuelles `MISSING` oder `BROKEN`.
-- `PARTIAL`: gemeinsamer Asset-Cache-Buster (`RQ-04-01`).
+- `PASS`: gemeinsamer Asset-Cache-Buster (`RQ-04-01`) code-seitig geschlossen.
 - `NOT TESTED`: moderne Browserabnahme MT-24 und physische Legacy-Abnahme
   MT-25.
 - Keine neue Reparatur-ID für Sprint 18; der Befund besitzt dieselbe Root

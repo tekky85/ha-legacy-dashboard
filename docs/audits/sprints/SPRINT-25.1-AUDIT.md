@@ -28,12 +28,10 @@ erhalten eine ausschließlich aus den sichtbaren Children abgeleitete Severity,
 Counts und Details. Der globale ungefilterte Healthzustand bleibt davon
 getrennt.
 
-`PARTIAL` entsteht nicht aus einem neu gefundenen fachlichen Filter- oder
-Themefehler. Die gemeinsam genutzten Assets werden jedoch weiterhin mit
-inkonsistenten immutable Cacheversionen ausgeliefert (`RQ-04-01`): Dashboard
-`v=51`, Systemseite `v=44`, Admin teilweise `v=50`. Damit kann gerade ein
-Legacy-Gerät routeabhängig eine alte Theme-/Filter-/Navigationseinbindung
-behalten. Außerdem fehlt eine lückenlose direkte Zuordnung aller 74
+`PARTIAL` entsteht nicht aus einem fachlichen Filter- oder Themefehler.
+Sprint 27.1-B hat die früher inkonsistenten immutable Cacheversionen aus
+`RQ-04-01` mit v52 und einem Gleichheitstest code-seitig geschlossen. Es fehlt
+weiterhin eine lückenlose direkte Zuordnung aller 74
 Spezifikationsfälle (`RQ-15-01`), und die vorgeschriebene reale iPad-/Safari-
 Abnahme steht aus.
 
@@ -56,7 +54,7 @@ Abnahme steht aus.
 | 25.1-THEME-13 | Ungültiger gespeicherter Wert fällt sicher zurück | PASS | Nur `dark`/`light` werden akzeptiert; Tests mit `sepia`/`contrast` starten sicher in Light. |
 | 25.1-THEME-14 | Totaler Storage-Ausfall lässt Umschaltung in der Sitzung zu | PASS | `Theme.current` und Klassenänderung hängen nicht vom Erfolg der Persistenz ab; gezielter Test ist grün. |
 | 25.1-THEME-15 | Keine Secrets in der Theme-Preference | PASS | Gespeichert wird ausschließlich der String `dark` oder `light`; kein Token-/Entityinhalt. |
-| 25.1-CACHE-01 | Aktuelle Theme-/Systemlogik wird routeübergreifend konsistent ausgeliefert | PARTIAL | `index.html` verwendet `v=51`, `system.html` `v=44`, Admin `v=50`; statische Assets sind immutable. `RQ-04-01`. |
+| 25.1-CACHE-01 | Aktuelle Theme-/Systemlogik wird routeübergreifend konsistent ausgeliefert | PASS | `index.html`, `system.html`, Admin und Manifest verwenden v52; `test/asset-version.test.js` prüft insbesondere Theme/Style/Compat/Systemnavigation. | RQ-04-01 code-seitig geschlossen; reale HomeScreen-Abnahme bleibt `NOT TESTED`. |
 | 25.1-SEV-01 | `All` zeigt alle Severity-Stufen | PASS | `activeSeverityFilter === "all"` umgeht nur die Severity-Bedingung; System-Frontendtest prüft die vollständige Fixture. |
 | 25.1-SEV-02 | `Critical` zeigt ausschließlich Critical | PASS | `issue.severity === activeSeverityFilter`; Test prüft sichtbares Critical-Child und schließt Nachbarstufen aus. |
 | 25.1-SEV-03 | `Error` zeigt ausschließlich Error | PASS | Exakter Stringvergleich; keine kumulative Ranglogik im Filter. |
@@ -139,13 +137,13 @@ ungefiltertes Error-Payload
 - MT-34: exakte Severity-/State-Filter und child-first Device Groups;
 - MT-40: Theme/Health/Return im HomeScreen;
 - MT-42: Desktop-Safari, Failure-Fallback und Langzeitlauf;
-- `RQ-04-01`: inkonsistente immutable Assetversionen;
+- `RQ-04-01`: in Sprint 27.1-B code-seitig geschlossen;
 - `RQ-08-02`: veraltete Produktbilder;
 - `RQ-15-01`: fehlende vollständige Einzelzuordnung der 74 Testfälle.
 
 ## Abschluss
 
 Die aktuelle fachliche Theme- und Filterlogik erfüllt den spezifizierten
-Endzustand. Sprint 25.1 kann wegen `RQ-04-01`, der unvollständigen direkten
+Endzustand. Sprint 25.1 kann wegen der unvollständigen direkten
 Testtraceability und der ausstehenden realen Safari-/iPad-Abnahme noch nicht
 als vollständig freigegeben gelten. Es wurde kein Anwendungscode repariert.

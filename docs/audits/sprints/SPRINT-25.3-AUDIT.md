@@ -82,7 +82,7 @@ und 330/330 vollständigen Tests bis zu den bestehenden Matrix-/Realgerätegates
 | 25.3-ROUTE-02 | Richtiger MIME-Typ, `nosniff` und restriktive CSP | PASS | Route setzt JPEG/PNG-Type, `X-Content-Type-Options: nosniff`; CSP erlaubt Bilder nur von `self`/`data:`. |
 | 25.3-ROUTE-03 | Fehlendes/unreferenziertes Asset liefert kontrolliert 404 | PASS | Serverroute gibt generischen 404; Wall-Renderer bleibt bedienbar und behält keine vorherige Bilddarstellung. |
 | 25.3-CACHE-01 | Ersatz verwendet eine neue Asset-ID und umgeht alten Bildcache | PASS | Jeder Upload erzeugt neue Random-ID; Public URL ändert sich, Assetantwort ist immutable cachebar. |
-| 25.3-CACHE-02 | Gemeinsame UI-Assets werden auf allen Routen konsistent versioniert | PARTIAL | Dashboard lädt v51, Systemseite v44, Admin geteilte Assets v50. Hintergrundruntime/Wall-CSS sind intern v51, Preview-/Theme-/Routenparität bleibt aber cacheabhängig. `RQ-04-01`. |
+| 25.3-CACHE-02 | Gemeinsame UI-Assets werden auf allen Routen konsistent versioniert | PASS | Dashboard, Systemseite, Admin und Manifest laden v52; `test/asset-version.test.js` prüft zusätzlich die geteilten Presentation-/Icon- und Theme-/Navigationsassets. | RQ-04-01 code-seitig geschlossen; reale Background-/Preview-Abnahme bleibt `NOT TESTED`. |
 | 25.3-RUNTIME-01 | Wall-Display rendert das jeweilige Dashboardbild | PASS | `src/public/js/app.js:applyDashboardAppearance()` setzt Body-Background aus ausschließlich validiertem `image_url`. |
 | 25.3-RUNTIME-02 | Position, Cover/Contain und Overlay werden angewendet | PASS | Enumprüfung im Client, Body-Position/-Size/-Repeat und separate Overlay-Opacity; Sprint-25.3-Test grün. |
 | 25.3-RUNTIME-03 | Dashboardwechsel entfernt alte Appearance vollständig | PASS | `applyDashboardAppearance()` löscht Image/Position/Size und versteckt Overlay, wenn kein gültiger Background vorliegt. |
@@ -183,7 +183,7 @@ für PNG zuverlässig.
 - `RQ-16-01`: automatisiert geschlossen; reale Background-Abnahmen bleiben
   `NOT TESTED`;
 - `RQ-16-02`: unvollständige direkte Zuordnung der 84 Testfälle;
-- `RQ-04-01`: inkonsistente immutable Version gemeinsam genutzter Assets;
+- `RQ-04-01`: in Sprint 27.1-B code-seitig geschlossen;
 - `RQ-13-01`: veröffentlichte RC.1-Artefakte enthalten nicht den heutigen Code;
 - `RQ-14-04`: Stable-Pipeline erzwingt diese manuellen Gates nicht.
 

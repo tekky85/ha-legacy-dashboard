@@ -110,10 +110,16 @@ Schreibdomain.
 - Kein aktuelles `MISSING` oder `BROKEN`.
 - Kein neuer umsetzbarer Reparaturpunkt.
 - `NOT TESTED`: physische iPad-mini-/iOS-9-Abnahme MT-18.
-- RQ-04-01 aus Part 04 bleibt separat offen.
+- RQ-04-01 aus Part 04 ist seit Sprint 27.1-B code-seitig geschlossen.
 
 ## Final Assessment
 
 Sprint 17.4 erfüllt die weiterhin anwendbaren implementierbaren Anforderungen.
 Wegen der fehlenden realen Zielgeräteabnahme bleibt der Sprint-27-
 Baselinestatus `PARTIAL`.
+
+## Sprint-27.1-B-Re-Audit
+
+`RQ-04-01` ist code-seitig geschlossen: Dashboard, System, Admin und Manifest
+verwenden v52; `test/asset-version.test.js` und die Gesamtsuite 331/331 sind
+grün. Die Focus-Logik blieb unverändert. Reale iPad-Abnahme bleibt `NOT TESTED`.

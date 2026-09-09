@@ -116,3 +116,10 @@ ohne JPEG-Validierung oder Uploadgrenzen abzuschwächen.
 Keine Credential-, HA-Write-, Adminauthentifizierungs- oder Privilegien-
 Regression wurde gefunden. Der frühere PNG-Datenintegritätsbefund ist
 automatisiert geschlossen; die realen HAOS-/iPad-Abnahmen bleiben ausstehend.
+
+## Sprint-27.1-B-Re-Audit
+
+Die unveränderten Netzwerk-/JPEG-Pfade werden nun mit konsistenten v52-
+Frontendreferenzen ausgeliefert. Assetversions-Test und Gesamtsuite 331/331
+sind grün; keine Netzwerkberechtigung wurde ergänzt. Reale HAOS-/iPad-Abnahme
+bleibt `NOT TESTED`.

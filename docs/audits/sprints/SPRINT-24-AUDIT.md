@@ -219,3 +219,10 @@ real validiert werden.
 
 Audit Part 13 ist abgeschlossen. Audit Part 14 wurde nicht begonnen und umfasst
 laut `AUDIT_INDEX.md` ausschließlich Sprint 25.
+
+## Sprint-27.1-B-Re-Audit
+
+Standalone- und App-Paket verteilen denselben nun v52-konsistent referenzierten
+Quellbaum. `test/asset-version.test.js`, App-/Standalone-Regressionen und die
+Gesamtsuite 331/331 sind grün. RQ-04-01 ist code-seitig geschlossen; HAOS-
+Runtime und reale Clients bleiben `NOT TESTED`.

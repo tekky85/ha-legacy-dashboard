@@ -318,3 +318,9 @@ P1-Befunde offenstehen.
 
 Audit Part 14 ist abgeschlossen. Audit Part 15 wurde nicht begonnen und
 umfasst laut `AUDIT_INDEX.md` ausschließlich Sprint 25.1 und 25.2.
+
+## Sprint-27.1-B-Re-Audit
+
+Release-/Standalone-/App-Quellen enthalten dieselben v52-Referenzen. Der neue
+Assetversions-Test und die Gesamtsuite 331/331 sind grün. RQ-04-01 ist
+code-seitig geschlossen; daraus folgt keine Artefakt- oder RC-Freigabe.

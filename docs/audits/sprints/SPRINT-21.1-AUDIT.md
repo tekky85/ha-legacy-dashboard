@@ -67,7 +67,7 @@ Cross-Device-Grouping und keine Write-Erweiterung wurde gefunden.
 | 21.1-T1 | Vollständige 77-Punkte-Testanforderung nachvollziehbar abgesichert | PARTIAL | 5 direkte Sprint-21.1-Tests plus breite Frontend-/Issue-/Securitytests; Fokus 153/153 | Mehrere Layout-/UI-/Long-Name-/Statusvarianten nur indirekt oder manuell; `RQ-09-02`. |
 | 21.1-MAN1 | Moderne Safari-Abnahme von Gruppen, Filtern, Details und Layout | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-31 | Kein realer Safari-Lauf in Part 09. |
 | 21.1-MAN2 | iPad mini/iOS 9 Portrait/Landscape/HomeScreen | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-32 | Kein physischer Zielgerätetest. |
-| 21.1-CACHE2 | Systemassets besitzen konsistente Cacheversion | PARTIAL | Systemseite `v=44`, Dashboard `v=51`, immutable static | Bestehender `RQ-04-01`, nun auch Sprint 21.1 zugeordnet. |
+| 21.1-CACHE2 | Systemassets besitzen konsistente Cacheversion | PASS | Systemseite, Dashboard, Admin und Manifest verwenden v52; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen. |
 | 21.1-SHOT1 | Stark geändertes Error Dashboard besitzt aktuellen echten Screenshot | PARTIAL | D1-Audit; `RQ-08-02`; MT-29 | Vorhandene Error-Aufnahme ist formatseitig falsch benannt und nach späteren Änderungen nicht belastbar. |
 | 21.1-DOC1 | Device Groups, Filter, Spalten, Standalone und Details dokumentiert | PASS | README DE/EN, Projektstatus, Roadmap | Spätere Filter-/Spaltensemantik ist als aktuelle Wahrheit dokumentiert. |
 
@@ -149,7 +149,7 @@ noch den globalen Health-Status oder Write Grants.
 
 ## Findings
 
-- `PARTIAL`: `RQ-09-02`, bestehend `RQ-04-01` und `RQ-08-02`.
+- `PARTIAL`: `RQ-09-02` und `RQ-08-02`; `RQ-04-01` ist code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: keine fachliche Gruppierungs-/Navigationsfunktion bestätigt.
 - `NOT TESTED`: MT-31 und MT-32.

@@ -149,3 +149,9 @@ veraltet.
 - MT-63: vollständige physische iPad-mini-Session für Portrait/Landscape,
   Rotation, alle aktuellen Typen/Tiers, lange Inhalte, Controls, Focus,
   Background, Theme und HomeScreen.
+
+## Sprint-27.1-B-Re-Audit
+
+Card-Presentation, Icons und Styles werden in Dashboard/System/Admin gemeinsam
+als v52 referenziert. `test/asset-version.test.js`, Matrix-Regressionen und die
+Gesamtsuite 331/331 sind grün. RQ-18-01 und reale iPad-Matrix bleiben offen.

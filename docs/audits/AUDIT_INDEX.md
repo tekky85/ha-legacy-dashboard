@@ -828,8 +828,29 @@ nicht, dass das Projekt RC-ready ist.
 - Manuell: MT-59 und MT-60 sind jetzt ausführbar; alle 72 Ergebnisse bleiben
   `NOT TESTED`. Weitere verknüpfte Tests bleiben nur wegen anderer Repairs
   blockiert.
-- Nächster zulässiger Schritt: Batch 27.1-B (`RQ-04-01`); kein anderer Repair
-  wurde begonnen.
+- Nächster zulässiger Schritt war Batch 27.1-B (`RQ-04-01`); kein anderer
+  Repair wurde begonnen.
+
+## Sprint 27.1 – Repair Batch B
+
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Basiscommit: `3830259`
+- Repair: `RQ-04-01`
+- Root Cause: Dashboard, Systemseite, Admin und Manifest verwendeten trotz
+  immutable Static-Cache unterschiedliche Assetquery-Versionen v51/v44/v50.
+- Implementierung: sämtliche Assetreferenzen auf die erhöhte gemeinsame
+  Version v52 gesetzt; `test/asset-version.test.js` erzwingt Gleichheit,
+  Erhöhung und die Parität gemeinsam genutzter Theme-/Navigation-/Icon-/
+  Presentation-Assets.
+- Re-Audit: Sprint 17.2 bis 17.7 sowie alle im kanonischen Finding betroffenen
+  Audits Sprint 18 bis 26.2, insgesamt 29 Auditdateien.
+- Testevidenz: 46/46 fokussiert und 331/331 vollständig; keine Produktlogik,
+  HA-Route, Berechtigung oder Cache-Header-Semantik verändert.
+- Manuell: `RQ-04-01` wurde aus allen Testabhängigkeiten entfernt; sämtliche
+  72 Ergebnisse bleiben `NOT TESTED`, kombinierte Tests behalten ihre übrigen
+  Blocker.
+- Ergebnis: `RQ-04-01` **CODE CLOSED / MANUAL PENDING**. Sprint 27.1 stoppt
+  planmäßig nach Batch B; kein weiterer Repair wurde begonnen.
 
 ## Verifikation der Audit-Baseline
 

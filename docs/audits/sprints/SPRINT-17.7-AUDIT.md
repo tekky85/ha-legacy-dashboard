@@ -100,10 +100,16 @@ Flexzentrierung. Volle Rows zentrieren Inline-Block-Groups per
 - Kein aktuelles `MISSING` oder `BROKEN`.
 - Kein neuer Reparaturauftrag.
 - Drei reale Safari-Matrizen bleiben als MT-21 bis MT-23 `NOT TESTED`.
-- RQ-04-01 bleibt unabhängig offen.
+- RQ-04-01 ist seit Sprint 27.1-B code-seitig geschlossen.
 
 ## Final Assessment
 
 Sprint 17.7 ist strukturell und automatisiert vollständig vorhanden. Die
 fehlenden physischen Safari-Abnahmen verhindern allein den Gesamtstatus
 `PASS`; der Sprint-27-Baselinestatus bleibt `PARTIAL`.
+
+## Sprint-27.1-B-Re-Audit
+
+Die unveränderte gemeinsame Control-Hierarchie wird über Dashboard/System/Admin
+konsistent als v52 referenziert. Gleichheitstest und Gesamtsuite 331/331 sind
+grün; RQ-04-01 ist code-seitig geschlossen, iPad bleibt `NOT TESTED`.

@@ -104,7 +104,7 @@ Abnahmelücken `PARTIAL`.
 | 23-MAN4 | Nichtregression auf iPad Air 2/iPadOS 15.8.5 | NOT TESTED | MT-49 | Keine physische Geräteprüfung. |
 | 23-SHOT1 | Aktuelle echte Errors-Impact-/Admin-Diagnostics-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vier Systembilder haben falsches Dateiformat; UI-Stand ist nicht belastbar aktuell. |
 | 23-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Read-only-Impact/Traces | PASS | README DE/EN; Projektstatus; Roadmap | Keine Automation-Write-Funktion versprochen. |
-| 23-CACHE4 | Gemeinsame Wall-Assets besitzen routeübergreifend gleiche Cacheversion | PARTIAL | Dashboard `v=51`, System `v=44`, Admin geteilt `v=50`; immutable | Bestehender P1-Befund `RQ-04-01`. |
+| 23-CACHE4 | Gemeinsame Wall-Assets besitzen routeübergreifend gleiche Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen. |
 
 ## Current Automation Diagnostics Flow
 
@@ -167,7 +167,8 @@ erfüllt aber nicht den spezifizierten produktiven `unknown`-Impactpfad.
 - `RQ-12-03` – Reference-Index bei Cache-Hit mit frischem Inventory neu bauen;
 - `RQ-12-04` – vollständige Sprint-22-/23-Testmatrizen zuordnen/härten;
 - `RQ-09-01` – Error-only-Reconnect betrifft auch Automation Config/Trace;
-- `RQ-04-01`, `RQ-08-02`, `RQ-08-03` bleiben anwendbar.
+- `RQ-08-02` und `RQ-08-03` bleiben anwendbar; `RQ-04-01` ist code-seitig
+  geschlossen.
 
 ## Security and Deployment Review
 
@@ -181,7 +182,8 @@ Part 13 bzw. MT-46.
 ## Remaining Sprint 23 Gaps
 
 Vor `COMPLETE` sind `RQ-12-02`, `RQ-12-03`, `RQ-12-04`, `RQ-09-01`,
-`RQ-04-01`, `RQ-08-02` sowie MT-46 bis MT-49 zu schließen. Insbesondere darf der
+`RQ-08-02` sowie MT-46 bis MT-49 zu schließen; `RQ-04-01` ist code-seitig
+geschlossen. Insbesondere darf der
 `unknown`-Pfad keine dynamische Automation fälschlich einer konkreten Störung
 als Ursache zuordnen; die Reparatur muss Unsicherheit sichtbar, aber
 kausalitätsfrei darstellen.

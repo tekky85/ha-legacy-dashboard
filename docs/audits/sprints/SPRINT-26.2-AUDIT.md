@@ -87,7 +87,7 @@ Control- oder Securitydefekt gefunden.
 | 26.2-S3 | HA-/Supervisor-/Admin-Token getrennt und backend-only | PASS | Runtime-/Adminauth und Frontendscan; keine Tokenwerte im Public Payload. |
 | 26.2-S4 | Keine Registry-/Area-/Label-Writes | PASS | Read-only Metadatenpfade unverändert. |
 | 26.2-LEG1 | Safari iOS 9 / ES5 | PASS | Syntax-/Verbotscan über alle Wall-JS-Dateien grün. |
-| 26.2-CACHE1 | Aktuelle Control-/Capability-UI konsistent ausgeliefert | PARTIAL | Geteilte Assets tragen v51/v44/v50; stale UI kann neue Servercapabilities falsch darstellen. `RQ-04-01`. |
+| 26.2-CACHE1 | Aktuelle Control-/Capability-UI konsistent ausgeliefert | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js` prüft shared Presentation-/Icon-Assets und alle Entry Points. | RQ-04-01 code-seitig geschlossen; echte iPad-Control-Abnahme bleibt `NOT TESTED`. |
 | 26.2-MATRIX1 | Card-Matrix erwartet capabilityabhängige Controls korrekt | BROKEN | Alter Haupt-Harness verlangt bei Climate unknown/unavailable pauschal drei Controls. Bestehendes `RQ-18-01`; Produktlogik selbst korrekt. |
 | 26.2-T1 | Lightfälle 1–10 automatisiert | PASS | `test/sprint-26-2.test.js` und `test/gateway.test.js`, mehrere IDs. |
 | 26.2-T2 | Climate-Powerfälle 11–20 automatisiert | PASS | Mehrere Modusmatrizen, no-off, preferred/last/fallback/unavailable/unauthorized. |
@@ -97,7 +97,7 @@ Control- oder Securitydefekt gefunden.
 | 26.2-M2 | Reale iPad-Controls über Grid/Focus/Room | NOT TESTED | MT-72. |
 | 26.2-DOD1 | Zentraler produktiver Endzustand | PASS | Kein verbleibender Code-/Securitydefekt im kontrollierten Audit gefunden. |
 | 26.2-DOD2 | Reale Zielsystemabnahme | NOT TESTED | Keine Produktion/physische Hardware in Part 19. |
-| 26.2-DOD3 | Vollständig RC-freigabefähig | PARTIAL | Reale Gates sowie RQ-04-01/RQ-18-01 und globale RC-P1-Blocker bleiben offen. |
+| 26.2-DOD3 | Vollständig RC-freigabefähig | PARTIAL | RQ-04-01 ist code-seitig geschlossen; reale Gates, RQ-18-01 und weitere globale RC-P1-Blocker bleiben offen. |
 
 ## Root Causes und finale Architektur
 
@@ -130,7 +130,8 @@ auf.
 ## Reparatur- und Manuelltestbezug
 
 - Kein neuer Part-19-Reparatureintrag.
-- `RQ-04-01`: aktuelle Capability-/Controlassets konsistent ausliefern.
+- `RQ-04-01`: Capability-/Controlassets seit Sprint 27.1-B konsistent als v52
+  ausgeliefert.
 - `RQ-18-01`: Harnesserwartungen aus echten Capabilities ableiten.
 - MT-71: reale HA-Integrationsmatrix mit drei Lights und mehreren Climates.
 - MT-72: Grid-/Focus-/Room-Controlmatrix auf dem iPad mini.

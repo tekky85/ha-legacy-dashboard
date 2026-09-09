@@ -67,7 +67,7 @@ geänderte gemeinsame Legacy-Style-Datei.
 | 17.3-SEC3 | Preview-Input und Power-Payload werden serverseitig validiert | PASS | Admin-Preview-Entityfilter, API-Payloadprüfung, Rate-Limit | Manipulierte Entity-/Servicewerte werden nicht durchgereicht. |
 | 17.3-LEG1 | Wall-Display bleibt ES5/Safari-iOS-9-kompatibel | PASS | 21× `node --check`; statischer Forbidden-Syntax-Scan | Kein Fetch, Promise, Arrow, `let/const`, Async/Await oder moderne Module. |
 | 17.3-LEG2 | Kein CSS Grid, Flexbox-`gap`, ResizeObserver oder Container Query im Wall-Frontend | PASS | statischer Scan; Legacy-/Systemtests | Focus basiert auf fixed Positioning und klassischem Flexbox. |
-| 17.3-CACHE1 | Geänderte Legacy-Assets verwenden einen konsistent erhöhten Cache-Buster | PARTIAL | `index.html` nutzt `v=51`; `system.html` lädt gemeinsames `style.css`/`theme.js` mit `v=44` | Gemeinsamer Reparaturpunkt RQ-04-01; besonders relevant für aggressives Safari-Caching. |
+| 17.3-CACHE1 | Geänderte Legacy-Assets verwenden einen konsistent erhöhten Cache-Buster | PASS | Alle drei HTML-Einstiegspunkte und `manifest.json` verwenden v52; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen; aggressiver realer Safari-Cache bleibt manuell zu prüfen. |
 | 17.3-REG1 | Sprint-17.2-Geometrie/Theme sowie System-Dashboards bleiben regressionsfrei | PASS | Sprint-17.2-, Legacy-, Gateway- und Systemtests; Browserlauf | Kein Summary-/Error-Businesscode wurde in Part 04 verändert. Cacheauslieferung separat `PARTIAL`. |
 | 17.3-TST1 | Preview-, Control-, Climate-Power-, Focus-, Security- und Regressionstests | PASS | `test/sprint-17-3.test.js`, 17.4–17.7, 25.6, 26.2, Gateway/Security | Part-04-Fokuslauf 127/127; Gesamtsuite 329/329. |
 | 17.3-MAN1 | Reale Admin-Preview-Abnahme in aktuellem Safari mit Pointer/Resize | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-17 | Kontrollierter Chromium-Lauf belegt Grundfunktion, nicht reale Safari-/Pointer-Gesten. |
@@ -114,7 +114,7 @@ existiert kein Browser-HA-WebSocket oder generischer Serviceproxy.
 
 ## Findings
 
-- `PARTIAL`: gemeinsamer Cache-Buster-Befund RQ-04-01.
+- `PASS`: gemeinsamer Cache-Buster-Befund RQ-04-01 ist code-seitig geschlossen.
 - `NOT TESTED`: reale iPad-Focus-/Control-Abnahmen MT-14 bis MT-16 und reale
   Safari-/Pointer-Preview-Abnahme MT-17.
 - Kein `MISSING` und kein aktuell reproduzierter funktionaler `BROKEN`-Befund.

@@ -88,7 +88,7 @@ Abnahmen; kein neuer funktionaler oder Security-Defekt wurde gefunden.
 | 21.5-MAN3 | macOS Safari: Healthzustände, API-Ausfall und Filterunabhängigkeit | NOT TESTED | MT-42 | Kein realer Safari-Lauf in Part 11. |
 | 21.5-SHOT1 | Aktuelle echte Dashboard-/Summary-/Error-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Bilder belegen Navigation/Health des heutigen Builds nicht vollständig. |
 | 21.5-DOC1 | README DE/EN, Roadmap und Projektstatus dokumentieren Navigation/Health/Return | PASS | `README.de.md`; `README.en.md`; Roadmap; Projektstatus | Fachbeschreibung ist in beiden Sprachen vorhanden. |
-| 21.5-CACHE1 | Navigation/Health und gemeinsame Styles besitzen routeübergreifend konsistente Cacheversion | PARTIAL | Dashboard `system-navigation.js/style.css?v=51`; Systemseite dieselben Assets `v=44`; immutable Cache | Bestehender P1-Befund `RQ-04-01`, jetzt mit direkter Part-11-Evidenz. |
+| 21.5-CACHE1 | Navigation/Health und gemeinsame Styles besitzen routeübergreifend konsistente Cacheversion | PASS | Dashboard und Systemseite laden `system-navigation.js`/`style.css` mit v52; Admin/Manifest sind ebenfalls v52; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen. |
 
 ## Current Health and Navigation Flow
 
@@ -146,8 +146,8 @@ Systemseitenpayload und können die globale Statuspipeline nicht beeinflussen.
 
 ## Repair Mapping
 
-- `RQ-04-01` – Navigation/Health kann routeabhängig aus unterschiedlich
-  versioniertem immutable Cache stammen;
+- `RQ-04-01` – Navigation/Health-Cachepfad in Sprint 27.1-B code-seitig
+  geschlossen;
 - `RQ-08-02` – veraltete Produktbilder;
 - `RQ-11-01` – fehlende vollständige Einzelzuordnung der 75-/73-Punkte-
   Testmatrizen.
@@ -161,5 +161,5 @@ Browser-WebSocket oder HA-Write wurde hinzugefügt.
 
 ## Remaining Sprint 21.5 Gaps
 
-Keine bestätigte fachliche Laufzeitlücke. Vor RC sind `RQ-04-01`,
+Keine bestätigte fachliche Laufzeitlücke. Vor RC sind
 `RQ-08-02`, `RQ-11-01` sowie die realen MT-40 bis MT-42 abzuschließen.

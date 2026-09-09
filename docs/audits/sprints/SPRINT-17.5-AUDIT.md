@@ -55,7 +55,7 @@ diesem Baseline-Part; deshalb bleibt der Gesamtstatus `PARTIAL`.
 | 17.5-BODY1 | Fixed Overlay, Hintergrund-Scroll-Lock und Close/Außenklick | PASS | `.focus-overlay`; `lockPageScroll()`/`unlockPageScroll()`; Browserlauf | Außenklick entfernte Overlayklasse und Body-Lock. |
 | 17.5-G1 | Grid-Renderer und Gridgeometrie bleiben unabhängig | PASS | `Dashboard.getFocusSource()` liefert nur Daten; Focus-Renderer ohne Gridselectors | Focus-Öffnen änderte das gemessene Grid-Rechteck nicht. |
 | 17.5-AP1 | Normale Admin-Live-Preview bleibt gridorientiert; Focus-Preview optional | N/A | `src/admin/js/app.js`: `renderLivePreview()` | Es existiert keine Focus-Preview und keine Pflicht zur Neueinführung. |
-| 17.5-TH1 | Theme-Persistenz und Compact-Identity unverändert | PASS | `theme.js`; Presentation-/Focus-Tests; Dark-Browserlauf | RQ-04-01 bleibt als separater Cache-Buster-Befund aus Part 04 bestehen. |
+| 17.5-TH1 | Theme-Persistenz und Compact-Identity unverändert | PASS | `theme.js`; Presentation-/Focus-Tests; Dark-Browserlauf; `test/asset-version.test.js` | RQ-04-01 ist seit Sprint 27.1-B code-seitig geschlossen. |
 | 17.5-SYS1 | Summary/Errors und deren Businesslogik unverändert | PASS | Systemtests und Gatewaytests | Gesamtsuite vollständig grün; Part 05 änderte keinen Anwendungscode. |
 | 17.5-SEC1 | Keine neue Write-API, Domain oder automatische Allowlist | PASS | `src/routes/api.js`; `src/services/control-authorization.js`; Securitytests | Light/Climate bleiben enge, serverseitig autorisierte Endpunkte. |
 | 17.5-SEC2 | Tokens backend-only, kein Browser-HA-WebSocket | PASS | statischer Public-Scan; `src/services/homeassistant*.js`; `test/security.test.js` | Focus-Bundle enthält keine Tokenreferenz und keinen HTTP-/WS-Client. |
@@ -117,10 +117,16 @@ Supervisor-Token bleiben backend-only.
 - Kein neuer umsetzbarer Reparaturpunkt.
 - `NOT TESTED`: MT-18 (Legacy-iOS-9), MT-19 (iPad Air 2/iPadOS 15.8.5) und
   MT-20 (macOS Safari).
-- RQ-04-01 bleibt unverändert offen und wird nicht in Part 05 repariert.
+- RQ-04-01 war im Baseline-Part 05 offen und ist seit Sprint 27.1-B code-seitig geschlossen.
 
 ## Final Assessment
 
 Sprint 17.5 ist architektonisch und automatisiert vollständig vorhanden. Die
 fehlenden spezifizierten realen Safari-/iPad-Abnahmen verhindern im
 Sprint-27-Baseline-Audit ein `PASS`; Gesamtstatus bleibt `PARTIAL`.
+
+## Sprint-27.1-B-Re-Audit
+
+Die getrennte Focus-Runtime wird nun zusammen mit allen Entry Points unter
+v52 ausgeliefert. Der neue Gleichheitstest und die Gesamtsuite 331/331 sind
+grün; `RQ-04-01` ist code-seitig geschlossen, Realgerät bleibt `NOT TESTED`.

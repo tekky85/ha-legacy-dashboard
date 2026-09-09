@@ -68,12 +68,12 @@ gefunden.
 | 26-H4 | Safari iOS 9 / ES5 | PASS | Wall-JS besteht `node --check` und Legacy-Scan; kein fetch/Promise/Arrow/let/const/async/optional chaining. |
 | 26-H5 | Kein CSS Grid/Flex-gap als Voraussetzung | PASS | Wall-CSS nutzt Flexbox mit Margins/Fallbacks; statischer Scan grün. |
 | 26-SEC1 | Sicherheitsgrenzen unverändert | PASS | Keine neue Write-Route; HA-/Supervisor-/Admin-Token bleiben serverseitig; Area read-only. |
-| 26-CACHE1 | Geänderte/geteilte Assets konsistent versioniert | PARTIAL | Dashboard v51, System v44, Admin geteilt v50; stale Layout/Section-CSS auf iOS möglich. Bestehendes `RQ-04-01`. |
+| 26-CACHE1 | Geänderte/geteilte Assets konsistent versioniert | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js` deckt geteilte Layout-/Presentation-Assets ab. | RQ-04-01 code-seitig geschlossen; reales iOS bleibt manuell. |
 | 26-T1 | Section-Normalisierung, CRUD, Reorder, Assignment, Delete, Persistenz und Migration automatisiert | PASS | `test/sprint-26.test.js`, `dashboard-config`, `dashboard-persistence`, `layout`, `admin-api`, `admin-ui`; Part-19-Fokuslauf 95/95. |
 | 26-M1 | Reale Section-Darstellung auf iPad mini | NOT TESTED | MT-67. |
 | 26-M2 | Reales Admin-CRUD und Standalone-Persistenz | NOT TESTED | MT-68. |
 | 26-DOD1 | Vollständige reale Abnahme | NOT TESTED | Keine physische/produktive Runtime wurde in Part 19 verwendet. |
-| 26-DOD2 | Sprint vollständig RC-freigabefähig | PARTIAL | Implementierung/Testbasis grün; `RQ-04-01` und reale MT-67/68-Abnahmen bleiben offen. |
+| 26-DOD2 | Sprint vollständig RC-freigabefähig | PARTIAL | Implementierung/Testbasis grün und RQ-04-01 code-seitig geschlossen; reale MT-67/68-Abnahmen bleiben `NOT TESTED`. |
 
 ## Architektur- und Sicherheitsbefund
 
@@ -95,7 +95,7 @@ Control-Berechtigung.
 
 ## Reparatur- und Manuelltestbezug
 
-- `RQ-04-01`: Section-/Layout-/Theme-Dateien müssen über alle Legacy-Routen
-  konsistent versioniert werden.
+- `RQ-04-01`: Section-/Layout-/Theme-Dateien sind seit Sprint 27.1-B über alle
+  Legacy-Routen konsistent als v52 versioniert.
 - MT-67: physische Section-Darstellung, Rotation und Reload auf iPad mini.
 - MT-68: vollständiges Section-CRUD samt Persistenz auf Admin/Standalone.

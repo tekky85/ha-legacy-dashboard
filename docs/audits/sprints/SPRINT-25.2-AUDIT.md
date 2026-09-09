@@ -83,7 +83,7 @@ sind fachlich breit, aber nicht einzeln vollständig zugeordnet (`RQ-15-01`).
 | 25.2-LEG-03 | CSS benötigt kein Grid/Flex-gap/ResizeObserver/Container Query | PASS | Relevanter Wall-CSS-/Source-Scan grün. |
 | 25.2-DEP-01 | Standalone/LXC funktioniert ohne Hostannahme | PASS | Relative Pfade folgen dem ausgelieferten Origin einschließlich Host und Port; keine LXC-Adresse im Code. Reale Rollout-Abnahme ist nicht Teil des Auditlaufs. |
 | 25.2-DEP-02 | Home Assistant App funktioniert bei direktem LAN-Port ohne Ingressannahme | PASS | Ebenfalls relative Pfade; keine Ingress-/Supervisor-Navigation oder originändernde WebUI-URL im Browsercode. Reale HAOS-Abnahme bleibt spätere Queue. |
-| 25.2-CACHE-01 | Aktueller Navigationhelper wird auf allen Routen konsistent ausgeliefert | PARTIAL | Dashboard lädt `system-navigation.js?v=51`, Systemseite `v=44`; immutable Cache kann den alten HomeScreen-Pfad halten. `RQ-04-01`. |
+| 25.2-CACHE-01 | Aktueller Navigationhelper wird auf allen Routen konsistent ausgeliefert | PASS | Dashboard und Systemseite laden `system-navigation.js?v=52`; Admin/Manifest sind ebenfalls v52; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen; HomeScreen-Same-Window bleibt real zu prüfen. |
 | 25.2-TEST-01 | Alle 51 nummerierten Fälle sind direkt rückverfolgbar | PARTIAL | Fünf breite Sprint-25.2-Tests plus Sprint-21.5-, Gateway-, Theme-, Filter- und Gesamttests; nicht jeder Einzelpunkt besitzt eine direkte Zuordnung. `RQ-15-01`. |
 | 25.2-MAN-01 | iPad mini: Default→Summary→Back bleibt HomeScreen | NOT TESTED | MT-40; Part 15 verwendete kein physisches iPad. |
 | 25.2-MAN-02 | iPad mini: Default/Custom→Errors→Back bleibt HomeScreen | NOT TESTED | MT-40. |
@@ -137,7 +137,7 @@ Systemseite
 - MT-40: vollständiger iPad-mini-HomeScreen-Default-/Custom-Ablauf;
 - MT-41: iPad Air 2 in Safari und optional HomeScreen;
 - MT-42: macOS Safari, Redirectabwehr und Langzeitlauf;
-- `RQ-04-01`: inkonsistente immutable Assetversionen;
+- `RQ-04-01`: in Sprint 27.1-B code-seitig geschlossen;
 - `RQ-15-01`: unvollständige Einzelzuordnung der 51 Testfälle;
 - `RQ-14-04`: Stable-Gate erzwingt die realen 25.1/25.2-Abnahmen noch nicht.
 

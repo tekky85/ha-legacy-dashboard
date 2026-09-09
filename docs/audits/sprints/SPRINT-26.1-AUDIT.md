@@ -91,11 +91,11 @@ Rendererpfad bleiben intakt.
 | 26.1-ADMIN2 | Preview und gespeicherter Runtimepfad entsprechen einander | PASS | Test persistiert Draft, liest Public Dashboard und prüft identische Backgroundreferenz/Roomdaten. |
 | 26.1-RUNTIME1 | Früherer Collapse-Defekt | PASS | Root Cause behoben: Expanded-Flexinhalt scrollt und schrumpft nicht mehr auf 0 px; direkter DOM-/Browser-Test. |
 | 26.1-RUNTIME2 | Früherer Background-Defekt | PASS | Root Cause behoben: CSP blockierte Inline-Style; dedizierte Backgroundebene wird per CSSOM gesetzt. |
-| 26.1-CACHE1 | Aktuelle Room-/Collapse-/Backgroundassets auf allen Routen | PARTIAL | Immutable Cache-Buster v51/v44/v50 können alte Shared-CSS-/Controllerzustände mischen. `RQ-04-01`. |
+| 26.1-CACHE1 | Aktuelle Room-/Collapse-/Backgroundassets auf allen Routen | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js` prüft shared Presentation-/Icon-/Theme-/Navigationsassets. | RQ-04-01 code-seitig geschlossen; reale iPad-Abnahme bleibt `NOT TESTED`. |
 | 26.1-M1 | Room Card auf realem iPad mini | NOT TESTED | MT-69. |
 | 26.1-M2 | Room Background und `/data` auf HAOS | NOT TESTED | MT-70. |
 | 26.1-DOD1 | Alle automatisierbaren Kernfälle | PASS | Fokus 95/95, Ergänzung 72/72, Gesamtsuite 329/329; Room-Harness 4/4. |
-| 26.1-DOD2 | Vollständige Release-/Realgeräteabnahme | PARTIAL | RQ-18-01, RQ-04-01 und MT-69/70 bleiben offen; RQ-16-01 ist automatisiert geschlossen. |
+| 26.1-DOD2 | Vollständige Release-/Realgeräteabnahme | PARTIAL | RQ-04-01 und RQ-16-01 sind code-seitig geschlossen; RQ-18-01 und MT-69/70 bleiben offen beziehungsweise `NOT TESTED`. |
 
 ## Bekannte Defekte: Root Cause und aktueller Fix
 
@@ -128,7 +128,8 @@ automatisiert geschlossen.
 
 ## Reparatur- und Manuelltestbezug
 
-- `RQ-04-01`: Cacheversionen für Room-/Shared-Assets vereinheitlichen.
+- `RQ-04-01`: Cacheversionen für Room-/Shared-Assets in Sprint 27.1-B
+  code-seitig vereinheitlicht.
 - `RQ-16-01`: automatisiert geschlossen; kein Room-Sonderpfad eingeführt.
 - `RQ-18-01`: vollständige aktuelle Room-Matrix inklusive Tall und
   capabilityabhängigen Controls in das echte Browser-Gate integrieren.

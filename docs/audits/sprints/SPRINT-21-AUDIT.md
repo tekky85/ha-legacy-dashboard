@@ -74,7 +74,7 @@ wurde gefunden.
 | 21-T1 | Vollständige 93-Punkte-Testanforderung nachvollziehbar abgesichert | PARTIAL | 15 direkte Sprint-21-Tests plus breite Regression; 153/153 Fokus | Mehrere Einzelvarianten sind nur indirekt oder nicht als eigene Assertion verknüpft; `RQ-09-02`. |
 | 21-MAN1 | Reale Registry-/Diagnose-/Partial-Failure-Abnahme im modernen Safari/LXC | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-30 | Kein reales HA kontaktiert. |
 | 21-MAN2 | Reale Zielgeräteabnahme mit Enrichment und Metadatenfehlern | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-32 | Kein physischer iPad-Lauf in Part 09. |
-| 21-CACHE2 | Geänderte System-/Shared-Assets haben konsistente Cacheversion | PARTIAL | Dashboard `v=51`, Systemseite `v=44`, immutable static | Bestehender `RQ-04-01`, nun auch Sprint 21 zugeordnet. |
+| 21-CACHE2 | Geänderte System-/Shared-Assets haben konsistente Cacheversion | PASS | Dashboard, Systemseite, Admin und Manifest referenzieren v52; `test/asset-version.test.js`; immutable Auslieferung bleibt unverändert. | RQ-04-01 code-seitig geschlossen. |
 | 21-SHOT1 | Error/Summary/Admin-Diagnose-Screenshots geprüft/aktualisiert | PARTIAL | D1-Audit und `RQ-08-02` | Vorhandene System-/Adminbilder sind nach späteren sichtbaren Sprints nicht belastbar aktuell. |
 | 21-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Architektur | PASS | README DE/EN Registry-/Diagnoseabschnitte; Roadmap; Projektstatus Sprint-21-Abschnitt | README-Sprachen sind inhaltlich parallel; der globale Statuskopf ist separat in `RQ-08-03` veraltet. |
 
@@ -160,7 +160,8 @@ vollständig; dies war kein Produktfehler.
 
 ## Findings
 
-- `PARTIAL`: `RQ-09-01`, `RQ-09-02`, bestehend `RQ-04-01` und `RQ-08-02`.
+- `PARTIAL`: `RQ-09-01`, `RQ-09-02` und `RQ-08-02`; `RQ-04-01` ist
+  code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: keine bestätigte fachliche oder sicherheitsrelevante Funktion.
 - `NOT TESTED`: MT-30 und MT-32; echte HAOS-Laufzeit bleibt dem Sprint-24-Audit

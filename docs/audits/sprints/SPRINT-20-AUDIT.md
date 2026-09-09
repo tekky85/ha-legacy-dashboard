@@ -83,7 +83,7 @@ teilweise mit gezielten Einzelassertions belegt ist (`RQ-08-01`).
 | 20-MAN1 | Manuelle moderne Browserabnahme aller Zustände und Adminregeln | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-27 | In Part 08 wurde kein physischer Safari-Lauf durchgeführt. |
 | 20-MAN2 | Reale iPad-mini-/iOS-9-Abnahme Portrait/Landscape, Theme und große Listen | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-28 | Kein realer Zielgerätetest in Part 08. |
 | 20-LOG1 | Keine sensitiven Attribute/Secrets in Logs | PASS | `src/services/logger.js`; Securitytest; Gateway-Outputassertions | Fehler werden auf Typ/Code reduziert. |
-| 20-CACHE1 | Geänderte Legacy-Assets besitzen konsistente Cacheversion | PARTIAL | Dashboard `v=51`, Systemseite `v=44`, geteilte Admin-Assets `v=50`; immutable Static Cache | Bestehender P1-Befund `RQ-04-01`, jetzt ausdrücklich auch Sprint 20 zugeordnet. |
+| 20-CACHE1 | Geänderte Legacy-Assets besitzen konsistente Cacheversion | PASS | Dashboard, Systemseite, Admin und Manifest verwenden v52; `test/asset-version.test.js`; immutable Static Cache bleibt beabsichtigt. | RQ-04-01 code-seitig geschlossen. |
 | 20-DOC1 | Route, States, Severity, Security/Ignore, stale/offline und Abgrenzung sind dokumentiert | PASS – superseded by Sprint D1/later docs | README DE/EN; Projektstatus; Roadmap | Grace Periods werden heute als umgesetzte Sprint-22-Regeln dokumentiert. |
 | 20-N1 | Keine Registry-/Repair-/Matter-/Automation-/Grace-Erweiterung im historischen Sprint 20 | N/A – replaced by Sprints 21–23 | aktuelle read-only Diagnosearchitektur | Die später ausdrücklich geplanten Funktionen sind additiv und führen keine HA-Schreibaktionen ein. |
 
@@ -163,8 +163,8 @@ erlaubtem 127.0.0.1-Bind war vollständig grün.
 ## Findings
 
 - Kein aktuelles `MISSING` oder fachlich `BROKEN`.
-- `PARTIAL`: `RQ-04-01` (P1 Cache-Buster) und `RQ-08-01` (P2 explizite
-  Sprint-20-Testmatrix).
+- `PARTIAL`: `RQ-08-01` (P2 explizite Sprint-20-Testmatrix); `RQ-04-01` ist
+  code-seitig geschlossen.
 - `NOT TESTED`: MT-27 und MT-28.
 
 ## Final Assessment

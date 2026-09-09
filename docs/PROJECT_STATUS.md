@@ -2,9 +2,10 @@
 
 Stand: 9. September 2026. Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
 der anschließende Repair-Queue-Consolidation-Pass wurden auf Repository-Commit
-`593ba5a` abgeschlossen. Sprint 27.1-A repariert auf Basis `dec0c54` den
-zentralen PNG-/Background-Replace-Defekt `RQ-16-01`; der automatisierte Gate-
-und Re-Audit-Lauf ist vollständig grün. Reale iPad-/HomeScreen-/Safari-, LXC-,
+`593ba5a` abgeschlossen. Sprint 27.1-A reparierte `RQ-16-01`, Sprint 27.1-B
+vereinheitlicht auf Basis `3830259` die routeübergreifenden immutable
+Assetversionen aus `RQ-04-01`; beide automatisierten Gate- und Re-Audit-Läufe
+sind vollständig grün. Reale iPad-/HomeScreen-/Safari-, LXC-,
 Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate bleiben offen.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
@@ -26,7 +27,7 @@ Status:
 - Sprint-27-Baseline-Audit: **COMPLETE**
 - Repair Queue Consolidation: **COMPLETE**
 - Sprint-27.1-A / RQ-16-01: **COMPLETE – MANUAL PENDING**
-- Sprint-27.1-B / RQ-04-01: **NEXT**
+- Sprint-27.1-B / RQ-04-01: **COMPLETE – MANUAL PENDING**
 - Manuelle Abnahme: **PENDING**
 - Finales RC-Gate: **PENDING**
 
@@ -47,6 +48,16 @@ und das letzte gültige Asset ohne Temp-/Waisendatei. Fokuslauf 85/85 und
 Gesamtsuite 330/330 sind grün; MT-59/60 sind ausführbar, bleiben aber wie alle
 physischen/Betriebstests `NOT TESTED`. Es wurden keine HA-Write-, Token-,
 Admin- oder Browser-Sicherheitsgrenzen verändert.
+
+### Sprint 27.1-B – Routeübergreifender Assetstand
+
+Dashboard, Summary/Errors, Admin und Manifest referenzieren alle Public-Assets
+mit der erhöhten Version v52. Der neue Test `test/asset-version.test.js` prüft
+eine einzige Version über alle Entry Points und die Parität der gemeinsam
+genutzten Theme-, Style-, Compat-, Navigation-, Icon- und Presentation-Dateien.
+Fokuslauf 46/46 und Gesamtsuite 331/331 sind grün. `RQ-04-01` ist code-seitig
+geschlossen; alle physischen/Betriebsresultate bleiben `NOT TESTED`, und es
+wurde keine RC-Freigabe abgeleitet.
 
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 

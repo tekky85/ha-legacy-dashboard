@@ -56,7 +56,7 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | ID | Requirement | Status | Evidence / Begründung |
 |---|---|---|---|
 | 25.4-SCOPE-01 | Sprint ist Validierung, kein Feature-Sprint | PASS | Commit `d0313b0` änderte nur Projektstatus, Roadmap und `docs/RC_CHECKLIST.md`; Part 17 ändert ebenfalls keinen Anwendungscode. |
-| 25.4-PRE-01 | Sprint-24-/25-/25.1-/25.2-/25.3-Endzustände tatsächlich prüfen | PARTIAL | Einzelne aktuelle Audits liegen vor; offene RQ-04-01, RQ-13-01 und RQ-14-01/-02/-04/-05 widerlegen weiterhin eine vollständige Freigabe. RQ-16-01 ist repariert. |
+| 25.4-PRE-01 | Sprint-24-/25-/25.1-/25.2-/25.3-Endzustände tatsächlich prüfen | PARTIAL | RQ-04-01 und RQ-16-01 sind code-seitig geschlossen; RQ-13-01 und RQ-14-01/-02/-04/-05 sowie reale Gates widerlegen weiterhin eine vollständige Freigabe. |
 | 25.4-A1-01 | `repository.yaml` vorhanden und valides YAML | PASS | Datei vorhanden; Ruby-YAML-Parser erfolgreich. |
 | 25.4-A1-02 | Repositoryname, URL und Maintainer ohne Platzhalter/interne URL | PASS | `HA Legacy Dashboard Apps`, öffentliches GitHub-Repository, `tky <mbp@tky.cloud>`; kein Platzhalter/interner Host. |
 | 25.4-A2-01 | App-`config.yaml` vorhanden und valides YAML | PASS | `ha_legacy_dashboard/config.yaml`; Parser und Sprint-24-Test grün. |
@@ -133,11 +133,11 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-MATRIX-02 | Matrix ist ein commitbezogener, aktueller Kandidatennachweis | BROKEN | Kopf RC.1/741bba4, LXC 42d88f3, Tests 275/283/290, später angehängte Sprints; aktueller HEAD 329 Tests. `RQ-17-01`. |
 | 25.4-MATRIX-03 | PASS-Aussagen entsprechen dem aktuellen Repositoryzustand | BROKEN | Falscher Dockerfile-Pfad und „0 Schwachstellen“ trotz aktuellem Moderate-Befund bleiben falsch. Der frühere PNG-Widerspruch ist repariert. `RQ-17-01`, RQ-14-05. |
 | 25.4-BLOCK-01 | Expliziter Abschnitt `RC BLOCKERS` vorhanden | PASS | Fünf Punkte plus Abschlussreihenfolge; RC-Empfehlung ausdrücklich BLOCKED. |
-| 25.4-BLOCK-02 | Blockerliste enthält alle aktuell offenen P1-Befunde | BROKEN | RQ-04-01, RQ-13-01 und RQ-14-01/-02/-04 sind nicht vollständig als heutige Gatebedingungen enthalten. `RQ-17-01`; RQ-16-01 ist geschlossen. |
+| 25.4-BLOCK-02 | Blockerliste enthält alle aktuell offenen P1-Befunde | BROKEN | RQ-13-01 und RQ-14-01/-02/-04 sind nicht vollständig als heutige Gatebedingungen enthalten. `RQ-17-01`; RQ-04-01 und RQ-16-01 sind code-seitig geschlossen. |
 | 25.4-MANUAL-01 | Reale HAOS-, LXC-, Netzwerk- und iPad-Punkte nicht künstlich PASS | PARTIAL | Alte Evidenz ist überwiegend korrekt begrenzt; einige Matrix-PASS-Zeilen werden aber ohne klare Buildgrenze neben späteren Ständen wiederverwendet. MT-Zuordnung und RQ-17-01. |
 | 25.4-MANUAL-02 | Vollständige ausführbare Manuelltests vorhanden | PASS | MT-13/34/40/42 und MT-50 bis MT-56/58 bis MT-60 besitzen Voraussetzungen, Routen, Schritte, Expected, Fail, Evidence und Result. |
 | 25.4-RC-01 | RC nur bei vollständigen Pflicht-PASS freigeben | PASS | Dokument empfiehlt ausdrücklich `BLOCKED`; kein Stable-/Tag-/Publish in Part 17. |
-| 25.4-RC-02 | Aktueller HEAD ist RC-freigabefähig | BROKEN | Aktuelles Image fehlt, mehrere P1-Befunde und reale Pflichtgates sind offen; zusammengeführt in `RQ-17-01` mit Abhängigkeiten RQ-04-01/RQ-13-01/RQ-14-01/-02/-04. |
+| 25.4-RC-02 | Aktueller HEAD ist RC-freigabefähig | BROKEN | Aktuelles Image fehlt, mehrere P1-Befunde und reale Pflichtgates sind offen; zusammengeführt in `RQ-17-01` mit verbleibenden Abhängigkeiten RQ-13-01/RQ-14-01/-02/-04. RQ-04-01 ist code-seitig geschlossen. |
 
 ## Aktuelle RC Result Matrix
 
@@ -175,7 +175,7 @@ ausdrücklich auf `741bba4` begrenzt.
 
 ## RC BLOCKERS
 
-1. `RQ-04-01`: routeabhängige immutable Cacheversionen beheben und re-auditieren.
+1. `RQ-04-01`: in Sprint 27.1-B code-seitig geschlossen; Realtests bleiben ausstehend.
 2. `RQ-13-01`: erst nach Reparaturen eine neue unveränderliche Version aus
    genau dem Kandidatencommit veröffentlichen; RC.1 nicht überschreiben.
 3. `RQ-14-01`: Standalone-Bundle mit tatsächlich enthaltenem Install-/Upgrade-/
@@ -259,3 +259,10 @@ lebende Checklist-Text ist jedoch kein verlässlicher aktueller Kandidatennachwe
 mehr. Part 17 ist baseline-seitig abgeschlossen, der PNG-Pfad im gezielten
 Sprint-27.1-A-Re-Audit repariert. Sprint 25.4 bleibt `PARTIAL` und der aktuelle
 Stand für RC/Stable `BLOCKED`; es wurde kein Image oder Release veröffentlicht.
+
+## Sprint-27.1-B-Re-Audit
+
+Der Cache-P1-Befund RQ-04-01 ist durch einheitliches v52 und den neuen
+Gleichheitstest code-seitig geschlossen; Gesamtsuite 331/331 ist grün. Die
+übrigen RC-Blocker und realen Gates bleiben unverändert offen, daher bleibt
+Sprint 25.4 insgesamt `FAIL`/RC `BLOCKED`.

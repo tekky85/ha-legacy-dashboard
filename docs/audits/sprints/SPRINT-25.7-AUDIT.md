@@ -90,12 +90,12 @@ HomeScreen-Safari-Cacheumgebung besonders relevant.
 | 25.7-DOC-01 | README DE/EN semantisch synchron | PASS | Beide verlinken dieselbe Kioskanleitung und dieselbe Ein-/Mehrgeräteempfehlung. |
 | 25.7-DOC-02 | Projektstatus/Roadmap aktualisiert | PASS | Sprint-25.7-Abschnitte vorhanden; globaler Statusdrift bleibt separat `RQ-08-03`. |
 | 25.7-DOC-03 | Keine erfundenen Produkt-/Gerätescreenshots | N/A | Sprint fügte keine vermeintliche Realgeräteaufnahme hinzu. |
-| 25.7-CACHE-01 | Kiosk erhält aktuelle gemeinsame Assets zuverlässig | PARTIAL | Dashboard v51, System v44, Admin v50; aggressiver iOS-HomeScreen-Cache kann Theme/Navigation/Layout mischen. Bestehendes `RQ-04-01`. |
+| 25.7-CACHE-01 | Kiosk erhält aktuelle gemeinsame Assets zuverlässig | PASS | Dashboard, System, Admin und Manifest verwenden die erhöhte Version v52; `test/asset-version.test.js` verhindert routeabhängige Abweichungen. | RQ-04-01 code-seitig geschlossen; ein echter iOS-9-Cache-/Kiosklauf bleibt `NOT TESTED`. |
 | 25.7-MANUAL-01 | HomeScreen/Guided Access/Home-Taste real | NOT TESTED | MT-64. |
 | 25.7-MANUAL-02 | Sleep/Wake/Auto-Lock/Power/Restart real | NOT TESTED | MT-65. |
 | 25.7-MANUAL-03 | Exit, Reboot und Post-Reboot-Relaunch real | NOT TESTED | MT-66. |
 | 25.7-DOD-01 | Guided Access auf realem iPad mini getestet | NOT TESTED | Definition of Done noch nicht erfüllt. |
-| 25.7-DOD-02 | Sprint vollständig abgeschlossen | PARTIAL | Dokumentation und technische Voraussetzungen sind vorhanden; physisches Pflichtgate MT-64 bis MT-66 und Cache-P1 `RQ-04-01` offen. |
+| 25.7-DOD-02 | Sprint vollständig abgeschlossen | PARTIAL | Dokumentation und technische Voraussetzungen sind vorhanden; RQ-04-01 ist code-seitig geschlossen, das physische Pflichtgate MT-64 bis MT-66 bleibt `NOT TESTED`. |
 
 ## Quellen- und Plausibilitätsprüfung
 

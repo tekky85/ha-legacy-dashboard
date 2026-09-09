@@ -79,7 +79,7 @@ Prüfung tatsächlich durchgeführt und mit Datum/System dokumentiert wurde.
 | MT-71 | 26.2 | Reale HA-Controlmatrix mit drei Lights und mehreren Climate-Capabilities | macOS Safari plus isoliertes Test-HA/Standalone | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-72 | 26.2 | Gemeinsame Light-/Climate-Controls in Grid, Focus und Room auf dem Legacy-iPad | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 
-+## Reparaturabhängigkeiten der manuellen Tests
+## Reparaturabhängigkeiten der manuellen Tests
 
 Diese Zuordnung entscheidet nur, wann ein Ergebnis als verbindliche Abnahme
 gewertet werden darf. `CAN RUN NOW` bedeutet, dass kein bekannter Produkt-
@@ -88,80 +88,84 @@ Repair den Test blockiert; ein Explorationslauf darf dokumentiert werden.
 IDs. Release-/Stable-Tests verwenden zusätzlich immer einen exakten,
 commitbezogenen Kandidaten.
 
+Sprint 27.1-B entfernte `RQ-04-01` aus allen Abhängigkeiten. Die dadurch allein
+blockierten Tests sind nun `CAN RUN NOW`; kombinierte Einträge bleiben nur von
+ihren übrigen Repairs blockiert. Sämtliche 72 Resultate bleiben `NOT TESTED`.
+
 | Manual Test | Execution State | Blocked By Repairs |
 |---|---|---|
-| MT-01 | BLOCKED | RQ-04-01 |
-| MT-02 | BLOCKED | RQ-04-01 |
+| MT-01 | CAN RUN NOW | – |
+| MT-02 | CAN RUN NOW | – |
 | MT-03 | CAN RUN NOW | – |
 | MT-04 | CAN RUN NOW | – |
-| MT-05 | BLOCKED | RQ-04-01 |
-| MT-06 | BLOCKED | RQ-04-01 |
+| MT-05 | CAN RUN NOW | – |
+| MT-06 | CAN RUN NOW | – |
 | MT-07 | CAN RUN NOW | – |
 | MT-08 | CAN RUN NOW | – |
-| MT-09 | BLOCKED | RQ-04-01, RQ-18-01 |
+| MT-09 | BLOCKED | RQ-18-01 |
 | MT-10 | CAN RUN NOW | – |
-| MT-11 | BLOCKED | RQ-04-01 |
-| MT-12 | BLOCKED | RQ-04-01 |
-| MT-13 | BLOCKED | RQ-04-01 |
-| MT-14 | BLOCKED | RQ-04-01 |
-| MT-15 | BLOCKED | RQ-04-01 |
-| MT-16 | BLOCKED | RQ-04-01 |
+| MT-11 | CAN RUN NOW | – |
+| MT-12 | CAN RUN NOW | – |
+| MT-13 | CAN RUN NOW | – |
+| MT-14 | CAN RUN NOW | – |
+| MT-15 | CAN RUN NOW | – |
+| MT-16 | CAN RUN NOW | – |
 | MT-17 | CAN RUN NOW | – |
-| MT-18 | BLOCKED | RQ-04-01 |
-| MT-19 | BLOCKED | RQ-04-01 |
-| MT-20 | BLOCKED | RQ-04-01 |
-| MT-21 | BLOCKED | RQ-04-01 |
-| MT-22 | BLOCKED | RQ-04-01 |
-| MT-23 | BLOCKED | RQ-04-01 |
-| MT-24 | BLOCKED | RQ-04-01 |
-| MT-25 | BLOCKED | RQ-04-01 |
+| MT-18 | CAN RUN NOW | – |
+| MT-19 | CAN RUN NOW | – |
+| MT-20 | CAN RUN NOW | – |
+| MT-21 | CAN RUN NOW | – |
+| MT-22 | CAN RUN NOW | – |
+| MT-23 | CAN RUN NOW | – |
+| MT-24 | CAN RUN NOW | – |
+| MT-25 | CAN RUN NOW | – |
 | MT-26 | CAN RUN NOW | – |
-| MT-27 | BLOCKED | RQ-04-01 |
-| MT-28 | BLOCKED | RQ-04-01 |
-| MT-29 | RUN AFTER ALL VISIBLE REPAIRS | RQ-04-01, RQ-09-01, RQ-12-01/02/03, RQ-18-01 |
+| MT-27 | CAN RUN NOW | – |
+| MT-28 | CAN RUN NOW | – |
+| MT-29 | RUN AFTER ALL VISIBLE REPAIRS | RQ-09-01, RQ-12-01/02/03, RQ-18-01 |
 | MT-30 | BLOCKED | RQ-09-01 |
 | MT-31 | CAN RUN NOW | – |
-| MT-32 | BLOCKED | RQ-04-01, RQ-09-01 |
-| MT-33 | BLOCKED | RQ-04-01 |
-| MT-34 | BLOCKED | RQ-04-01 |
+| MT-32 | BLOCKED | RQ-09-01 |
+| MT-33 | CAN RUN NOW | – |
+| MT-34 | CAN RUN NOW | – |
 | MT-35 | BLOCKED | RQ-09-01 |
 | MT-36 | BLOCKED | RQ-09-01 |
 | MT-37 | CAN RUN NOW | – |
 | MT-38 | CAN RUN NOW | – |
-| MT-39 | BLOCKED | RQ-04-01 |
-| MT-40 | BLOCKED | RQ-04-01 |
-| MT-41 | BLOCKED | RQ-04-01 |
-| MT-42 | BLOCKED | RQ-04-01 |
+| MT-39 | CAN RUN NOW | – |
+| MT-40 | CAN RUN NOW | – |
+| MT-41 | CAN RUN NOW | – |
+| MT-42 | CAN RUN NOW | – |
 | MT-43 | BLOCKED | RQ-12-01 |
 | MT-44 | BLOCKED | RQ-12-01 |
-| MT-45 | BLOCKED | RQ-04-01, RQ-12-01 |
+| MT-45 | BLOCKED | RQ-12-01 |
 | MT-46 | BLOCKED | RQ-09-01, RQ-12-02, RQ-12-03 |
 | MT-47 | BLOCKED | RQ-12-02, RQ-12-03 |
-| MT-48 | BLOCKED | RQ-04-01, RQ-09-01, RQ-12-02, RQ-12-03 |
-| MT-49 | BLOCKED | RQ-04-01, RQ-12-02, RQ-12-03 |
+| MT-48 | BLOCKED | RQ-09-01, RQ-12-02, RQ-12-03 |
+| MT-49 | BLOCKED | RQ-12-02, RQ-12-03 |
 | MT-50 | BLOCKED | RQ-09-01, RQ-13-01, RQ-13-02 |
 | MT-51 | BLOCKED | RQ-13-01 |
 | MT-52 | BLOCKED | RQ-13-01, RQ-14-02 |
 | MT-53 | BLOCKED | RQ-13-01 |
-| MT-54 | BLOCKED | RQ-04-01, RQ-13-01 |
+| MT-54 | BLOCKED | RQ-13-01 |
 | MT-55 | BLOCKED | RQ-13-01, RQ-14-01/02/04/05, RQ-17-01 |
 | MT-56 | BLOCKED | RQ-14-01, RQ-14-02 |
 | MT-57 | RUN AFTER ALL REPAIRS | RQ-13-01, RQ-14-04, RQ-17-01 |
-| MT-58 | BLOCKED | RQ-04-01 |
+| MT-58 | CAN RUN NOW | – |
 | MT-59 | CAN RUN NOW | – |
 | MT-60 | CAN RUN NOW | – |
 | MT-61 | BLOCKED | RQ-13-01, RQ-13-02 |
 | MT-62 | BLOCKED | RQ-13-01, RQ-13-02 |
-| MT-63 | BLOCKED | RQ-04-01, RQ-18-01 |
-| MT-64 | BLOCKED | RQ-04-01, RQ-13-01 |
-| MT-65 | BLOCKED | RQ-04-01, RQ-13-01 |
-| MT-66 | BLOCKED | RQ-04-01, RQ-13-01 |
-| MT-67 | BLOCKED | RQ-04-01 |
-| MT-68 | BLOCKED | RQ-04-01 |
-| MT-69 | BLOCKED | RQ-04-01, RQ-18-01 |
+| MT-63 | BLOCKED | RQ-18-01 |
+| MT-64 | BLOCKED | RQ-13-01 |
+| MT-65 | BLOCKED | RQ-13-01 |
+| MT-66 | BLOCKED | RQ-13-01 |
+| MT-67 | CAN RUN NOW | – |
+| MT-68 | CAN RUN NOW | – |
+| MT-69 | BLOCKED | RQ-18-01 |
 | MT-70 | BLOCKED | RQ-13-01, RQ-13-02 |
-| MT-71 | BLOCKED | RQ-04-01 |
-| MT-72 | BLOCKED | RQ-04-01, RQ-18-01 |
+| MT-71 | CAN RUN NOW | – |
+| MT-72 | BLOCKED | RQ-18-01 |
 
 ## Detaillierte Anleitungen aus Audit Part 19
 

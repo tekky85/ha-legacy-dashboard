@@ -80,7 +80,7 @@ Abnahmen. Kein neuer aktueller Laufzeitdefekt wurde gefunden.
 | 21.2-MAN2 | Error-/Spalten-/Risk-Abnahme auf iPad mini | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-34 | Kein physischer Test in Part 10. |
 | 21.2-SHOT1 | Aktuelle echte Summary-/Error-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Systembilder belegen den heutigen Stand nicht vollständig. |
 | 21.2-DOC1 | Filter, Spalten und Risk Severity dokumentiert | PASS | README DE/EN, Roadmap, Projektstatus | Spätere Rule-/Filtersemantik als aktuelle Wahrheit dokumentiert. |
-| 21.2-CACHE1 | Geänderte geteilte Assets besitzen konsistente Cacheversion | PARTIAL | Dashboard `v=51`, System `v=44`, Admin geteilte Assets `v=50`; immutable Static Cache | Bestehender P1-Befund `RQ-04-01`. |
+| 21.2-CACHE1 | Geänderte geteilte Assets besitzen konsistente Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js`; immutable Header unverändert. | RQ-04-01 code-seitig geschlossen. |
 
 ## Current Filter and Column Flow
 
@@ -125,7 +125,7 @@ sandboxbedingte `listen EPERM`-Fehler. Der unveränderte Lauf mit erlaubtem
 
 ## Findings
 
-- `PARTIAL`: `RQ-10-01`, bestehend `RQ-04-01` und `RQ-08-02`.
+- `PARTIAL`: `RQ-10-01` und `RQ-08-02`; `RQ-04-01` ist code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: kein aktueller fachlicher Filter-/Risk-/Spaltendefekt bestätigt.
 - `NOT TESTED`: MT-33 und MT-34.
