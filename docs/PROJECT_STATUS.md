@@ -1,24 +1,37 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 31. August 2026, Sprint 26.1 auf Basis des sauberen, mit `origin/main`
-identischen Commits `2097af2` vollständig erneut auditiert und korrigiert.
-Sprint 26.2 wurde zuvor mit `2097af2` abgeschlossen.
-Release Candidate `1.0.0-rc.1` ist veröffentlicht; die JPEG-Härtung aus Sprint
-25.5 und die Kartenkorrekturen aus Sprint 25.6 gehören zum noch nicht neu
-getaggten Stand nach RC.1. Reale iPad-/HomeScreen-/Safari- und verbleibende
-HAOS-Persistenzabnahmen bleiben offen.
+Stand: 9. September 2026. Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
+der anschließende Repair-Queue-Consolidation-Pass wurden auf Repository-Commit
+`593ba5a` abgeschlossen. Sprint-27.1-Reparaturen wurden noch nicht begonnen.
+Reale iPad-/HomeScreen-/Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie
+das finale RC-Gate bleiben offen.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
 
 ## Sprint-27-Auditprogramm
 
-Das chronologische RC-Audit läuft separat in
-[`docs/audits/AUDIT_INDEX.md`](audits/AUDIT_INDEX.md). Die noch vorläufige
-Gesamtbewertung steht in
-[`docs/audits/RC_AUDIT_SUMMARY.md`](audits/RC_AUDIT_SUMMARY.md). Part 01 und
-Part 02 auditieren auf Commit `8d2295a` die Sprints 12–16; Sprint 17 und
-spätere Sprints wurden noch nicht bewertet.
+Das chronologische RC-Audit steht in
+[`docs/audits/AUDIT_INDEX.md`](audits/AUDIT_INDEX.md); alle 37 auditierbaren
+Spezifikationen besitzen einen Baseline-Audit. Der kanonische Reparaturbacklog
+steht in [`docs/audits/REPAIR_QUEUE.md`](audits/REPAIR_QUEUE.md), die
+Konsolidierungsentscheidung in
+[`docs/audits/REPAIR_QUEUE_CONSOLIDATION.md`](audits/REPAIR_QUEUE_CONSOLIDATION.md)
+und die weiterhin offenen Realtests in
+[`docs/audits/MANUAL_TEST_QUEUE.md`](audits/MANUAL_TEST_QUEUE.md).
+
+Status:
+
+- Sprint-27-Baseline-Audit: **COMPLETE**
+- Repair Queue Consolidation: **COMPLETE**
+- Sprint-27.1-Reparaturen: **NOT STARTED**
+- Manuelle Abnahme: **PENDING**
+- Finales RC-Gate: **PENDING**
+
+Diese kompakte Aktualisierung schließt nicht den separaten Befund
+`RQ-08-03`: Der umfangreiche historische Technikbericht muss nach den
+Reparaturen noch vollständig gegen Schema, Verpackung und finalen RC-Stand
+abgeglichen werden.
 
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 

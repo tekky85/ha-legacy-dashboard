@@ -18,7 +18,7 @@ Prüfung tatsächlich durchgeführt und mit Datum/System dokumentiert wurde.
 | MT-10 | 17, 17.1 | Layoutpersistenz und Backup über produktiven Dienstneustart | Standalone-LXC `ha-legacy-dashboard`, systemd | Ein Testwidget in beiden Profilen verschieben und vergrößern, speichern, Dashboard neu laden, Dienst kontrolliert neu starten und beide Profile erneut prüfen; sicherstellen, dass `dashboards.json.bak` gültig bleibt und keine Position doppelt skaliert wird. | NOT TESTED |
 | MT-11 | 17.2 | Kartenidentität und Compact-Inhalte auf realer Zielhardware | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-12 | 17.2 | Proportionale Grid-Geometrie, Rotation und Text-Overflow | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
-| MT-13 | 17.2 | Globale Theme-Persistenz über alle Legacy-Routen | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-13 | 17.2, 25.1, 25.4 | Globale Theme-Persistenz über alle Legacy-Routen | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-14 | 17.3 | Focus-Overlay, Karteninhalte und Grid-Trennung | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-15 | 17.3 | Unified Light Control und Event-Trennung | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-16 | 17.3 | Climate Power, Sollwertsteuerung und Fehlerzustände im Focus | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
@@ -39,19 +39,2735 @@ Prüfung tatsächlich durchgeführt und mit Datum/System dokumentiert wurde.
 | MT-31 | 21.1 | Echte Device-ID-Gruppierung, Filter, Details und responsive Cards im modernen Safari | macOS 13.7.8 Safari plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-32 | 21, 21.1 | Registry-Kontext und Device Groups auf realem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-33 | 21.2 | Summary-Filter und persistente 1/2/3-Spaltenansicht auf dem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
-| MT-34 | 21.2, 21.3 | Exakte Error-Severity-/State-Filter, child-first Device Groups und Spalten auf dem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-34 | 21.2, 21.3, 25.1, 25.4 | Exakte Error-Severity-/State-Filter, child-first Device Groups und Spalten auf dem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-35 | 21.3 | Device-Class- und HA-Label-Kritikalitätsmodi gegen ein kontrolliertes reales HA | macOS Safari plus Standalone-LXC/kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-36 | 21.3 | Label-Rename, stale/unsupported, Löschung und Recovery ohne stillen Fallback | macOS Safari plus Standalone-LXC/kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-37 | 21.4 | Entity Rule Manager, kombinierte Filter und Batch Save/Discard im Desktop-Safari | aktuelle macOS-Safari-Version plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-38 | 21.4 | Entity Rule Manager, Touchziele und große Inventare auf modernem Touch-Tablet | iPad Air 2, iPadOS 15.8.5, Safari | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-39 | 21.4 | Vereinfachte Summary-/Error-Header und Count-Semantik auf der Legacy-Zielhardware | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
-| MT-40 | 21.5 | Globale Health-/Summary-Navigation und sichere Rückkehr im Legacy-HomeScreen | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
-| MT-41 | 21.5 | Same-Window-Systemnavigation und Return-Nichtregression auf iPad Air 2 | iPad Air 2, iPadOS 15.8.5, Safari/HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
-| MT-42 | 21.5 | Healthzustände, Filterunabhängigkeit, Failure-Fallback und Langzeitlauf in Desktop-Safari | aktuelle macOS-Safari-Version plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-40 | 21.5, 25.1, 25.2, 25.4 | Globale Health-/Summary-Navigation und sichere Rückkehr im Legacy-HomeScreen | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-41 | 21.5, 25.2 | Same-Window-Systemnavigation und Return-Nichtregression auf iPad Air 2 | iPad Air 2, iPadOS 15.8.5, Safari/HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-42 | 21.5, 25.1, 25.2, 25.4 | Healthzustände, Filterunabhängigkeit, Failure-Fallback und Langzeitlauf in Desktop-Safari | aktuelle macOS-Safari-Version plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-43 | 22 | Reale Grace-/Expected-Offline-/Flapping-/Recovery- und Health-Semantik | macOS Safari plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-44 | 22 | Persistenz, `last_changed` und Prozesslokalität auf Standalone/LXC | Standalone-LXC `ha-legacy-dashboard` plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-45 | 22 | Sprint-22-Error-/Health-Darstellung auf dem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-46 | 23 | Reales Automation Inventory, Referenzen, Capabilities, Partial Failure und Traces | macOS Safari plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-47 | 23 | Automation Impact und Advanced Diagnostics im Desktop-Safari | aktuelle macOS-Safari-Version plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-48 | 23 | Automation Impact und Advanced Diagnostics auf dem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-49 | 23 | Automation-Impact-Nichtregression auf iPad Air 2 | iPad Air 2, iPadOS 15.8.5, Safari/HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-50 | 24, 25.4 | Reale Supervisor-Core-WebSocket-, Outage-/Recovery- und Log-Abnahme | Home Assistant OS auf amd64 plus kontrolliertes Test-HA | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-51 | 24, 25.3, 25.4 | `/data`-Persistenz, Rechte, Backgrounds und App-Restart | Home Assistant OS auf amd64 | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-52 | 24, 25.3, 25.4 | Cold Backup/Restore, Versionsupgrade, Backgrounds und HAOS-Reboot/Autostart | Home Assistant OS auf amd64 | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-53 | 24, 25.4 | Reale aarch64-App-Installation und Laufzeit | Home Assistant OS auf aarch64 | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-54 | 24, 25.3, 25.4 | Direkter App-LAN-Zugriff, Background und Legacy-Routen auf dem Ziel-iPad | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-55 | 25, 25.4 | Nächster RC: öffentlicher Releaseworkflow, GHCR-Multi-Arch-Manifest, Prerelease und Checksums | GitHub Actions/GHCR/GitHub Release plus isolierter amd64-Testhost | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-56 | 25, 25.4 | Standalone-Fresh-Install, echtes N→N+1-Upgrade und Rollback aus Releasearchiven | isolierter Debian-LXC/VM auf amd64 | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-57 | 25 | Stable-Promotion und kontrollierte `latest`-Aktualisierung nach vollständiger Freigabe | GitHub Actions/GHCR/GitHub Release | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-58 | 25.3, 25.4 | Dashboard-Background, optionaler Titel, Vollhöhe, Footer, Focus und Cacheersatz auf dem Legacy-Zielgerät | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-59 | 25.3, 25.4 | Geschützter Upload, Preview-/Runtime-Parität, Validierung und Ersatz im modernen Safari | aktuelle macOS-Safari-Version plus kontrollierte Real-App | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-60 | 25.3, 25.4 | Standalone-`DATA_DIR`, Rechte, Persistenz, Backup und Dienstneustart | isolierter Standalone-LXC `ha-legacy-dashboard` | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-61 | 25.5 | Direkter LAN-, Hostname-, mDNS-, IPv4-/IPv6- und Portpfad des aktuellen HA-App-Kandidaten | Mac plus iPad mini 1/iOS 9.3.5 und aktuelles Test-HAOS | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-62 | 25.3, 25.5 | Reale JPEG-/PNG-Uploads, sichere Ablehnung, Replace/Rollback und `/data`-Persistenz | aktueller macOS Safari, Test-HAOS und iPad mini 1/iOS 9.3.5 | Vollständige Anleitung weiter unten; erst nach RQ-16-01 als PASS wertbar. | NOT TESTED |
+| MT-63 | 25.6 | Card Type × Valid Size × Representative State auf realer Legacy-Hardware | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten; aktuellen Room-Typ und Tall-Fälle einschließen. | NOT TESTED |
+| MT-64 | 25.7 | HomeScreen, Guided Access, Home-Taste, Same-Context-Navigation, Theme und Rotation | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-65 | 25.7 | Sleep/Wake, Volume, Touch, Auto-Lock, Dauerstrom sowie WLAN-/HA-/App-Recovery | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-66 | 25.7 | Guided-Access-Exit, Gerätereboot, Post-Reboot-Relaunch und erneute Kiosksperre | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-67 | 26 | Section-Rendering, unassigned Fallback, Titel, Rotation und Reload auf Legacy-Hardware | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-68 | 26 | Vollständiges Section-CRUD, Kartenbewahrung und Persistenz | aktuelle macOS-Safari-Version plus isolierter Standalone-LXC | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-69 | 26.1 | Native Room Card, Area-Vorschlag, Collapse, Background, Größen, Alerts und Controls | iPad mini 1, iOS 9.3.5, HomeScreen plus macOS-Safari für Admin | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-70 | 26.1 | Room-Background, Konfiguration und Assets über HAOS-App-Restart | Home Assistant OS Test-App plus macOS Safari | Vollständige Anleitung weiter unten; erst nach RQ-16-01 als PASS wertbar. | NOT TESTED |
+| MT-71 | 26.2 | Reale HA-Controlmatrix mit drei Lights und mehreren Climate-Capabilities | macOS Safari plus isoliertes Test-HA/Standalone | Vollständige Anleitung weiter unten. | NOT TESTED |
+| MT-72 | 26.2 | Gemeinsame Light-/Climate-Controls in Grid, Focus und Room auf dem Legacy-iPad | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
+
++## Reparaturabhängigkeiten der manuellen Tests
+
+Diese Zuordnung entscheidet nur, wann ein Ergebnis als verbindliche Abnahme
+gewertet werden darf. `CAN RUN NOW` bedeutet, dass kein bekannter Produkt-
+Repair den Test blockiert; ein Explorationslauf darf dokumentiert werden.
+`BLOCKED` verlangt vorherige Reparatur und gezielten Re-Audit der genannten
+IDs. Release-/Stable-Tests verwenden zusätzlich immer einen exakten,
+commitbezogenen Kandidaten.
+
+| Manual Test | Execution State | Blocked By Repairs |
+|---|---|---|
+| MT-01 | BLOCKED | RQ-04-01 |
+| MT-02 | BLOCKED | RQ-04-01 |
+| MT-03 | CAN RUN NOW | – |
+| MT-04 | CAN RUN NOW | – |
+| MT-05 | BLOCKED | RQ-04-01 |
+| MT-06 | BLOCKED | RQ-04-01 |
+| MT-07 | CAN RUN NOW | – |
+| MT-08 | CAN RUN NOW | – |
+| MT-09 | BLOCKED | RQ-04-01, RQ-18-01 |
+| MT-10 | CAN RUN NOW | – |
+| MT-11 | BLOCKED | RQ-04-01 |
+| MT-12 | BLOCKED | RQ-04-01 |
+| MT-13 | BLOCKED | RQ-04-01 |
+| MT-14 | BLOCKED | RQ-04-01 |
+| MT-15 | BLOCKED | RQ-04-01 |
+| MT-16 | BLOCKED | RQ-04-01 |
+| MT-17 | CAN RUN NOW | – |
+| MT-18 | BLOCKED | RQ-04-01 |
+| MT-19 | BLOCKED | RQ-04-01 |
+| MT-20 | BLOCKED | RQ-04-01 |
+| MT-21 | BLOCKED | RQ-04-01 |
+| MT-22 | BLOCKED | RQ-04-01 |
+| MT-23 | BLOCKED | RQ-04-01 |
+| MT-24 | BLOCKED | RQ-04-01 |
+| MT-25 | BLOCKED | RQ-04-01 |
+| MT-26 | CAN RUN NOW | – |
+| MT-27 | BLOCKED | RQ-04-01 |
+| MT-28 | BLOCKED | RQ-04-01 |
+| MT-29 | RUN AFTER ALL VISIBLE REPAIRS | RQ-04-01, RQ-09-01, RQ-12-01/02/03, RQ-16-01, RQ-18-01 |
+| MT-30 | BLOCKED | RQ-09-01 |
+| MT-31 | CAN RUN NOW | – |
+| MT-32 | BLOCKED | RQ-04-01, RQ-09-01 |
+| MT-33 | BLOCKED | RQ-04-01 |
+| MT-34 | BLOCKED | RQ-04-01 |
+| MT-35 | BLOCKED | RQ-09-01 |
+| MT-36 | BLOCKED | RQ-09-01 |
+| MT-37 | CAN RUN NOW | – |
+| MT-38 | CAN RUN NOW | – |
+| MT-39 | BLOCKED | RQ-04-01 |
+| MT-40 | BLOCKED | RQ-04-01 |
+| MT-41 | BLOCKED | RQ-04-01 |
+| MT-42 | BLOCKED | RQ-04-01 |
+| MT-43 | BLOCKED | RQ-12-01 |
+| MT-44 | BLOCKED | RQ-12-01 |
+| MT-45 | BLOCKED | RQ-04-01, RQ-12-01 |
+| MT-46 | BLOCKED | RQ-09-01, RQ-12-02, RQ-12-03 |
+| MT-47 | BLOCKED | RQ-12-02, RQ-12-03 |
+| MT-48 | BLOCKED | RQ-04-01, RQ-09-01, RQ-12-02, RQ-12-03 |
+| MT-49 | BLOCKED | RQ-04-01, RQ-12-02, RQ-12-03 |
+| MT-50 | BLOCKED | RQ-09-01, RQ-13-01, RQ-13-02 |
+| MT-51 | BLOCKED | RQ-13-01, RQ-16-01 |
+| MT-52 | BLOCKED | RQ-13-01, RQ-14-02, RQ-16-01 |
+| MT-53 | BLOCKED | RQ-13-01 |
+| MT-54 | BLOCKED | RQ-04-01, RQ-13-01, RQ-16-01 |
+| MT-55 | BLOCKED | RQ-13-01, RQ-14-01/02/04/05, RQ-17-01 |
+| MT-56 | BLOCKED | RQ-14-01, RQ-14-02 |
+| MT-57 | RUN AFTER ALL REPAIRS | RQ-13-01, RQ-14-04, RQ-17-01 |
+| MT-58 | BLOCKED | RQ-04-01, RQ-16-01 |
+| MT-59 | BLOCKED | RQ-16-01 |
+| MT-60 | BLOCKED | RQ-16-01 |
+| MT-61 | BLOCKED | RQ-13-01, RQ-13-02 |
+| MT-62 | BLOCKED | RQ-13-01, RQ-13-02, RQ-16-01 |
+| MT-63 | BLOCKED | RQ-04-01, RQ-18-01 |
+| MT-64 | BLOCKED | RQ-04-01, RQ-13-01 |
+| MT-65 | BLOCKED | RQ-04-01, RQ-13-01 |
+| MT-66 | BLOCKED | RQ-04-01, RQ-13-01 |
+| MT-67 | BLOCKED | RQ-04-01 |
+| MT-68 | BLOCKED | RQ-04-01 |
+| MT-69 | BLOCKED | RQ-04-01, RQ-16-01, RQ-18-01 |
+| MT-70 | BLOCKED | RQ-13-01, RQ-13-02, RQ-16-01 |
+| MT-71 | BLOCKED | RQ-04-01 |
+| MT-72 | BLOCKED | RQ-04-01, RQ-18-01 |
+
+## Detaillierte Anleitungen aus Audit Part 19
+
+## MT-67
+
+Test ID: TEST-IPAD-SECTION-001
+
+Sprint: 26
+
+Requirement: Dashboards ohne und mit mehreren Sections auf dem Legacy-Zielgerät
+ohne Überlappung, Koordinatenverlust, horizontales Scrollen oder
+Footer-/Background-/Focus-Regression darstellen.
+
+Device/System: iPad mini 1 mit iOS 9.3.5 im HomeScreen-Modus; aktueller
+isolierter Standalone- oder HA-App-Testkandidat.
+
+Preconditions:
+
+- Kandidatencommit und Deploymentmodus sind notiert;
+- ein Dashboard ohne Sections sowie ein Custom-Dashboard mit zwei benannten
+  Sections und mindestens einer unassigned Karte sind vorbereitet;
+- beide Sections enthalten je Sensor, Light oder Climate mit teilweise gleichen
+  lokalen `x/y`-Koordinaten;
+- ein Sectiontitel ist sichtbar, der andere verborgen; Dashboardbackground,
+  Footer, Summary/Errors und eine Focus-fähige Karte sind vorhanden;
+- keine privaten Entitynamen oder Tokens werden als Evidenz erfasst.
+
+Exact route/page: `http://<TEST-IP>:3000/`, `/d/<section-dashboard-id>`,
+`/system/summary` und `/system/errors`.
+
+Exact dashboard/section/card: Dashboard `section-audit`; Sections
+`section-ground`/`section-upper`; unassigned Sensor; Climate für Focus.
+
+Entity state/capabilities: read-only Sensor plus ausdrücklich autorisiertes
+Test-Light/Climate; Climate verfügbar mit Target-Capability.
+
+Card size/orientation: mindestens Compact, Wide und Large; Portrait,
+Landscape und Portrait→Landscape→Portrait.
+
+### Steps
+
+1. Starte das sectionslose Dashboard im Hochformat und notiere Kartenposition,
+   Hintergrund und Footer; prüfe, dass kein leerer Sectionheader erscheint.
+2. Öffne `/d/section-audit` und prüfe die vertikale Reihenfolge beider Sections,
+   den sichtbaren/verborgenen Titel sowie alle Karten.
+3. Verifiziere, dass identische lokale Koordinaten in verschiedenen Sections
+   keine Überlappung erzeugen und jede Karte innerhalb ihres Rasters bleibt.
+4. Prüfe die unassigned Karte im eindeutig erkennbaren Fallbackbereich.
+5. Scrolle vom ersten bis zum letzten Abschnitt; prüfe Seitenbreite,
+   Hintergrundkontinuität und Footerposition.
+6. Öffne Focus aus beiden Sections nacheinander und schließe ihn per Control,
+   Außenfläche und Zurücknavigation; prüfe unveränderte Gridgeometrie.
+7. Drehe Portrait→Landscape→Portrait und wiederhole Schritte 2 bis 6.
+8. Lade die Seite neu und wiederhole Sectionreihenfolge, Titel und unassigned
+   Karte.
+9. Öffne Summary und Errors und kehre jeweils zum exakten Section-Dashboard
+   zurück.
+
+### Expected Visual Result
+
+- Sections stehen vertikal; jedes interne Grid ist separat und überlappt nicht.
+- Verborgene Sectiontitel hinterlassen keinen unnötigen Titelabstand.
+- Keine horizontale Scrollbar, Backgroundlücke oder Footerverlagerung.
+- Focus bleibt zentriert und verändert keine Sectionkoordinaten.
+
+### Expected Functional Result
+
+- Alle Karten einschließlich unassigned bleiben sichtbar und erhalten ihre
+  Position nach Rotation, Reload und Systemseiten-Rückkehr.
+- Autorisierte Controls funktionieren, ohne Sectionwechsel auszulösen.
+
+### Fail If
+
+- eine Karte fehlt, überlappt oder in eine andere Section wandert;
+- gleiche lokale Koordinaten kollidieren über Sectiongrenzen;
+- Titel, Footer, Background, Focus oder Returnziel brechen;
+- horizontales Scrollen oder eine leere Lücke entsteht.
+
+### Evidence
+
+- Fotos von sectionslosem Dashboard und beiden Sections in Portrait/Landscape;
+- Foto der unassigned Karte, des Focus und des Footers;
+- Kandidatencommit, Route und Ergebnis je Schritt, ohne private Daten.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen für MT-01 bis MT-10 (Konsistenzkorrektur Part 19)
+
+Die Kurzzeilen MT-01 bis MT-10 besaßen vor dem finalen Baseline-Abgleich noch
+keine vollständigen Einzelanleitungen. Die folgenden Einträge vervollständigen
+nur die Testdokumentation; kein Ergebnis wurde ausgeführt oder auf `PASS`
+gesetzt.
+
+## MT-01
+
+Test ID: TEST-IPAD-BASELINE-01
+
+Sprint: 12
+
+Requirement: Climate-Controls, kompakte Kartengeometrie, Theme und
+Fehler-/Refreshverhalten auf der Legacy-Zielhardware.
+
+Device/System: iPad mini 1, iOS 9.3.5, Safari und HomeScreen; isolierter
+Dashboard-Testkandidat.
+
+Preconditions: Testdashboard mit langem Sensorwert, Binary, autorisiertem Light
+und Climate; Climate verfügbar mit Min/Max/Step und kontrolliert auslösbarem
+Backendfehler; Kandidatencommit notiert.
+
+Exact route/page: `http://<TEST-IP>:3000/` und `/d/default`.
+
+Exact test data/card: Compact Sensor/Binary/Light/Climate, lange Namen/Units,
+Climate active/off/unavailable.
+
+### Steps
+
+1. Öffne `/` in Safari im Hochformat und danach über das HomeScreen-Icon.
+2. Prüfe alle Compact Cards in Light und Dark auf lesbare Identität/Werte.
+3. Betätige Climate Minus und Plus einzeln, dann rasch nacheinander; beobachte
+   Busy/Disabled und den bestätigten Sollwert.
+4. Löse den vorbereiteten Backendfehler aus und prüfe Meldung sowie Rollback.
+5. Setze Climate unavailable und prüfe deaktivierte Controls.
+6. Drehe ins Querformat und zurück; wiederhole Minus/Plus und Light Power.
+7. Warte mindestens zwei Refreshintervalle und prüfe, dass kein alter Zustand
+   einen neu bestätigten Sollwert überschreibt.
+
+### Expected Result
+
+- Visual: keine Überlappung/Clipping/horizontale Scrollbar; Controls zentriert
+  und ungefähr mindestens 44 px; Theme konsistent.
+- Functional: genau ein Request je Tap, Busy verhindert Doppelaktion, Fehler
+  stellt bestätigten Wert her, unavailable bleibt disabled.
+
+### Fail If
+
+- Wert/Unit/Control verlässt die Karte, Sollwert springt zurück, doppelter
+  Request entsteht, Fehler bleibt optimistisch stehen oder HomeScreen verlässt
+  den Kontext.
+
+### Evidence
+
+- Fotos Portrait/Landscape und Light/Dark; anonymisierte Sollwert-/Fehlertabelle;
+  Kandidatencommit und iOS-Version, keine Tokens/private Namen.
+
+### Result
+
+NOT TESTED
+
+## MT-02
+
+Test ID: TEST-IPAD-MULTI-DASHBOARD-01
+
+Sprint: 13
+
+Requirement: Default-/Custom-Routing, Darstellung, Refresh und HomeScreen-
+Kontext auf iOS 9.
+
+Device/System: iPad mini 1, iOS 9.3.5, HomeScreen; isolierter Kandidat.
+
+Preconditions: Default-Dashboard und Custom-Dashboard `esszimmer` mit
+unterschiedlichen Titeln/Karten; direkte LAN-Origin; Light/Dark verfügbar.
+
+Exact route/page: `http://<TEST-IP>:3000/`, `/d/default`, `/d/esszimmer`.
+
+Exact test data/card: mindestens Sensor, Binary, Light und Climate auf beide
+Dashboards verteilt; Zustandsänderung im Test-HA möglich.
+
+### Steps
+
+1. Starte `/` vom HomeScreen und notiere aufgelöste Dashboard-ID/Titel.
+2. Öffne `/d/default` und vergleiche Inhalt mit `/`.
+3. Öffne `/d/esszimmer`; prüfe ausschließlich dessen konfigurierte Karten.
+4. Ändere einen Mockzustand und warte auf Auto-Refresh auf beiden Routen.
+5. Schalte Theme, lade jede Route neu und prüfe Persistenz.
+6. Drehe auf jeder Route Portrait/Landscape; prüfe Header, Uhr/Datum und Status.
+7. Navigiere zwischen Routen und prüfe, dass keine Safari-UI/neues Fenster
+   erscheint.
+
+### Expected Result
+
+- Visual: korrekter Titel/Inhalt je Route, responsiv ohne Überlauf; Metadaten
+  dezent und Theme stabil.
+- Functional: `/` und `/d/default` zeigen Default, Custom bleibt getrennt,
+  Refresh aktualisiert Zustände im selben HomeScreen-Kontext.
+
+### Fail If
+
+- falsches Dashboard/Title, vermischte Karten, HTTP-Fehler, fehlender Refresh,
+  Themeverlust oder normales Safari/neuer Tab erscheint.
+
+### Evidence
+
+- Fotos aller drei Routen in beiden Orientierungen; Zeit-/State-Protokoll und
+  Kandidatencommit ohne interne/private Details.
+
+### Result
+
+NOT TESTED
+
+## MT-03
+
+Test ID: TEST-HA-RUNTIME-MULTI-DASHBOARD-WRITE-01
+
+Sprint: 13
+
+Requirement: Multi-Dashboard-Sichtbarkeit bleibt von expliziter
+serverseitiger Light-/Climate-Autorisierung getrennt.
+
+Device/System: macOS Safari plus kontrolliertes Test-Home-Assistant und
+isolierter Standalone-Kandidat.
+
+Preconditions: dieselben autorisierten Light-/Climate-Entities erscheinen im
+Default- und Custom-Dashboard; je eine sichtbare nicht autorisierte Entity;
+Fake-/Testcredentials, keine Produktion.
+
+Exact route/page: `/`, `/d/esszimmer`, `/api/status`; Controls nur über UI.
+
+Exact test data/card: autorisiertes Light/Climate und nicht autorisierte
+Light/Climate, jeweils verfügbar.
+
+### Steps
+
+1. Notiere Grants serverseitig und öffne Default-Dashboard.
+2. Schalte autorisiertes Light und ändere Climate-Target; bestätige im Test-HA.
+3. Wiederhole dieselben Entities im Custom-Dashboard.
+4. Prüfe nicht autorisierte sichtbare Karten: kein bedienbares Control.
+5. Sende über lokale Testfixture einen engen Request für die nicht autorisierte
+   Entity und prüfe serverseitige Ablehnung ohne HA-Service.
+6. Entferne eine Entity nur aus einem Dashboard und prüfe, dass dies keine
+   Rechteänderung der verbleibenden expliziten Konfiguration vortäuscht.
+
+### Expected Result
+
+- Visual: Controls sind auf beiden Dashboards konsistent; unauthorized disabled.
+- Functional: autorisierte Writes funktionieren routenunabhängig; Sichtbarkeit
+  erzeugt nie Write-Recht; Backend bleibt maßgeblich.
+
+### Fail If
+
+- Entity funktioniert nur auf einer Route/Test-ID, unauthorized erreicht HA,
+  Dashboardwechsel ändert Grant oder Browser kann Domain/Service bestimmen.
+
+### Evidence
+
+- anonymisierte Grant-/Route-/Aktionstabelle und redigiertes HA-Serviceprotokoll;
+  keine Tokens.
+
+### Result
+
+NOT TESTED
+
+## MT-04
+
+Test ID: TEST-ADMIN-CONFIG-01
+
+Sprint: 15, 16
+
+Requirement: Geschützte Admin UI, Dashboard-/Widget-Editor, Preview,
+Save/Discard und Größenwahl im aktuellen Safari.
+
+Device/System: aktuelle macOS-Safari-Version; isolierter Kandidat mit
+kontrolliertem Entityinventar.
+
+Preconditions: Admin API aktiv, separater Testtoken, mindestens zwei
+Dashboards/mehrere Entitydomains; letzte gültige Config/Backup vorhanden.
+
+Exact route/page: `http://<TEST-IP>:3000/admin`, Previewroute innerhalb Admin,
+`/d/<test-dashboard>`.
+
+Exact test data/card: Sensor/Binary/Light/Climate; Größen compact/normal/wide/
+tall/large; lange Namen; authorized und read-only Karten.
+
+### Steps
+
+1. Öffne `/admin` ohne Token, mit falschem Token und mit gültigem Testtoken.
+2. Erstelle, benenne, dupliziere und lösche ein Testdashboard; setze Default.
+3. Suche/filtere Entityinventar und füge alle vier Kartentypen hinzu.
+4. Ändere Sichtbarkeit, Reihenfolge und jede Größe; vergleiche Live Preview.
+5. Verwirf Änderungen und prüfe unveränderte Runtime.
+6. Wiederhole, speichere, lade Admin/Runtime neu und vergleiche.
+7. Provoziere kontrollierten Savefehler; prüfe Meldung, Draft und letzte Config.
+8. Prüfe Tastaturfokus, Labels, Kontrast und Logout/erneute Authentifizierung.
+
+### Expected Result
+
+- Visual: Editor/Preview ohne abgeschnittene Controls, klare Fehler/Fokuszustände.
+- Functional: Auth schützt Admin; CRUD/Größen/Save/Discard/Reload sind konsistent;
+  Fehler zerstört keine Config.
+
+### Fail If
+
+- Admin ohne Token erreichbar, Secret im URL/Log, Preview weicht nach Save von
+  Runtime ab, Discard speichert oder Fehler überschreibt letzte gültige Config.
+
+### Evidence
+
+- anonymisierte Screenshots der Editorzustände; CRUD-/Save-Ergebnistabelle;
+  keine Tokenwerte oder privaten Entities.
+
+### Result
+
+NOT TESTED
+
+## MT-05
+
+Test ID: TEST-IPAD-ADMIN-WALL-REGRESSION-01
+
+Sprint: 15
+
+Requirement: Im modernen Admin gespeicherte Konfiguration rendert und steuert
+auf dem Legacy-iPad korrekt.
+
+Device/System: macOS Safari für Admin; iPad mini 1/iOS 9.3.5 HomeScreen;
+isolierter Kandidat/Test-HA.
+
+Preconditions: MT-04-Testdashboard gespeichert; autorisiertes Light/Climate;
+Admincredential verbleibt ausschließlich am Mac.
+
+Exact route/page: Mac `/admin`; iPad `/` und `/d/<custom-dashboard>`.
+
+Exact test data/card: geänderte Reihenfolge/Sichtbarkeit/Größe für Sensor,
+Binary, Light und Climate; lange Werte.
+
+### Steps
+
+1. Speichere am Mac eine eindeutig erkennbare Konfigurationsänderung.
+2. Öffne Default und Custom am iPad neu; vergleiche Karten/Order/Visibility.
+3. Warte zwei Refreshintervalle und prüfe aktuelle Zustände.
+4. Schalte Light und ändere Climate-Target auf beiden vorgesehenen Routen.
+5. Prüfe Light/Dark sowie Portrait/Landscape.
+6. Verifiziere, dass `/admin` nicht automatisch authentifiziert ist und kein
+   Adminsecret auf dem iPad gespeichert wurde.
+
+### Expected Result
+
+- Visual: gespeicherte Konfiguration erscheint vollständig ohne Überlauf.
+- Functional: Refresh/Controls funktionieren nur für Grants; Adminschutz bleibt.
+
+### Fail If
+
+- alte/teilweise Config durch Cache, Controls verlieren Funktion, Theme/Layout
+  bricht oder Admincredential gelangt aufs iPad.
+
+### Evidence
+
+- Mac-Preview und iPad-Runtime-Fotos derselben anonymisierten Config;
+  State-/Controlprotokoll.
+
+### Result
+
+NOT TESTED
+
+## MT-06
+
+Test ID: TEST-IPAD-TILE-SIZES-01
+
+Sprint: 16
+
+Requirement: Alle Größenpresets mit aktuellem Layoutmodell auf iPad mini
+visuell und funktional prüfen.
+
+Device/System: iPad mini 1, iOS 9.3.5, Safari/HomeScreen; isolierter Kandidat.
+
+Preconditions: Matrixdashboard mit Sensor/Binary/Light/Climate in compact,
+normal, wide, tall, large; lange Namen/Werte/Units; autorisierte Controls.
+
+Exact route/page: `/d/size-audit`.
+
+Exact test data/card: pro Typ alle fünf Presets, on/off/unknown/unavailable;
+Climate mit Ist/Soll/HVAC.
+
+### Steps
+
+1. Öffne Matrix in Portrait und prüfe jede Karte auf Boundaries/Umbruch.
+2. Betätige Light und Climate Minus/Plus/Power in jeder sinnvollen Größe.
+3. Öffne Climate Focus aus kleinster und größter Karte.
+4. Schalte Light/Dark und vergleiche Kontrast/Status.
+5. Drehe Landscape und wiederhole Schritte 1 bis 4.
+6. Lade neu und prüfe unveränderte Größen/Kartenreihenfolge.
+
+### Expected Result
+
+- Visual: kein Overlap/Clipping/Horizontal-Scroll; bewusste Inhalte je Größe,
+  kompakter Header, zentrierte ca. 44-px-Controls.
+- Functional: Controls/Focus bleiben unabhängig von Größe nutzbar.
+
+### Fail If
+
+- Preset streckt nur leere Card, versteckt Pflichtinhalt, überlappt oder macht
+  Controls unbedienbar; Rotation/Reload verändert Größe.
+
+### Evidence
+
+- Fotos aller Presets in beiden Orientierungen/Themes; Ergebnismatrix je Typ.
+
+### Result
+
+NOT TESTED
+
+## MT-07
+
+Test ID: TEST-LXC-SIZE-PERSISTENCE-01
+
+Sprint: 16
+
+Requirement: Größenpersistenz und letzte gültige Konfiguration über realen
+Standalone-Dienstneustart.
+
+Device/System: isolierter Standalone-LXC `ha-legacy-dashboard` mit systemd.
+
+Preconditions: aktueller Commit ausgerollt; Testdashboard/Backup; Restartrecht;
+Fake-/Test-HA, keine Produktion.
+
+Exact route/page: `/admin`, `/d/size-persistence`, `/health`.
+
+Exact test data/card: zwei Widgets mit unterschiedlichen Größen in beiden
+Layoutprofilen.
+
+### Steps
+
+1. Notiere Ausgangsgrößen und Config-/Backuphashes.
+2. Ändere beide Größen im Admin, speichere und lade Runtime neu.
+3. Starte den Dienst kontrolliert neu und prüfe `/health`.
+4. Lade Admin/Runtime erneut und vergleiche Größen/Profile.
+5. Provoziere einen ungültigen Größenwert über isolierte Configfixture; prüfe
+   kontrollierte Ablehnung ohne Ersetzen der letzten gültigen Config.
+
+### Expected Result
+
+- Visual: Größen vor/nach Restart identisch.
+- Functional: atomare Persistenz/Backup bleiben gültig; Invalid wird abgewiesen.
+
+### Fail If
+
+- Größe geht verloren, doppelt skaliert, Backup beschädigt oder Dienst lädt
+  ungültige Config.
+
+### Evidence
+
+- Vorher-/Nachher-Screenshots, Hash-/Dienststatus ohne Configinhalt/Secrets.
+
+### Result
+
+NOT TESTED
+
+## MT-08
+
+Test ID: TEST-ADMIN-GRID-POINTER-01
+
+Sprint: 17, 17.1
+
+Requirement: Pointer-/Maus-Drag, Resize, Snapping, Kollision, Bounds,
+Save/Discard und Duplikation im aktuellen Adminraster.
+
+Device/System: aktuelle macOS-Safari-Version und ein weiterer moderner
+Pointerbrowser; isolierter Kandidat.
+
+Preconditions: Dashboard mit mindestens vier Karten, freie/gesperrte Zellen,
+Portrait-/Landscapeprofil; Admin-Testtoken.
+
+Exact route/page: `/admin` Layouteditor und `/d/grid-pointer`.
+
+Exact test data/card: Sensor, Binary, Light, Climate mit stabilen IDs.
+
+### Steps
+
+1. Wähle Portrait; ziehe jede Karte nacheinander links/rechts/oben/unten und
+   vergleiche Zielvorschau sowie Zell-Snapping.
+2. Nutze Resize-Handle in beide Achsen; teste Mindestgröße und Bounds.
+3. Ziehe auf belegte Zelle und außerhalb des Rasters; prüfe Ablehnung/Fallback.
+4. Wiederhole in Landscape.
+5. Discard und vergleiche Ausgang; danach Änderungen speichern und reloaden.
+6. Dupliziere Dashboard und prüfe neue Widget-IDs bei gleicher Geometrie.
+7. Vergleiche Runtime in beiden Profilen.
+
+### Expected Result
+
+- Visual: klare Drag-/Resize-Vorschau, kein Springen/Überlappen.
+- Functional: Snapping/Kollision/Bounds deterministisch; Save/Discard korrekt;
+  Duplikat mit eindeutigen IDs.
+
+### Fail If
+
+- Pointer bleibt hängen, Karte landet falsch, Collision wird gespeichert,
+  Profile überschreiben sich oder IDs werden dupliziert.
+
+### Evidence
+
+- Video/Schrittbilder der Gesten; Koordinaten/IDs vor/nach Save/Discard/Duplikat.
+
+### Result
+
+NOT TESTED
+
+## MT-09
+
+Test ID: TEST-IPAD-GRID-PRESENTATION-01
+
+Sprint: 17, 17.1
+
+Requirement: Grid, Responsive Presentation, Rotation, Focus, Controls und
+Systemnavigation auf iPad mini.
+
+Device/System: iPad mini 1, iOS 9.3.5, HomeScreen; isolierter Kandidat.
+
+Preconditions: Default/Custom mit compact/normal/wide/tall/large Sensor,
+Binary, Light, Climate; lange Namen/Werte; Background/Footer; Summary/Errors.
+
+Exact route/page: `/`, `/d/<custom>`, `/system/summary`, `/system/errors`.
+
+Exact test data/card: on/off/unknown/unavailable und autorisierte Controls.
+
+### Steps
+
+1. Prüfe Default und Custom im Portrait auf Gridgrenzen/Informationshierarchie.
+2. Drehe Landscape→Portrait und prüfe dieselben Karten/Koordinaten.
+3. Betätige Light sowie Climate Minus/Plus/Power; prüfe Zentrierung/Touchziel.
+4. Öffne Climate Focus, prüfe Ist/Soll/HVAC/Controls und drehe erneut.
+5. Schalte Light/Dark und lade neu.
+6. Öffne Summary/Errors und kehre zum exakten Dashboard zurück.
+
+### Expected Result
+
+- Visual: kein Overlap/Horizontal-Scroll/Backgroundgap/Footershift; Focus
+  unabhängig von Gridgröße; lange Inhalte kontrolliert.
+- Functional: Controls und Returnnavigation funktionieren im selben Web-App-
+  Kontext; Rotation bewahrt Layout.
+
+### Fail If
+
+- Grid/Fokus komprimiert, Card überlappt, Control linksversetzt/klein, Theme
+  oder Returnziel geht verloren.
+
+### Evidence
+
+- Fotos aller Größen und Focus in beiden Orientierungen/Themes; Control-/Return-
+  Beobachtung ohne private Daten.
+
+### Result
+
+NOT TESTED
+
+## MT-10
+
+Test ID: TEST-LXC-LAYOUT-PERSISTENCE-01
+
+Sprint: 17, 17.1
+
+Requirement: Persistente Portrait-/Landscape-Koordinaten und Backup über
+Standalone-Dienstneustart.
+
+Device/System: isolierter Standalone-LXC mit systemd und aktueller Admin UI.
+
+Preconditions: Testdashboard mit mindestens drei Widgets, gültiges Backup,
+Admin-Testtoken; kontrollierter Test-HA.
+
+Exact route/page: `/admin`, `/d/layout-persistence`, `/health`.
+
+Exact test data/card: Sensor/Light/Climate; unterschiedliche Koordinaten und
+Größen je Profil.
+
+### Steps
+
+1. Notiere IDs, x/y/w/h beider Profile und Config-/Backuphashes.
+2. Verschiebe/vergrößere Widgets in Portrait; speichere.
+3. Wiederhole mit anderen Koordinaten in Landscape; speichere.
+4. Lade Admin und Runtime in beiden Profilen neu; vergleiche.
+5. Starte Dienst kontrolliert neu und prüfe `/health` sowie beide Profile.
+6. Prüfe, dass Koordinaten nicht doppelt skaliert und Backup/letzte Config
+   gültig sind.
+7. Provoziere isoliert eine Kollision/Out-of-bounds-Config und prüfe Ablehnung.
+
+### Expected Result
+
+- Visual: beide Profile behalten ihre unabhängige Geometrie ohne Überlappung.
+- Functional: Reload/Restart erhalten Layout; ungültiger Save zerstört nichts.
+
+### Fail If
+
+- Profile überschreiben sich, x/y/w/h ändern nach Restart, Karten kollidieren,
+  doppelte Skalierung oder Backupverlust entsteht.
+
+### Evidence
+
+- anonymisierte Koordinatentabelle, Screenshots beider Profile, Hash-/Dienststatus
+  ohne Secrets.
+
+### Result
+
+NOT TESTED
+
+## MT-68
+
+Test ID: TEST-ADMIN-SECTION-001
+
+Sprint: 26
+
+Requirement: Section-CRUD, Kartenverschiebung, sichere Löschung und atomare
+Persistenz auf der echten Standalone-Laufzeit bestätigen.
+
+Device/System: aktuelle macOS-Safari-Version und isolierter Standalone-LXC mit
+systemd; kontrollierter Test-HA-Datenbestand.
+
+Preconditions:
+
+- aktueller Kandidat ist im isolierten LXC ausgerollt, Commit/Datenpfad notiert;
+- separater Admin-Testtoken, keine Produktionscredentials;
+- Custom-Dashboard mit drei Karten und gültiger Config-Backupdatei;
+- Dienstneustart ist im Testfenster erlaubt.
+
+Exact route/page: `http://<TEST-IP>:3000/admin`, `/d/<section-crud-id>`,
+`/api/admin/config` nur über den normalen Adminclient.
+
+Exact dashboard/section/card: Dashboard `section-crud`; Karten A/B/C mit
+stabilen Widget-IDs; Sections „Erdgeschoss“ und „Obergeschoss“.
+
+Entity state/capabilities: lokale Mockentities reichen; Schreibcontrols sind
+für diesen Test nicht erforderlich.
+
+Card size/orientation: Admin Portrait- und Landscape-Profil; Runtime in beiden
+Browserbreiten.
+
+### Steps
+
+1. Öffne `/admin`, authentifiziere dich und notiere die drei Widget-IDs.
+2. Erstelle „Erdgeschoss“, speichere und prüfe Runtime sowie Reload.
+3. Benenne in „EG“ um, schalte `showTitle` aus/ein und speichere jeweils.
+4. Erstelle „Obergeschoss“, ändere die Sectionreihenfolge und speichere.
+5. Weise Karte A „EG“, B „Obergeschoss“ und C `unassigned` zu; speichere und
+   prüfe beide Layoutprofile.
+6. Verschiebe B nach „EG“ und A nach „Obergeschoss“; kontrolliere, dass lokale
+   Kollisionen sicher neu platziert werden und Widget-IDs gleich bleiben.
+7. Lösche „EG“ mit darin befindlicher Karte B. Speichere und prüfe, dass B nun
+   unassigned und nicht gelöscht ist.
+8. Lade Admin und Runtime neu; vergleiche Section-/Widgetanzahl und IDs.
+9. Starte nur den Dashboarddienst kontrolliert neu; prüfe erneut Config,
+   Reihenfolge, Titelstatus, Zuordnung und Backupgültigkeit.
+10. Erzeuge einen ungültigen Sectionentwurf (z. B. doppelte ID über eine lokale
+    Testfixture, nicht durch Browser-Manipulation im Produktivsystem) und prüfe,
+    dass Save kontrolliert scheitert und die letzte gültige Config bleibt.
+
+### Expected Visual Result
+
+- Editor und Runtime zeigen dieselben Sections, Reihenfolge und Titelzustände.
+- Nach Löschung erscheint Karte B im unassigned Bereich; keine Karte verschwindet.
+
+### Expected Functional Result
+
+- Create/Rename/Reorder/Assign/Move/Delete persistieren atomar.
+- Widget-IDs und Kartenanzahl bleiben über Delete, Reload und Restart identisch.
+- Ungültige Config ersetzt weder aktive Datei noch Backup.
+
+### Fail If
+
+- Section-Löschung löscht eine Karte;
+- Zuordnung/Reihenfolge geht nach Reload/Restart verloren;
+- Kartenpositionen werden doppelt skaliert oder kollidieren;
+- ungültiges Save beschädigt letzte gültige Config/Backup.
+
+### Evidence
+
+- bereinigte Vorher-/Nachher-Tabelle mit Section-/Widget-IDs und Reihenfolge;
+- Screenshots von Admin und Runtime; Hash/Status von Config und Backup ohne Inhalt
+  oder Secrets; Dienststatus ohne Tokenwerte.
+
+### Result
+
+NOT TESTED
+
+## MT-69
+
+Test ID: TEST-IPAD-ROOM-001
+
+Sprint: 26.1
+
+Requirement: Native Room Card von Admin-Auto-Setup bis echter iPad-Runtime,
+Collapse/Expand, Background, Größen, Alerts und sicheren Controls prüfen.
+
+Device/System: aktuelle macOS-Safari-Version für `/admin`; iPad mini 1 mit
+iOS 9.3.5 im HomeScreen-Modus; isolierter aktueller Kandidat.
+
+Preconditions:
+
+- RQ-16-01 und RQ-18-01 sind repariert/re-auditiert;
+- Test-HA-Area „Testraum“ mit stabilen Registry-IDs und Entities für Temperatur,
+  Humidity, Climate, Presence, zwei Öffnungen, Light, Switch, Cover, Fan, Media,
+  Lock, Battery und Safety Alert;
+- eine manuell abweichende Entity ist zum Override vorbereitet;
+- valides anonymes JPEG/PNG aus kontrollierter Quelle;
+- Room Card liegt in einer Sprint-26-Section; Light/Climate explizit autorisiert,
+  übrige Domains read-only.
+
+Exact route/page: `http://<TEST-IP>:3000/admin` und
+`http://<TEST-IP>:3000/d/room-audit`.
+
+Exact dashboard/section/card: Dashboard `room-audit`, Section `floor-test`,
+Room Widget `room-test`.
+
+Entity state/capabilities: Temperatur/Humidity numerisch; Presence on/off;
+eine/two open windows; Low Battery; Safety warning/critical; Climate off plus
+unterstützter Nicht-Off-Modus und Target; Light on/off; optionale Entity
+unavailable/missing.
+
+Card size/orientation: Compact, Standard, Wide, Tall und Large; collapsed und
+expanded; Portrait/Landscape/Rotation.
+
+### Steps
+
+1. Wähle „Testraum“ im Admin und löse Auto-Setup ausdrücklich aus; protokolliere
+   jede vorgeschlagene Rolle.
+2. Ersetze eine vorgeschlagene Entity manuell, speichere und prüfe nach Reload,
+   dass Auto-Setup sie nicht still zurücksetzt.
+3. Lade Room-Background, prüfe Adminpreview, speichere und öffne die Runtime.
+4. Prüfe Collapsed: Raumname, primäre Temperatur, Humidity soweit Tier erlaubt,
+   Presence/Openings und wichtigster Alert; optionale fehlende Daten auslassen.
+5. Tippe den expliziten Toggle einmal: Details werden sichtbar, ARIA/Symbol
+   stimmen; tippe erneut: Details werden verborgen.
+6. Bediene im Expanded-Zustand Light sowie Climate Minus/Plus/Power und prüfe,
+   dass kein Controltap Collapse auslöst oder doppelt schaltet.
+7. Setze je eine optionale Entity unknown, unavailable und missing; lade neu und
+   prüfe kontrollierte Darstellung ohne Kartenabbruch.
+8. Prüfe ein und mehrere offene Fenster, Low Battery und Safety Alert; vergleiche
+   Severity mit dem Error Dashboard derselben Momentaufnahme.
+9. Prüfe nacheinander alle fünf Größen in Portrait und Landscape, einschließlich
+   langem Raumnamen/langem Wert; drehe bei Expanded und offenem Controlstatus.
+10. Lade Runtime neu, prüfe Background und Config; entferne danach das Bild im
+    Admin und bestätige sicheren Fallback ohne Bild.
+11. Entferne die HA Area aus dem kontrollierten Registryfixture, nicht aus einer
+    Produktion; prüfe Warnung im Admin und erhaltene manuelle Rollen/Runtime.
+
+### Expected Visual Result
+
+- Preview und Runtime zeigen denselben Background hinter lesbarem Inhalt ohne
+  Touchinterception.
+- Jede Größe hat eine bewusste Informationshierarchie; keine Überläufe,
+  abgeschnittenen Controls oder horizontale Scrollbar.
+- Alerts stimmen visuell mit zentraler Severity überein.
+
+### Expected Functional Result
+
+- Auto-Setup ist Vorschlag, manuelle Overrides bleiben erhalten.
+- Collapse/Expand reagiert genau einmal; Controls toggeln die Card nicht.
+- Nur ausdrücklich autorisierte Light-/Climate-Controls schreiben; alle anderen
+  Rollen bleiben read-only.
+- Missing Area/Entity/Background bricht die Card nicht.
+
+### Fail If
+
+- Room kann nicht geöffnet/geschlossen werden oder toggelt doppelt;
+- ein Controltap verändert Collapse oder eine read-only Domain schreibt;
+- Runtimebackground fehlt trotz Preview oder fängt Touch ab;
+- Area-Vorschlag überschreibt manuelle Auswahl still;
+- Größe/Rotation erzeugt Überlauf, leere große Card oder unbedienbare Controls.
+
+### Evidence
+
+- anonymisierte Admin-/Runtime-Screenshots je Tier und Orientierung;
+- Video/Beobachtungsfolge Toggle→Control→Toggle;
+- Vorschlags-/Override-Tabelle und Alertvergleich, ohne private IDs/Tokens.
+
+### Result
+
+NOT TESTED
+
+## MT-70
+
+Test ID: TEST-HAOS-ROOM-001
+
+Sprint: 26.1
+
+Requirement: Room-Konfiguration und Backgroundassets unter `/data` über
+App-Restart bewahren; Preview/Runtime/Replace/Remove sicher halten.
+
+Device/System: Home Assistant OS Testsystem (amd64 oder aarch64) mit aktuellem
+App-Kandidaten; macOS Safari für Admin/Runtime.
+
+Preconditions:
+
+- RQ-16-01 ist repariert/re-auditiert;
+- exakter Image-/Manifestdigest, Appversion und Sourcecommit sind notiert;
+- separater Admin-Testtoken; keine LLATs oder Supervisor-Tokens im Browser;
+- Room Card mit Area, manueller Rolle und bekanntem gültigem Background;
+- App-Restart und Einsicht in bereinigte App-Logs sind erlaubt.
+
+Exact route/page: `http://<HA-IP>:3000/admin`, `/d/room-haos`, `/health`.
+
+Exact dashboard/section/card: Custom-Dashboard `room-haos`, Section `test`,
+Room `room-haos-card`.
+
+Entity state/capabilities: lokales kontrolliertes Test-HA; Controls sind für
+diesen Persistenztest optional.
+
+Card size/orientation: Wide und Large im Desktopbrowser.
+
+### Steps
+
+1. Speichere Room-Konfiguration und Background; notiere anonymisierte IDs und
+   Dateihashes unter `/data`, ohne Inhalte/Tokens zu exportieren.
+2. Vergleiche Adminpreview und Runtime in Wide/Large und lade beide neu.
+3. Starte nur die HA Legacy Dashboard App kontrolliert neu; prüfe `/health`,
+   Admin und Runtime.
+4. Verifiziere Configfelder, manuelle Override-Rolle, Sectionzuordnung,
+   Background-ID/-hash und Dateirechte.
+5. Ersetze das Background durch ein zweites valides Bild; prüfe, dass erst nach
+   erfolgreichem Configsave das alte unreferenzierte Asset entfernt wird.
+6. Simuliere einen validierten Uploadfehler; prüfe, dass Bild 2, Config und Hash
+   erhalten bleiben und keine Temp-/Waisendatei entsteht.
+7. Entferne den Room-Background regulär; prüfe Preview/Runtime ohne Bild und
+   kontrollierte Entfernung nur wenn keine andere Referenz existiert.
+8. Starte die App erneut und prüfe den bildlosen, weiterhin funktionsfähigen
+   Room sowie secretfreie Logs.
+
+### Expected Visual Result
+
+- Preview und Runtime sind vor/nach Restart identisch.
+- Nach Fehler bleibt das letzte gültige Bild; nach Remove rendert die Card ohne
+  Lücke oder kaputtes Bildsymbol.
+
+### Expected Functional Result
+
+- Config und Assets liegen persistent unter `/data`; atomarer Replace/Rollback
+  und Referenzschutz funktionieren.
+- Logs/Browser enthalten weder HA-, Supervisor- noch Admin-Token.
+
+### Fail If
+
+- Restart verliert Room, Section, Override oder Background;
+- Fehler ersetzt/löscht letztes gültiges Asset oder hinterlässt Teil-/Waisenfile;
+- Remove löscht ein noch anderweitig referenziertes Asset;
+- ganzer `/data`-Inhalt oder ein Secret wird öffentlich erreichbar/logged.
+
+### Evidence
+
+- Commit/Image/Appversion, redigierte Health-/Logausgabe;
+- Config-/Asset-Hashes und Rechte vor/nach Restart/Replace/Failure/Remove;
+- anonymisierte Preview-/Runtime-Screenshots.
+
+### Result
+
+NOT TESTED
+
+## MT-71
+
+Test ID: TEST-HA-RUNTIME-CONTROL-001
+
+Sprint: 26.2
+
+Requirement: Zentrale Autorisierung und echte Light-/Climate-Capabilities mit
+mehreren Integrationen serverseitig und im Desktopbrowser verifizieren.
+
+Device/System: aktuelle macOS-Safari-Version, isolierter Standalone-Kandidat
+und ausdrücklich kontrolliertes Test-Home-Assistant.
+
+Preconditions:
+
+- Kandidatencommit/HA-Version/Integrationen notiert; keine Produktions-HA;
+- drei Lights: historisches Test-Light, zweite und dritte unterschiedliche
+  Entity/Integration; mindestens eine unavailable und eine sichtbare aber nicht
+  autorisierte Light-Entity;
+- Climates: historisches Thermostat, `off+heat`, `off+auto`, `off+heat+auto`,
+  ohne `off`, unavailable; reale min/max/step dokumentiert;
+- nur vorgesehene Testentities besitzen explizite Grants; bevorzugter Modus ist
+  einmal gültig und kontrolliert einmal stale/unsupported;
+- ein HA-Servicefehler kann im Test kontrolliert ausgelöst werden.
+
+Exact route/page: `/admin`, `/d/control-audit`, `/api/status`; enge
+Controlendpunkte ausschließlich über die UI.
+
+Exact dashboard/section/card: Gridcards aller Entities plus Room Card mit
+zweitem Light und zweitem Climate; eine Section; Focus-fähige Gridcards.
+
+Entity state/capabilities: wie oben; Targettests active/off, exaktes Minimum,
+Maximum, gültiger Step, below/above/invalid und Backendfailure.
+
+Card size/orientation: Standard/Wide/Large im Desktopbrowser.
+
+### Steps
+
+1. Prüfe im Admin die Grants; ändere nur ausdrücklich vorgesehene Testentities
+   und speichere. Verifiziere, dass Sichtbarkeit allein keinen Grant setzt.
+2. Schalte jedes der drei autorisierten Lights Off→On und On→Off; prüfe State
+   nach HA-Bestätigung.
+3. Prüfe unavailable, nicht autorisiertes, falsche Domain und unbekannte Entity
+   über kontrollierte Testfälle: UI disabled/kein Control und serverseitige
+   Ablehnung ohne HA-Service.
+4. Prüfe Climate `off+heat`, `off+auto` und `off+heat+auto`: Power erscheint und
+   sendet jeweils einen tatsächlich unterstützten Nicht-Off-Modus.
+5. Prüfe Last-known, gültige Preference und deterministic Fallback nacheinander;
+   stale/unsupported Preference darf nie gesendet werden.
+6. Prüfe Climate ohne `off`, unavailable und unauthorized: kein Fake-Power bzw.
+   serverseitige Ablehnung.
+7. Ändere Target im aktiven Zustand um einen gültigen Step und bestätige HA-
+   Zustand.
+8. Schalte Climate aus, ändere Target um einen gültigen Step und prüfe im HA-
+   Zustand/Serviceprotokoll, dass kein Power-/HVAC-Aufruf erfolgte und State
+   `off` bleibt.
+9. Setze exakt Minimum und Maximum; versuche below, above und einen ungültigen
+   Step sowie nicht numerische Eingabe über kontrollierte API-Testfixture.
+10. Löse einen HA-Servicefehler im aktiven und Off-State aus; prüfe sicheren
+    Fehler, Rollback auf bestätigten Targetwert und keinen Auto-Power.
+11. Wiederhole repräsentative Light-/Climatefälle in Grid, Focus und Room und
+    vergleiche Capability/Disabled-Entscheidungen.
+12. Prüfe bereinigte Backendlogs auf feste Domain/Services, Ablehnungen und
+    Abwesenheit aller Tokens/Payloadsecrets.
+
+### Expected Visual Result
+
+- Alle Oberflächen zeigen dieselbe capabilityabhängige Controlmenge.
+- No-off/unavailable/unauthorized erhalten keinen irreführenden Powerbutton;
+  Fehler stellen den bestätigten Targetwert wieder her.
+
+### Expected Functional Result
+
+- Mehrere IDs funktionieren unabhängig vom historischen Testentitynamen.
+- Backend bleibt autoritativ und ruft nur `light.turn_on/off`,
+  `climate.set_hvac_mode` oder `climate.set_temperature` mit validierten Daten.
+- Targetänderung in `off` lässt Climate aus.
+
+### Fail If
+
+- nur historische Test-IDs funktionieren;
+- UI-Sichtbarkeit erteilt Write-Rechte oder Browser kann Domain/Service wählen;
+- `heat` wird gesendet, obwohl nicht unterstützt, oder no-off zeigt Power;
+- Off-State-Target schaltet ein;
+- Range/Step/invalid/unauthorized erreicht HA oder Fehler lässt falschen
+  optimistischen Zustand stehen.
+
+### Evidence
+
+- anonymisierte Matrix Entity→Modes/Range/Grant→UI/API/HA-Ergebnis;
+- redigiertes HA-Serviceprotokoll und Backendlog ohne Tokens;
+- Screenshots Grid/Focus/Room vor/nach repräsentativen Aktionen.
+
+### Result
+
+NOT TESTED
+
+## MT-72
+
+Test ID: TEST-IPAD-CONTROL-001
+
+Sprint: 26.2
+
+Requirement: Gemeinsame Light-/Climate-Controlentscheidung und Touchverhalten
+in Grid, Focus und Room auf dem iPad mini bestätigen.
+
+Device/System: iPad mini 1, iOS 9.3.5, HomeScreen; aktueller isolierter
+Standalone- oder HA-App-Kandidat mit kontrolliertem Test-HA.
+
+Preconditions:
+
+- MT-71-Datenbestand oder äquivalent: mindestens zwei autorisierte
+  unterschiedliche Lights und zwei autorisierte Climates (`off+heat` und
+  `off+auto`), plus no-off/unavailable/unauthorized Fälle;
+- Gridcards und eine Room Card enthalten dieselben Testentities;
+- Climategrenzen/Step sind dokumentiert; HomeScreen-Icon frisch für Kandidat;
+- keine Admincredentials auf dem iPad.
+
+Exact route/page: `http://<TEST-IP>:3000/d/control-audit` im HomeScreen;
+Focus durch Tap auf jeweilige Gridcard.
+
+Exact dashboard/section/card: Section `controls`; Grid Light 1/2, Grid Climate
+1/2, Room `controls-room` mit Light 2/Climate 2.
+
+Entity state/capabilities: beide Lights on/off; beide Climates active/off mit
+Target; ein Climate ohne off; unavailable und unauthorized Vergleichskarten.
+
+Card size/orientation: Standard und Large; Portrait/Landscape und Rotation bei
+offenem Focus/expanded Room.
+
+### Steps
+
+1. Starte im Hochformat; prüfe Touchziele, Zentrierung und Disabledzustände
+   aller Gridcontrols.
+2. Schalte Light 1 und Light 2 jeweils Off→On→Off in Grid; warte auf bestätigten
+   Zustand und prüfe Busy/Fehlerzustand.
+3. Öffne beide Lights nacheinander in Focus und wiederhole; prüfe, dass nur das
+   Control schaltet und Focus offen bleibt.
+4. Expandiere Room, schalte Light 2 und prüfe, dass Room nicht collapsiert.
+5. Prüfe beide Climates in Grid: Power Off→On wählt den jeweiligen echten Modus;
+   On→Off funktioniert.
+6. Lasse beide Climates aus und ändere Target per Minus/Plus; prüfe am sichtbaren
+   State und über MT-71-Evidenz, dass sie aus bleiben.
+7. Wiederhole Power und Target in Focus sowie Expanded Room; kein Controltap
+   darf Focus schließen oder Room toggeln.
+8. Prüfe no-off, unavailable und unauthorized: keine falsche bedienbare
+   Oberfläche; UI darf nicht allein Autorisierung behaupten.
+9. Drehe mit offenem Climate-Focus und expanded Room ins Querformat und zurück;
+   wiederhole je einen Light- und Targettap.
+10. Simuliere den vorbereiteten Backendfehler; prüfe lesbare generische Meldung,
+    Rollback und weiter bedienbare übrige Karten.
+
+### Expected Visual Result
+
+- Power und Minus/Plus sind in Grid, Focus und Room zentriert, nicht geclippt
+  und ungefähr mindestens 44×44 px.
+- Busy/Disabled/Fehlerzustände sind konsistent; Rotation komprimiert keine Card.
+
+### Expected Functional Result
+
+- Beide Light- und Climate-IDs funktionieren auf allen vorgesehenen Flächen.
+- Target in `off` verändert nur den Sollwert; Room/Focus bleiben offen.
+- No-off/unavailable/unauthorized bleiben sicher nicht bedienbar.
+
+### Fail If
+
+- nur eine historische Entity funktioniert oder Buttons linksversetzt/unbrauchbar
+  sind;
+- ein Controltap toggelt Room, schließt Focus oder löst doppelt aus;
+- Off-State-Target schaltet Climate ein;
+- eine Oberfläche widerspricht der zentralen Capability/Authorization;
+- Rotation/Fehler lässt Controls oder Karten in falschem Zustand.
+
+### Evidence
+
+- Fotos/kurzes Video Grid→Focus→Room in beiden Orientierungen;
+- anonymisierte Ergebnistabelle pro Entity/Oberfläche/Aktion;
+- keine privaten Entitynamen, IPs, Tokens oder Admincredentials aufnehmen.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 18
+
+## MT-61
+
+Test ID: TEST-HAOS-NETWORK-01
+
+Sprint: 25.5
+
+Requirement: Aktuellen direkten LAN-Zugriff getrennt nach IP, Hostname, mDNS,
+IPv4, IPv6, Bind-Adresse, Protokoll und Port klassifizieren, ohne einen
+Netzwerkfehler als Appfehler zu behandeln.
+
+Device: Mac im selben LAN sowie iPad mini 1.
+
+iOS: 9.3.5 auf dem iPad mini.
+
+Preconditions:
+
+- ein ausdrücklich als Testkandidat dokumentierter aktueller HA-App-Build ist
+  auf HAOS installiert und gestartet;
+- der Kandidatencommit, die Appversion und die HAOS-Version sind notiert;
+- Port 3000 ist in der App-Metadatei gemappt;
+- keine produktiven Tokens werden in Screenshots oder Notizen aufgenommen;
+- IP-Adresse und optionaler lokaler DNS-/mDNS-Name des Testhosts sind bekannt.
+
+Exact dashboard URL:
+
+- `http://<HA-IP>:3000/`
+- `http://<HA-IP>:3000/health`
+- `http://<lokaler-hostname>:3000/`
+- nur falls im Netz vorhanden: `http://<hostname>.local:3000/`
+
+Deployment mode: Home Assistant App auf Test-HAOS, direkter gemappter LAN-Port;
+kein Ingress.
+
+Exact device settings required: Mac und iPad im selben WLAN/LAN; keine VPN-
+oder Private-Relay-Umleitung; iPad-Safari zunächst normal, noch nicht Guided
+Access.
+
+### Steps
+
+1. Notiere Kandidatencommit, Appversion, HAOS-Version, Host-IP und verwendeten
+   Hostnamen, ohne interne Daten öffentlich zu teilen.
+2. Prüfe auf dem Mac die A- und AAAA-Auflösung des Hostnamens und protokolliere
+   getrennt IPv4- und IPv6-Ergebnis.
+3. Rufe am Mac `http://<HA-IP>:3000/health` und anschließend `/` auf.
+4. Rufe dieselben Pfade mit dem lokalen DNS-Namen und, falls eingerichtet, mit
+   `.local` auf; notiere für jeden Versuch aufgelöste Adresse, Protokoll und
+   Port.
+5. Erzwinge am Mac getrennt IPv4 und IPv6 für Hostname:3000 und vergleiche mit
+   Hostname:8123. Ändere keine Apprechte, wenn nur einer der Netzpfade fehlt.
+6. Öffne am iPad zuerst die IP-URL und danach den Hostnamen jeweils in Safari.
+7. Verifiziere, dass die IP-URL weiterhin Dashboard, Summary und Errors laden
+   kann; melde getrennt, ob ausschließlich Hostname/mDNS oder IPv6 scheitert.
+8. Prüfe die App-Info: Bind-Adresse `0.0.0.0`, Portmapping 3000 und WebUI-Port;
+   vergleiche diese Daten mit dem beobachteten Netzpfad.
+
+### Expected Visual Result
+
+- Die funktionierende URL zeigt dasselbe Dashboard ohne Ingress-Chrome.
+- Ein nicht funktionierender Hostname zeigt keinen anderen Dashboardstand und
+  wird nicht durch eine UI-Sonderlösung kaschiert.
+
+### Expected Functional Result
+
+- `http://<HA-IP>:3000/health` antwortet und die IP-basierte LAN-Nutzung bleibt
+  möglich.
+- A/AAAA/mDNS und IPv4/IPv6 lassen sich eindeutig einem funktionierenden oder
+  fehlenden Pfad zuordnen.
+- Wenn IP:3000 funktioniert, aber Hostname nur auf eine nicht erreichbare
+  Adresse auflöst, lautet die Klassifikation Netzwerk/mDNS/Dual-Stack, nicht
+  Appberechtigung.
+
+### Fail If
+
+- IP:3000 ist trotz laufender App nicht erreichbar;
+- der Container lauscht nur auf Loopback oder Port 3000 ist nicht gemappt;
+- die Dokumentation führt zur falschen Origin, zum falschen Protokoll/Port
+  oder erzwingt Ingress;
+- zur Umgehung werden host_network, privileged oder breite Apprechte benötigt.
+
+### Evidence
+
+- datierte Tabelle mit Kandidatencommit, URL, A/AAAA, gewählter IP-Familie,
+  HTTP-Ergebnis und Client;
+- Screenshot/Foto des funktionierenden iPad-Dashboards ohne private Entitynamen;
+- bereinigter Auszug aus App-Port-/WebUI-Konfiguration, niemals Tokens.
+
+### Result
+
+NOT TESTED
+
+## MT-62
+
+Test ID: TEST-BACKGROUND-UPLOAD-01
+
+Sprint: 25.3, 25.5
+
+Requirement: Reale JPEG-Varianten akzeptieren, getarnte/defekte/übergroße
+Dateien sicher ablehnen, das letzte gültige Background bewahren und Assets
+unter `/data` über Restart erhalten.
+
+Device: Mac mit aktueller Safari-Version für `/admin`, Test-HAOS-App und iPad
+mini 1.
+
+iOS: 9.3.5 auf dem Anzeige-iPad.
+
+Preconditions:
+
+- RQ-16-01 ist repariert und re-auditiert;
+- aktueller Testkandidat auf HAOS, separater Admin-Testtoken;
+- Testdashboard ohne private Namen;
+- Fixtures: Baseline JPEG, Progressive JPEG, JFIF/APP0, EXIF/APP1 mit
+  Orientation, ICC/APP2, EXIF mit Thumbnail, JPEG ohne EXIF, je `.jpg` und
+  `.jpeg`, valides PNG;
+- Negativfixtures: truncated/malformed JPEG, HTML als JPG, SVG als JPG, PNG
+  ohne IDAT, PNG mit falscher CRC, übergroße Datei und Dateiname mit
+  Traversalzeichen.
+
+Exact dashboard URL: `http://<HA-IP>:3000/admin` und
+`http://<HA-IP>:3000/d/<test-dashboard-id>`.
+
+Deployment mode: Home Assistant App auf Test-HAOS, Assets unter `/data`.
+
+Exact device settings required: Mac und iPad im selben LAN; Admin nur am Mac;
+iPad über direkten LAN-Port im HomeScreen-Modus.
+
+### Steps
+
+1. Setze ein bekanntes gültiges Ausgangsbild und speichere; notiere dessen
+   sichtbare Darstellung und Assetreferenz ohne interne Pfade zu veröffentlichen.
+2. Lade nacheinander jede positive JPEG-Variante hoch, speichere, öffne das
+   reale Dashboard neu und prüfe Position, Cover/Contain, Overlay und
+   Orientierung.
+3. Wiederhole mindestens einmal mit `.jpg` und einmal mit `.jpeg`.
+4. Lade ein valides PNG hoch und prüfe dieselbe Preview-/Runtime-Parität.
+5. Stelle das bekannte gültige Ausgangsbild wieder her.
+6. Versuche jede Negativfixture einzeln. Verwerfe nach jeder Ablehnung den
+   Entwurf beziehungsweise lade die Adminseite neu.
+7. Prüfe nach jedem Fehler, dass das Ausgangsbild in Preview und Runtime
+   unverändert bleibt und keine neue Assetreferenz gespeichert wurde.
+8. Prüfe im App-Datenverzeichnis bereinigt, dass keine Temp-/Teil-/Waisendatei
+   entstand und Dateinamen nicht aus dem Uploadnamen übernommen wurden.
+9. Starte nur die Test-App kontrolliert neu und prüfe Config, Asset, Preview
+   und Runtime erneut.
+10. Öffne das Dashboard am iPad im Hoch- und Querformat und prüfe JPEG-
+    Darstellung, Rotation und fehlendes horizontales Scrollen.
+
+### Expected Visual Result
+
+- Alle positiven JPEG-Varianten und das valide PNG erscheinen gleich in Admin-
+  Preview und realem Dashboard; EXIF-Varianten werden nicht wegen ihrer
+  Metadatensegmente abgelehnt.
+- Nach jedem Negativupload bleibt das vorherige Bild sichtbar.
+- Auf dem iPad entstehen keine Lücke, falsche Orientierung oder Footer-/Focus-
+  Überlagerung.
+
+### Expected Functional Result
+
+- Positive Varianten speichern erfolgreich; alle Negativvarianten liefern
+  kontrollierte Fehler.
+- Kein Fehler verändert persistierte Config oder letztes gültiges Asset.
+- Restart bewahrt das Bild unter `/data`.
+
+### Fail If
+
+- ein gültiges Baseline-/Progressive-/JFIF-/EXIF-/ICC-/Thumbnail-JPEG wird
+  abgelehnt;
+- HTML/SVG/truncated/oversized/path-traversal oder strukturell ungültiges PNG
+  wird angenommen;
+- ein Fehler entfernt oder ersetzt das gültige Background;
+- Teil-/Waisendateien, inkonsistente Config oder Secret-Logs entstehen;
+- Preview und Runtime weichen ab oder Restart verliert das Asset.
+
+### Evidence
+
+- bereinigte Ergebnistabelle pro Fixture;
+- Preview-/Runtime-Screenshots ohne private Daten;
+- Dateiliste vor/nach Negativfällen und Restart, ohne Secrets;
+- iPad-Fotos Portrait/Landscape.
+
+### Result
+
+NOT TESTED
+
+## MT-63
+
+Test ID: TEST-IPAD-CARD-MATRIX-01
+
+Sprint: 25.6
+
+Requirement: Alle aktuell unterstützten Kartentypen in jeder gültigen Größe
+mit repräsentativen Zuständen, Portrait/Landscape, Controls, Focus,
+Background, Theme und HomeScreen physisch verifizieren.
+
+Device: iPad mini 1.
+
+iOS: 9.3.5.
+
+Preconditions:
+
+- RQ-18-01 ist repariert und der Test-Harness meldet lokal PASS;
+- aktueller Kandidat auf isolierter LXC- oder HA-App-Testinstanz;
+- kontrollierte Card-Matrix mit `sensor`, `binary`, `light`, `climate`, `room`;
+- je Profil alle von `src/services/layout.js` erlaubten Breiten und Höhen 1–4;
+- Zustände: kurz/lang, negative/dezimale Werte, Units, on/off, unknown,
+  unavailable, verschiedene Control-Capabilities; Room collapsed/expanded,
+  Alerts und Background;
+- ausdrücklich autorisierte Test-Light/-Climate-Entities, keine Produktion.
+
+Exact dashboard URL: `http://<TEST-IP>:3000/d/card-matrix` sowie der nur lokal
+bereitgestellte Harness `http://<TEST-IP>:<TEST-PORT>/test/card-matrix-harness.html`.
+
+Deployment mode: isolierte Standalone/LXC- oder HA-App-Testinstanz; direkter
+LAN-Port, HomeScreen-Web-App.
+
+Exact device settings required: Auto-Rotation zunächst aktiv; Safari-Zoom 100
+Prozent; Test sowohl Light als auch Dark; Guided Access für diese Matrix nicht
+erforderlich.
+
+### Steps
+
+1. Starte die Matrix im Hochformat und prüfe den Harnessstatus sowie jede
+   gültige Portraitgröße der fünf aktuellen Typen.
+2. Prüfe pro Typ kurze und lange Identität, lange Unit/Werte, unknown und
+   unavailable auf Overlap, Clipping und horizontales Scrollen.
+3. Prüfe Light on/off/unavailable und Climate Heating/Cooling/Off/Unknown/
+   Unavailable; zähle sichtbare Controls entsprechend der tatsächlichen
+   Capability, nicht pauschal.
+4. Prüfe Climate Compact, Standard, Wide, Tall und Large: Ist, Soll, HVAC,
+   Minus, Plus, Power, sekundäre Info und mindestens ca. 44×44-px-Touchziele.
+5. Prüfe Room in allen gültigen Größen, besonders Tall: collapsed/expanded,
+   Background, lange Raumnamen, Alerts und capabilityabhängige Controls.
+6. Öffne Focus bei Sensor, Binary, Light und Climate; prüfe, dass Gridgröße die
+   Focusgeometrie nicht komprimiert und Schaltflächen zentriert bleiben.
+7. Wiederhole Schritte 1–6 im Querformat und drehe bei offenem Dashboard sowie
+   offenem Focus Portrait→Landscape→Portrait.
+8. Wiederhole repräsentative Compact/Large/Room/Climate-Fälle in Light und Dark.
+9. Öffne die Matrix aus dem HomeScreen-Icon, navigiere Summary/Errors und
+   zurück; prüfe Background, Footer und unveränderte Kartenkoordinaten.
+10. Dokumentiere jeden fehlerhaften Case mit exakter ID, Profil, Größe,
+    Zustand und Presentation Tier getrennt.
+
+### Expected Visual Result
+
+- Kein Typ überlappt, clippt oder erzeugt horizontales Scrollen;
+- jede Größe hat eine bewusste Presentation, Climate Large nutzt den Raum und
+  Room Tall bleibt lesbar;
+- Controls und SVG-Inhalte sind optisch zentriert, Touchziele ausreichend;
+- Rotation, Theme, Background, Footer und Focus bleiben stabil.
+
+### Expected Functional Result
+
+- Genau die capabilityabhängigen Controls sind vorhanden; keine Duplikate und
+  keine Fake-Power-Buttons bei unknown/unavailable;
+- autorisierte Light-/Climate-Controls funktionieren, unavailable bleibt
+  deaktiviert;
+- Room-Controls toggeln nicht versehentlich collapsed/expanded;
+- HomeScreen-Navigation bleibt im selben Kontext.
+
+### Fail If
+
+- irgendein gültiger Case überläuft, clippt, fehlt oder die falsche Tierklasse
+  nutzt;
+- Climate Large wirkt wie eine Kleinkarte im leeren Rechteck;
+- Room ist in Tall oder einer anderen gültigen Größe ungetestet/unbrauchbar;
+- Controls fehlen trotz Capability, erscheinen ohne Capability, duplizieren
+  sich, sind linksversetzt oder kleiner als ca. 44×44 px;
+- Rotation zerbricht Grid, Focus, Background oder Footer.
+
+### Evidence
+
+- vollständige Ergebnisdatei/Checkliste mit Case-IDs;
+- Fotos der fünf Tiers, Climate Large und Room Tall in beiden Orientierungen;
+- Fehlerfoto plus Case-ID und Handlung für jeden FAIL.
+
+### Result
+
+NOT TESTED
+
+## MT-64
+
+Test ID: TEST-IPAD-KIOSK-01
+
+Sprint: 25.7
+
+Requirement: HomeScreen-Start, Guided-Access-Aktivierung, Home-Tasten-Sperre,
+Same-Context-Navigation, sichere Rückkehr, Theme und Rotation.
+
+Device: iPad mini 1 mit physischer Home-Taste.
+
+iOS: 9.3.5.
+
+Preconditions:
+
+- aktueller Kandidat über direkte LAN-IP erreichbar;
+- Default- und ein Custom-Dashboard vorhanden;
+- Summary erreichbar und ein kontrollierter Warning-/Error-Testzustand für den
+  Health-Link vorhanden;
+- HomeScreen-Icon nach `docs/IPAD_KIOSK.md` neu angelegt;
+- Guided Access aktiviert und separater Code gesetzt;
+- Touch aktiv, Motion/Rotation für den ersten Durchlauf erlaubt, Home-Taste
+  durch die Sitzung eingeschränkt.
+
+Exact dashboard URL: `http://<TEST-IP>:3000/` und
+`http://<TEST-IP>:3000/d/<custom-dashboard-id>`.
+
+Deployment mode: aktueller Standalone/LXC- oder HA-App-Testkandidat über
+direkten LAN-Port; kein Ingress.
+
+Exact device settings required: Guided Access gemäß den auf diesem konkreten
+iOS-9.3.5-Gerät sichtbaren Menüs; die tatsächlich angezeigten deutschen
+Bezeichnungen werden wortgetreu notiert, nicht aus aktuellem iPadOS übernommen.
+
+### Steps
+
+1. Öffne die IP-URL in Safari und füge sie zum Home-Bildschirm hinzu; beende
+   Safari und starte ausschließlich über das neue Icon.
+2. Prüfe, dass das Dashboard ohne normale Safari-Adress-/Tab-Leiste startet.
+3. Aktiviere Guided Access mit dem auf dem Gerät angebotenen dreifachen Home-
+   Tastendruck; notiere die realen iOS-9-Menünamen und gewählten Optionen.
+4. Drücke einmal und zweimal normal die Home-Taste und versuche den Appwechsel.
+5. Öffne Summary, kehre zurück und vergleiche das exakte Ausgangsdashboard.
+6. Öffne Errors über den Health-Indikator, kehre zurück und prüfe erneut das
+   exakte Ausgangsziel.
+7. Wechsel zum Custom-Dashboard, wiederhole Summary, Errors und Return.
+8. Schalte Dark→Light→Dark, lade innerhalb des HomeScreen-Kontexts neu und
+   wiederhole eine Systemroute samt Rückkehr.
+9. Prüfe Dashboard im Hochformat, drehe ins Querformat und zurück; wiederhole
+   mit offenem Focus. Danach starte eine zweite Guided-Access-Sitzung mit
+   Motion deaktiviert und prüfe, dass die Gerätesperre wie dokumentiert wirkt.
+10. Betätige je ein ausdrücklich autorisiertes Test-Light und Climate-Control;
+    prüfe, dass Touch aktiv bleibt und keine Navigation ausgelöst wird.
+
+### Expected Visual Result
+
+- HomeScreen startet fullscreen ohne zusätzliche Safari-UI;
+- Default/Custom/Summary/Errors/Return bleiben im selben Web-App-Fenster;
+- Portrait/Landscape und Focus überlaufen nicht; Theme bleibt konsistent.
+
+### Expected Functional Result
+
+- Normaler Home-Tastendruck verlässt die aktive Guided-Access-Sitzung nicht;
+- Summary und Errors kehren exakt zum aufrufenden Default-/Custom-Dashboard
+  zurück;
+- Theme persistiert; Light/Climate bleiben bedienbar;
+- Motion erlaubt Rotation, Motion aus unterbindet sie entsprechend der
+  tatsächlichen iOS-9-Option.
+
+### Fail If
+
+- normales Safari oder ein neues Fenster/Tab öffnet;
+- Home-Taste verlässt die Sitzung;
+- Return verliert Custom-Dashboard/Origin oder akzeptiert externes Ziel;
+- Theme geht verloren, Layout/Focus bricht bei Rotation oder Controls reagieren
+  nicht;
+- die dokumentierten iOS-9-Schritte lassen sich mit den realen Menüs nicht
+  nachvollziehen.
+
+### Evidence
+
+- Fotos von HomeScreen-Start, Guided-Access-Optionen, Default/Custom/System-
+  Rückkehr und beiden Orientierungen;
+- wortgetreue iOS-9-Menülabels und Ergebnis je Schritt;
+- keine Codes, Tokens, privaten Entitynamen oder internen Daten aufnehmen.
+
+### Result
+
+NOT TESTED
+
+## MT-65
+
+Test ID: TEST-IPAD-POWER-01
+
+Sprint: 25.7
+
+Requirement: Sleep/Wake-, Volume-, Touch-, Auto-Lock-, Dauerstrom- und
+Recoveryverhalten im realen Wandbetrieb.
+
+Device: iPad mini 1.
+
+iOS: 9.3.5.
+
+Preconditions:
+
+- MT-64-Grundsetup vorhanden;
+- geeignetes Ladegerät/Kabel, sicher belüfteter Teststand und reduzierte
+  Helligkeit;
+- Auto-Lock-Einstellung und Guided-Access-Hardwareoptionen dokumentiert;
+- Test-HA/App darf kontrolliert neu gestartet werden;
+- keine Produktionsautomation wird verändert.
+
+Exact dashboard URL: `http://<TEST-IP>:3000/d/<test-dashboard-id>`.
+
+Deployment mode: aktueller Standalone/LXC- oder HA-App-Testkandidat über
+direkten LAN-Port.
+
+Exact device settings required: separater Guided-Access-Code; Touch an;
+Sleep/Wake und Volume nacheinander in den dokumentierten Varianten testen;
+Auto-Lock passend zum Dauerbetrieb; iPad durchgehend am Ladegerät für den
+Langzeitschritt.
+
+### Steps
+
+1. Starte Guided Access mit Touch aktiv und prüfe alle Dashboardcontrols.
+2. Teste die Sleep/Wake-Option einmal erlaubt und einmal gesperrt; betätige die
+   physische Taste und notiere Bildschirm-/Sitzungsverhalten.
+3. Teste Volume einmal erlaubt und einmal gesperrt; prüfe, dass weder Variante
+   Dashboardlayout noch Guided Access beendet.
+4. Prüfe Auto-Lock zunächst mit einem kurzen sicheren Testintervall und danach
+   mit der für den Wandbetrieb gewählten Einstellung; berühre das Gerät nicht.
+5. Lasse das Display am Ladegerät für die geplante Betriebsdauer aktiv;
+   beobachte Helligkeit, Wärme, Ladevorgang und unbeabsichtigtes Sleep.
+6. Trenne WLAN kurz und verbinde es wieder; prüfe sichtbaren Offline-/Stale-
+   Zustand und selbständige Dashboard-Recovery.
+7. Starte den kontrollierten Test-Home-Assistant neu; prüfe Stale/Health und
+   anschließende Recovery ohne neues Fenster.
+8. Starte anschließend nur die Dashboard-App/den LXC-Dienst neu; prüfe dieselbe
+   Recovery und dass Guided Access/HomeScreen-Kontext erhalten bleibt oder die
+   dokumentierte manuelle Aktion ausreicht.
+9. Wecke den Bildschirm nach erlaubtem Sleep und prüfe Theme, Route, Returnziel
+   und Controls erneut.
+
+### Expected Visual Result
+
+- Das Dashboard bleibt layoutstabil und zeigt bei Netzwerk/HA/App-Ausfall
+  keinen falschen Healthy-Zustand;
+- nach Recovery erscheinen aktuelle Daten ohne Safari-Chrome oder neue Seite.
+
+### Expected Functional Result
+
+- Hardwaretasten verhalten sich exakt gemäß den gewählten Guided-Access-
+  Optionen;
+- Touch bleibt nutzbar; Auto-Lock/Display-on entspricht der Geräteeinstellung,
+  nicht einer erfundenen Web-API;
+- WLAN-, HA- und App-Restart werden mit sichtbarem Zwischenzustand toleriert.
+
+### Fail If
+
+- eine gesperrte Taste beendet die Sitzung oder eine erlaubte Taste ist ohne
+  Dokumentation wirkungslos;
+- Display schläft trotz gewählter Dauerbetriebsoption unerwartet oder die
+  Anleitung verspricht mehr als iOS 9 liefert;
+- Touch/Controls fallen aus;
+- Offlinezustand wird als healthy versteckt oder Recovery erfordert Löschen des
+  HomeScreen-Icons;
+- gefährliche Wärme-/Ladeauffälligkeiten auftreten (Test sofort beenden).
+
+### Evidence
+
+- Tabelle je Hardware-/Auto-Lock-Option mit realem iOS-9-Label;
+- Zeitangaben und Fotos vor Ausfall, während Stale/Offline und nach Recovery;
+- sichere Beobachtungsnotiz zu Ladezustand/Wärme, keine Secrets.
+
+### Result
+
+NOT TESTED
+
+## MT-66
+
+Test ID: TEST-IPAD-KIOSK-RECOVERY-01
+
+Sprint: 25.7
+
+Requirement: Beabsichtigter Guided-Access-Exit, Codepflicht, iPad-Reboot,
+Post-Reboot-Relaunch und erneute Kiosksperre ohne falsches Autostartversprechen.
+
+Device: iPad mini 1 mit Home-Taste.
+
+iOS: 9.3.5.
+
+Preconditions:
+
+- MT-64 erfolgreich vorbereitet;
+- Guided-Access-Code ist dem Tester bekannt, aber kein Admin-/HA-Secret;
+- aktueller Testkandidat und direktes LAN verfügbar;
+- iPad darf im Testfenster kontrolliert neu gestartet und einmal von der
+  Stromversorgung getrennt werden.
+
+Exact dashboard URL: `http://<TEST-IP>:3000/d/<test-dashboard-id>`.
+
+Deployment mode: aktueller Standalone/LXC- oder HA-App-Testkandidat über
+direkten LAN-Port.
+
+Exact device settings required: Guided Access aktiv; Home-Taste eingeschränkt;
+Touch aktiv; sicherer Zugriff auf den konfigurierten separaten Exitcode.
+
+### Steps
+
+1. Versuche während Guided Access den normalen Home-Tastendruck und danach den
+   vorgesehenen dreifachen Druck.
+2. Gib absichtlich einmal einen falschen Code ein und prüfe, dass die Sitzung
+   nicht endet; beende danach mit dem korrekten Code.
+3. Starte die HomeScreen-Web-App erneut und aktiviere Guided Access wieder.
+4. Starte das iPad kontrolliert neu. Beobachte, ob irgendeine App automatisch
+   startet, ohne dies vorauszusetzen.
+5. Entsperre das Gerät, öffne die Dashboard-Web-App manuell vom HomeScreen und
+   prüfe Route, Theme und Erreichbarkeit.
+6. Prüfe, ob Guided Access nach Reboot aktiv ist; falls nicht, aktiviere es
+   erneut und dokumentiere genau die notwendige manuelle Folge.
+7. Wiederhole den Rebootpfad nach einem kurzen kontrollierten Stromverlust,
+   sofern dies sicher möglich ist.
+8. Simuliere eine festhängende/fehlerhafte Web-App durch Beenden/Neustart des
+   HomeScreen-Kontexts; führe die dokumentierte sichere Recovery aus.
+9. Prüfe abschließend, dass der normale Home-Tastendruck wieder eingeschränkt
+   ist und Summary/Errors/Return funktionieren.
+
+### Expected Visual Result
+
+- Nach manuellem Relaunch erscheint das korrekte Dashboard mit persistentem
+  Theme;
+- kein Dokumentationsschritt behauptet einen unbeaufsichtigten Start, wenn das
+  reale Gerät ihn nicht liefert.
+
+### Expected Functional Result
+
+- Exit verlangt den konfigurierten Code; falscher Code beendet die Sitzung
+  nicht;
+- nach Reboot/Stromverlust kann das Dashboard sicher manuell neu geöffnet und
+  Guided Access erneut gestartet werden;
+- die Recovery ist nachvollziehbar und verliert weder Origin noch Returnziel.
+
+### Fail If
+
+- Guided Access lässt sich normal ohne Code verlassen;
+- der dokumentierte sichere Exit funktioniert nicht;
+- Anleitung verspricht automatischen Relaunch/erneuten Guided Access, den das
+  Gerät nicht liefert;
+- HomeScreen-Shortcut oder Dashboard bleibt nach Reboot dauerhaft unbrauchbar;
+- Recovery erfordert Admin-/HA-Credentials auf dem iPad.
+
+### Evidence
+
+- datierte Ablaufnotiz für Exit, falschen/richtigen Code, Reboot,
+  Stromverlust, manuellen Relaunch und erneute Aktivierung;
+- Fotos nach Reboot und nach erneuter Kiosksperre, ohne Codes oder Secrets.
+
+### Result
+
+NOT TESTED
+
+## Zuordnung aus Audit Part 15
+
+Part 15 erzeugt keine redundanten neuen Test-IDs. Die bereits vollständig
+ausformulierten Tests wurden den zusätzlichen Sprints zugeordnet:
+
+- MT-13 deckt das Sprint-25.1-Theme-Gate auf dem iPad mini ab;
+- MT-34 deckt das Sprint-25.1-Exact-Filter-/Same-Child-Gate ab;
+- MT-40 deckt Sprint 25.1 und 25.2 im realen iPad-mini-HomeScreen ab;
+- MT-41 deckt Sprint 25.2 auf dem iPad Air 2 in Safari/HomeScreen ab;
+- MT-42 deckt beide Sprints in aktuellem macOS Safari einschließlich
+  Redirect-, Failure- und Langzeitverhalten ab.
+
+Alle fünf Einträge enthalten Gerät, Voraussetzungen, exakte Routen/Testdaten,
+Schrittfolge, visuell und funktional erwartetes Ergebnis, Fehlerkriterien,
+zu erfassende Evidenz und das Ergebnisfeld `NOT TESTED`.
+
+## Zuordnung aus Audit Part 17
+
+Part 17 erzeugt keine redundanten neuen Test-IDs. Für Sprint 25.4 wurden die
+bereits vollständig ausformulierten MT-13, MT-34, MT-40, MT-42, MT-50 bis
+MT-56 und MT-58 bis MT-60 zusätzlich zugeordnet. Gemeinsam decken sie den
+commitbezogenen nächsten RC, aktuelle HAOS-/Supervisor-/`/data`-/Restart-/
+Backup-Abnahme, direkten LAN-Pfad, Standalone-Installation/Upgrade/Rollback,
+Theme, exakte Filter, HomeScreen, Background, Full Height, Footer, Focus,
+Uploadvalidierung und das reale iPad-mini-Gate ab.
+
+Jeder Eintrag enthält weiterhin Gerät/System, Voraussetzungen, exakte Route,
+konkrete Testdaten, einzelne Handlungen, erwartetes visuelles und funktionales
+Resultat, Fehlerkriterien, Evidenzvorgaben und den Status `NOT TESTED`.
+
+## Detaillierte Anleitungen aus Audit Part 12
+
+## MT-43
+
+Test ID: MT-43
+
+Sprint: 22
+Requirement: Reale serverseitige Grace-, Risk-, Expected-Offline-, Flapping-,
+Stable-Recovery- und globale Health-Semantik.
+Device: Mac mit aktueller macOS-Safari-Version und kontrolliertem Test-Home-
+Assistant; keine Produktionsinstanz.
+Preconditions: Aktueller Build; Admin API mit separatem Testtoken; ein normales
+Test-Entity, ein Diagnostic-Entity, ein Security-Window und ein Safety-Smoke-
+Entity mit kontrollierbaren `unknown`-/`unavailable`-/healthy-Zuständen; ein
+zweites Entity am selben echten Test-`device_id`; kurze, dokumentierte
+Test-Karenzen, damit der Ablauf ohne lange Wartezeiten reproduzierbar ist.
+Exact route/page: `/admin`, `/system/errors` und `/d/<test-dashboard-id>`.
+Test data/entity/card required: ausschließlich synthetische Testnamen; normale,
+diagnostische, Security- und Safety-Risk-Class; Global Health Indicator auf
+dem Testdashboard.
+Configuration required: Testregeln gemäß Schritt 1, `device_class`-Modus,
+separater Admin-Testtoken und unveränderte explizite Control Grants.
+
+### Steps
+
+1. Öffne `/admin`, notiere die Ausgangskonfiguration und setze für das normale
+   Entity testweise 5 s Unknown Grace, 10 s Unavailable Grace und 5 s Recovery.
+2. Speichere, lade `/system/errors` neu und setze das Entity auf `unknown`.
+   Beobachte vor und nach Ablauf von 5 s Error Dashboard und Health Indicator.
+3. Wiederhole mit `unavailable` vor und nach 10 s.
+4. Setze Smoke auf `unknown` und anschließend `unavailable`; beobachte den
+   Zustand ohne lange Karenz. Wiederhole Window `unavailable` mit der kurzen
+   Security-Karenz.
+5. Aktiviere Expected Offline nur für das normale Entity und setze es auf
+   `unavailable`, danach auf `unknown`. Prüfe die unterschiedliche Wirkung.
+6. Versuche Expected Offline für Smoke zunächst ohne, dann ausdrücklich mit
+   `allowCriticalExpectedOffline`; dokumentiere Warnung, Validierung und
+   Ergebnis. Stelle die sichere Ausgangsregel anschließend wieder her.
+7. Erzeuge beim normalen Entity mindestens vier Wechsel healthy ↔ unavailable
+   innerhalb des konfigurierten Fensters. Prüfe Flapping-Text und Warning-
+   Severity; wiederhole kontrolliert mit einem Security-Entity.
+8. Setze ein sichtbares unavailable Entity für weniger als 5 s healthy und
+   wieder unavailable; prüfe `Recovery Pending`. Halte es danach länger als
+   5 s healthy und prüfe das stabile Verschwinden.
+9. Prüfe nach jedem Schritt, dass der globale Health Indicator nur bei
+   tatsächlich aktivem Warning/Error/Critical sichtbar wird und lokale
+   Errorfilter ihn nicht verändern.
+10. Verwirf oder speichere die dokumentierte sichere Ausgangskonfiguration und
+    kontrolliere, dass keine Testregel auf Produktions-Entities verbleibt.
+
+### Expected Result
+
+- Grace-Grenzen, Risk-Class-Verkürzung, Expected Offline und Ignore bleiben
+  semantisch getrennt.
+- Safety/Security wird ohne bewusste Ausnahme nicht verborgen.
+- Flapping erscheint verständlich; Recovery Pending verhindert sichtbares
+  Alarmflackern.
+- Health folgt der ungefilterten serverseitigen Issue-Menge.
+
+### Fail If
+
+- Ein Safety-/Security-Problem bleibt hinter langer normaler Grace verborgen.
+- Expected Offline verbirgt `unknown`, erteilt eine Control-Berechtigung oder
+  verändert eine HA-Entity.
+- Flapping/Recovery verschwindet zu früh oder lokale Filter setzen Health auf
+  Healthy.
+- Admin speichert ungültige Grenzwerte oder verliert den Ausgangsdraft.
+
+### Evidence
+
+- Zeitgestempelte Screenshots vor/an/nach jeder Karenz und während Recovery.
+- Notiere Test-Entity-IDs anonymisiert, `device_id`, Regeln, Browser-/HA-
+  Version, gemessene Zeiten und Endzustand der zurückgesetzten Konfiguration.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 16
+
+## MT-58
+
+Test ID: MT-58
+
+Sprint: 25.3, 25.4
+Requirement: Background, optionaler Dashboardtitel, Vollhöhe, normaler Footer,
+Focus-Stacking, Theme, Same-Window-Navigation und Cacheersatz auf der realen
+Legacy-Zielhardware.
+Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App in Portrait und
+Landscape.
+Preconditions: Aktueller reparierter Build nach `RQ-04-01` und `RQ-16-01`;
+direkt erreichbare Standalone- oder HA-App-LAN-URL; Adminzugriff nur auf einem
+separaten modernen Gerät; drei kleine datenschutzgeprüfte Testbilder (JPEG,
+PNG und deutlich unterscheidbares Ersatzbild); Default-Dashboard und zwei
+Custom-Dashboards mit 0/1/wenigen/vielen Testkarten; keine Admin-Credentials
+auf dem iPad.
+Exact route/page: `/`, `/d/<background-a>`, `/d/<background-b>`,
+`/system/summary`, `/system/errors` und die jeweilige Focus-Ansicht.
+Test data/entity/card required: Ein read-only Sensor, eine Binary-Karte, ein
+ausdrücklich autorisiertes ungefährliches Light und Climate, lange Kartentitel,
+mindestens eine unavailable Entity; Dashboard A mit `showTitle=false`,
+`contain` und Overlay 30; Dashboard B mit `showTitle=true`, `cover` und Overlay
+0; Default mit dritter Position/Overlaykonfiguration.
+
+### Steps
+
+1. Leere den Web-App-Cache nur zu Beginn kontrolliert, lege die direkte URL auf
+   den HomeScreen und starte sie von dort. Notiere App-/Commitversion und
+   Bildschirmorientierung.
+2. Öffne `/`, Dashboard A und Dashboard B nacheinander. Prüfe, dass jedes exakt
+   sein eigenes Bild, Position, Cover/Contain und Overlay zeigt und kein Bild
+   des vorherigen Dashboards stehen bleibt.
+3. Prüfe auf Dashboard A mit `showTitle=false`, dass weder Titel noch leerer
+   Titelplatz sichtbar ist, Summary, Health, Verbindungsstatus, Uhr und
+   Theme-Schalter aber erhalten bleiben. Prüfe auf Dashboard B den sichtbaren
+   Titel.
+4. Prüfe die vorbereiteten 0-, 1-, wenige- und viele-Karten-Zustände in Portrait
+   und Landscape. Drehe jeweils einmal Portrait→Landscape→Portrait.
+5. Kontrolliere bei kurzem Inhalt, dass Bild/Overlay bis zum unteren Viewport
+   reichen und der Aktualisiert-Footer unten im normalen Dokumentfluss steht.
+   Kontrolliere bei vielen Karten, dass der Footer erst nach dem Inhalt kommt,
+   nicht über Karten schwebt und keine horizontale Scrollleiste entsteht.
+6. Schalte Dark→Light→Dark, lade neu und wechsle zwischen den Dashboards. Bild,
+   Overlay, Titelzustand und Theme müssen unabhängig korrekt bleiben.
+7. Öffne Focus für Sensor, Light und Climate. Bediene ausschließlich die
+   freigegebenen Controls; prüfe, dass Focus samt Dimming über Background und
+   Overlay liegt und kein Tap vom Background abgefangen wird.
+8. Öffne Summary und Errors über die internen Controls und kehre jeweils zum
+   exakten Default-/Custom-Dashboard zurück. Kontrolliere, dass kein normaler
+   Safari-Tab entsteht und Origin/Port unverändert bleiben.
+9. Lass das alte Bild auf dem iPad im Cache. Ersetze es im Admin auf dem
+   separaten Gerät durch das deutlich unterscheidbare Bild, speichere und lade
+   das Dashboard am iPad neu. Notiere alte und neue anonymisierte Asset-ID.
+10. Prüfe in einer kontrollierten Umgebung ein fehlendes referenziertes Asset:
+    Die Dashboardroute muss weiter laden, Controls/Navigation müssen nutzbar
+    bleiben und nur das Bild fehlen. Stelle anschließend die gültige
+    Konfiguration wieder her.
+
+### Expected Result
+
+- Jedes Dashboard zeigt ausschließlich seine gespeicherte Appearance; Wechsel,
+  Rotation, Reload und Theme vermischen keine Zustände.
+- `showTitle=false` entfernt nur Titel und Titelraum, nie Summary/Health oder
+  andere globale Controls.
+- Background und Overlay füllen bei kurzem Inhalt den Viewport; langer Inhalt
+  wächst normal. Der kompakte Aktualisiert-Footer ist mittig, nicht fixed und
+  überlappt keine Karte.
+- Focus liegt vollständig und bedienbar über dem Hintergrund; interne Routen
+  bleiben im HomeScreen-Fenster.
+- Nach Ersatz erscheint ohne manuelles Cacheleeren die neue Asset-ID/das neue
+  Bild. Ein fehlendes Asset bricht die Anwendung nicht.
+
+### Fail If
+
+- Falsches/älteres Bild, weißer Unterseitenstreifen, Backgroundlücke,
+  horizontales Scrollen, Karten-/Footerüberlappung oder feststehender Footer.
+- Titelraum bleibt leer stehen oder Summary/Health verschwindet zusammen mit
+  dem Titel.
+- Focus liegt hinter Overlay, ist kontrastarm oder Controls reagieren nicht.
+- Summary/Errors öffnen normalen Safari, verlieren Returnziel, Theme oder
+  Origin/Port.
+- Ersatz bleibt wegen Cache unsichtbar oder ein fehlendes Bild verhindert
+  Rendering/Bedienung.
+
+### Evidence
+
+- Fotos/Screenshots aller drei Dashboards in beiden Orientierungen, mindestens
+  je eines mit/ohne Titel und mit kurzem/langem Inhalt.
+- Focus-, Summary-/Errors-/Return- und Light/Dark-Aufnahmen.
+- Redigierte alte/neue Asset-ID, App-/Commitversion, Zeitstempel und beobachtete
+  Footer-/Scroll-/Rotationsergebnisse.
+
+### Result
+
+NOT TESTED
+
+## MT-59
+
+Test ID: MT-59
+
+Sprint: 25.3, 25.4
+Requirement: Geschützte Admin-End-to-End-Konfiguration, Uploadvalidierung,
+Preview-/Runtime-Parität, sicherer Ersatz und sichere Entfernung.
+Device: Aktuelle macOS-Safari-Version mit kontrollierter lokaler Real-App oder
+isoliertem Test-LXC; kein produktives Home Assistant.
+Preconditions: Build nach `RQ-04-01` und `RQ-16-01`; lokales Fake-HA und
+separates Admin-Testtoken; Default plus zwei Custom-Dashboards; gültige kleine
+Baseline-/Progressive-JPEGs, JFIF/EXIF/ICC-JPEGs, PNGs, `.jpg` und `.jpeg`;
+Fixtures für truncated JPEG/PNG, PNG ohne IDAT, falsche PNG-CRC, HTML/SVG mit
+Bildendung, Oversize, falschen MIME-Typ und Pfadmanipulation.
+Exact route/page: `/admin`, `/`, `/d/<background-a>`, `/d/<background-b>` und
+`/assets/backgrounds/<anonymisierte-id>`.
+Test data/entity/card required: Generische Sensor-/Binary-Testkarten und
+datenschutzgeprüfte Bilder ohne private EXIF-/Standort-/Personendaten.
+
+### Steps
+
+1. Öffne `/admin` ohne Token, mit falschem Token und danach mit gültigem
+   Testtoken. Prüfe, dass nur die letzte Variante die Konfiguration liest oder
+   schreibt; beobachte Write-Rate-Limit ohne es zu umgehen.
+2. Lade nacheinander gültiges PNG, `.jpg`, `.jpeg`, Baseline, Progressive,
+   JFIF/EXIF/ICC hoch. Prüfe je Upload Preview, gespeicherte Config, Runtimebild,
+   Content-Type, `nosniff` und ausschließlich relative Asset-URL.
+3. Prüfe alle fünf Positionen, `cover`, `contain`, Overlay 0/10/30/50 und
+   `showTitle` an/aus. Vergleiche Admin-Preview und tatsächliche Dashboardroute
+   nach Save/Reload.
+4. Weise unterschiedliche Bilder/Einstellungen Default und beiden Custom-
+   Dashboards zu; wechsle mehrfach und kontrolliere die Isolation.
+5. Notiere anonymisiert Config und Asset-ID, dann versuche jede ungültige
+   Fixture: truncated, fehlendes IDAT, falsche CRC, HTML, SVG, falscher MIME,
+   Oversize und manipulierte ID/Pfad. Prüfe nach jedem Versuch Config, altes
+   Bild, Verzeichnisinhalt und Logs.
+6. Simuliere kontrolliert einen Config-Persistenzfehler nach gültigem neuen
+   Upload. Prüfe, dass das neue Temp-/Assetfile entfernt und das alte Bild samt
+   Config erhalten bleibt.
+7. Ersetze anschließend erfolgreich ein Bild. Prüfe neue ID/URL und neues Bild;
+   das alte unreferenzierte Asset darf nicht mehr ausgeliefert werden.
+8. Entferne das Bild regulär. Prüfe `background:null`, weiterhin funktionierende
+   Runtime, 404 für die alte ID und keine verwaiste Datei.
+9. Prüfe Browsernetzwerk und redigierte Logs auf HA-, Supervisor- oder Admin-
+   Token, absolute Dateipfade, Rohpayloads und nutzerbestimmte Dateinamen.
+
+### Expected Result
+
+- Nur authentifizierte, limitierte Adminwrites sind möglich; Public Browser
+  sieht ausschließlich die relative referenzgeprüfte Assetroute.
+- Alle gültigen JPEG-/PNG-Varianten zeigen in Preview und Runtime dieselbe
+  Darstellung.
+- Jede ungültige/manipulierte/übergroße Datei wird kontrolliert abgewiesen;
+  bestehende Config und Bild bleiben unverändert, keine Teil-/Waisendatei
+  entsteht.
+- Erfolgreicher Ersatz verwendet eine neue ID; Remove entfernt nur das nicht
+  mehr referenzierte Asset. Keine Credentials oder privaten Pfade erscheinen.
+
+### Fail If
+
+- Unauthentifizierter Upload/Remove gelingt oder Rate-Limit wird umgangen.
+- Preview und Runtime unterscheiden sich nach Save/Reload.
+- Eine invalid PNG/JPEG-/HTML-/SVG-/Oversize-/Traversal-Fixture wird akzeptiert,
+  das alte Bild verschwindet oder eine Teil-/Waisendatei bleibt zurück.
+- Assetroute listet Dateien, liefert unreferenzierte IDs oder setzt unsicheren
+  MIME-/Sniffing-Kontext.
+- Token, Rohpayload oder lokaler Pfad erscheint im Browser oder Log.
+
+### Evidence
+
+- Redigierte Screenshots von Admin-Preview und korrespondierender Runtime je
+  Hauptvariante; Statuscodes/Header und anonymisierte Asset-IDs.
+- Tabelle jeder validen/invaliden Fixture mit Resultat, Config-/Dateihash vor
+  und nachher sowie redigierte Logs.
+
+### Result
+
+NOT TESTED
+
+## MT-60
+
+Test ID: MT-60
+
+Sprint: 25.3, 25.4
+Requirement: Standalone-`DATA_DIR`, Dateirechte, atomare Persistenz, Backup,
+Dienstneustart und fehlendes Asset im produktionsnahen LXC-Modell.
+Device: Isolierter Standalone-Debian-LXC `ha-legacy-dashboard` mit systemd und
+lokalem Fake-HA; nicht der produktive Dienst.
+Preconditions: Aktueller reparierter Commit nach `RQ-16-01`; gesicherter
+Test-LXC; Runtimeuser `dashboard`; separater persistenter Test-Datenpfad;
+gültiges JPEG/PNG ohne private Daten; Admin-Testtoken; keine produktive `.env`.
+Exact route/page: `/health`, `/api/status`, `/admin`, `/`,
+`/d/<background-persistence>` und systemd-Status/Logs.
+Test data/entity/card required: Custom-Dashboard mit einem Widget,
+`showTitle=false`, Background plus eindeutigem Overlay-/Positionmarker.
+
+### Steps
+
+1. Konfiguriere den expliziten persistenten `DATA_DIR` und
+   `DASHBOARD_CONFIG_PATH`, starte den Dienst und bestätige `/health` sowie den
+   Runtimeuser.
+2. Lege das Testdashboard im Admin an, lade das Bild hoch und speichere die
+   Appearance. Dokumentiere Config-/Backup-/Assetpfad nur anonymisiert,
+   Besitzer, Modi, Größen und Hashes.
+3. Prüfe, dass Datenverzeichnis `0700`, Config/Backup/Assets restriktiv und
+   keine Backgrounddatei im Gitbaum oder Webroot liegt.
+4. Lade Dashboard/Asset, stoppe und starte den Dienst vollständig und prüfe
+   danach Config, Background, Titelzustand, Hashes, `/health` und Logs.
+5. Ersetze das Bild erfolgreich und prüfe neue ID/Hash sowie Entfernung des
+   alten unreferenzierten Assets. Starte erneut und wiederhole die Prüfung.
+6. Provoziere einen abgewiesenen ungültigen Upload und einen kontrollierten
+   Config-Schreibfehler. Prüfe, dass Primärdatei, `.bak` und letztes gültiges
+   Bild erhalten bleiben und keine Tempdatei existiert.
+7. Entferne/verschiebe in der isolierten Umgebung nur das aktuelle Testasset,
+   ohne Config anzupassen. Starte neu: Dashboard muss ohne Bild weiter
+   funktionieren. Stelle danach die gültige Sicherung wieder her.
+8. Entferne nur die angelegten Testdaten oder setze den LXC auf den vorherigen
+   Snapshot zurück.
+
+### Expected Result
+
+- Alle persistenten Daten liegen ausschließlich am konfigurierten Datenpfad
+  mit restriktiven Rechten und überleben Dienstneustarts.
+- Configstore und Assetstore ersetzen atomar; `.bak` und letztes gültiges
+  Asset bleiben bei Fehlern nutzbar, keine Temp-/Waisendatei entsteht.
+- Ein fehlendes Asset führt nur zu fehlendem Background, nicht zu Dienst-,
+  Dashboard-, Navigation- oder Controlausfall.
+- Logs bleiben secretfrei und der Git-/Webroot enthält keine Uploads.
+
+### Fail If
+
+- Daten landen in einem flüchtigen, Git- oder öffentlich statischen Pfad,
+  Rechte sind zu weit oder Restart verliert Appearance/Asset.
+- Fehlgeschlagener Upload/Configwrite beschädigt Primärdatei, Backup oder
+  gültiges Bild beziehungsweise lässt Tempdateien zurück.
+- Fehlendes Asset verhindert Dienststart oder Dashboardbedienung.
+- Credentials, private Pfade oder Bildinhalte erscheinen in Logs.
+
+### Evidence
+
+- Redigierte systemd-/Health-/Logausgaben, App-/Commitversion und Zeitstempel.
+- Vor/nachher Hashes, Owner/Modi, anonymisierte Verzeichnisliste und
+  Dashboard-Screenshots vor/nach Neustart, Ersatz und fehlendem Asset.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 13
+
+## MT-50
+
+Test ID: MT-50
+
+Sprint: 24, 25.4
+Requirement: Reale Supervisor-Core-WebSocket-Kommunikation, sichere
+Teil-Ausfälle, autonome Recovery und secretfreie App-Logs.
+Device: Home Assistant OS auf amd64 mit einer kontrollierten Testinstanz;
+Desktop-Safari für die Beobachtung.
+Preconditions: `RQ-13-01`, `RQ-13-02` und `RQ-09-01` vor finaler Abnahme
+behoben; neue unveränderliche Testversion installiert; mindestens je eine
+Registry-/Area-/Label-/Config-Entry-/Repair- und Automation-Testinformation;
+kein Long-Lived HA Token in den App-Optionen; separates Test-Admin-Token.
+Exact route/page: App-Logansicht, `/health`, `/api/status`, `/admin`,
+`/system/errors` und `/system/summary` über den direkten App-Port.
+Test data/entity/card required: generische Test-Entities/Devices/Areas/Labels,
+eine referenzierende Testautomation und ein ungefährlicher Test-Repair-Eintrag
+oder klar dokumentierter Unsupported-Fall.
+Configuration required: App-Modus, `homeassistant_api: true`, direkter Port,
+Admin API nur für das Testfenster aktiviert; keine Produktionssecrets in
+Screenshots oder Protokollen.
+
+### Steps
+
+1. Starte die App und notiere Version, Architektur, Startzeit und Port; prüfe
+   `/health` sowie `/api/status` ohne Browser-HA-Credentials.
+2. Öffne `/admin` und notiere die Quellenstatus für Entity-, Device-, Area-,
+   Label-, Config-Entry-, Repair- und Automationdaten.
+3. Öffne Summary und Errors und prüfe, dass ausschließlich normalisierte,
+   reduzierte Daten erscheinen; öffne Advanced Diagnostics für eine
+   Testautomation.
+4. Kontrolliere die App-Logs vom Start bis zu diesem Punkt auf Tokenwerte,
+   Authorization-Header, rohe Registries, rohe Automationkonfiguration und
+   rohe Trace-Payloads.
+5. Stoppe Home Assistant Core kontrolliert, ohne die App zu stoppen. Lade
+   `/health`, `/api/status`, Summary und Errors mehrfach während des Ausfalls.
+6. Starte Core wieder und beobachte ohne App-Neustart, ob REST-State und alle
+   WebSocket-Quellen nach Backoff selbständig auf Fresh/Available wechseln.
+7. Wiederhole, falls die Testumgebung dies gezielt erlaubt, mit einer
+   WebSocket-Unterbrechung ohne absichtlich erzeugten normalen Close und prüfe
+   die autonome Recovery nach der Reparatur von `RQ-09-01`.
+8. Deaktiviere Admin API wieder und prüfe, dass der direkte Port keine
+   Supervisor-/HA-Credentials oder generische HA-Kommandofläche bereitstellt.
+
+### Expected Result
+
+- REST und serverseitiger WebSocket authentifizieren ausschließlich über den
+  Supervisorpfad; der Browser erhält keine Tokens und keine Rohdaten.
+- `/health` bleibt während eines Core-Ausfalls verfügbar; fachliche Endpunkte
+  zeigen kontrolliertes stale/offline/unsupported statt eines Crashs.
+- Alle Quellen erholen sich nach Core-/Transport-Rückkehr ohne App-Neustart.
+- Logs enthalten nur redigierte, diagnostisch notwendige Angaben.
+
+### Fail If
+
+- Ein Token, Authorization-Header, eine rohe Registry/Config oder ein roher
+  Trace erscheint im Browser oder Log.
+- `/health` hängt an der Core-Erreichbarkeit, die App beendet sich oder eine
+  Quelle bleibt nach Rückkehr bis zu einem manuellen App-Neustart ausgefallen.
+- Der Browser kann freie WebSocket-Commands, Domains oder HA-Services senden.
+
+### Evidence
+
+- Redigierte Screenshots von Health, Quellenstatus, stale/offline und Recovery.
+- Redigierter Logauszug mit Zeitachse; App-/HAOS-/Core-Version und gemessene
+  Recoveryzeiten, niemals Credentialwerte.
+
+### Result
+
+NOT TESTED
+
+## MT-51
+
+Test ID: MT-51
+
+Sprint: 24, 25.3, 25.4
+Requirement: Persistenz der App-Konfiguration und Background-Assets unter
+`/data`, sichere Rechte und Erhalt über einen App-Restart.
+Device: Home Assistant OS auf amd64.
+Preconditions: Aktuelle Testversion nach `RQ-13-01`; Backup der vorhandenen
+App-Daten; separates Admin-Testtoken; ein ausschließlich für die Abnahme
+angelegtes Custom-Dashboard und ein unkritisches JPEG-/PNG-Testbild ohne private
+Metadaten.
+Exact route/page: `/admin`, `/d/<persistence-test-dashboard-id>`, App-Stop/
+Start in Home Assistant und App-Logs.
+Test data/entity/card required: Custom-Dashboard mit einem Widget, eigener
+Section, Dashboard- oder Room-Background und `showTitle`-Einstellung.
+Configuration required: App-Modus mit Standard-`DATA_DIR=/data`; keine
+manuelle Umleitung auf `/tmp` oder einen Container-Image-Pfad.
+
+### Steps
+
+1. Erstelle im Admin das Testdashboard, die Section und das Widget, lade das
+   Testbild hoch, weise es zu und speichere.
+2. Lade die Dashboardroute neu und dokumentiere Konfiguration, Titelzustand,
+   Section, Widget und sichtbaren Background.
+3. Prüfe über eine sichere HAOS-App-Diagnose oder Shell nur Metadaten:
+   Dashboarddatei, `.bak` und Background liegen unter `/data`; notiere Owner,
+   Modus und Größe, aber keine privaten Dateiinhalte.
+4. Stoppe die App vollständig, starte sie erneut und warte auf `/health`.
+5. Öffne Admin und Dashboard erneut. Prüfe alle gespeicherten Werte, das Asset
+   und die weiterhin gültige Backupdatei.
+6. Ersetze das Testbild, provoziere kontrolliert einen ungültigen Upload und
+   prüfe, dass die zuletzt gültige Datei/Konfiguration erhalten bleibt.
+7. Entferne ausschließlich die angelegten Testdaten oder stelle das Backup
+   kontrolliert wieder her.
+
+### Expected Result
+
+- Erforderliche Daten liegen unter `/data`, besitzen restriktive App-Rechte
+  und überleben Stop/Start unverändert.
+- Ungültige Writes beschädigen weder Primärdatei, Backup noch vorhandenes
+  Background-Asset.
+- Keine erforderliche Persistenz liegt nur in `/app`, `/tmp` oder einer
+  flüchtigen Image-Schicht.
+
+### Fail If
+
+- Dashboard, Section, Widget, Einstellung oder Asset fehlt nach Restart.
+- Dateien sind unerwartet weltlesbar, Backup/Primärdatei inkonsistent oder ein
+  fehlgeschlagener Upload ersetzt den gültigen Background.
+- Logs oder Evidence enthalten Admin-/Supervisor-Credentials.
+
+### Evidence
+
+- Vor-/Nachher-Screenshots von Admin und Dashboard.
+- Redigierte Dateimetadaten unter `/data`, App-Version, Restartzeit und Ergebnis
+  des Invalid-Upload-Checks.
+
+### Result
+
+NOT TESTED
+
+## MT-52
+
+Test ID: MT-52
+
+Sprint: 24, 25.3, 25.4
+Requirement: Cold Backup/Restore, Upgrade zwischen zwei unveränderlichen App-
+Versionen sowie HAOS-Reboot und `boot: auto` ohne Datenverlust.
+Device: Home Assistant OS auf amd64 in einer kontrollierten Testumgebung.
+Preconditions: Zwei veröffentlichte und voneinander unterscheidbare Test-/RC-
+Versionen aus exakten Commits; `RQ-13-01`/`RQ-13-02` behoben; MT-51-Datensatz
+vorhanden; vollständige HAOS-Sicherungsmöglichkeit; Wartungsfenster.
+Exact route/page: `/health`, `/admin`, `/d/<persistence-test-dashboard-id>`,
+Home-Assistant-App-Verwaltung sowie Backup-/Restore-Oberfläche.
+Test data/entity/card required: Persistenzdashboard aus MT-51 einschließlich
+Background, Section, Widget und eindeutigem ungefährlichem Marker.
+Configuration required: `backup: cold`, `boot: auto`, direkter Port 3000 oder
+dokumentierter alternativer Host-Port; keine Produktionsinstanz.
+
+### Steps
+
+1. Starte Version A, bestätige `/health` und alle MT-51-Testdaten.
+2. Erzeuge ein Cold Backup der App und notiere Version und Zeitstempel.
+3. Ändere danach einen sichtbaren Testwert, damit Restore eindeutig erkennbar
+   ist; stoppe/starte die App einmal.
+4. Stelle das Cold Backup wieder her und prüfe, dass der Zustand exakt auf den
+   gesicherten Marker zurückkehrt und die App sauber startet.
+5. Aktualisiere auf Version B und prüfe `/health`, App-Log, Dashboarddaten,
+   Background und Adminzugriff. Bestätige die tatsächlich laufende Version.
+6. Starte Home Assistant Core separat neu und prüfe Recovery ohne App-Datenverlust.
+7. Starte anschließend den kompletten HAOS-Host neu. Warte auf `boot: auto`,
+   öffne `/health` und prüfe erneut alle Testdaten und Supervisorquellen.
+8. Stelle die Testumgebung kontrolliert zurück und bewahre nur redigierte
+   Nachweise.
+
+### Expected Result
+
+- Cold Backup/Restore ist reproduzierbar und verwendet die App-Daten.
+- Upgrade A→B startet genau Version B und erhält `/data`.
+- Core- und HAOS-Restart führen zur automatischen Recovery; `boot: auto`
+  startet die App ohne manuelle Aktion.
+
+### Fail If
+
+- Restore liefert falsche/fehlende Daten, Upgrade läuft weiterhin mit Version
+  A oder HAOS-Reboot erfordert manuellen App-Start.
+- App hängt dauerhaft auf stale/offline, Backgrounds fehlen oder Logs enthalten
+  Credentials.
+
+### Evidence
+
+- Redigierte Screenshots vor Backup, nach Änderung, nach Restore, nach Upgrade
+  und nach Reboot; Versionen, Commit-/Image-Digests, Zeitstempel und Startdauer.
+
+### Result
+
+NOT TESTED
+
+## MT-53
+
+Test ID: MT-53
+
+Sprint: 24, 25.4
+Requirement: Reale aarch64-Kompatibilität von Image, Startup, Supervisor-
+Transport, direktem Port und Persistenz.
+Device: Home Assistant OS auf echter aarch64-Hardware.
+Preconditions: Nach `RQ-13-01` veröffentlichtes Multi-Arch-Image mit
+nachgewiesenem arm64-Manifest; kontrollierte HAOS-Testinstanz; separates
+Admin-Testtoken; keine Produktionsdaten.
+Exact route/page: App-Installation, `/health`, `/api/status`, `/admin`,
+`/system/summary`, `/system/errors` und `/d/<arm64-test-dashboard-id>`.
+Test data/entity/card required: je ein read-only Sensor/Binary, ein ausdrücklich
+autorisiertes ungefährliches Test-Light/Climate und ein Background-Testasset.
+Configuration required: Standard-App-Optionen, direkter Port, App-Modus ohne
+Long-Lived HA Token.
+
+### Steps
+
+1. Prüfe vor Installation, dass das veröffentlichte Manifest einen
+   `linux/arm64`-Digest besitzt; installiere genau diese App-Version.
+2. Starte die App und kontrolliere `/health`, `/api/status`, Architektur und
+   gestartete Version im redigierten Log.
+3. Öffne Default-/Custom-Dashboard, Summary, Errors und Admin; prüfe States,
+   Registrykontext und direkte LAN-Erreichbarkeit.
+4. Schalte ausschließlich die beiden freigegebenen Test-Entities einmal und
+   bestätige, dass nicht autorisierte Entities deaktiviert/abgewiesen bleiben.
+5. Speichere ein Testdashboard samt Background, starte die App neu und prüfe
+   den Erhalt unter `/data`.
+6. Stoppe/Starte Core kontrolliert und prüfe REST-/WebSocket-Recovery.
+7. Prüfe Logs auf native Modulfehler, Architekturfehler, Tokens oder rohe
+   Supervisorpayloads; entferne die Testdaten.
+
+### Expected Result
+
+- Das arm64-Manifest wird nativ geladen; App startet ohne Emulation-/Native-
+  Dependencyfehler.
+- REST, WebSocket, direkter Port, Writesicherheitsgrenze und `/data` verhalten
+  sich wie auf amd64.
+
+### Fail If
+
+- Image fehlt für arm64, startet nur emuliert oder scheitert an Architektur.
+- Funktionen, Berechtigungen oder Persistenz unterscheiden sich sicherheits-
+  oder funktionsrelevant von amd64.
+
+### Evidence
+
+- Manifestdigest, Hardware-/HAOS-Version, redigierte Startlogs und Screenshots
+  jeder Route vor/nach Restart; keine Credentials oder privaten Entitynamen.
+
+### Result
+
+NOT TESTED
+
+## MT-54
+
+Test ID: MT-54
+
+Sprint: 24, 25.3, 25.4
+Requirement: Vollständiger direkter LAN-Zugriff auf die HA-App mit Safari iOS
+9/HomeScreen ohne Ingress-/HA-Frontend-Abhängigkeit.
+Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
+Preconditions: Aktuelle App-Version nach `RQ-13-01` auf HAOS; feste erreichbare
+IPv4-Adresse und direkter App-Port; Cache-Buster `RQ-04-01` behoben; ein
+generisch benanntes Default-/Custom-Dashboard mit Section, Sensor/Binary,
+autorisiertem Test-Light und Climate; keine Admin-Credentials auf dem iPad.
+Exact route/page: `http://<HAOS-IPv4>:<App-Port>/`, `/d/<test-dashboard-id>`,
+`/system/summary` und `/system/errors` über interne Navigation.
+Test data/entity/card required: Light und Climate mit ungefährlichen
+Testzuständen, unavailable Entity, Healthzustände Healthy und Warning/Error,
+lange Kartennamen und optionaler Background.
+Configuration required: direkter Port aktiv; kein Ingress als Voraussetzung;
+gültige Returnziele; Light-/Climate-Grants ausschließlich serverseitig.
+
+### Steps
+
+1. Lege die direkte IPv4-URL auf dem HomeScreen ab, starte sie von dort und
+   bestätige Fullscreen ohne sichtbare Safari-Chrome.
+2. Lade Default- und Custom-Dashboard in Portrait und Landscape; prüfe
+   Background, Section, Karten, Footer, Light/Dark und fehlenden horizontalen
+   Overflow.
+3. Öffne Summary über den neutralen Link, Errors über den Health Indicator und
+   kehre jeweils zum exakten internen Dashboard zurück.
+4. Bestätige, dass alle Navigation im selben HomeScreen-Fenster und unter
+   exakt derselben Origin/Port bleibt; kein HA-Frontend/Ingress/normaler Safari-
+   Tab darf erscheinen.
+5. Schalte das ausdrücklich autorisierte Light und Climate einmal in Grid und
+   Focus; ändere Climate-Zielwert innerhalb der sicheren Grenzen.
+6. Prüfe unavailable und nicht autorisierte Entities auf deaktivierte Controls;
+   ein Control-Tap darf Focus nicht ungewollt öffnen/schließen.
+7. Starte Home Assistant Core neu und beobachte stale/offline sowie Recovery,
+   ohne die Web-App zu verlassen. Starte danach nur die App neu und wiederhole.
+8. Schließe und öffne die HomeScreen-Web-App erneut; prüfe Route, Theme und
+   Bedienbarkeit. Dokumentiere `.local` nur separat, ohne funktionierenden
+   IPv4-Zugriff als Fehler zu behandeln.
+
+### Expected Result
+
+- Direkte IPv4-App-URL funktioniert ohne Ingress oder HA-Frontend und bleibt
+  bei interner Navigation in derselben HomeScreen-Web-App.
+- Layout, Theme, Systemrouten und enge autorisierte Controls funktionieren auf
+  iOS 9; nicht autorisierte/unavailable Writes bleiben gesperrt.
+- Core-/App-Restart wird mit kontrolliertem Status und anschließender Recovery
+  toleriert.
+
+### Fail If
+
+- Eine interne Route öffnet normalen Safari, ändert Origin/Port oder verlangt
+  moderne HA-Ingress-Anmeldung.
+- Layout überläuft/überlappt, Controls sind nicht bedienbar oder Credentials/
+  Adminzugriff werden auf dem iPad benötigt.
+- Neustart hinterlässt dauerhaft falschen Healthy-, stale- oder offline-Status.
+
+### Evidence
+
+- Fotos/Screenshots von HomeScreen-Start, Default/Custom, Summary/Errors,
+  Portrait/Landscape und Restart-Recovery; notiere iOS-/App-/HAOS-Version,
+  verwendete Origin anonymisiert und Ergebnis jedes Controls.
+
+### Result
+
+NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 12 (Fortsetzung)
+
+## MT-44
+
+Test ID: MT-44
+
+Sprint: 22
+Requirement: Persistente Regeln, zuverlässiges HA-`last_changed`, atomare
+Konfiguration und bewusst prozesslokale Flapping-Historie über LXC-Neustart.
+Device: Standalone-LXC `ha-legacy-dashboard` mit systemd und kontrolliertem
+Test-Home-Assistant.
+Preconditions: Wartungsfenster; gültiges Backup der Dashboardkonfiguration;
+ein normales Test-Entity seit mindestens zwei Minuten `unavailable`; eine
+zweite Entity für Flapping; kein produktiver Credentialinhalt in Befehls-
+oder Bildnachweisen.
+Exact route/page: `/admin`, `/system/errors`, Service
+`ha-legacy-dashboard.service`.
+Test data/entity/card required: zwei isolierte Test-Entities und eine
+Test-Device-Regel; `unavailableGraceMs=30000`, kurze Recovery für den Test.
+Configuration required: persistierte Entity-/Device-Regeln in der vorhandenen
+Dashboardkonfiguration; gültige Primärdatei und `.bak`; keine Produktionsregel
+ändern.
+
+### Steps
+
+1. Speichere Entity-/Device-Regeln im Admin, lade `/system/errors` neu und
+   bestätige ihre aktuelle Wirkung.
+2. Stelle sicher, dass Entity A bereits länger als 30 s `unavailable` ist und
+   als Issue sichtbar ist.
+3. Starte ausschließlich `ha-legacy-dashboard.service` kontrolliert neu und
+   warte auf erfolgreichen Dienststatus.
+4. Lade `/system/errors` sofort neu und prüfe, dass Entity A aufgrund seines
+   HA-`last_changed` nicht erneut 30 s unsichtbar wird.
+5. Erzeuge bei Entity B vor dem Neustart Flapping und dokumentiere das Issue.
+6. Starte den Dienst erneut; prüfe, dass die prozesslokale Flapping-Historie
+   kontrolliert verloren sein darf, ohne Crash, persistierte Rohhistorie oder
+   falsche Severity zu erzeugen.
+7. Prüfe nach dem Neustart `/admin`: Regeln sind erhalten, die primäre
+   Konfigurationsdatei und `.bak` sind gültig und Dateirechte unverändert.
+8. Erzeuge erneut die nötigen Transitionen und prüfe, dass Flapping wieder
+   erkannt wird; stelle alle Testzustände und Regeln anschließend zurück.
+
+### Expected Result
+
+- Konfiguration überlebt den Dienstneustart atomar; alte unavailable-Dauer
+  nutzt HA-`last_changed`.
+- Nur der flüchtige Ringbuffer wird verworfen und danach sauber neu aufgebaut.
+- Service startet ohne Tokenausgabe, Datenverlust oder zusätzlichen HA-Poll.
+
+### Fail If
+
+- Ein lang ausgefallenes Entity wird nach Restart erneut für die volle Grace
+  verborgen.
+- Regeln/Backup gehen verloren oder Flapping-Historie wird unerwartet als
+  ungebundene Datei persistiert.
+- Logs enthalten Credentials oder der Dienst benötigt eine neue Berechtigung.
+
+### Evidence
+
+- Vor-/Nachher-Screenshots der Issues, redigierter Service-Status und
+  Dateimetadaten von Konfiguration/Backup; keine Dateiinhalte mit privaten IDs.
+- Notiere Neustartzeit, HA-`last_changed`, Softwareversionen und Reset-Erfolg.
+
+### Result
+
+NOT TESTED
+
+## MT-45
+
+Test ID: MT-45
+
+Sprint: 22
+Requirement: Verständliche Flapping-/Recovery-/Device-Hint-Darstellung und
+stabiler Health Indicator auf Safari iOS 9.
+Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
+Preconditions: Testdashboard mit neutralem Summary-Link und Health Indicator;
+kontrolliertes Test-HA liefert eine Device Group mit mindestens drei Children,
+davon mindestens zwei unavailable, ein Flapping- und ein Recovery-Pending-
+Child; sichere generische Namen; MT-43-Regeln bereits serverseitig vorbereitet.
+Exact route/page: `/d/<test-dashboard-id>` und `/system/errors?returnTo=...`.
+Test data/entity/card required: echte gemeinsame Test-`device_id`, Warning-
+und Critical-Beispiel, lange Entity-/Gerätenamen, 1-/2-/3-Spaltenpräferenz.
+Configuration required: serverseitige Sprint-22-Testregeln aus MT-43,
+vorbereitete Spalten-/Themepräferenz und gültiges Return Target.
+
+### Steps
+
+1. Starte das Dashboard vom HomeScreen in Portrait, warte auf frische Daten
+   und öffne Errors über den Health Indicator.
+2. Prüfe Device-Title, Issue-/Unavailable-/Unknown-/Flapping-/Recovery-Counts
+   und den konservativen Device-Failure-Hinweis.
+3. Klappe Childdetails auf und prüfe Flapping-/Recovery-Texte, Severity und
+   lange Namen auf Clipping/Überlauf.
+4. Wechsle Severity und State einzeln sowie kombiniert; bestätige, dass
+   sichtbare Children/Group-Severity stimmen und Health unverändert global ist.
+5. Teste 1/2/3 Columns im verfügbaren Viewport, Dark/Light und drehe nach
+   Landscape; prüfe keine horizontale Seitenscrollbar oder Card-Überlappung.
+6. Kehre über Back exakt zum Ausgangsdashboard zurück und prüfe, dass die
+   HomeScreen-Web-App nicht in normales Safari wechselt.
+7. Beobachte eine serverseitig ausgelöste Recovery über mindestens zwei
+   Refreshzyklen; der Health Indicator darf nicht vorzeitig verschwinden.
+
+### Expected Result
+
+- Alle neuen Zustände sind ohne reine Farbcodierung verständlich und innerhalb
+  ihrer Cards lesbar.
+- Device-Hint bleibt vorsichtig formuliert; Controls/Navi bleiben mindestens
+  ungefähr 44 px groß.
+- Rotation, Theme und Return bleiben stabil im HomeScreen-Kontext.
+
+### Fail If
+
+- Text/Count überlappt, horizontales Scrollen entsteht oder Gruppenseverity
+  passt nicht zu sichtbaren Children.
+- Health flackert, verschwindet durch Filter oder HomeScreen wird verlassen.
+- Touchziele reagieren doppelt/nicht oder die Systemseite benötigt moderne
+  Browserfunktionen.
+
+### Evidence
+
+- Je ein Foto in Portrait/Landscape und Light/Dark; zusätzliche Aufnahme der
+  geöffneten Childdetails und Recovery.
+- Notiere iOS-Version, Viewportorientierung, Dashboard-ID und Resultat jedes
+  Schritts ohne private Entitynamen im Bild.
+
+### Result
+
+NOT TESTED
+
+## MT-46
+
+Test ID: MT-46
+
+Sprint: 23
+Requirement: Automation Inventory, explizite Referenzindizes, Capabilities,
+Partial Failure und sanitierte Trace Summaries gegen eine reale HA-Version.
+Device: Mac mit aktueller Safari-Version, Gateway gegen kontrolliertes Test-
+Home-Assistant; zusätzlich Backend-/Adminstatus beobachtbar.
+Preconditions: Test-HA mit mindestens fünf Automationen: on, off, unavailable,
+direkte Entity-/Device-Referenz, indirekte Area-/Label-Referenz, Template oder
+Blueprint; mindestens eine Condition-false-, Not-triggered- und echte Error-
+Trace; keine Produktionsgeheimnisse in Automationstexten.
+Exact route/page: `/system/errors`, `/admin` → Diagnostic Sources und
+`/api/system-dashboards/errors/automation-traces` nur über die UI auslösen.
+Test data/entity/card required: problematische Test-Entity mit realer
+`device_id`, `area_id`, `label_id`; Automation-Namen lang/kurz; bekannte letzte
+Triggerzeiten.
+Configuration required: read-only Registry-/Automation-/Trace-Zugriff des
+Test-HA, `device_class`- oder dokumentierter Label-Modus, keine Automation-
+Write-Berechtigung im Dashboard.
+
+### Steps
+
+1. Öffne Errors und prüfe, dass ohne Advanced-Diagnostics-Interaktion noch
+   keine Trace-Abfrage erfolgt.
+2. Erzeuge ein aktives Sprint-22-Issue für die referenzierte Entity und prüfe
+   direkte Entity-/Device- sowie indirekte Area-/Label-Zuordnungen.
+3. Prüfe, dass eine unbeteiligte Automation nicht erscheint und dynamische/
+   Blueprint-Referenzen als unvollständige Analyse sichtbar werden, ohne als
+   Ursache behauptet zu werden.
+4. Prüfe on/off/unavailable/unknown, Friendly Name, Disabled-Kontext und
+   Last-triggered-Anzeige; `off` darf kein eigenes Error erzeugen.
+5. Öffne Advanced Diagnostics. Prüfe Inventory-/Config-/Trace-Capability und
+   die drei Tracearten: Erfolg/Error, Condition false, Not triggered.
+6. Kontrolliere im Browser-Netzwerkpayload, dass keine Raw Config, Trace-
+   Variables, Actions, Services, vollständige States oder Tokens enthalten sind.
+7. Simuliere kontrolliert unsupported oder Timeout nur für Trace; Registry,
+   Inventory und statischer Impact müssen weiter funktionieren.
+8. Simuliere einen einzelnen Config-Lesefehler und prüfe Partial-/Last-known-
+   Verhalten. Stelle danach alle Quellen wieder her und prüfe Recovery.
+9. Schalte eine referenzierte Automation innerhalb des 60-s-Config-TTL von on
+   auf off und prüfe, ob Disabled-Kontext und Triggerzeit sofort dem aktuellen
+   State-Snapshot folgen; dieser Schritt re-auditiert `RQ-12-03`.
+
+### Expected Result
+
+- Nur explizit belegte statische Treffer werden direct/indirect zugeordnet;
+  dynamische Unsicherheit bleibt sichtbar und kausalitätsfrei.
+- Trace wird capability-driven/on-demand geladen und vollständig reduziert.
+- Teilfehler degradieren nur die betroffene Quelle; aktueller Automation-
+  Zustand bleibt unabhängig vom Config-TTL aktuell.
+
+### Fail If
+
+- Browser erhält Rohkonfiguration/-trace, Token oder beliebige WS-Kommandos.
+- Condition false/Not triggered wird als Fehler gewertet, `off` erzeugt Error
+  oder Trace-Ausfall zerstört das Error Dashboard.
+- State/Disabled/lastTriggered bleibt nach Schritt 9 bis zum Config-TTL alt.
+
+### Evidence
+
+- Screenshots von Impact/Advanced Diagnostics und redigierte Network-
+  Feldliste; notiere HA-Version, Capabilitystatus und jede Referenzart.
+- Keine Automation-YAML, Tracevariable, interne IP oder private Namen sichern.
+
+### Result
+
+NOT TESTED
+
+## MT-47
+
+Test ID: MT-47
+
+Sprint: 23
+Requirement: Desktop-Safari-Darstellung, Collapse/Expand, lange Automation-
+Namen, Trace-On-Demand und Fehlerdegradation.
+Device: Mac mit aktueller macOS-Safari-Version und kontrolliertem Test-HA.
+Preconditions: MT-46-Testdaten; Errorpayload mit mindestens einer Device Group,
+einem Standalone Issue, mehreren direkten/indirekten Automationtreffern und
+langen Namen; Tracequelle verfügbar und separat störbar.
+Exact route/page: `/system/errors?returnTo=%2Fd%2F<test-dashboard-id>`.
+Test data/entity/card required: Device-/Standalone-Issue, disabled Automation,
+lange Namen, 1-/2-/3-Spaltenansicht, Dark/Light.
+Configuration required: Sprint-22-Testregeln lassen die beiden Issues aktiv;
+Automationreferenzen/Traces entsprechen MT-46; gültiges internes Return Target.
+
+### Steps
+
+1. Öffne Errors in Light Mode bei breitem Fenster und prüfe Impact Counts für
+   Device Group und Standalone Issue.
+2. Klappe zuerst Childdetails, dann Automation Impact auf und zu; prüfe ARIA-
+   Zustand, Fokus und dass beide Bereiche unabhängig bleiben.
+3. Prüfe Direct-/Area-/Label-Labels, Disabled-/Unavailable-Kontext und letzte
+   Triggerzeit bei langen Namen.
+4. Öffne Advanced Diagnostics erst jetzt und beobachte genau eine gebündelte
+   Trace-Abfrage; klappe den Bereich mehrfach, ohne unnötige Neuabfrage im TTL.
+5. Prüfe Trace Error, Condition false und Not triggered sowie den Hinweis, dass
+   Impact keine Ursache beweist.
+6. Wechsle 1/2/3 Columns, verkleinere bis schmalen Viewport und prüfe
+   Umbruch/Overflow; wiederhole in Dark Mode.
+7. Unterbrich nur die Tracequelle, lade neu/öffne erneut und prüfe kontrollierte
+   unsupported/error/stale-Anzeige bei weiterhin sichtbarem statischem Impact.
+8. Kehre über Back exakt zum Testdashboard zurück.
+
+### Expected Result
+
+- Details sind initial collapsed, tastatur-/mausbedienbar und ohne horizontale
+  Scrollbar; lange Namen brechen/kürzen kontrolliert.
+- Trace lädt nur on-demand, ist reduziert und sein Ausfall isoliert.
+- Theme, Columns und sicherer Return bleiben erhalten.
+
+### Fail If
+
+- Collapse-Zustände koppeln sich, Fokus geht verloren oder Inhalte überlaufen.
+- Opening/Filtering löst HA-Write aus, Trace lädt bereits im Header oder Raw-
+  Daten erscheinen.
+- Traceausfall entfernt statischen Impact oder setzt global Health falsch.
+
+### Evidence
+
+- Screenshots der initial geschlossenen und geöffneten Bereiche in Light/Dark;
+  Network-Requestzählung, Safari-Version und Partial-Failure-Resultat.
+
+### Result
+
+NOT TESTED
+
+## MT-48
+
+Test ID: MT-48
+
+Sprint: 23
+Requirement: Automation Impact und Advanced Diagnostics auf Safari iOS 9 in
+Portrait/Landscape, HomeScreen und allen sinnvollen Spaltenansichten.
+Device: iPad mini 1, iOS 9.3.5, HomeScreen-Web-App.
+Preconditions: Datenschutzsichere MT-46-Testdaten; aktuelle Anwendung zum
+HomeScreen hinzugefügt; mindestens eine Device Group und ein Standalone Issue
+mit Impact; Trace verfügbar oder bewusst als unsupported vorbereitet.
+Exact route/page: Ausgang `/d/<test-dashboard-id>`, danach
+`/system/errors?returnTo=...`.
+Test data/entity/card required: lange Automation-/Device-/Area-Namen,
+direct/indirect, disabled, letzte Triggerzeit; 1-/2-/3-Column-Präferenz.
+Configuration required: Testpayload aus MT-46, gültiges Return Target,
+persistierbare Theme-/Spaltenpräferenz; kein Admin-Credential auf dem iPad.
+
+### Steps
+
+1. Starte das Dashboard vom HomeScreen in Portrait und öffne Errors über den
+   Health Indicator.
+2. Prüfe initial geschlossene Automation-Impact- und Advanced-Diagnostics-
+   Bereiche; tippe Impact auf/zu und beobachte genau eine Zustandsänderung.
+3. Klappe Device Children auf und prüfe, dass die Automationdetails weder
+   verschwinden noch versehentlich Child-/Card-Aktionen auslösen.
+4. Öffne Advanced Diagnostics, warte auf Trace/Unsupported-Status und prüfe
+   alle Texte, lange Namen und Touchziele auf Lesbarkeit.
+5. Schalte zwischen 1/2/3 Columns; akzeptiere responsiven Fallback, aber keine
+   horizontale Seitenscrollbar oder überlappende Cards.
+6. Wechsle Light/Dark, drehe nach Landscape und wiederhole Schritte 2 bis 5.
+7. Navigiere Summary → Errors → zurück zum exakten Ausgangsdashboard und
+   prüfe, dass der HomeScreen-Kontext erhalten bleibt.
+
+### Expected Result
+
+- Alle Toggle reagieren einmal pro Tap, Touchziele sind ungefähr 44 px und
+  Details bleiben in Portrait/Landscape lesbar.
+- Direct/Indirect/Disabled/Trace werden ohne reine Farbcodierung verständlich.
+- Kein Overflow, kein Safari-Wechsel, kein UI-Absturz bei unsupported Trace.
+
+### Fail If
+
+- Doppelte Touchreaktion, eingefrorener Toggle, abgeschnittener Inhalt,
+  horizontales Scrollen oder Verlassen der HomeScreen-App.
+- Advanced Diagnostics benötigt moderne API, bleibt leer ohne Erklärung oder
+  zeigt Rohdaten.
+
+### Evidence
+
+- Fotos in Portrait und Landscape, Light/Dark und mit geöffnetem Impact;
+  notiere Column-Auswahl, Trace-Status, iOS-Version und jedes Einzelergebnis.
+
+### Result
+
+NOT TESTED
+
+## MT-49
+
+Test ID: MT-49
+
+Sprint: 23
+Requirement: Nichtregression der Automation-Impact-/Trace-Oberfläche auf dem
+bekannten iPad-Air-2-Safari-Ziel.
+Device: iPad Air 2, iPadOS 15.8.5, Safari und optional dieselbe HomeScreen-App.
+Preconditions: Dieselben datenschutzsicheren Testdaten wie MT-48; kein Admin-
+Token auf dem Gerät gespeichert; direct/indirect/disabled und Tracebeispiele.
+Exact route/page: `/system/errors?returnTo=%2Fd%2F<test-dashboard-id>`.
+Test data/entity/card required: eine Device Group und ein Standalone Issue mit
+langen Automationnamen, 1-/2-/3-Column-Präferenz, Light/Dark.
+Configuration required: dieselben Sprint-22-/23-Testregeln wie MT-48,
+gültiges Return Target und keine Admin- oder HA-Credentials im Browser.
+
+### Steps
+
+1. Öffne Errors in Portrait und prüfe initial collapsed Impact/Diagnostics.
+2. Tippe jeden Toggle auf und zu; prüfe Fokus, ARIA-Wirkung, genau eine
+   Reaktion und unveränderte Childdetails.
+3. Öffne Advanced Diagnostics, prüfe Trace-/Capabilitytexte und lange Namen.
+4. Wechsle 1/2/3 Columns und Light/Dark, dann drehe nach Landscape.
+5. Prüfe in beiden Orientierungen auf Überlauf, Clipping, Card-Kompression und
+   erreichbare Touchziele.
+6. Navigiere zum Custom-Dashboard zurück und wieder zu Errors; prüfe
+   Same-Window-/Return- und Theme-/Column-Persistenz.
+
+### Expected Result
+
+- Impact und Advanced Diagnostics bleiben in beiden Orientierungen vollständig
+  bedienbar; kein früherer Focus-/Flex-Kompressionseffekt tritt auf.
+- Interne Navigation bleibt same-window; Theme/Columns bleiben persistent.
+
+### Fail If
+
+- Card oder Toggle ist komprimiert, links versetzt, abgeschnitten oder nicht
+  bedienbar.
+- Navigation öffnet normales Safari/neuen Tab oder verliert das Rückziel.
+- Trace-/Impactanzeige verändert einen HA-Zustand.
+
+### Evidence
+
+- Je ein Screenshot Portrait/Landscape mit geöffneten Details; notiere Safari-
+  Modus, Theme, Columns, Rückziel und Ergebnis.
+
+### Result
+
+NOT TESTED
 
 ## Detaillierte Anleitungen aus Audit Part 04
 
 ## MT-11
+
+Test ID: MT-11
 
 Sprint: 17.2
 Requirement: Sichtbare Kartenidentität und primärer Compact-Inhalt für Sensor,
@@ -109,6 +2825,8 @@ NOT TESTED
 ## Detaillierte Anleitungen aus Audit Part 11
 
 ## MT-37
+
+Test ID: MT-37
 
 Sprint: 21.4
 Requirement: Entity Rule Manager mit vollständiger Metadatensuche,
@@ -186,6 +2904,8 @@ NOT TESTED
 
 ## MT-38
 
+Test ID: MT-38
+
 Sprint: 21.4
 Requirement: Touchbedienbarer Entity Rule Manager ohne Massendropdowns bei
 großem Inventar.
@@ -245,6 +2965,8 @@ für die moderne Admin UI.
 NOT TESTED
 
 ## MT-39
+
+Test ID: MT-39
 
 Sprint: 21.4
 Requirement: Kompakte gemeinsame Summary-/Error-Header mit genau einer
@@ -310,7 +3032,9 @@ NOT TESTED
 
 ## MT-40
 
-Sprint: 21.5
+Test ID: MT-40
+
+Sprint: 21.5, 25.1, 25.2, 25.4
 Requirement: Summary-/Health-Navigation, fail-safe Healthzustände, exaktes
 Return Target und Erhalt des HomeScreen-Kontexts auf der Legacy-Zielhardware.
 Device: iPad mini 1, iOS 9.3.5, als vom HomeScreen gestartete Web-App.
@@ -386,7 +3110,9 @@ NOT TESTED
 
 ## MT-41
 
-Sprint: 21.5
+Test ID: MT-41
+
+Sprint: 21.5, 25.2
 Requirement: Same-window-/same-origin-Navigation und Return-Nichtregression auf
 dem bekannten iPad-Air-2-Safari-Ziel.
 Device: iPad Air 2, iPadOS 15.8.5, Safari sowie optional dieselbe Seite als
@@ -437,7 +3163,9 @@ NOT TESTED
 
 ## MT-42
 
-Sprint: 21.5
+Test ID: MT-42
+
+Sprint: 21.5, 25.1, 25.2, 25.4
 Requirement: Globale Healthberechnung, Failure-Fallback,
 Filterunabhängigkeit, Open-Redirect-Abwehr und stabiler Langzeitbetrieb im
 Desktop-Safari.
@@ -507,6 +3235,8 @@ NOT TESTED
 ## Detaillierte Anleitungen aus Audit Part 09
 
 ## MT-30
+
+Test ID: MT-30
 
 Sprint: 21
 Requirement: Reale read-only Registry-/Diagnoseanreicherung, Quellenstatus,
@@ -607,6 +3337,8 @@ NOT TESTED
 
 ## MT-31
 
+Test ID: MT-31
+
 Sprint: 21.1
 Requirement: Device-Gruppierung ausschließlich über echte `device_id`,
 Standalone-Regeln, Filter/Counts, collapsed Childdetails und responsives
@@ -693,6 +3425,8 @@ Orientation: breites Desktopfenster und schmales Fenster unter 700 px.
 NOT TESTED
 
 ## MT-32
+
+Test ID: MT-32
 
 Sprint: 21, 21.1
 Requirement: Registry-Kontext, echte Device Groups, Filter/Details, Theme,
@@ -783,6 +3517,8 @@ NOT TESTED
 
 ## MT-33
 
+Test ID: MT-33
+
 Sprint: 21.2
 Requirement: Summary-Kategoriefilter, eigener Empty State, stale/offline-
 Sichtbarkeit und getrennt persistierte responsive Spalten auf Safari iOS 9.
@@ -865,7 +3601,9 @@ NOT TESTED
 
 ## MT-34
 
-Sprint: 21.2, 21.3
+Test ID: MT-34
+
+Sprint: 21.2, 21.3, 25.1, 25.4
 Requirement: Exakte Severity- und State-Filter mit AND auf demselben Child,
 child-first Geräteaggregation, sichtbare Gruppenseverity und responsive
 1/2/3-Spaltenansicht auf Safari iOS 9.
@@ -945,6 +3683,8 @@ langer Device-/Childname; erwartete Counts schriftlich vorbereitet.
 NOT TESTED
 
 ## MT-35
+
+Test ID: MT-35
 
 Sprint: 21.3
 Requirement: Kritikalitätsmodi Device Classes und Home Assistant Labels,
@@ -1029,6 +3769,8 @@ NOT TESTED
 
 ## MT-36
 
+Test ID: MT-36
+
 Sprint: 21.3
 Requirement: Stabile Label-ID bei Rename, Last-known-Verhalten, sichtbarer
 unsupported/error/missing-Zustand und automatische Recovery ohne stillen
@@ -1109,6 +3851,8 @@ NOT TESTED
 ## Detaillierte Anleitungen aus Audit Part 08
 
 ## MT-27
+
+Test ID: MT-27
 
 Sprint: 20
 Requirement: Error Dashboard MVP mit getrennter unavailable-/unknown-
@@ -1200,6 +3944,8 @@ NOT TESTED
 
 ## MT-28
 
+Test ID: MT-28
+
 Sprint: 20
 Requirement: Reale iPad-mini-/iOS-9-Abnahme des Error Dashboards in
 Portrait/Landscape, Light/Dark und HomeScreen mit Touch, Scrollen und
@@ -1280,6 +4026,8 @@ Orientation: Portrait und Landscape.
 NOT TESTED
 
 ## MT-29
+
+Test ID: MT-29
 
 Sprint: D1
 Requirement: Aktuelle Produkt-Screenshot-Galerie aus der real laufenden
@@ -1367,6 +4115,8 @@ NOT TESTED
 
 ## MT-24
 
+Test ID: MT-24
+
 Sprint: 18, 19
 Requirement: System-Dashboard-Routen, gemeinsamer Online-/Stale-/Offline-/
 Recovery-Zustand, Summary-Darstellung, Theme und sichere interne Navigation im
@@ -1448,6 +4198,8 @@ Orientation: schmales/hohes und breites/flaches Safari-Fenster.
 NOT TESTED
 
 ## MT-25
+
+Test ID: MT-25
 
 Sprint: 18, 19
 Requirement: Reale Legacy-Abnahme der System-Shell und des Summary MVP auf
@@ -1531,6 +4283,8 @@ NOT TESTED
 
 ## MT-26
 
+Test ID: MT-26
+
 Sprint: 19
 Requirement: Reale Admin-Konfiguration von Summary Ignore und Media-Privacy
 einschließlich persistiertem Reload, manueller Überschreibung und Trennung von
@@ -1607,6 +4361,8 @@ NOT TESTED
 ## Detaillierte Anleitungen aus Audit Part 06
 
 ## MT-21
+
+Test ID: MT-21
 
 Sprint: 17.6, 17.7
 Requirement: Gemeinsames SVG-Power-Control und vollständige Hierarchie
@@ -1707,6 +4463,8 @@ NOT TESTED
 
 ## MT-22
 
+Test ID: MT-22
+
 Sprint: 17.6, 17.7
 Requirement: Nichtregression des gemeinsamen SVG-Power-Controls und der
 vollständigen Control-Hierarchie auf der Plattform der bestätigten Focus-
@@ -1783,6 +4541,8 @@ NOT TESTED
 
 ## MT-23
 
+Test ID: MT-23
+
 Sprint: 17.6, 17.7
 Requirement: Desktop-Safari-Nichtregression der gemeinsamen SVG-/Control-
 Hierarchie sowie Vergleichsbasis für die beiden mobilen Safari-Geräte.
@@ -1850,6 +4610,8 @@ NOT TESTED
 ## Detaillierte Anleitungen aus Audit Part 05
 
 ## MT-18
+
+Test ID: MT-18
 
 Sprint: 17.4, 17.5
 Requirement: Viewportbasierter nativer Focus, priorisierte Inhalte,
@@ -1942,6 +4704,8 @@ NOT TESTED
 
 ## MT-19
 
+Test ID: MT-19
+
 Sprint: 17.5
 Requirement: Bestätigte Mobile-Safari-Kompressionsregression ist auf dem
 Referenzgerät durch die native Focus-Architektur behoben.
@@ -2010,6 +4774,8 @@ NOT TESTED
 
 ## MT-20
 
+Test ID: MT-20
+
 Sprint: 17.5
 Requirement: Das vor Sprint 17.5 gute Desktop-Safari-Verhalten regressiert
 durch den nativen Focus-Renderer nicht.
@@ -2074,6 +4840,8 @@ NOT TESTED
 
 ## MT-12
 
+Test ID: MT-12
+
 Sprint: 17.2
 Requirement: Proportionale, gutter-aware Grid-Geometrie und sichere
 Neuberechnung bei Rotation.
@@ -2129,7 +4897,9 @@ NOT TESTED
 
 ## MT-13
 
-Sprint: 17.2
+Test ID: MT-13
+
+Sprint: 17.2, 25.1, 25.4
 Requirement: Globale Theme-Persistenz über Reload, Default-/Custom- und
 System-Dashboards.
 Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
@@ -2184,6 +4954,8 @@ NOT TESTED
 
 ## MT-14
 
+Test ID: MT-14
+
 Sprint: 17.3
 Requirement: Focus-Overlay, typgerechte Inhalte, Schließen und fehlender
 Grid-Reflow.
@@ -2236,6 +5008,8 @@ autorisiertes Light, autorisiertes Climate mit Ist/Soll/HVAC.
 NOT TESTED
 
 ## MT-15
+
+Test ID: MT-15
 
 Sprint: 17.3
 Requirement: Gemeinsamer Light-Power-Control, Busy/Error/Unavailable und
@@ -2291,6 +5065,8 @@ Test data/entity/card required: drei eindeutig benannte Light-Karten.
 NOT TESTED
 
 ## MT-16
+
+Test ID: MT-16
 
 Sprint: 17.3
 Requirement: Climate Power, Sollwertsteuerung, sichere Capability-Auswertung
@@ -2351,6 +5127,8 @@ NOT TESTED
 
 ## MT-17
 
+Test ID: MT-17
+
 Sprint: 17.3
 Requirement: Reale Admin-Live-Preview mit aktuellen Daten, Profil-/Theme-
 Umschaltung und Preview während Pointer-Drag/Resize.
@@ -2405,3 +5183,265 @@ mindestens eine unavailable Entity.
 ### Result
 
 NOT TESTED
+
+## Detaillierte Anleitungen aus Audit Part 14
+
+## MT-55
+
+Test ID: MT-55
+
+Sprint: 25, 25.4
+Requirement: Ein neuer Release Candidate wird aus genau einem freigegebenen
+Commit reproduzierbar als öffentliches Prerelease, Standalone-Artefakt und
+generisches amd64/aarch64-GHCR-Manifest veröffentlicht, ohne `latest` zu
+verändern.
+System: GitHub Actions, GHCR, GitHub Release und isolierter Linux-Testhost mit
+Docker/Buildx; kein produktives Home Assistant.
+Preconditions: Alle P1-Reparaturen des vorgesehenen RC sind re-auditiert; ein
+neuer, noch nicht existierender RC-Versionsstring und Tag wurden in allen
+Versionsquellen vorbereitet; CI auf dem exakten Commit ist grün; GHCR-Paket ist
+öffentlich; der vor dem Test existierende `latest`-Digest wurde notiert oder
+`latest` existiert nachvollziehbar noch nicht.
+Exact version/tag/artifact under test: Der konkret zu veröffentlichende neue
+`v<version>-rc.<n>`-Tag, `ghcr.io/tekky85/ha-legacy-dashboard:<version>-rc.<n>`,
+`ha-legacy-dashboard-<version>-rc.<n>.tar.gz` und `SHA256SUMS`; Werte vor dem
+Start im Ergebnisprotokoll eintragen.
+Exact route/page: GitHub Actions Release-Run, GitHub Release-Seite, GHCR-
+Paketansicht sowie lokal `/health`, `/api/status` und `/` am Testcontainer.
+Test data/entity/card required: Ausschließlich der mitgelieferte lokale
+Supervisor-/HA-Mock und Fake-Credentials aus dem Release-Smoke-Test.
+
+### Steps
+
+1. Notiere Releasecommit, vollständigen Tag, erwarteten Image-/Archivnamen und
+   den bisherigen `latest`-Digest beziehungsweise „nicht vorhanden“.
+2. Prüfe am Commit einen sauberen Arbeitsbaum, die vollständige CI und die
+   Gleichheit von Paket-, Lockfile-, App-, Metadaten-, Changelog- und
+   Release-Notes-Version.
+3. Erzeuge und pushe erst nach der dokumentierten Freigabe den neuen RC-Tag.
+4. Öffne den genau durch diesen Tag gestarteten Releaseworkflow und verifiziere
+   die Jobs `validate`, amd64, arm64, Manifest, Smoke und Publish einzeln.
+5. Prüfe, dass beide Architekturjobs dasselbe Dockerfile und den exakten
+   Releasecommit verwenden und keine Produktions-HA-URL/-Credentials erhalten.
+6. Inspiziere das versionierte GHCR-Manifest; protokolliere Digest und die
+   Plattformen `linux/amd64` sowie `linux/arm64`.
+7. Ziehe das versionierte Image auf dem isolierten amd64-Testhost und starte
+   den vorgesehenen localhost-Mock-Smoke-Test; prüfe `/health`, `/api/status`,
+   `/` und mindestens ein statisches CSS-/JS-Asset.
+8. Öffne den GitHub Release und prüfe `prerelease`, Release Notes, Archiv und
+   `SHA256SUMS`.
+9. Lade beide Dateien in ein leeres Verzeichnis, führe
+   `sha256sum --check SHA256SUMS` aus und liste den Tar-Inhalt.
+10. Prüfe, dass das Tar keine `.env`, Keys, Logs, Tests, `node_modules`,
+    `data`, Uploads oder lokale Pfade enthält und alle versprochenen
+    Installationsdokumente/Pfade tatsächlich vorhanden sind.
+11. Vergleiche den `latest`-Digest mit Schritt 1. Ein RC darf ihn nicht ändern
+    und bei vorher fehlendem `latest` keinen neuen Tag anlegen.
+12. Prüfe, dass App-`config.yaml`, GitHub Release, Image-Label/Tag und Archiv-
+    `VERSION` genau dieselbe RC-Version/Revision bezeichnen.
+
+### Expected Result
+
+- Alle Releasejobs gehören zum exakten freigegebenen Commit und sind grün.
+- Das versionierte öffentliche Manifest enthält genau die unterstützten
+  amd64-/arm64-Plattformen; der Container besteht den isolierten Smoke-Test.
+- GitHub kennzeichnet den Release als Prerelease und hängt Archiv plus gültige
+  Checksum an.
+- Das Bundle ist secretfrei, selbsttragend dokumentiert und reproduzierbar.
+- `latest` bleibt bei einem RC unverändert.
+
+### Fail If
+
+- Eine Version, Revision, Architektur oder ein Artefakt fehlt/abweicht.
+- Ein Job verwendet einen anderen Commit, ein altes Image oder Produktions-HA.
+- Checksum, Manifest, Health/API/Assets oder Bundle-Inhalt schlagen fehl.
+- Das RC verändert/erzeugt `latest` oder erscheint als Stable-Release.
+- Credential, Nutzerdatum, Upload, Log, Schlüssel oder nicht auflösbarer
+  Installationspfad ist im öffentlichen Artefakt enthalten.
+
+### Evidence
+
+- Workflow-URL und Job-Screenshots/-Logs ohne Secrets.
+- Tag, Commit-SHA, Release-URL, Manifest-/Arch-Digests.
+- Ausgabe der Manifest-, Checksum- und Tar-Inhaltsprüfung.
+- Container-Smoke-Ausgabe und vor/nachher `latest`-Digest.
+
+### Result
+
+NOT TESTED
+
+## MT-56
+
+Test ID: MT-56
+
+Sprint: 25, 25.4
+Requirement: Das Standalone-Releaseartefakt unterstützt einen echten Fresh
+Install, ein N→N+1-Upgrade und einen kontrollierten Rollback, ohne Konfiguration,
+Regeln, Hintergründe, Adminschutz oder Daten zu verlieren.
+System: Isolierter Debian-LXC oder VM auf amd64 mit systemd und Node.js 22;
+nicht der produktive Dashboard-LXC und kein produktives Home Assistant.
+Preconditions: Zwei tatsächlich veröffentlichte, aufeinanderfolgende
+Standalone-Releases N und N+1 samt gültiger `SHA256SUMS`; lokaler Fake-HA oder
+isoliertes Test-HA; eigener Testbenutzer; freie Testports; keine echte `.env`.
+Exact version/tag/artifact under test: Im Ergebnis die konkreten Tags,
+`ha-legacy-dashboard-<N>.tar.gz` und
+`ha-legacy-dashboard-<N+1>.tar.gz` eintragen.
+Exact route/page: `/health`, `/api/status`, `/admin`, `/`, ein Custom-Dashboard,
+`/system/summary` und `/system/errors` auf der isolierten LAN-Adresse.
+Test data/entity/card required: Mindestens Default- und Custom-Dashboard,
+Section, Room Card, Entity Rule, Grace-Regel, Critical Mode/Label, ein
+Hintergrundbild und separate Fake-Admin-/HA-Credentials.
+
+### Steps
+
+1. Lade Release N und N+1 jeweils mit zugehöriger Checksum in getrennte leere
+   Verzeichnisse und verifiziere beide mit `sha256sum --check`.
+2. Entpacke N in ein versionsbezogenes Runtimeverzeichnis. Befolge nur die im
+   Archiv enthaltene Anleitung; notiere jede fehlende Datei oder unauflösbare
+   Befehlsreferenz.
+3. Erzeuge aus `.env.example` eine ausschließlich lokale Test-`.env`, setze
+   Modus `0600`, installiere mit Lockfile und passe die systemd-Unit an den
+   Testpfad/-benutzer an.
+4. Starte Release N und prüfe Dienststatus, secretfreie Logs, `/health`,
+   `/api/status`, Dashboard und Adminzugang.
+5. Lege die Testkonfiguration an: Custom-Dashboard, Section, Room Card,
+   Hintergrund, Summary-/Error-Entity-Regeln, Critical Mode/Label, Grace-Regel
+   und unveränderte explizite Control-Freigabe. Notiere Konfigurations- und
+   Hintergrundhashes sowie die Dateirechte.
+6. Schalte Light/Dark und prüfe Default, Custom, Summary, Errors sowie Rückkehr;
+   notiere, dass Theme browserlokal erhalten bleibt.
+7. Sichere `.env`, den vollständigen Datenordner und das aktive
+   Runtimeverzeichnis. Stoppe den Dienst.
+8. Entpacke N+1 in ein neues Verzeichnis, übernimm `.env` und Daten gemäß der
+   Bundle-Anleitung, installiere die gesperrten Produktionsabhängigkeiten und
+   schalte die Unit kontrolliert auf N+1 um.
+9. Starte N+1, prüfe Health/API/Logs und verifiziere jedes Testobjekt aus
+   Schritt 5, Hintergrunddatei/-hash, Adminschutz, Theme und Controls.
+10. Starte den Dienst und danach den LXC/die VM neu; wiederhole die
+    Persistenzprüfung.
+11. Simuliere einen fehlgeschlagenen Upgrade-Start kontrolliert, ohne Daten zu
+    löschen; verifiziere, dass die Sicherung und letzte gültige Konfiguration
+    erhalten bleiben.
+12. Stoppe N+1, stelle den dokumentierten Rollback auf Release N samt passender
+    Datensicherung her und prüfe erneut Health, API, UI, Daten, Adminschutz und
+    Logs.
+13. Vergleiche alle vor/nachher Hashes und dokumentiere gegebenenfalls
+    notwendige, ausdrücklich angekündigte Migrationen.
+
+### Expected Result
+
+- Beide Checksums sind gültig und jede Anleitung ist vollständig aus dem
+  jeweiligen Archiv heraus ausführbar.
+- Fresh Install, N→N+1, Neustart und Rollback starten kontrolliert.
+- Dashboards, Sections, Room Cards, Regeln, Modi, Hintergründe, Adminschutz und
+  Theme bleiben entsprechend der dokumentierten Persistenz erhalten.
+- `.env` bleibt `0600`, Tokens erscheinen weder im Browser noch in Logs.
+- Ein Fehler zerstört weder Daten noch die letzte gültige Konfiguration.
+
+### Fail If
+
+- Die Anleitung verlangt eine fehlende Datei/einen Git-Arbeitsbaum oder der
+  Dienst startet nur mit undokumentierten Schritten.
+- Checksum, Lockfileinstallation, Health/API oder ein Runtimewechsel scheitert.
+- Konfiguration, Upload, Regel, Theme, Adminschutz oder Datei-/Secretgrenze
+  verändert sich unerwartet.
+- Rollback ist nicht möglich oder überschreibt die letzte gültige Datenkopie.
+
+### Evidence
+
+- Verwendete Versionen, Commit-/Artefaktdigests und Checksum-Ausgaben.
+- Redigierte Install-/systemd-/Health-/API-/Logausgaben.
+- Vor/nachher Konfigurations- und Hintergrundhashes, Dateirechte und
+  Screenshots der relevanten Routen.
+- Protokoll von Fresh Install, Upgrade, Neustart, Fehlerfall und Rollback.
+
+### Result
+
+NOT TESTED
+
+## MT-57
+
+Test ID: MT-57
+
+Sprint: 25
+Requirement: Ein Stable-Release wird erst nach vollständiger, commitbezogener
+Freigabe erzeugt und aktualisiert `latest` kontrolliert auf exakt das geprüfte
+versionierte Multi-Arch-Manifest.
+System: GitHub Actions, GHCR und GitHub Release; keine Produktions-HA-Instanz.
+Preconditions: Mindestens ein erfolgreich abgenommener RC; alle P0/P1-
+Reparaturen geschlossen und re-auditiert; alle verbindlichen iPad-/HAOS-/
+Standalone-Manuelltests für den Stable-Kandidaten dokumentiert PASS; neue
+Stable-SemVer ohne Suffix in allen Quellen; CI grün; keine bestehende
+widersprüchliche Stable-Version.
+Exact version/tag/artifact under test: Der konkrete neue `v<stable>`-Tag,
+`ghcr.io/tekky85/ha-legacy-dashboard:<stable>`, `:latest`, Standalone-Tar und
+`SHA256SUMS`; alle Werte vor Start eintragen.
+Exact route/page: Commitbezogenes Freigabedokument/geschütztes Environment,
+GitHub Actions Release-Run, GHCR-Paketansicht und GitHub Release-Seite.
+Test data/entity/card required: Keine Produktionsdaten; die Runtimeabnahme muss
+bereits durch die referenzierten manuellen Tests mit kontrollierten Daten belegt
+sein.
+
+### Steps
+
+1. Prüfe, dass die Freigabematrix den exakten Stable-Commit, RC-Digests,
+   abgeschlossene Pflicht-Manuelltests und keine offenen P0/P1-Befunde nennt.
+2. Notiere den bisherigen `latest`-Digest und den Digest des geprüften
+   versionierten Stable-Kandidaten.
+3. Prüfe die Stable-Version in Paket, Lockfile, App, Metadaten, Changelogs und
+   Release Notes; sie darf kein `-rc.N` enthalten.
+4. Erzeuge/pushe den Stable-Tag erst nach dem überprüfbaren Approval.
+5. Beobachte den Workflow und stelle sicher, dass `latest` vor erfolgreichem
+   Test, beiden Arch-Builds, Manifestvalidator und Smoke-Test unverändert bleibt.
+6. Nach erfolgreichem Gate prüfe, dass der `latest`-Manifestdigest exakt dem
+   versionierten Stable-Manifest entspricht und beide Plattformen enthält.
+7. Prüfe, dass GitHub einen normalen Release, kein Prerelease, mit finalen
+   Notes, Archiv und gültiger Checksum erstellt.
+8. Prüfe, dass der vorherige RC-Tag, sein Manifest und seine Artefakte
+   unverändert bleiben und nicht überschrieben wurden.
+9. Dokumentiere einen kontrollierten fehlgeschlagenen Testlauf oder eine
+   Workflow-Fixture: vor dem finalen Gate dürfen weder neuer `latest`-Tag noch
+   GitHub Release entstehen.
+
+### Expected Result
+
+- Stable wird nur für den vollständig freigegebenen Commit veröffentlicht.
+- `latest` ändert sich erst nach allen Gates und zeigt exakt auf das geprüfte
+  versionierte amd64/aarch64-Manifest.
+- GitHub Release ist stable, vollständig und checksum-validiert.
+- RC-/ältere unveränderliche Tags und Artefakte bleiben unverändert.
+- Ein fehlgeschlagenes Gate veröffentlicht weder `latest` noch Release.
+
+### Fail If
+
+- Tag/Release kann ohne dokumentierte commitbezogene Pflichtabnahme entstehen.
+- `latest` ändert sich vor dem Smoke-Test, zeigt auf einen anderen Digest oder
+  enthält nicht beide Plattformen.
+- GitHub kennzeichnet Stable als Prerelease oder überschreibt RC-Artefakte.
+- Ein fehlerhafter Lauf hinterlässt öffentliches `latest`/Release.
+
+### Evidence
+
+- Freigabedokument/Approval mit Commit und Resultaten.
+- Workflow-URL und Jobstatus, Stable-/`latest`-/Arch-Digests vor und nachher.
+- GitHub-Release-URL, Releaseart, Checksumausgabe und Artefaktliste.
+- Nachweis, dass frühere RC-Tags/Artefakte unverändert sind.
+
+### Result
+
+NOT TESTED
+
+## Finale Strukturprüfung aus Audit Part 19
+
+- 72 Tabellenzeilen und 72 eindeutige Detailüberschriften sind vorhanden;
+  keine ID fehlt und keine ist doppelt.
+- Jeder Eintrag enthält explizit Test ID, Sprint, Requirement, Device/System,
+  Preconditions, exakte Schritte, Expected Result, Fail If, Evidence und
+  Result `NOT TESTED`.
+- MT-01 bis MT-10 wurden in Part 19 ausschließlich dokumentarisch
+  vervollständigt; kein manueller Test wurde ausgeführt oder umbewertet.
+- MT-67 bis MT-72 decken Sections, Room Cards, HAOS-Room-Persistenz, reale
+  Control-Integrationen und die iPad-Controlmatrix aus Part 19 ab.
+- Primäre, überschneidungsfreie Systemzuordnung: iPad mini/HomeScreen 31,
+  iPad Air 2 5, macOS-/Browser-/kontrolliertes Test-HA 18, Standalone/LXC 9,
+  HAOS 7, Release/GitHub 2.
