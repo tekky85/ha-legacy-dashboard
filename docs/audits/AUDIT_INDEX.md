@@ -810,6 +810,27 @@ Die Konsolidierung normalisierte und priorisierte ausschließlich den Backlog.
 Sie reparierte keinen Produktcode, führte keinen Realtest aus und bedeutet
 nicht, dass das Projekt RC-ready ist.
 
+## Sprint 27.1 – Repair Batch A
+
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Basiscommit: `dec0c54`
+- Repair: `RQ-16-01`
+- Root Cause: Der gemeinsame PNG-Parser prüfte weder Chunk-CRC noch zwingende
+  Bilddaten und Critical-Chunk-Reihenfolge; ein ungültiger Upload konnte daher
+  als erfolgreicher Dashboard-/Room-Ersatz das letzte gültige Asset verdrängen.
+- Implementierung: CRC32 je Chunk, gültiger IHDR-Inhalt, strikte bekannte
+  Critical-Chunk-Reihenfolge, zusammenhängendes IDAT und sauberes IEND/EOF im
+  zentralen `dashboard-backgrounds`-Store.
+- Re-Audit: Sprint 25.3, 25.4, 25.5 und 26.1.
+- Testevidenz: 85/85 fokussiert und 330/330 vollständig, alle geänderten
+  JavaScriptdateien syntaktisch gültig; ausschließlich Localhost-Mocks,
+  Fake-Credentials und lokale Dateien.
+- Manuell: MT-59 und MT-60 sind jetzt ausführbar; alle 72 Ergebnisse bleiben
+  `NOT TESTED`. Weitere verknüpfte Tests bleiben nur wegen anderer Repairs
+  blockiert.
+- Nächster zulässiger Schritt: Batch 27.1-B (`RQ-04-01`); kein anderer Repair
+  wurde begonnen.
+
 ## Verifikation der Audit-Baseline
 
 - Vollständige Testsuite: 329 von 329 Tests bestanden, 0 fehlgeschlagen.

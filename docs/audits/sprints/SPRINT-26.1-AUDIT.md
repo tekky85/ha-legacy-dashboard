@@ -7,7 +7,9 @@
 - Auditierter Branch: `main`
 - Auditierter Repository-Commit: `593ba5a2660121f6d4af9340499c6d860e754524`
 - Sprint-Spezifikation: [`SPRINT-26.1.md`](../../sprints/SPRINT-26.1.md)
-- Anwendungscode geändert: nein
+- Gezielter Re-Audit: Sprint 27.1-A, Basiscommit `dec0c54`
+- Anwendungscode im Baseline-Audit geändert: nein; Sprint 27.1-A: zentraler
+  PNG-Parser gehärtet
 - Physisches iPad, produktiver LXC, HAOS oder produktives Home Assistant geprüft: nein
 
 ## Gesamtergebnis
@@ -25,9 +27,9 @@ ohne Fehler.
 
 `PARTIAL` bleibt korrekt, weil die zentrale aktuelle Card Matrix Room/Tall/
 Capability-Fälle nicht vollständig als ausführbares Gate enthält
-(`RQ-18-01`), der wiederverwendete PNG-Uploadpfad strukturell ungültige PNGs
-akzeptiert (`RQ-16-01`) und reale iPad-/HAOS-Prüfungen fehlen. JPEG, Persistenz,
-Runtime-URL und Rendererpfad selbst sind nicht erneut gebrochen.
+(`RQ-18-01`) und reale iPad-/HAOS-Prüfungen fehlen. Der wiederverwendete PNG-
+Uploadpfad ist in Sprint 27.1-A gehärtet; JPEG, Persistenz, Runtime-URL und
+Rendererpfad bleiben intakt.
 
 ## Requirement-Matrix
 
@@ -58,7 +60,7 @@ Runtime-URL und Rendererpfad selbst sind nicht erneut gebrochen.
 | 26.1-C3 | Expanded zeigt zusätzliche Rollen/Controls | PASS | `.room-expanded-content` mit Entitygruppen und sicheren Controls. |
 | 26.1-C4 | Fehlende optionale Daten werden ausgelassen | PASS | Leere Rollen erzeugen keine kaputten Platzhalter; unavailable bleibt kontrolliert. |
 | 26.1-D1 | Secure Background-Infrastruktur von Sprint 25.3 wiederverwenden | PASS | Dieselbe `dashboard-backgrounds`-Ablage, Adminauth, Größenlimit, atomare Persistenz und referenzierte Assetroute. |
-| 26.1-D2 | PNG-Strukturvalidierung und Last-valid-Replace sicher | BROKEN | Der gemeinsame Parser akzeptiert PNG ohne `IDAT` bzw. mit falscher CRC; Room Replace erbt das Risiko. Bestehendes `RQ-16-01`. |
+| 26.1-D2 | PNG-Strukturvalidierung und Last-valid-Replace sicher | PASS | Der gemeinsame Parser prüft CRC, IHDR/Critical-Chunk-Reihenfolge, IDAT und IEND/EOF; der Room-API-Test bewahrt bei CRC-Tamper ausschließlich Altconfig und Altasset. |
 | 26.1-D3 | JPEG/Runtime-URL/Persistenz | PASS | JPEG-Parser gehärtet; `publicRoomConfiguration()` liefert nur kontrollierte `/assets/backgrounds/<id>`-URL. |
 | 26.1-D4 | Missing Background fällt sicher zurück | PASS | Fehlende/ungültige URL erzeugt Karte ohne Bild; Layout und Inhalt bleiben. |
 | 26.1-E1 | Alerts verwenden zentrale Risk-/Issue-Logik | PASS | `Rooms.build()` filtert den bereits erzeugten Issue-/Summary-Snapshot; keine zweite Engine. |
@@ -93,7 +95,7 @@ Runtime-URL und Rendererpfad selbst sind nicht erneut gebrochen.
 | 26.1-M1 | Room Card auf realem iPad mini | NOT TESTED | MT-69. |
 | 26.1-M2 | Room Background und `/data` auf HAOS | NOT TESTED | MT-70. |
 | 26.1-DOD1 | Alle automatisierbaren Kernfälle | PASS | Fokus 95/95, Ergänzung 72/72, Gesamtsuite 329/329; Room-Harness 4/4. |
-| 26.1-DOD2 | Vollständige Release-/Realgeräteabnahme | PARTIAL | RQ-16-01, RQ-18-01, RQ-04-01 und MT-69/70 bleiben offen. |
+| 26.1-DOD2 | Vollständige Release-/Realgeräteabnahme | PARTIAL | RQ-18-01, RQ-04-01 und MT-69/70 bleiben offen; RQ-16-01 ist automatisiert geschlossen. |
 
 ## Bekannte Defekte: Root Cause und aktueller Fix
 
@@ -120,13 +122,14 @@ Room erhält Daten aus genau einem normalisierten System-Snapshot pro
 Dashboardantwort. Area-Vorschläge sind read-only; keine Zuordnung erteilt
 automatisch Schreibrechte. Grid, Focus und Room verwenden nach Sprint 26.2
 dieselbe serverseitige Grant-/Capabilityentscheidung. Tokens, rohe Registries
-und generische HA-Commands gelangen nicht in den Browser. Der einzige aktuelle
-Background-Sicherheitsbefund ist der bereits zentrale PNG-Befund `RQ-16-01`.
+und generische HA-Commands gelangen nicht in den Browser. Der zentrale PNG-
+Befund `RQ-16-01` ist nach Struktur-/CRC- und Room-Replacement-Regression
+automatisiert geschlossen.
 
 ## Reparatur- und Manuelltestbezug
 
 - `RQ-04-01`: Cacheversionen für Room-/Shared-Assets vereinheitlichen.
-- `RQ-16-01`: gemeinsamen PNG-Validator reparieren; kein Room-Sonderpfad.
+- `RQ-16-01`: automatisiert geschlossen; kein Room-Sonderpfad eingeführt.
 - `RQ-18-01`: vollständige aktuelle Room-Matrix inklusive Tall und
   capabilityabhängigen Controls in das echte Browser-Gate integrieren.
 - MT-69: Room Card, Collapse, Background, Größen, Alerts und Controls auf iPad.

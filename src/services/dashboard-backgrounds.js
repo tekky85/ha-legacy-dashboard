@@ -11,6 +11,29 @@ const MAX_PIXELS = 16777216;
 const IMAGE_ID_PATTERN =
     /^bg-[a-f0-9]{32}\.(?:jpg|png)$/;
 
+const PNG_CRC_TABLE = (function () {
+
+    const table = [];
+
+
+    for (let value = 0; value < 256; value += 1) {
+        let crc = value;
+
+
+        for (let bit = 0; bit < 8; bit += 1) {
+            crc = (crc & 1)
+                ? 0xedb88320 ^ (crc >>> 1)
+                : crc >>> 1;
+        }
+
+        table[value] = crc >>> 0;
+    }
+
+
+    return table;
+
+}());
+
 
 function backgroundError(code, message) {
 
@@ -42,6 +65,59 @@ function validateDimensions(width, height) {
 }
 
 
+function pngCrc32(buffer, start, end) {
+
+    let crc = 0xffffffff;
+
+
+    for (let index = start; index < end; index += 1) {
+        crc = PNG_CRC_TABLE[
+            (crc ^ buffer[index]) & 0xff
+        ] ^ (crc >>> 8);
+    }
+
+
+    return (crc ^ 0xffffffff) >>> 0;
+
+}
+
+
+function validatePngHeader(buffer, dataStart) {
+
+    const bitDepth = buffer[dataStart + 8];
+    const colorType = buffer[dataStart + 9];
+    const compressionMethod = buffer[dataStart + 10];
+    const filterMethod = buffer[dataStart + 11];
+    const interlaceMethod = buffer[dataStart + 12];
+
+    const allowedBitDepths = {
+        0: [1, 2, 4, 8, 16],
+        2: [8, 16],
+        3: [1, 2, 4, 8],
+        4: [8, 16],
+        6: [8, 16]
+    };
+
+
+    if (
+        !allowedBitDepths[colorType] ||
+        allowedBitDepths[colorType].indexOf(bitDepth) === -1 ||
+        compressionMethod !== 0 ||
+        filterMethod !== 0 ||
+        (interlaceMethod !== 0 && interlaceMethod !== 1)
+    ) {
+        throw backgroundError(
+            "background_file_invalid",
+            "PNG-Header ist ungültig"
+        );
+    }
+
+
+    return colorType;
+
+}
+
+
 function inspectPng(buffer) {
 
     const signature = Buffer.from([
@@ -51,9 +127,13 @@ function inspectPng(buffer) {
 
     let offset = 8;
     let sawHeader = false;
+    let sawPalette = false;
+    let sawData = false;
+    let dataEnded = false;
     let sawEnd = false;
     let width = 0;
     let height = 0;
+    let colorType = null;
 
 
     if (
@@ -76,14 +156,36 @@ function inspectPng(buffer) {
             offset + 8
         );
 
+        const typeStart = offset + 4;
         const dataStart = offset + 8;
-        const nextOffset = dataStart + length + 4;
+        const dataEnd = dataStart + length;
+        const nextOffset = dataEnd + 4;
 
 
         if (nextOffset > buffer.length) {
             throw backgroundError(
                 "background_file_invalid",
                 "PNG-Datei ist unvollständig"
+            );
+        }
+
+        if (
+            !/^[A-Za-z]{4}$/.test(type) ||
+            (buffer[typeStart + 2] & 0x20) !== 0
+        ) {
+            throw backgroundError(
+                "background_file_invalid",
+                "PNG-Chunktyp ist ungültig"
+            );
+        }
+
+        if (
+            buffer.readUInt32BE(dataEnd) !==
+            pngCrc32(buffer, typeStart, dataEnd)
+        ) {
+            throw backgroundError(
+                "background_file_invalid",
+                "PNG-Prüfsumme ist ungültig"
             );
         }
 
@@ -98,13 +200,51 @@ function inspectPng(buffer) {
             width = buffer.readUInt32BE(dataStart);
             height = buffer.readUInt32BE(dataStart + 4);
             validateDimensions(width, height);
+            colorType = validatePngHeader(
+                buffer,
+                dataStart
+            );
             sawHeader = true;
-        }
+        } else if (type === "IHDR") {
+            throw backgroundError(
+                "background_file_invalid",
+                "PNG-Header ist ungültig"
+            );
+        } else if (type === "PLTE") {
+            if (
+                sawPalette ||
+                sawData ||
+                colorType === 0 ||
+                colorType === 4 ||
+                length === 0 ||
+                length % 3 !== 0 ||
+                length > 768
+            ) {
+                throw backgroundError(
+                    "background_file_invalid",
+                    "PNG-Palette ist ungültig"
+                );
+            }
 
-        offset = nextOffset;
+            sawPalette = true;
+        } else if (type === "IDAT") {
+            if (
+                dataEnded ||
+                (colorType === 3 && !sawPalette)
+            ) {
+                throw backgroundError(
+                    "background_file_invalid",
+                    "PNG-Bilddaten sind ungültig"
+                );
+            }
 
-        if (type === "IEND") {
-            if (length !== 0 || offset !== buffer.length) {
+            sawData = true;
+        } else if (type === "IEND") {
+            if (
+                length !== 0 ||
+                !sawData ||
+                nextOffset !== buffer.length
+            ) {
                 throw backgroundError(
                     "background_file_invalid",
                     "PNG-Ende ist ungültig"
@@ -113,12 +253,25 @@ function inspectPng(buffer) {
 
             sawEnd = true;
             break;
+        } else {
+            if ((buffer[typeStart] & 0x20) === 0) {
+                throw backgroundError(
+                    "background_file_invalid",
+                    "PNG enthält einen unbekannten kritischen Chunk"
+                );
+            }
+
+            if (sawData) {
+                dataEnded = true;
+            }
         }
+
+        offset = nextOffset;
 
     }
 
 
-    if (!sawHeader || !sawEnd) {
+    if (!sawHeader || !sawData || !sawEnd) {
         throw backgroundError(
             "background_file_invalid",
             "PNG-Datei ist unvollständig"

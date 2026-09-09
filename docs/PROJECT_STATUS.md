@@ -2,9 +2,10 @@
 
 Stand: 9. September 2026. Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
 der anschließende Repair-Queue-Consolidation-Pass wurden auf Repository-Commit
-`593ba5a` abgeschlossen. Sprint-27.1-Reparaturen wurden noch nicht begonnen.
-Reale iPad-/HomeScreen-/Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie
-das finale RC-Gate bleiben offen.
+`593ba5a` abgeschlossen. Sprint 27.1-A repariert auf Basis `dec0c54` den
+zentralen PNG-/Background-Replace-Defekt `RQ-16-01`; der automatisierte Gate-
+und Re-Audit-Lauf ist vollständig grün. Reale iPad-/HomeScreen-/Safari-, LXC-,
+Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate bleiben offen.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -24,7 +25,8 @@ Status:
 
 - Sprint-27-Baseline-Audit: **COMPLETE**
 - Repair Queue Consolidation: **COMPLETE**
-- Sprint-27.1-Reparaturen: **NOT STARTED**
+- Sprint-27.1-A / RQ-16-01: **COMPLETE – MANUAL PENDING**
+- Sprint-27.1-B / RQ-04-01: **NEXT**
 - Manuelle Abnahme: **PENDING**
 - Finales RC-Gate: **PENDING**
 
@@ -32,6 +34,19 @@ Diese kompakte Aktualisierung schließt nicht den separaten Befund
 `RQ-08-03`: Der umfangreiche historische Technikbericht muss nach den
 Reparaturen noch vollständig gegen Schema, Verpackung und finalen RC-Stand
 abgeglichen werden.
+
+### Sprint 27.1-A – Upload Integrity
+
+Der gemeinsame, begrenzte PNG-Parser prüft jetzt die CRC jedes Chunks,
+zulässige IHDR-Felder, die Reihenfolge und Einmaligkeit kritischer Chunks,
+mindestens einen zusammenhängenden IDAT-Block sowie sauberes IEND/EOF. Die
+neuen Regressionen decken fehlendes IDAT, CRC-Manipulation, Truncation, Daten
+nach IEND, unbekannte kritische Chunks und doppeltes IHDR ab. Dashboard- und
+Room-Card-Replacement bewahren bei Ablehnung die letzte gültige Konfiguration
+und das letzte gültige Asset ohne Temp-/Waisendatei. Fokuslauf 85/85 und
+Gesamtsuite 330/330 sind grün; MT-59/60 sind ausführbar, bleiben aber wie alle
+physischen/Betriebstests `NOT TESTED`. Es wurden keine HA-Write-, Token-,
+Admin- oder Browser-Sicherheitsgrenzen verändert.
 
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 

@@ -7,7 +7,9 @@
 - Auditierter Branch: `main`
 - Auditierter Repository-Commit: `593ba5a2660121f6d4af9340499c6d860e754524`
 - Sprint-Spezifikation: [`SPRINT-25.5.md`](../../sprints/SPRINT-25.5.md)
-- Anwendungscode geändert: nein
+- Gezielter Re-Audit: Sprint 27.1-A, Basiscommit `dec0c54`
+- Anwendungscode im Baseline-Audit geändert: nein; Sprint 27.1-A: zentraler
+  PNG-Parser gehärtet
 - Produktives Home Assistant, HAOS, LXC, Netzwerk oder physisches iPad
   kontaktiert: nein
 
@@ -30,11 +32,11 @@ denselben App-Port. Binding, Portmapping und WebUI sind korrekt; es wurden
 keine breiten HAOS-Rechte oder DNS-Hacks hinzugefügt. Diese historische
 Evidenz ist kein aktueller Runtime-PASS; die Wiederholung steht in MT-61.
 
-Eine aktuelle Sicherheitsregression verhindert ein vollständiges Ergebnis:
-Der gemeinsame PNG-Validator akzeptiert weiterhin PNG ohne `IDAT` und ohne
-CRC-Prüfung. Das ist der bereits vorhandene P1-Befund `RQ-16-01`, der auch das
-Sprint-25.5-Ziel „Upload-Sicherheit bleibt erhalten“ betrifft. Reale HAOS-
-Persistenz und Anzeige der JPEG-Hintergründe auf dem iPad bleiben `NOT TESTED`.
+Der gemeinsame PNG-Validator ist im gezielten Sprint-27.1-A-Re-Audit ebenfalls
+gehärtet: CRC, IHDR-Inhalt, Critical-Chunk-Reihenfolge, IDAT und IEND/EOF werden
+validiert; ungültiger Dashboard-/Room-Ersatz bewahrt das letzte gültige Asset.
+`RQ-16-01` ist automatisiert geschlossen. Reale HAOS-Persistenz und Anzeige
+der JPEG-/PNG-Hintergründe auf dem iPad bleiben `NOT TESTED`.
 
 ## Requirement-Matrix
 
@@ -69,17 +71,17 @@ Persistenz und Anzeige der JPEG-Hintergründe auf dem iPad bleiben `NOT TESTED`.
 | 25.5-SAFE-01 | Uploadfehler bewahrt vorhandenes Background | PASS | Store schreibt erst Tempdatei; Admin entfernt Altasset erst nach erfolgreichem Configwrite und entfernt Neuasset bei Persistenzfehler. |
 | 25.5-SAFE-02 | Keine Teil-/Waisendateien bei JPEG-Fehler | PASS | Validierung vor Persistenz; Tempdatei, `fsync`, atomisches Rename und Cleanup im Fehlerpfad. |
 | 25.5-SAFE-03 | Config und Asset bleiben konsistent | PASS | `src/routes/admin.js` ordnet Store → Configpersistenz → Referenzbereinigung transaktional an. |
-| 25.5-SAFE-04 | Bestehende PNG-Funktion und Uploadsicherheit unverändert korrekt | BROKEN | `inspectPng()` prüft weder CRC noch ein vorhandenes `IDAT`; kontrollierte Probe akzeptiert Signatur+IHDR+IEND. Bestehendes `RQ-16-01`. |
+| 25.5-SAFE-04 | Bestehende PNG-Funktion und Uploadsicherheit unverändert korrekt | PASS | `inspectPng()` prüft CRC, IHDR, Critical-Chunk-Reihenfolge, IDAT und sauberes IEND/EOF; direkte Negativ- und API-Replace-Regressionen sind grün. |
 | 25.5-SEC-01 | Keine Credentials/Secrets im Browser oder Log | PASS | Frontendscan ohne Werte/Tokenzugriff; Logger- und Securitytests grün. Dokumentierte Variablennamen sind keine Secrets. |
 | 25.5-SEC-02 | Keine HA-Write-Erweiterung | PASS | Upload ist lokale Adminfunktion; HA-Write-Pfade bleiben explizit Light/Climate. |
 | 25.5-LEGACY-01 | Safari iOS 9 / ES5 bleibt erhalten | PASS | Wall-Frontendscan und `node --check`; Uploadeditor darf moderner Browser sein. |
 | 25.5-TEST-01 | Geforderte JPEG-Varianten lokal automatisiert | PASS | `test/sprint-25-5.test.js`, alle relevanten Fälle im 89/89-Fokuslauf grün. |
-| 25.5-TEST-02 | Gemeinsame Uploadvalidierung vollständig regressiert | PARTIAL | JPEG umfassend, PNG-Strukturregression fehlt und ist real gebrochen; `RQ-16-01`. |
+| 25.5-TEST-02 | Gemeinsame Uploadvalidierung vollständig regressiert | PASS | JPEG-Varianten sowie PNG ohne IDAT, CRC-Tamper, Truncation, trailing data, unknown critical, duplicate IHDR und Dashboard-/Room-Rollback sind direkt regressiert. |
 | 25.5-IPAD-01 | JPEG-Background real auf iPad mini sichtbar | NOT TESTED | Kein physisches Gerät in Part 18; MT-62. |
 | 25.5-IPAD-02 | Portrait/Landscape und Replace/Remove real | NOT TESTED | MT-62. |
 | 25.5-APP-01 | Asset über realen App-Neustart unter `/data` persistent | NOT TESTED | Architektur und lokale Persistenztests PASS; aktuelle HAOS-Laufzeit MT-62/MT-51. |
 | 25.5-DOC-01 | Projektstatus und Betriebsdokumentation aktualisiert | PASS | Sprintabschnitt in `docs/PROJECT_STATUS.md`; Diagnose/Fallback in `docs/DEPLOYMENT.md`. |
-| 25.5-DOD-01 | Sprint vollständig releasefähig | PARTIAL | JPEG-Fix und Netzklassifikation vorhanden; PNG-P1 `RQ-16-01` sowie aktuelle HAOS-/iPad-Abnahmen MT-61/62 offen. |
+| 25.5-DOD-01 | Sprint vollständig releasefähig | PARTIAL | JPEG-/PNG-Härtung und Netzklassifikation sind vorhanden; aktuelle HAOS-/iPad-Abnahmen MT-61/62 bleiben offen. |
 
 ## Root Cause und sichere Fehlersemantik
 
@@ -90,22 +92,18 @@ neues Segment mit Längenfeld behandelt werden. Der aktuelle Parser trennt diese
 Phasen. JPEG-Validierung bleibt aktiv und prüft weiterhin Struktur,
 Dimensionen, Vollständigkeit und Limits.
 
-Der bestätigte Restdefekt liegt nicht im JPEG-Pfad, sondern in der gemeinsam
-weiterbestehenden PNG-Prüfung. Er wird nicht als neuer Part-18-Befund
-dupliziert, sondern erweitert die Sprintzuordnung und RC-Evidenz von
-`RQ-16-01`.
+Der bestätigte Restdefekt lag nicht im JPEG-Pfad, sondern in der gemeinsamen
+PNG-Prüfung. Sprint 27.1-A behebt ihn im wiederverwendeten zentralen Parser,
+ohne JPEG-Validierung oder Uploadgrenzen abzuschwächen.
 
 ## Testevidenz
 
-- Part-18-Fokuslauf: 89/89 Tests bestanden, ausschließlich Localhost-Mocks,
+- Sprint-27.1-A-Fokuslauf: 85/85 Tests bestanden, ausschließlich Localhost-Mocks,
   Fake-Credentials und lokale Filesystem-Fixtures.
-- Kontrollierte PNG-Direktprobe: 45-Byte-Datei aus Signatur, IHDR und IEND ohne
-  IDAT wurde fälschlich akzeptiert; `RQ-16-01` reproduziert.
-- Die Gesamtsuite wurde mehrfach gestartet. Wegen einer lokalen monotonen
-  Timer-/Zeitsprungstörung brachen ausschließlich zeitbasierte Gatewayfälle
-  technisch ab; die übrigen 327/328 Tests meldeten keinen fachlichen Fehler.
-  Der frühere Part-17-Stand 329/329 bleibt historische Evidenz, wird aber nicht
-  als neuer Part-18-Gesamtlauf ausgegeben.
+- Die ursprünglichen Direktproben reproduzierten die Akzeptanz von PNG ohne
+  IDAT und mit falscher CRC. Nach der Reparatur werden beide sowie weitere
+  Strukturfehler abgewiesen.
+- Gesamtsuite: 330/330 Tests bestanden.
 
 ## Offene reale Abnahme
 
@@ -116,6 +114,5 @@ dupliziert, sondern erweitert die Sprintzuordnung und RC-Evidenz von
 ## Sicherheitsbewertung
 
 Keine Credential-, HA-Write-, Adminauthentifizierungs- oder Privilegien-
-Regression wurde gefunden. Der PNG-Befund ist dennoch releasekritisch, weil
-ein strukturell ungültiges Bild als erfolgreicher Ersatz behandelt werden und
-dadurch das letzte gültige Background verdrängen kann.
+Regression wurde gefunden. Der frühere PNG-Datenintegritätsbefund ist
+automatisiert geschlossen; die realen HAOS-/iPad-Abnahmen bleiben ausstehend.

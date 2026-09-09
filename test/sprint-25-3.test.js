@@ -10,14 +10,12 @@ const DashboardConfig =
     require("../src/config/dashboard");
 const Runtime = require("../src/config/runtime");
 const JpegSamples = require("./fixtures/jpeg-samples");
+const PngSamples = require("./fixtures/png-samples");
 
 
 const ROOT = path.join(__dirname, "..");
 
-const PNG = Buffer.from(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
-    "base64"
-);
+const PNG = PngSamples.valid;
 
 const JPEG = JpegSamples.baseline;
 
@@ -103,6 +101,27 @@ test("Bildprüfung akzeptiert ausschließlich stimmige JPEG- und PNG-Dateien", f
                 "background_file_too_large";
         }
     );
+});
+
+
+test("PNG-Prüfung erzwingt CRC, Bilddaten und kritische Chunk-Reihenfolge", function () {
+    [
+        PngSamples.noIdat,
+        PngSamples.badCrc,
+        PngSamples.truncated,
+        PngSamples.trailingData,
+        PngSamples.unknownCritical,
+        PngSamples.duplicateHeader
+    ].forEach(function (sample) {
+        assert.throws(
+            function () {
+                Backgrounds.inspectImage(sample, "image/png");
+            },
+            function (error) {
+                return error.code === "background_file_invalid";
+            }
+        );
+    });
 });
 
 

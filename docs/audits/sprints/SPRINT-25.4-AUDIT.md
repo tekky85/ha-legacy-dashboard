@@ -7,7 +7,9 @@
 - Auditierter Branch: `main`
 - Auditierter Repository-Commit: `593ba5a2660121f6d4af9340499c6d860e754524`
 - Sprint-Spezifikation: [`SPRINT-25.4.md`](../../sprints/SPRINT-25.4.md)
-- Anwendungscode geändert: nein
+- Gezielter Re-Audit: Sprint 27.1-A, Basiscommit `dec0c54`
+- Anwendungscode im Baseline-Audit geändert: nein; Sprint 27.1-A: zentraler
+  PNG-Parser gehärtet
 - Produktives Home Assistant, HAOS, LXC, Netzwerk oder physisches iPad
   kontaktiert: nein
 - Öffentliche Release-/Workflow-/GHCR-Metadaten read-only geprüft: ja
@@ -36,10 +38,11 @@ Sprint-25.5-/25.6-Ergebnisse. Damit ist die Matrix kein einheitlicher,
 commitbezogener Kandidatennachweis. Zusätzlich behauptet sie ein Root-
 `Dockerfile`, obwohl die Pipeline korrekt `ha_legacy_dashboard/Dockerfile`
 verwendet, sowie null npm-Schwachstellen, während der aktuelle Audit eine
-moderate `qs`-Schwachstelle mit zwei Advisories meldet. Die aktuelle
-Blockerliste kennt außerdem weder den P1-PNG-Defekt `RQ-16-01` noch alle
-bereits offenen P1-Releasebefunde. Dieser neue Evidenz-/Dokumentationsdefekt ist
-`RQ-17-01`.
+moderate `qs`-Schwachstelle mit zwei Advisories meldet. Vor Sprint 27.1-A
+bildete die Blockerliste außerdem weder den damaligen P1-PNG-Defekt noch alle
+bereits offenen P1-Releasebefunde ab. Der PNG-Codepfad ist jetzt repariert; der
+commitbezogene Evidenz-/Dokumentationsdefekt `RQ-17-01` bleibt davon unabhängig
+offen.
 
 Die vorhandenen realen HAOS-/LXC-Nachweise bleiben historische Evidenz für die
 jeweils ausdrücklich genannten älteren Builds; sie werden nicht als PASS für
@@ -53,7 +56,7 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | ID | Requirement | Status | Evidence / Begründung |
 |---|---|---|---|
 | 25.4-SCOPE-01 | Sprint ist Validierung, kein Feature-Sprint | PASS | Commit `d0313b0` änderte nur Projektstatus, Roadmap und `docs/RC_CHECKLIST.md`; Part 17 ändert ebenfalls keinen Anwendungscode. |
-| 25.4-PRE-01 | Sprint-24-/25-/25.1-/25.2-/25.3-Endzustände tatsächlich prüfen | PARTIAL | Einzelne aktuelle Audits liegen vor; offene RQ-04-01, RQ-13-01, RQ-14-01/-02/-04/-05 und RQ-16-01 widerlegen eine vollständige Freigabe. |
+| 25.4-PRE-01 | Sprint-24-/25-/25.1-/25.2-/25.3-Endzustände tatsächlich prüfen | PARTIAL | Einzelne aktuelle Audits liegen vor; offene RQ-04-01, RQ-13-01 und RQ-14-01/-02/-04/-05 widerlegen weiterhin eine vollständige Freigabe. RQ-16-01 ist repariert. |
 | 25.4-A1-01 | `repository.yaml` vorhanden und valides YAML | PASS | Datei vorhanden; Ruby-YAML-Parser erfolgreich. |
 | 25.4-A1-02 | Repositoryname, URL und Maintainer ohne Platzhalter/interne URL | PASS | `HA Legacy Dashboard Apps`, öffentliches GitHub-Repository, `tky <mbp@tky.cloud>`; kein Platzhalter/interner Host. |
 | 25.4-A2-01 | App-`config.yaml` vorhanden und valides YAML | PASS | `ha_legacy_dashboard/config.yaml`; Parser und Sprint-24-Test grün. |
@@ -103,7 +106,7 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-FILTER-01 | Severityfilter sind exakt und Status verwendet dasselbe Child | PASS | Tabellenlauf in `test/system-frontend.test.js`; global Health bleibt unverändert. Physisch MT-34. |
 | 25.4-HOME-01 | Interne Navigation bleibt same-window/same-origin und return-sicher | PASS | Sprint-25.2-Tests grün; kein `_blank`/`window.open`; reales HomeScreen-Gate MT-40/54. |
 | 25.4-BG-01 | Dashboardbackground/Title funktionieren in lokaler Runtime | PASS | Sprint-25.3-, Admin-, Gateway- und Persistenztests grün. |
-| 25.4-BG-02 | JPEG/PNG/SVG/MIME/Oversize/Traversal-Abnahme ist korrekt | BROKEN | JPEG gehärtet, aber PNG ohne IDAT/falsche CRC wird akzeptiert; Checklisten-PASS ist falsch. `RQ-16-01`. |
+| 25.4-BG-02 | JPEG/PNG/SVG/MIME/Oversize/Traversal-Abnahme ist korrekt | PASS | JPEG bleibt gehärtet; PNG-Struktur, CRC, IDAT und IEND/EOF sowie sichere Dashboard-/Room-Replacements sind in Sprint 27.1-A direkt regressiert. |
 | 25.4-BG-03 | Backgrounds über realen App-/LXC-Restart | NOT TESTED | MT-51/52/58/60. |
 | 25.4-HEIGHT-01 | Full Height und normaler kompakter Footer funktionieren lokal | PASS | CSS-/Sprint-25.3-Test; keine feste Footerposition/Versionsnummer im Normaldashboard. |
 | 25.4-HEIGHT-02 | 0/1/wenige/viele Karten auf realem iPad | NOT TESTED | MT-58. |
@@ -128,13 +131,13 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-TELEM-01 | Keine Telemetrie/Analytics/Crash-Uploads | PASS | Source-/Dependency-/Networkscan ohne entsprechende Integration. |
 | 25.4-MATRIX-01 | RC Result Matrix vorhanden und verwendet nur PASS/FAIL/BLOCKED/NOT TESTED | PASS | `docs/RC_CHECKLIST.md`; 145 Statuszeilen, keine fremden Statuswerte. |
 | 25.4-MATRIX-02 | Matrix ist ein commitbezogener, aktueller Kandidatennachweis | BROKEN | Kopf RC.1/741bba4, LXC 42d88f3, Tests 275/283/290, später angehängte Sprints; aktueller HEAD 329 Tests. `RQ-17-01`. |
-| 25.4-MATRIX-03 | PASS-Aussagen entsprechen dem aktuellen Repositoryzustand | BROKEN | Falscher Dockerfile-Pfad, „0 Schwachstellen“ trotz aktuellem Moderate-Befund und Upload-PASS trotz PNG-Defekt. `RQ-17-01`, RQ-14-05, RQ-16-01. |
+| 25.4-MATRIX-03 | PASS-Aussagen entsprechen dem aktuellen Repositoryzustand | BROKEN | Falscher Dockerfile-Pfad und „0 Schwachstellen“ trotz aktuellem Moderate-Befund bleiben falsch. Der frühere PNG-Widerspruch ist repariert. `RQ-17-01`, RQ-14-05. |
 | 25.4-BLOCK-01 | Expliziter Abschnitt `RC BLOCKERS` vorhanden | PASS | Fünf Punkte plus Abschlussreihenfolge; RC-Empfehlung ausdrücklich BLOCKED. |
-| 25.4-BLOCK-02 | Blockerliste enthält alle aktuell offenen P1-Befunde | BROKEN | RQ-04-01, RQ-13-01, RQ-14-01/-02/-04 und RQ-16-01 sind nicht vollständig als heutige Gatebedingungen enthalten. `RQ-17-01`. |
+| 25.4-BLOCK-02 | Blockerliste enthält alle aktuell offenen P1-Befunde | BROKEN | RQ-04-01, RQ-13-01 und RQ-14-01/-02/-04 sind nicht vollständig als heutige Gatebedingungen enthalten. `RQ-17-01`; RQ-16-01 ist geschlossen. |
 | 25.4-MANUAL-01 | Reale HAOS-, LXC-, Netzwerk- und iPad-Punkte nicht künstlich PASS | PARTIAL | Alte Evidenz ist überwiegend korrekt begrenzt; einige Matrix-PASS-Zeilen werden aber ohne klare Buildgrenze neben späteren Ständen wiederverwendet. MT-Zuordnung und RQ-17-01. |
 | 25.4-MANUAL-02 | Vollständige ausführbare Manuelltests vorhanden | PASS | MT-13/34/40/42 und MT-50 bis MT-56/58 bis MT-60 besitzen Voraussetzungen, Routen, Schritte, Expected, Fail, Evidence und Result. |
 | 25.4-RC-01 | RC nur bei vollständigen Pflicht-PASS freigeben | PASS | Dokument empfiehlt ausdrücklich `BLOCKED`; kein Stable-/Tag-/Publish in Part 17. |
-| 25.4-RC-02 | Aktueller HEAD ist RC-freigabefähig | BROKEN | Aktuelles Image fehlt, mehrere P1-Befunde und reale Pflichtgates sind offen; zusammengeführt in `RQ-17-01` mit Abhängigkeiten RQ-04-01/RQ-13-01/RQ-14-01/-02/-04/RQ-16-01. |
+| 25.4-RC-02 | Aktueller HEAD ist RC-freigabefähig | BROKEN | Aktuelles Image fehlt, mehrere P1-Befunde und reale Pflichtgates sind offen; zusammengeführt in `RQ-17-01` mit Abhängigkeiten RQ-04-01/RQ-13-01/RQ-14-01/-02/-04. |
 
 ## Aktuelle RC Result Matrix
 
@@ -153,7 +156,7 @@ ausdrücklich auf `741bba4` begrenzt.
 | Aktueller lokaler Containerbuild | NOT TESTED | Docker nicht verfügbar; CI baut nur bei neuem Commit/Tag erneut. |
 | Automatisierte Tests/Syntax | PASS | 92/92 fokussiert, 329/329 vollständig, 119 JS und 8 Shell-Dateien syntaktisch gültig. |
 | Credential-/Permission-Sicherheit | PASS | Secret-Scan grün, backend-only Tokens, keine breiten Apprechte. |
-| Uploadvalidierung | FAIL | PNG ohne IDAT/falsche CRC akzeptiert; RQ-16-01. |
+| Uploadvalidierung | PASS | JPEG und PNG einschließlich Struktur-/CRC-Negativfällen sowie Last-valid-Replace automatisiert grün. Reale Runtime-Abnahme bleibt separat NOT TESTED. |
 | Produktionsabhängigkeiten | FAIL | Eine moderate `qs`-Schwachstelle mit zwei Advisories; RQ-14-05. |
 | RC-Evidenzdokument | FAIL | Mehrere Commit-/Teststände und veraltete PASS-Aussagen vermischt; RQ-17-01. |
 | Standalone-Bundle | FAIL | Operativ nicht selbsttragende Dokumentation; RQ-14-01. |
@@ -166,7 +169,7 @@ ausdrücklich auf `741bba4` begrenzt.
 | App-`/data`, Restart, Backup/Upgrade | NOT TESTED | MT-51/52. |
 | Default/Custom/Summary/Errors lokal | PASS | Aktuelle localhost-Regression grün. |
 | Theme/Filter/Same-Window lokal | PASS | Aktuelle fokussierte Regression grün. |
-| Background/Full Height/Focus lokal | FAIL | Rendering lokal grün, aber PNG-Gate gebrochen. |
+| Background/Full Height/Focus lokal | PASS | Rendering und gehärtetes PNG-/Replace-Gate lokal grün. |
 | iPad mini Pflichtlauf | NOT TESTED | MT-13/34/40/54/58. |
 | Current-commit RC-Empfehlung | BLOCKED | Offene P1-Befunde und reale Pflichtgates. |
 
@@ -180,10 +183,9 @@ ausdrücklich auf `741bba4` begrenzt.
 4. `RQ-14-02`: echten N→N+1-/Rollbacknachweis herstellen.
 5. `RQ-14-04`: Stable technisch an commitbezogene Gates/offene P1-Befunde
    koppeln.
-6. `RQ-16-01`: PNG-Struktur-/CRC-Prüfung und Replace-Erhalt reparieren.
-7. `RQ-17-01`: RC-Checkliste in einen commit-/artefaktkohärenten Nachweis
+6. `RQ-17-01`: RC-Checkliste in einen commit-/artefaktkohärenten Nachweis
    überführen und alle aktuellen Blocker/Statuswerte synchronisieren.
-8. Die zugeordneten realen HAOS-, LXC-, Netzwerk-, App-Restart-/Backup- und
+7. Die zugeordneten realen HAOS-, LXC-, Netzwerk-, App-Restart-/Backup- und
    iPad-mini-Pflichtprüfungen auf genau dem neuen Kandidaten ausführen.
 
 Bis alle P1-Befunde geschlossen/re-auditiert und alle Pflichtprüfungen für
@@ -204,8 +206,8 @@ denselben Kandidaten `PASS` sind, bleibt die Empfehlung **BLOCKED**.
 
 ## Automatisierte und öffentliche Verifikation
 
-- Part-17-Fokuslauf: **92/92 PASS**, 0 Fehler.
-- Gesamtsuite: **329/329 PASS**, 0 Fehler.
+- Sprint-27.1-A-Fokuslauf: **85/85 PASS**, 0 Fehler.
+- Gesamtsuite: **330/330 PASS**, 0 Fehler.
 - Release-Gate-Komponenten: 119 JavaScriptdateien mit `node --check`, acht
   Shell-Dateien mit `sh -n`, Versionscheck und Secret-Scan: **PASS**.
 - `repository.yaml`, App-`config.yaml` und beide Übersetzungs-YAMLs: **PASS**.
@@ -246,14 +248,14 @@ Repair-Zuordnung:
 
 - neu `RQ-17-01`: inkohärente/veraltete RC-Checkliste;
 - zusätzliche Sprint-25.4-Evidenz für `RQ-04-01`, `RQ-08-03`, `RQ-09-01`,
-  `RQ-13-01`, `RQ-14-01`, `RQ-14-02`, `RQ-14-04`, `RQ-14-05` und
-  `RQ-16-01`.
+  `RQ-13-01`, `RQ-14-01`, `RQ-14-02`, `RQ-14-04` und `RQ-14-05`;
+  `RQ-16-01` ist im gezielten Re-Audit automatisiert geschlossen.
 
 ## Abschluss
 
 Sprint 25.4 hat korrekt keine Freigabe behauptet und den damaligen Kandidaten
 grundsätzlich nachvollziehbar als `BLOCKED` eingeordnet. Der heute vorhandene
 lebende Checklist-Text ist jedoch kein verlässlicher aktueller Kandidatennachweis
-mehr. Part 17 ist baseline-seitig abgeschlossen, Sprint 25.4 bleibt `PARTIAL`
-und der aktuelle HEAD bleibt für RC/Stable `BLOCKED`. Es wurde weder repariert,
-committed, gepusht noch veröffentlicht.
+mehr. Part 17 ist baseline-seitig abgeschlossen, der PNG-Pfad im gezielten
+Sprint-27.1-A-Re-Audit repariert. Sprint 25.4 bleibt `PARTIAL` und der aktuelle
+Stand für RC/Stable `BLOCKED`; es wurde kein Image oder Release veröffentlicht.

@@ -7,6 +7,7 @@ const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
 const JpegSamples = require("./fixtures/jpeg-samples");
+const PngSamples = require("./fixtures/png-samples");
 const DashboardConfig = require("../src/config/dashboard");
 
 
@@ -829,10 +830,7 @@ test(
                     "Content-Type": "image/png"
                 };
 
-                const png = Buffer.from(
-                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
-                    "base64"
-                );
+                const png = PngSamples.valid;
 
                 const unauthorized = await request(
                     gateway.port,
@@ -912,6 +910,19 @@ test(
                     })
                 );
                 assert.equal(failedReplacement.status, 400);
+
+                const invalidPngReplacement = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/background",
+                    PngSamples.noIdat,
+                    auth
+                );
+                assert.equal(invalidPngReplacement.status, 400);
+                assert.equal(
+                    invalidPngReplacement.json.error,
+                    "background_file_invalid"
+                );
 
                 const preservedConfiguration = await request(
                     gateway.port,
@@ -1023,10 +1034,7 @@ test(
                 const pngAuth = Object.assign({}, auth, {
                     "Content-Type": "image/png"
                 });
-                const png = Buffer.from(
-                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
-                    "base64"
-                );
+                const png = PngSamples.valid;
                 const room = {
                     id: "living-room",
                     entity: "",
@@ -1125,6 +1133,19 @@ test(
                 );
                 assert.equal(failedReplacement.status, 400);
 
+                const invalidPngReplacement = await request(
+                    gateway.port,
+                    "POST",
+                    "/api/admin/dashboards/default/widgets/living-room/background",
+                    PngSamples.badCrc,
+                    pngAuth
+                );
+                assert.equal(invalidPngReplacement.status, 400);
+                assert.equal(
+                    invalidPngReplacement.json.error,
+                    "background_file_invalid"
+                );
+
                 const afterFailure = await request(
                     gateway.port,
                     "GET",
@@ -1135,6 +1156,16 @@ test(
                         return widget.id === "living-room";
                     }).room.background.image_url,
                     "/assets/backgrounds/" + firstImageId
+                );
+
+                const backgroundDirectory = path.join(
+                    temporaryDirectory,
+                    "room-backgrounds-data",
+                    "backgrounds"
+                );
+                assert.deepEqual(
+                    fs.readdirSync(backgroundDirectory),
+                    [firstImageId]
                 );
 
                 const removed = await request(

@@ -7,7 +7,9 @@
 - Auditierter Branch: `main`
 - Auditierter Repository-Commit: `593ba5a2660121f6d4af9340499c6d860e754524`
 - Sprint-Spezifikation: [`SPRINT-25.3.md`](../../sprints/SPRINT-25.3.md)
-- Anwendungscode geändert: nein
+- Gezielter Re-Audit: Sprint 27.1-A, Basiscommit `dec0c54`
+- Anwendungscode im Baseline-Audit geändert: nein; Sprint 27.1-A: zentraler
+  PNG-Parser gehärtet
 - Produktives Home Assistant, HAOS, LXC oder physisches iPad kontaktiert: nein
 
 ## Gesamtergebnis
@@ -24,22 +26,23 @@ Position, `cover`/`contain`, Overlay und optionalen Titel ES5-kompatibel. Der
 Flex-/Viewport-Aufbau hält Background, Inhalt und nicht fixierten Footer über
 die volle sichtbare Höhe; Focus liegt deterministisch darüber.
 
-Part 16 fand jedoch einen echten aktuellen Parserdefekt. Der PNG-Prüfer
-verifiziert weder Chunk-CRC noch das Vorhandensein von `IDAT`. Kontrollierte
-Direktproben akzeptierten deshalb ein 45-Byte-PNG nur aus Signatur, `IHDR` und
-`IEND` sowie ein PNG mit manipulierter CRC. Ein solcher Upload gilt fälschlich
-als erfolgreich; beim Ersetzen kann danach das bisherige gültige Asset entfernt
-werden. Damit sind die Anforderungen „ungültige/manipulierte Dateien ablehnen“
-und „bei jedem fehlgeschlagenen Ersatz die letzte gültige Konfiguration und
-Datei bewahren“ aktuell `BROKEN` (`RQ-16-01`). JPEG bleibt durch Sprint 25.5
-absichtlich superseded und gehärtet, nicht abgeschaltet.
+Der in Part 16 gefundene Parserdefekt ist in Sprint 27.1-A gezielt repariert.
+Der begrenzte PNG-Parser verifiziert nun die CRC jedes Chunks, gültige
+IHDR-Felder, die Reihenfolge und Einmaligkeit kritischer Chunks, mindestens
+einen zusammenhängenden `IDAT`-Block sowie ein sauberes `IEND` am Dateiende.
+Fehlendes `IDAT`, falsche CRC, Truncation, Daten nach `IEND`, doppelte Header
+und unbekannte kritische Chunks werden abgewiesen. Dashboard- und Room-
+Replacementtests bestätigen, dass dabei die letzte gültige Konfiguration und
+Datei erhalten bleiben und keine Temp-/Waisendatei entsteht. `RQ-16-01` ist
+damit automatisiert geschlossen; JPEG bleibt durch Sprint 25.5 gehärtet.
 
 Zusätzlich sind die 84 nummerierten Prüfpunkte der Spezifikation nicht
 vollständig direkt rückverfolgbar (`RQ-16-02`) und die bereits bekannte
 routeabhängige immutable Assetversion (`RQ-04-01`) betrifft auch Theme,
 Admin-Preview und Wall-Runtime. Reale iPad-, LXC-Restart- und HAOS-`/data`-
-Abnahmen stehen aus. Daher ist Sprint 25.3 trotz 96/96 fokussierten und 329/329
-vollständigen Tests nicht freigabefähig.
+Abnahmen stehen aus. Daher bleibt Sprint 25.3 trotz des bestandenen Re-Audits
+und 330/330 vollständigen Tests bis zu den bestehenden Matrix-/Realgerätegates
+`PARTIAL`.
 
 ## Requirement-Matrix
 
@@ -59,8 +62,8 @@ vollständigen Tests nicht freigabefähig.
 | 25.3-ADMIN-06 | Ungespeicherter Draft wird vor Assetoperation kontrolliert behandelt | PASS | Editor blockiert Upload/Remove bei dirty Config und fordert zuerst Save/Discard; verhindert versteckte Mischzustände. |
 | 25.3-AUTH-01 | Admin API standardmäßig aus und Bearer-geschützt | PASS | Globale `requireAdmin`-Middleware liegt vor Background-Parser/-Routen; bestehende Admin-Auth-Tests grün. |
 | 25.3-AUTH-02 | Write-Rate-Limit gilt auch für Upload/Remove | PASS | `router.use(limitAdminWrites)` liegt vor den Backgroundrouten. |
-| 25.3-UPLOAD-01 | Server akzeptiert nur JPEG/PNG und prüft tatsächlichen Inhalt | PARTIAL | MIME und Binärformat werden geprüft. JPEG ist gehärtet; PNG-Prüfung ist unvollständig (`RQ-16-01`). |
-| 25.3-UPLOAD-02 | Malformed/truncated/manipulierte Bilder werden abgewiesen | BROKEN | `inspectPng()` prüft weder CRC noch mindestens einen `IDAT`-Chunk. Direktproben mit fehlendem `IDAT` und falscher CRC wurden akzeptiert. `RQ-16-01`. |
+| 25.3-UPLOAD-01 | Server akzeptiert nur JPEG/PNG und prüft tatsächlichen Inhalt | PASS | MIME und Binärformat werden geprüft. JPEG ist gehärtet; PNG prüft Signatur, IHDR-Inhalt, CRC, Critical-Chunk-Reihenfolge, IDAT und IEND/EOF. |
+| 25.3-UPLOAD-02 | Malformed/truncated/manipulierte Bilder werden abgewiesen | PASS | Gezielte Regressionen weisen fehlendes `IDAT`, CRC-Manipulation, Truncation, Daten nach `IEND`, doppeltes `IHDR` und unbekannte kritische Chunks ab. |
 | 25.3-UPLOAD-03 | SVG/HTML als JPEG/PNG getarnt werden abgewiesen | PASS | Signatur-/Segmentprüfung lehnt Textpayloads ab; Sprint-25.5-Regressionen sind grün. |
 | 25.3-UPLOAD-04 | Dateigröße und Bilddimensionen/Pixelfläche sind begrenzt | PASS | 10 MiB Raw-Parserlimit sowie 4096 px je Achse und 16.777.216 Pixel in `dashboard-backgrounds.js`. |
 | 25.3-UPLOAD-05 | Pfadmanipulation und nutzerbestimmte Dateinamen sind ausgeschlossen | PASS | 128-Bit-Random-ID plus feste Endung; strikter ID-RegEx; `resolveImagePath()` akzeptiert keine Pfadbestandteile. |
@@ -72,7 +75,7 @@ vollständigen Tests nicht freigabefähig.
 | 25.3-STORE-04 | Verzeichnis/Datei besitzen restriktive Rechte | PASS | Store erzeugt Verzeichnis `0700`, temporäre/finale Datei `0600`; automatisierter Storetest grün. |
 | 25.3-STORE-05 | Assetwrite ist atomar und hinterlässt bei Schreibfehler keine Teildatei | PASS | exklusives Tempfile, `fsync`, `rename`, Directory-`fsync`; Fehlerpfad entfernt Tempfile. |
 | 25.3-STORE-06 | Konfigurationswrite bleibt validiert, atomar und mit Backup | PASS | `DashboardConfigStore.save()` validiert vor Tempwrite/rename und hält genau `.bak`; Persistenzsuite grün. |
-| 25.3-STORE-07 | Abgewiesener/fehlgeschlagener Ersatz bewahrt altes Asset und Config | BROKEN | Für tatsächlich abgewiesene Payloads korrekt: neues Asset wird bei Savefehler entfernt, altes erst nach erfolgreichem Save. Ein ungültiges PNG wird jedoch als Erfolg akzeptiert und kann das alte Asset entfernen. `RQ-16-01`. |
+| 25.3-STORE-07 | Abgewiesener/fehlgeschlagener Ersatz bewahrt altes Asset und Config | PASS | Validierung erfolgt vor dem Store. Dashboard- und Room-API-Regressionen prüfen ungültige PNG-Replacements und finden danach ausschließlich die unveränderte Altdatei samt alter Public-Config. |
 | 25.3-STORE-08 | Entfernen aktualisiert zuerst Config und löscht danach nur das alte Asset | PASS | DELETE-Route speichert `background:null`, anschließend `remove(oldImageId)`; fehlgeschlagener Configwrite bewahrt das Asset. |
 | 25.3-STORE-09 | Verwaiste Assets werden nach Configänderungen kontrolliert bereinigt | PASS | `cleanupUnusedBackgrounds()` vergleicht Referenzen; Room-Card-Erweiterung berücksichtigt später beide Referenzarten. |
 | 25.3-ROUTE-01 | Assetroute ist read-only, referenzgeprüft und ohne Directory Listing | PASS | `GET /assets/backgrounds/:imageId` prüft aktuelle Configreferenz und sicheren Pfad; Datenroot wird nicht statisch veröffentlicht. |
@@ -105,7 +108,7 @@ vollständigen Tests nicht freigabefähig.
 | 25.3-DOC-01 | README DE/EN und technische Dokumentation beschreiben Backgrounds synchron | PASS | Beide Sprachfassungen dokumentieren Upload, Felder, `DATA_DIR` und Sicherheit; Roadmap/Projektstatus enthalten Sprint 25.3. Globaler Statusdrift bleibt `RQ-08-03`. |
 | 25.3-DOC-02 | Echte/kontrollierte Screenshots für Dashboard und Admin vorhanden | PASS | `docs/screenshots/dashboards/background-image.png` und `docs/screenshots/admin/dashboard-background.png` sind echte PNGs aus kontrollierter Real-App, ohne sichtbare Tokens/IPs. Die allgemeine spätere D1-Galerielücke bleibt `RQ-08-02`. |
 | 25.3-TEST-01 | Kernpfad besitzt isolierte automatisierte Regressionen | PASS | `test/sprint-25-3.test.js` enthält neun direkte Tests; Admin-, Gateway-, Persistenz-, JPEG-, Focus-, Navigation-, Security- und Deploymenttests ergänzen den Pfad. |
-| 25.3-TEST-02 | Alle 84 nummerierten Testfälle sind direkt nachvollziehbar | PARTIAL | Breite Tests decken Kernfälle, aber nicht jede Größen-/Viewport-/Restart-/Failure-Kombination einzeln; der PNG-Defekt blieb trotz grüner Suite unentdeckt. `RQ-16-02`. |
+| 25.3-TEST-02 | Alle 84 nummerierten Testfälle sind direkt nachvollziehbar | PARTIAL | Die zuvor fehlenden PNG-Struktur-/CRC-/Replace-Fälle sind jetzt direkt regressiert. Nicht jede Größen-/Viewport-/Restart-/Failure-Kombination ist jedoch einzeln zugeordnet; `RQ-16-02` bleibt offen. |
 | 25.3-MAN-01 | Reales iPad mini: Background, Titel, Full Height, Footer, Focus, Theme, Cache und HomeScreen | NOT TESTED | MT-58; Part 16 führte keine physische Prüfung aus. |
 | 25.3-MAN-02 | Aktuelles Safari/Admin: Uploadmatrix, Preview/Runtime, Validierung und Ersatz | NOT TESTED | MT-59. |
 | 25.3-MAN-03 | Standalone/LXC: DATA_DIR, Rechte, Restart und Backup | NOT TESTED | MT-60. |
@@ -129,10 +132,10 @@ Public Dashboard Config
   -> Grid und normaler Footer im Flex-Dokumentfluss
 ```
 
-Die Architektur ist grundsätzlich sicher. Die markierte Lücke liegt vor dem
-Store: `inspectPng()` akzeptiert strukturell ungültige Dateien. Deshalb greift
-der ansonsten korrekte Rollbackpfad nicht, weil der Upload nicht als Fehler
-erkannt wird.
+Die Architektur und der Parserpfad sind im automatisierten Re-Audit sicher:
+`inspectPng()` weist die bekannten Strukturmanipulationen vor dem Store ab.
+Damit greifen die vorhandenen atomaren Store-/Config- und Rollbackgrenzen auch
+für PNG zuverlässig.
 
 ## Superseded-Beziehungen
 
@@ -148,11 +151,11 @@ erkannt wird.
 
 ## Automatisierte Verifikation
 
-- Part-16-Fokuslauf: **96/96 PASS**, 0 Fehler. Abgedeckt waren Sprint 25.3,
+- Sprint-27.1-A-Fokuslauf: **85/85 PASS**, 0 Fehler. Abgedeckt waren Sprint 25.3,
   Sprint-25.5-JPEGs, Admin API, Gateway, Persistenz, Focus, HomeScreen-
   Navigation, Security, Standalone und Deployment.
-- Gesamtsuite: **329/329 PASS**, 0 Fehler.
-- Elf relevante JavaScriptdateien bestanden `node --check`.
+- Gesamtsuite: **330/330 PASS**, 0 Fehler.
+- Geänderte JavaScriptdateien bestanden `node --check`.
 - `ha_legacy_dashboard/run.sh` und
   `deploy/prepare-home-assistant-app.sh` bestanden `sh -n`; der direkte
   Release-Versionscheck bestätigte den konsistenten String `v1.0.0-rc.1`.
@@ -162,8 +165,10 @@ erkannt wird.
   Flexbox-`gap`, ResizeObserver oder Container Query als Voraussetzung.
 - Security-Scan: kein HA-/Supervisor-Token im Public Payload, keine neue
   HA-Write-Route und kein generischer Service-/WebSocketproxy.
-- Kontrollierte read-only PNG-Proben: fehlender `IDAT` wurde akzeptiert;
-  manipulierte Chunk-CRC wurde akzeptiert. Damit ist `RQ-16-01` reproduziert.
+- Kontrollierte PNG-Proben: Der unveränderte Baselinecode akzeptierte fehlendes
+  `IDAT` und manipulierte CRC; der reparierte Parser weist beide sowie
+  Truncation, Daten nach `IEND`, doppeltes IHDR und unbekannte kritische Chunks
+  kontrolliert ab.
 - Tests verwendeten ausschließlich lokale Dateien, localhost-Mocks und
   Fake-Credentials; kein produktives System wurde kontaktiert.
 
@@ -175,7 +180,8 @@ erkannt wird.
 - MT-58: vollständige reale iPad-mini-Darstellung und Cacheersatz;
 - MT-59: Desktop-Safari-Admin-/Runtime-/Uploadmatrix;
 - MT-60: Standalone/LXC-Persistenz und Neustart;
-- `RQ-16-01`: unvollständige PNG-Struktur-/CRC-Validierung;
+- `RQ-16-01`: automatisiert geschlossen; reale Background-Abnahmen bleiben
+  `NOT TESTED`;
 - `RQ-16-02`: unvollständige direkte Zuordnung der 84 Testfälle;
 - `RQ-04-01`: inkonsistente immutable Version gemeinsam genutzter Assets;
 - `RQ-13-01`: veröffentlichte RC.1-Artefakte enthalten nicht den heutigen Code;
@@ -184,8 +190,7 @@ erkannt wird.
 ## Abschluss
 
 Die per-Dashboard Background-/Titel-/Full-Height-/Footerarchitektur ist im
-aktuellen Repository vorhanden und breit regressiert. Sprint 25.3 kann wegen
-des nachgewiesenen PNG-Akzeptanz- und Erhaltsfehlers, des offenen P1-
-Cachebefunds und fehlender realer Zielgeräte-/Betriebsabnahmen nur als
-`PARTIAL` gelten. Part 16 hat ausschließlich Auditdokumentation geändert und
-keine Reparatur vorgenommen.
+aktuellen Repository vorhanden und breit regressiert. Der nachgewiesene PNG-
+Akzeptanz- und Erhaltsfehler ist repariert. Sprint 25.3 bleibt wegen
+`RQ-16-02`, des offenen P1-Cachebefunds und fehlender realer Zielgeräte-/
+Betriebsabnahmen `PARTIAL`; daraus folgt ausdrücklich noch keine RC-Freigabe.

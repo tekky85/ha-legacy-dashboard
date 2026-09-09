@@ -67,7 +67,7 @@ Prüfung tatsächlich durchgeführt und mit Datum/System dokumentiert wurde.
 | MT-59 | 25.3, 25.4 | Geschützter Upload, Preview-/Runtime-Parität, Validierung und Ersatz im modernen Safari | aktuelle macOS-Safari-Version plus kontrollierte Real-App | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-60 | 25.3, 25.4 | Standalone-`DATA_DIR`, Rechte, Persistenz, Backup und Dienstneustart | isolierter Standalone-LXC `ha-legacy-dashboard` | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-61 | 25.5 | Direkter LAN-, Hostname-, mDNS-, IPv4-/IPv6- und Portpfad des aktuellen HA-App-Kandidaten | Mac plus iPad mini 1/iOS 9.3.5 und aktuelles Test-HAOS | Vollständige Anleitung weiter unten. | NOT TESTED |
-| MT-62 | 25.3, 25.5 | Reale JPEG-/PNG-Uploads, sichere Ablehnung, Replace/Rollback und `/data`-Persistenz | aktueller macOS Safari, Test-HAOS und iPad mini 1/iOS 9.3.5 | Vollständige Anleitung weiter unten; erst nach RQ-16-01 als PASS wertbar. | NOT TESTED |
+| MT-62 | 25.3, 25.5 | Reale JPEG-/PNG-Uploads, sichere Ablehnung, Replace/Rollback und `/data`-Persistenz | aktueller macOS Safari, Test-HAOS und iPad mini 1/iOS 9.3.5 | Vollständige Anleitung weiter unten; das automatisierte RQ-16-01-Gate ist erfüllt. | NOT TESTED |
 | MT-63 | 25.6 | Card Type × Valid Size × Representative State auf realer Legacy-Hardware | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten; aktuellen Room-Typ und Tall-Fälle einschließen. | NOT TESTED |
 | MT-64 | 25.7 | HomeScreen, Guided Access, Home-Taste, Same-Context-Navigation, Theme und Rotation | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-65 | 25.7 | Sleep/Wake, Volume, Touch, Auto-Lock, Dauerstrom sowie WLAN-/HA-/App-Recovery | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
@@ -75,7 +75,7 @@ Prüfung tatsächlich durchgeführt und mit Datum/System dokumentiert wurde.
 | MT-67 | 26 | Section-Rendering, unassigned Fallback, Titel, Rotation und Reload auf Legacy-Hardware | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-68 | 26 | Vollständiges Section-CRUD, Kartenbewahrung und Persistenz | aktuelle macOS-Safari-Version plus isolierter Standalone-LXC | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-69 | 26.1 | Native Room Card, Area-Vorschlag, Collapse, Background, Größen, Alerts und Controls | iPad mini 1, iOS 9.3.5, HomeScreen plus macOS-Safari für Admin | Vollständige Anleitung weiter unten. | NOT TESTED |
-| MT-70 | 26.1 | Room-Background, Konfiguration und Assets über HAOS-App-Restart | Home Assistant OS Test-App plus macOS Safari | Vollständige Anleitung weiter unten; erst nach RQ-16-01 als PASS wertbar. | NOT TESTED |
+| MT-70 | 26.1 | Room-Background, Konfiguration und Assets über HAOS-App-Restart | Home Assistant OS Test-App plus macOS Safari | Vollständige Anleitung weiter unten; das automatisierte RQ-16-01-Gate ist erfüllt. | NOT TESTED |
 | MT-71 | 26.2 | Reale HA-Controlmatrix mit drei Lights und mehreren Climate-Capabilities | macOS Safari plus isoliertes Test-HA/Standalone | Vollständige Anleitung weiter unten. | NOT TESTED |
 | MT-72 | 26.2 | Gemeinsame Light-/Climate-Controls in Grid, Focus und Room auf dem Legacy-iPad | iPad mini 1, iOS 9.3.5, HomeScreen | Vollständige Anleitung weiter unten. | NOT TESTED |
 
@@ -118,7 +118,7 @@ commitbezogenen Kandidaten.
 | MT-26 | CAN RUN NOW | – |
 | MT-27 | BLOCKED | RQ-04-01 |
 | MT-28 | BLOCKED | RQ-04-01 |
-| MT-29 | RUN AFTER ALL VISIBLE REPAIRS | RQ-04-01, RQ-09-01, RQ-12-01/02/03, RQ-16-01, RQ-18-01 |
+| MT-29 | RUN AFTER ALL VISIBLE REPAIRS | RQ-04-01, RQ-09-01, RQ-12-01/02/03, RQ-18-01 |
 | MT-30 | BLOCKED | RQ-09-01 |
 | MT-31 | CAN RUN NOW | – |
 | MT-32 | BLOCKED | RQ-04-01, RQ-09-01 |
@@ -140,26 +140,26 @@ commitbezogenen Kandidaten.
 | MT-48 | BLOCKED | RQ-04-01, RQ-09-01, RQ-12-02, RQ-12-03 |
 | MT-49 | BLOCKED | RQ-04-01, RQ-12-02, RQ-12-03 |
 | MT-50 | BLOCKED | RQ-09-01, RQ-13-01, RQ-13-02 |
-| MT-51 | BLOCKED | RQ-13-01, RQ-16-01 |
-| MT-52 | BLOCKED | RQ-13-01, RQ-14-02, RQ-16-01 |
+| MT-51 | BLOCKED | RQ-13-01 |
+| MT-52 | BLOCKED | RQ-13-01, RQ-14-02 |
 | MT-53 | BLOCKED | RQ-13-01 |
-| MT-54 | BLOCKED | RQ-04-01, RQ-13-01, RQ-16-01 |
+| MT-54 | BLOCKED | RQ-04-01, RQ-13-01 |
 | MT-55 | BLOCKED | RQ-13-01, RQ-14-01/02/04/05, RQ-17-01 |
 | MT-56 | BLOCKED | RQ-14-01, RQ-14-02 |
 | MT-57 | RUN AFTER ALL REPAIRS | RQ-13-01, RQ-14-04, RQ-17-01 |
-| MT-58 | BLOCKED | RQ-04-01, RQ-16-01 |
-| MT-59 | BLOCKED | RQ-16-01 |
-| MT-60 | BLOCKED | RQ-16-01 |
+| MT-58 | BLOCKED | RQ-04-01 |
+| MT-59 | CAN RUN NOW | – |
+| MT-60 | CAN RUN NOW | – |
 | MT-61 | BLOCKED | RQ-13-01, RQ-13-02 |
-| MT-62 | BLOCKED | RQ-13-01, RQ-13-02, RQ-16-01 |
+| MT-62 | BLOCKED | RQ-13-01, RQ-13-02 |
 | MT-63 | BLOCKED | RQ-04-01, RQ-18-01 |
 | MT-64 | BLOCKED | RQ-04-01, RQ-13-01 |
 | MT-65 | BLOCKED | RQ-04-01, RQ-13-01 |
 | MT-66 | BLOCKED | RQ-04-01, RQ-13-01 |
 | MT-67 | BLOCKED | RQ-04-01 |
 | MT-68 | BLOCKED | RQ-04-01 |
-| MT-69 | BLOCKED | RQ-04-01, RQ-16-01, RQ-18-01 |
-| MT-70 | BLOCKED | RQ-13-01, RQ-13-02, RQ-16-01 |
+| MT-69 | BLOCKED | RQ-04-01, RQ-18-01 |
+| MT-70 | BLOCKED | RQ-13-01, RQ-13-02 |
 | MT-71 | BLOCKED | RQ-04-01 |
 | MT-72 | BLOCKED | RQ-04-01, RQ-18-01 |
 
