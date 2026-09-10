@@ -1047,3 +1047,23 @@ nicht, dass das Projekt RC-ready ist.
 - Auditlauf änderte keinen Anwendungscode. Parts 01 bis 19 sind abgeschlossen;
   damit ist die geplante Sprint-27-Baseline vollständig. Nächster Schritt ist
   Repair-Queue-Konsolidierung vor Sprint 27.1, nicht ein Audit Part 20.
+
+## Sprint 27.2 – Public Test Release
+
+- Vorgesehene Version: `1.0.0-rc.2`
+- Vorgesehener Tag: `v1.0.0-rc.2`
+- Zweck: reproduzierbarer öffentlicher Zwischenstand nach den automatisiert
+  abgeschlossenen Reparaturbatches 27.1-A bis 27.1-D.
+- Releaseart: GitHub Prerelease/Public Test Release; niemals Stable oder
+  `latest`.
+- Geplante Artefakte: generisches GHCR-Multi-Arch-Manifest für amd64/aarch64,
+  Standalone-Tar und `SHA256SUMS`.
+- Sicherheitsgrenze: ausschließlich lokale Mocktests/Fake-Credentials im
+  Gate; keine Produktions-HA-, Supervisor- oder Admin-Credentials.
+- Manuell: alle HAOS-, LXC- und iPad-Ergebnisse bleiben bis zur echten
+  Durchführung `NOT TESTED`.
+- Status: **PREPARATION IN PROGRESS – PUBLICATION EVIDENCE PENDING**.
+- Scope: Kein Repair aus 27.1-E oder später wurde begonnen.
+- Lokales Gate: 60/60 fokussiert und 340/340 vollständig; Version, Secret,
+  Legacy-Syntax und Produktionsaudit grün. Lokales Archiv und Checksum sind
+  konsistent; Docker war auf dem Prüf-Mac nicht verfügbar.

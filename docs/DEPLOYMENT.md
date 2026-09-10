@@ -86,7 +86,7 @@ app_build_dir="$(mktemp -d)"
 ./deploy/prepare-home-assistant-app.sh "$app_build_dir"
 docker build \
   --build-arg BUILD_ARCH=amd64 \
-  --build-arg BUILD_VERSION=1.0.0-rc.1 \
+  --build-arg BUILD_VERSION=1.0.0-rc.2 \
   -t ha-legacy-dashboard-app:local \
   "$app_build_dir"
 ```
@@ -316,6 +316,14 @@ Ein veröffentlichter Tag wird nicht nachträglich verschoben oder erzwungen.
 
 Release-Archiv-, App-Upgrade- und Backup-/Rollback-Abläufe sind ausführlich in
 `docs/RELEASING.md` beschrieben.
+
+## Public Test Release 1.0.0-rc.2
+
+Der installierbare Zwischenstand ist unveränderlich als `v1.0.0-rc.2`
+versioniert. App-, Standalone-, Smoke-Test-, Git-LXC- und Rollbackschritte
+stehen in [`PUBLIC_TEST_RELEASE.md`](PUBLIC_TEST_RELEASE.md). Dieser Kandidat
+ist ausdrücklich kein Stable Release und verändert den Container-Tag `latest`
+nicht.
 
 ## GitHub-CI
 

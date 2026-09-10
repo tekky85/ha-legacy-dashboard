@@ -602,6 +602,12 @@ Complete instructions: `docs/DEPLOYMENT.md` and `docs/RELEASING.md`.
 
 ## Releases, Support, and License
 
+The current installable intermediate build is the **1.0.0-rc.2 Public Test
+Release**. It is intended for community, HAOS, LXC, and legacy-iPad testing,
+is not stable, and does not update `latest`. Testing focus, safe App/LXC
+updates, rollback, and defect reporting are documented in
+[`docs/PUBLIC_TEST_RELEASE.md`](docs/PUBLIC_TEST_RELEASE.md).
+
 Release candidates and stable releases use SemVer tags. Every release contains
 a versioned standalone archive and `SHA256SUMS`; containers are available as
 `ghcr.io/tekky85/ha-legacy-dashboard:<version>`. RC versions never update

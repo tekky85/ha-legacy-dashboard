@@ -14,6 +14,7 @@ const Manifest = require("../release/validate-manifest");
 const VersionCheck = require("../release/check-version");
 
 const ROOT = path.join(__dirname, "..");
+const CURRENT_VERSION = require("../package.json").version;
 const PREVIOUS_RELEASE_RUNTIME = path.join(
     ROOT,
     "test",
@@ -147,7 +148,7 @@ function verifyCrossVersionUpgrade(mode, root) {
 
 
 test("Release-Version ist in Tag, Paket, App, Metadaten und Changelogs konsistent", function (t) {
-    const release = VersionCheck.validate(ROOT, "v1.0.0-rc.1");
+    const release = VersionCheck.validate(ROOT, "v" + CURRENT_VERSION);
     const fixture = fs.mkdtempSync(
         path.join(os.tmpdir(), "ha-release-version-")
     );
@@ -163,14 +164,16 @@ test("Release-Version ist in Tag, Paket, App, Metadaten und Changelogs konsisten
         "ha_legacy_dashboard/config.yaml",
         "ha_legacy_dashboard/CHANGELOG.md",
         "release/metadata.json",
-        "release/notes/1.0.0-rc.1.md"
+        "release/notes/" + CURRENT_VERSION + ".md",
+        "src/admin/index.html",
+        "src/public/system.html"
     ].forEach(function (fileName) {
         const target = path.join(fixture, fileName);
         fs.mkdirSync(path.dirname(target), {recursive: true});
         fs.copyFileSync(path.join(ROOT, fileName), target);
     });
 
-    assert.equal(release.version, "1.0.0-rc.1");
+    assert.equal(release.version, CURRENT_VERSION);
     assert.equal(release.channel, "release-candidate");
     assert.equal(release.stable, false);
     assert.throws(function () {
@@ -179,12 +182,36 @@ test("Release-Version ist in Tag, Paket, App, Metadaten und Changelogs konsisten
     fs.writeFileSync(
         path.join(fixture, "ha_legacy_dashboard/config.yaml"),
         readProjectFile("ha_legacy_dashboard/config.yaml")
-            .replace("1.0.0-rc.1", "1.0.0"),
+            .replace(CURRENT_VERSION, "1.0.0"),
         "utf8"
     );
     assert.throws(function () {
-        VersionCheck.validate(fixture, "v1.0.0-rc.1");
+        VersionCheck.validate(fixture, "v" + CURRENT_VERSION);
     }, /App version differs/);
+});
+
+
+test("Public-Test-Release ist als Prerelease gekennzeichnet und besitzt sichere Fehlerhinweise", function () {
+    const workflow = readProjectFile(".github/workflows/release.yml");
+    const notes = readProjectFile(
+        "release/notes/" + CURRENT_VERSION + ".md"
+    );
+    const issueTemplate = readProjectFile(
+        ".github/ISSUE_TEMPLATE/bug_report.yml"
+    );
+
+    assert.match(workflow, /--prerelease/);
+    assert.match(workflow, /Public Test Release/);
+    assert.match(notes, /not a final or stable release/i);
+    assert.match(notes, /GitHub Issues/);
+    assert.match(notes, /sanitized logs/i);
+    assert.doesNotMatch(notes, /mark(?:ed)? as stable/i);
+    assert.match(issueTemplate, /Home Assistant version/);
+    assert.match(issueTemplate, /Home Assistant App/);
+    assert.match(issueTemplate, /Standalone\/LXC/);
+    assert.match(issueTemplate, /expected/i);
+    assert.match(issueTemplate, /actual/i);
+    assert.match(issueTemplate, /no tokens, passwords/);
 });
 
 

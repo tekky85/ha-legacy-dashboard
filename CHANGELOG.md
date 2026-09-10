@@ -5,6 +5,13 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 
 ## Unreleased
 
+No user-facing changes have been recorded after the current public test
+release.
+
+## 1.0.0-rc.2 – 2026-09-10
+
+This release candidate is a public test release, not a stable release.
+
 ### Changed
 
 - Replaced test-entity-specific Light/Climate authorization with persistent,
@@ -57,6 +64,19 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 
 - Documented the HAOS direct-LAN dual-stack case where `.local` resolves to
   IPv4 and IPv6 but the published App port is reachable through IPv4 only.
+- Added self-contained German and English standalone installation, upgrade,
+  backup, and rollback instructions to the release archive.
+
+### Release hardening
+
+- Hardened PNG validation and last-valid background replacement.
+- Unified immutable asset versions across Dashboard, System, Admin, and the
+  HomeScreen manifest.
+- Repaired backend WebSocket recovery, rule-source diagnostics, dynamic
+  automation uncertainty, and fresh automation impact state.
+- Separated local Supervisor source builds from the production GHCR image,
+  added real cross-version persistence/rollback fixtures, and updated the
+  production dependency gate to report zero known vulnerabilities.
 
 ## 1.0.0-rc.1 – 2026-08-25
 

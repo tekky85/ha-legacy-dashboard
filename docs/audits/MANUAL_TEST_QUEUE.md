@@ -1,5 +1,15 @@
 # Sprint-27-Warteschlange für manuelle Tests
 
+## Sprint-27.2-Testkandidat
+
+Der vorgesehene öffentliche Teststand ist `1.0.0-rc.2` / `v1.0.0-rc.2` mit
+dem Image `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.2` und dem Archiv
+`ha-legacy-dashboard-1.0.0-rc.2.tar.gz`. Nach erfolgreicher Veröffentlichung
+kann er als feste Referenz für die bereits beschriebenen HAOS-, Standalone-/
+LXC- und iPad-Prüfungen verwendet werden. Dieser Hinweis ändert kein Resultat:
+Alle nicht real ausgeführten Tests bleiben `NOT TESTED`, und vorhandene
+Repair-Abhängigkeiten bleiben bestehen.
+
 Automatisierte Tests ersetzen keine reale iPad-, HomeScreen- oder
 Home-Assistant-Abnahme. Ein Eintrag bleibt `NOT TESTED`, bis die beschriebene
 Prüfung tatsächlich durchgeführt und mit Datum/System dokumentiert wurde.

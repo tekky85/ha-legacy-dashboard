@@ -1,7 +1,7 @@
 {
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "channel": "release-candidate",
   "image": "ghcr.io/tekky85/ha-legacy-dashboard",
-  "standaloneArtifact": "ha-legacy-dashboard-1.0.0-rc.1.tar.gz",
-  "releaseNotes": "release/notes/1.0.0-rc.1.md"
+  "standaloneArtifact": "ha-legacy-dashboard-1.0.0-rc.2.tar.gz",
+  "releaseNotes": "release/notes/1.0.0-rc.2.md"
 }

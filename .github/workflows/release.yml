@@ -254,7 +254,7 @@ jobs:
             gh release create "$GITHUB_REF_NAME" \
               --verify-tag \
               --prerelease \
-              --title "HA Legacy Dashboard ${{ needs.validate.outputs.version }}" \
+              --title "HA Legacy Dashboard ${{ needs.validate.outputs.version }} – Public Test Release" \
               --notes-file "${{ needs.validate.outputs.release_notes }}"
           fi
           gh release upload "$GITHUB_REF_NAME" \

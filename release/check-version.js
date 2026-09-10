@@ -108,6 +108,16 @@ function validate(root, requestedTag) {
     )) {
         fail("App changelog heading is missing");
     }
+    if (readText(root, "src/admin/index.html").indexOf(
+        "Version " + version
+    ) === -1) {
+        fail("Admin version display differs");
+    }
+    if (readText(root, "src/public/system.html").indexOf(
+        "v" + version
+    ) === -1) {
+        fail("System dashboard version display differs");
+    }
     if (requestedTag && requestedTag !== expectedTag) {
         fail("Git tag " + requestedTag + " must be " + expectedTag);
     }

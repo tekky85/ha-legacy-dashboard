@@ -14,6 +14,7 @@ const PngSamples = require("./fixtures/png-samples");
 
 
 const ROOT = path.join(__dirname, "..");
+const CURRENT_VERSION = require("../package.json").version;
 
 const PNG = PngSamples.valid;
 
@@ -353,7 +354,9 @@ test("Admin-Oberfläche bietet Upload, Vorschau, Ersetzen, Entfernen und Batch-E
         app,
         /button\.dataset\.action === "background-upload"[\s\S]*button\.disabled = false;/
     );
-    assert.match(html, /Version 1\.0\.0-rc\.1/);
+    assert.match(html, new RegExp(
+        "Version " + CURRENT_VERSION.replace(/\./g, "\\.")
+    ));
 });
 
 

@@ -1,6 +1,12 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 10. September 2026. Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
+Stand: 10. September 2026. Sprint 27.2 bereitet den aktuellen Stand als
+`1.0.0-rc.2` Public Test Release vor. Der vorgesehene Tag
+`v1.0.0-rc.2`, das generische GHCR-Image und das Standalone-Artefakt werden
+erst nach dem vollständigen lokalen Gate veröffentlicht. Dieser Zwischenstand
+ist kein Stable Release; reale HAOS-/LXC-/iPad-Abnahmen bleiben `NOT TESTED`.
+
+Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
 der anschließende Repair-Queue-Consolidation-Pass wurden auf Repository-Commit
 `593ba5a` abgeschlossen. Sprint 27.1-A reparierte `RQ-16-01`, Sprint 27.1-B
 vereinheitlichte die routeübergreifenden immutable Assetversionen aus
@@ -37,6 +43,8 @@ Status:
 - Sprint-27.1-C / RQ-09-01, RQ-12-01 bis -03: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-D / RQ-13-02, RQ-14-01, RQ-14-02, RQ-14-05:
   **COMPLETE – MANUAL PENDING**
+- Sprint 27.2 / Public Test Release 1.0.0-rc.2:
+  **PREPARATION IN PROGRESS – PUBLICATION PENDING**
 - Manuelle Abnahme: **PENDING**
 - Finales RC-Gate: **PENDING**
 
@@ -96,6 +104,29 @@ und meldet null Befunde. Fokussiert bestanden 22/22, vollständig 339/339
 Tests. Reale HAOS-/LXC-/
 Release-/iPad-Abnahmen bleiben `NOT TESTED`; `RQ-13-01`, `RQ-14-04` und
 `RQ-17-01` verhindern weiterhin eine RC-Freigabe.
+
+### Sprint 27.2 – Public Test Release 1.0.0-rc.2
+
+Der Kandidat bündelt die automatisiert abgeschlossenen Reparaturbatches
+27.1-A bis 27.1-D als reproduzierbaren öffentlichen Teststand. Paket, App,
+Release-Metadaten, sichtbare Versionsangaben, Changelogs und Release Notes
+verwenden dieselbe RC-Version. Das Release bleibt als Prerelease markiert und
+verändert `latest` nicht. Ein Issue-Formular verlangt Version,
+Installationsart, HA-/Browserkontext, Reproduktion, Soll/Ist sowie nur
+sanitisierte Logs. Die genauen App-/LXC-/Standalone-Smoke- und Rollbackschritte
+stehen in `docs/PUBLIC_TEST_RELEASE.md`.
+
+Veröffentlichungscommit, Tagziel, Workflow, GHCR-Manifest, Architekturen,
+Standalone-SHA256 und GitHub-Prerelease werden nach erfolgreicher Publikation
+in diesem Abschnitt nachgetragen. Offene Reparatur- und Manuellteststände
+werden durch den Public Test Release nicht als bestanden umbewertet.
+
+Das lokale Release-Gate für `v1.0.0-rc.2` bestand einschließlich 340/340
+Tests, JavaScript-/Shellsyntax, Versions- und Secret-Prüfung. Der
+Produktionsaudit mit Schwelle Moderate meldete null Schwachstellen. Das lokal
+erzeugte Standalone-Archiv bestand seine SHA256-Prüfung; Docker ist auf dem
+Prüf-Mac nicht installiert, daher bleibt der Multi-Arch-Build dem vorhandenen
+GitHub-BuildKit-Workflow vorbehalten.
 
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 

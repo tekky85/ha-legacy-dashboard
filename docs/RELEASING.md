@@ -16,13 +16,14 @@ Die Versionsquelle ist die gemeinsam geprüfte SemVer-Version in:
 - `ha_legacy_dashboard/CHANGELOG.md`
 - Git-Tag `v<version>`
 
-`release/check-version.js` bricht bei jeder Abweichung ab. Der erste geplante
-Release ist `1.0.0-rc.1`; im Repository existierte davor kein Release-Tag.
+`release/check-version.js` bricht bei jeder Abweichung ab. Der aktuelle Public
+Test Release ist `1.0.0-rc.2`; `1.0.0-rc.1` bleibt als unveränderlicher
+historischer Kandidat erhalten.
 
 Release Candidate:
 
 ```text
-1.0.0-rc.1 -> v1.0.0-rc.1 -> GitHub Prerelease
+1.0.0-rc.2 -> v1.0.0-rc.2 -> GitHub Prerelease / Public Test Release
 ```
 
 Stable:
@@ -109,7 +110,7 @@ docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --file ha_legacy_dashboard/Dockerfile \
   --build-arg APP_SOURCE_PATH=ha_legacy_dashboard \
-  --build-arg BUILD_VERSION=1.0.0-rc.1 \
+  --build-arg BUILD_VERSION=1.0.0-rc.2 \
   .
 ```
 
@@ -128,7 +129,7 @@ Version, Revision, Erstellzeit, Source, Titel, Beschreibung und Lizenz.
 
 ```bash
 npm ci
-./release/test-gate.sh v1.0.0-rc.1
+./release/test-gate.sh v1.0.0-rc.2
 node release/create-standalone-bundle.js dist
 ```
 
@@ -140,8 +141,8 @@ Die CI-Buildprüfung bleibt unabhängig davon verbindlich.
 Nach Review und erfolgreicher CI:
 
 ```bash
-git tag -a v1.0.0-rc.1 -m "Release v1.0.0-rc.1"
-git push origin v1.0.0-rc.1
+git tag -a v1.0.0-rc.2 -m "HA Legacy Dashboard 1.0.0-rc.2 public test release"
+git push origin v1.0.0-rc.2
 ```
 
 Der Tag startet den Workflow. Erst dessen letzter Job erzeugt das GitHub
@@ -179,10 +180,10 @@ Die konkrete Version bleibt immer die bevorzugte unveränderliche Referenz.
 
 ```bash
 docker buildx imagetools inspect \
-  ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.1
+  ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.2
 
 docker pull --platform linux/amd64 \
-  ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.1
+  ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.2
 ```
 
 Das Manifest muss `linux/amd64` und `linux/arm64` enthalten. Das GHCR-Paket

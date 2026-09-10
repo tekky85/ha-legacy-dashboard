@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+No user-facing changes have been recorded after the current public test
+release.
+
+## 1.0.0-rc.2 – 2026-09-10
+
+This release candidate is a public test release, not a stable release.
+
 ### Added
 
 - Added persistent logical dashboard sections with optional Home Assistant
@@ -37,6 +44,17 @@
 
 - Clarified direct-LAN hostname diagnostics when `.local` returns both IPv4
   and IPv6 but the published App port is reachable through IPv4 only.
+- Added self-contained standalone installation, upgrade, backup, and rollback
+  instructions to the release bundle.
+
+### Release hardening
+
+- Hardened PNG validation and last-valid background replacement.
+- Unified immutable frontend asset versions across all entry points.
+- Repaired backend WebSocket recovery and sanitized diagnostics freshness.
+- Separated local Supervisor source builds from the production GHCR image,
+  added cross-version persistence/rollback coverage, and removed known
+  production dependency advisories.
 
 ## 1.0.0-rc.1 – 2026-08-25
 

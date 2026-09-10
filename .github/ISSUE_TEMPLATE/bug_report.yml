@@ -1,0 +1,84 @@
+name: Public test release bug
+description: Report a reproducible HA Legacy Dashboard defect
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing HA Legacy Dashboard. Never include Home Assistant,
+        Supervisor, or Admin tokens, passwords, `.env` files, private keys,
+        personal data, or unredacted sensitive logs.
+  - type: input
+    id: dashboard-version
+    attributes:
+      label: HA Legacy Dashboard version
+      description: For example, 1.0.0-rc.2.
+    validations:
+      required: true
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Deployment type
+      options:
+        - Home Assistant App
+        - Standalone/LXC
+    validations:
+      required: true
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home Assistant version
+      description: Use "not applicable" only for a standalone mock setup.
+    validations:
+      required: true
+  - type: input
+    id: device-browser
+    attributes:
+      label: Device and browser
+      description: Include the iOS and Safari version where applicable.
+    validations:
+      required: true
+  - type: input
+    id: affected-area
+    attributes:
+      label: Affected dashboard, card, or route
+      placeholder: Custom dashboard / Room Card / system/errors
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest exact sequence that reproduces the issue.
+      placeholder: |
+        1. Open ...
+        2. Tap ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots and sanitized logs
+      description: Remove credentials, private entity names, addresses, and personal data first.
+  - type: checkboxes
+    id: redaction
+    attributes:
+      label: Sensitive-data check
+      options:
+        - label: I confirmed that this report contains no tokens, passwords, `.env`, private keys, or unredacted sensitive logs.
+          required: true
