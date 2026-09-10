@@ -115,15 +115,23 @@ function cloneRules(rules) {
 }
 
 
-function applyRule(target, source) {
+function applyRule(target, source, sources, sourceName) {
     RULE_FIELDS.forEach(function (fieldName) {
         if (
             source &&
             Object.prototype.hasOwnProperty.call(source, fieldName)
         ) {
             target[fieldName] = source[fieldName];
+            if (sources && sourceName) {
+                sources[fieldName] = sourceName;
+            }
         }
     });
+}
+
+
+function sourceForField(resolved, fieldName) {
+    return resolved.ruleSources[fieldName] || resolved.ruleSource;
 }
 
 
@@ -193,41 +201,89 @@ function resolveRule(entity, settings, securityRelevant, modeCriticalEligible) {
     const domainRule = rules.domains[entity.domain] || null;
     const riskRule = rules.riskClasses[classification.riskClass] || null;
     const effective = {};
-    let source = "default";
+    const sources = {};
+    const riskSource = classification.source === "risk_class"
+        ? "risk_class"
+        : classification.source;
 
-    applyRule(effective, rules.defaults);
+    applyRule(effective, rules.defaults, sources, "default");
 
     if (domainRule) {
-        applyRule(effective, domainRule);
-        source = "domain";
+        applyRule(effective, domainRule, sources, "domain");
     }
 
     if (riskRule) {
-        applyRule(effective, riskRule);
-        source = classification.source === "risk_class"
-            ? "risk_class"
-            : classification.source;
+        applyRule(effective, riskRule, sources, riskSource);
     }
 
     if (classification.deviceRule) {
-        applyRule(effective, classification.deviceRule);
-        source = "device";
+        applyRule(
+            effective,
+            classification.deviceRule,
+            sources,
+            "device"
+        );
     }
 
     if (classification.entityRule) {
-        applyRule(effective, classification.entityRule);
-        source = "entity";
+        applyRule(
+            effective,
+            classification.entityRule,
+            sources,
+            "entity"
+        );
     }
 
     effective.riskClass = classification.riskClass;
+    sources.riskClass = classification.source;
 
-    return {
+    const resolved = {
         effective: effective,
         entityRule: classification.entityRule,
         deviceRule: classification.deviceRule,
-        ruleSource: source,
+        ruleSource: riskSource || "default",
+        ruleSources: sources,
         riskClass: classification.riskClass
     };
+    const currentState = stateKind(entity.state);
+    const primaryField = currentState === "unavailable" &&
+        expectedOfflineAllowedForResolved(resolved)
+        ? "expectedOffline"
+        : currentState === "unknown"
+            ? "unknownGraceMs"
+            : currentState === "unavailable"
+                ? "unavailableGraceMs"
+                : "recoveryGraceMs";
+
+    resolved.ruleSource = sources[primaryField] || riskSource || "default";
+    return resolved;
+}
+
+
+function expectedOfflineAllowedForResolved(resolved) {
+    const rule = resolved.effective;
+
+    if (rule.expectedOffline !== true) {
+        return false;
+    }
+
+    if (!Risk.isCritical(resolved.riskClass)) {
+        return true;
+    }
+
+    if (
+        resolved.entityRule &&
+        resolved.entityRule.expectedOffline === true &&
+        resolved.entityRule.allowCriticalExpectedOffline === true
+    ) {
+        return true;
+    }
+
+    return Boolean(
+        resolved.deviceRule &&
+        resolved.deviceRule.expectedOffline === true &&
+        resolved.deviceRule.allowCriticalExpectedOffline === true
+    );
 }
 
 
@@ -360,29 +416,7 @@ RuleEngine.prototype.sweep = function (now) {
 
 
 RuleEngine.prototype.expectedOfflineAllowed = function (resolved) {
-    const rule = resolved.effective;
-
-    if (rule.expectedOffline !== true) {
-        return false;
-    }
-
-    if (!Risk.isCritical(resolved.riskClass)) {
-        return true;
-    }
-
-    if (
-        resolved.entityRule &&
-        resolved.entityRule.expectedOffline === true &&
-        resolved.entityRule.allowCriticalExpectedOffline === true
-    ) {
-        return true;
-    }
-
-    return Boolean(
-        resolved.deviceRule &&
-        resolved.deviceRule.expectedOffline === true &&
-        resolved.deviceRule.allowCriticalExpectedOffline === true
-    );
+    return expectedOfflineAllowedForResolved(resolved);
 };
 
 
@@ -456,7 +490,7 @@ RuleEngine.prototype.evaluate = function (entity, settings, observation) {
             expectedOffline: true,
             flapping: false,
             recoveryPending: false,
-            ruleSource: resolved.ruleSource,
+            ruleSource: sourceForField(resolved, "expectedOffline"),
             transitionCount: 0
         };
     }
@@ -483,7 +517,12 @@ RuleEngine.prototype.evaluate = function (entity, settings, observation) {
                 expectedOffline: false,
                 flapping: false,
                 recoveryPending: false,
-                ruleSource: resolved.ruleSource,
+                ruleSource: sourceForField(
+                    resolved,
+                    currentState === "unknown"
+                        ? "unknownGraceMs"
+                        : "unavailableGraceMs"
+                ),
                 transitionCount: runtime.transitions.length
             };
         }
@@ -505,7 +544,14 @@ RuleEngine.prototype.evaluate = function (entity, settings, observation) {
             expectedOffline: false,
             flapping: flapping,
             recoveryPending: false,
-            ruleSource: resolved.ruleSource,
+            ruleSource: sourceForField(
+                resolved,
+                flapping
+                    ? "flapThreshold"
+                    : currentState === "unknown"
+                        ? "unknownGraceMs"
+                        : "unavailableGraceMs"
+            ),
             transitionCount: runtime.transitions.length,
             problemStartedAt: new Date(problemStartedAt).toISOString()
         };
@@ -531,7 +577,7 @@ RuleEngine.prototype.evaluate = function (entity, settings, observation) {
             expectedOffline: false,
             flapping: true,
             recoveryPending: false,
-            ruleSource: resolved.ruleSource,
+            ruleSource: sourceForField(resolved, "flapThreshold"),
             transitionCount: runtime.transitions.length,
             problemStartedAt: new Date(now).toISOString()
         };
@@ -547,6 +593,10 @@ RuleEngine.prototype.evaluate = function (entity, settings, observation) {
             evaluation.currentState = "healthy";
             evaluation.recoveryPending = true;
             evaluation.flapping = runtime.visible.flapping === true || flappingDetected;
+            evaluation.ruleSource = sourceForField(
+                resolved,
+                "recoveryGraceMs"
+            );
             evaluation.transitionCount = runtime.transitions.length;
             return evaluation;
         }
@@ -567,7 +617,7 @@ RuleEngine.prototype.evaluate = function (entity, settings, observation) {
         expectedOffline: false,
         flapping: false,
         recoveryPending: false,
-        ruleSource: resolved.ruleSource,
+        ruleSource: sourceForField(resolved, "recoveryGraceMs"),
         transitionCount: runtime.transitions.length
     };
 };

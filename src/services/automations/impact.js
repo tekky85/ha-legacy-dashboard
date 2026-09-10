@@ -3,6 +3,7 @@ const CONFIDENCE_ORDER = {
     indirect: 1,
     unknown: 2
 };
+const MAX_UNKNOWN_IMPACTS = 50;
 
 
 function addReason(result, inventory, automationEntityId, confidence, reason) {
@@ -211,6 +212,26 @@ function analysis(snapshot) {
     const indexes = automation.indexes || {};
     const configSource = snapshot.sources &&
         snapshot.sources.automationConfig || {};
+    const dynamicEntityIds = indexes.dynamicAutomationEntityIds || [];
+    const inventoryByEntityId = indexes.inventoryByEntityId || {};
+    const unknownImpacts = dynamicEntityIds.slice(
+        0,
+        MAX_UNKNOWN_IMPACTS
+    ).map(function (entityId) {
+        const automation = inventoryByEntityId[entityId] || {};
+
+        return {
+            entityId: automation.entityId || entityId,
+            name: automation.name || entityId,
+            state: automation.state || "unknown",
+            available: automation.available === true,
+            disabled: automation.state === "off",
+            lastTriggered: automation.lastTriggered || null,
+            confidence: "unknown",
+            reasons: ["dynamic"],
+            dynamicReferences: true
+        };
+    });
 
     return {
         inventoryCount: inventory.length,
@@ -224,9 +245,11 @@ function analysis(snapshot) {
                 references.dynamicReferences === true
             );
         }).length,
-        dynamicCount:
-            (indexes.dynamicAutomationEntityIds || []).length,
+        dynamicCount: dynamicEntityIds.length,
         unknownConfidence: "unknown",
+        unknownImpacts: unknownImpacts,
+        unknownImpactsTruncated:
+            dynamicEntityIds.length > unknownImpacts.length,
         configStatus: configSource.supported === false
             ? "unsupported"
             : configSource.stale
@@ -242,6 +265,7 @@ function analysis(snapshot) {
 
 module.exports = {
     CONFIDENCE_ORDER: CONFIDENCE_ORDER,
+    MAX_UNKNOWN_IMPACTS: MAX_UNKNOWN_IMPACTS,
     analysis: analysis,
     forIssue: forIssue,
     identifiersForIssue: identifiersForIssue,

@@ -88,7 +88,7 @@ deshalb ausdrücklich `NOT TESTED`.
 | 24-START-01 | Sicheres Startup, Verzeichnisvorbereitung und PID-1-Verhalten | PASS | `run.sh`: `umask 077`, `/data`, Optionsvalidierung, secretfreie Statusausgabe und `exec node /app/src/server.js`. |
 | 24-START-02 | Sauberes SIGTERM | PASS | `src/server.js` schließt HTTP-Server und HA-WebSocket bei SIGTERM/SIGINT mit begrenztem 10-s-Fallback; Deploymenttest grün. |
 | 24-START-03 | Reale HA-/App-/HAOS-Restarts und Boot-Autostart | NOT TESTED | `boot: auto` statisch korrekt; reale Abläufe siehe `MT-50` bis `MT-52`. |
-| 24-WS-01 | Temporäre HA-Unverfügbarkeit scheitert sicher und erholt sich | PARTIAL | REST-Snapshots besitzen stale/offline; WebSocket reconnectet bei Close. Ein isoliertes `error` ohne `close` plant jedoch keinen autonomen Reconnect (`RQ-09-01`), auch im App-Modus. |
+| 24-WS-01 | Temporäre HA-Unverfügbarkeit scheitert sicher und erholt sich | PASS | REST-Snapshots besitzen stale/offline; der gemeinsame Backend-WebSocket verarbeitet Error/Close seit Sprint 27.1-C idempotent und reconnectet mit begrenztem Backoff. | Automatisierter Transportpfad für Standalone und App PASS; reale HAOS-Recovery bleibt MT-50. |
 | 24-IMAGE-01 | Definierte Node-Version, Produktionsdependencies und gezielte Kopien | PASS – superseded by Sprint 25 | Multi-stage `ha_legacy_dashboard/Dockerfile`, Default `node:22-alpine`, `npm ci --omit=dev`, gezielte Runtime-Kopien. |
 | 24-IMAGE-02 | `.dockerignore` schließt Secrets, Daten und Entwicklungsartefakte aus | PASS | Root- und App-`.dockerignore`; Release-Secret-Scan grün; weder `.env` noch Daten/Keys werden kopiert. |
 | 24-IMAGE-03 | Aktuelle App-Version/Image entspricht dem auditierten Repositorycode | BROKEN | `1.0.0-rc.1` referenziert ein Image/Tag vom Commit `741bba4`; aktueller Commit ist `593ba5a` mit späteren Runtimeänderungen. Siehe `RQ-13-01`. |
@@ -101,7 +101,7 @@ deshalb ausdrücklich `NOT TESTED`.
 | 24-LEGACY-01 | Wall-Display bleibt ES5/iOS-9-kompatibel | PASS | App verwendet denselben Wall-Build; Legacy-Suite und statischer Scan grün, kein CSS Grid/Flex-gap oder verbotene moderne Syntax. |
 | 24-LEGACY-02 | Reale iPad-mini-Abnahme über App-Direktport | NOT TESTED | Historisch waren Default/Custom sowie Light/Climate-Grundsteuerung erreichbar; vollständige aktuelle Route-/HomeScreen-Abnahme siehe `MT-54`. |
 | 24-REG-01 | Sprint-21-/21.x-Funktionen bleiben erhalten | PASS | Part-09 bis Part-11 sowie Part-13-Fokuslauf grün; keine App-spezifische Browserabweichung. |
-| 24-REG-02 | Sprint 22/23 vollständig regressionsfrei | PARTIAL | Tests grün, aber aktuelle Baselinebefunde `RQ-12-01` bis `RQ-12-04` zeigen fachliche bzw. Testlücken; App nutzt denselben Code. |
+| 24-REG-02 | Sprint 22/23 vollständig regressionsfrei | PARTIAL | `RQ-12-01` bis `RQ-12-03` sind in Sprint 27.1-C repariert und gezielt regressiert; die vollständige Anforderungsmatrix `RQ-12-04` bleibt offen. | App nutzt denselben transportneutralen Code. |
 | 24-TEST-01 | Connection-, Config-, Persistenz-, Container-, Legacy- und Securitytests | PASS | Part-13-Fokuslauf 153/153; Gesamtsuite 329/329; ausschließlich localhost-Mocks/Fake-Credentials. |
 | 24-TEST-02 | Syntax und statische Metadatenprüfung | PASS | 7 relevante JS-Dateien `node --check`; beide Shellskripte `sh -n`; YAML-Dateien parsebar; Versions- und Secret-Scan grün. |
 
@@ -198,14 +198,15 @@ Repositoryinhalt hochgerechnet. Neu beziehungsweise weiterhin offen sind:
   werden.
 - **RQ-13-02 (BROKEN, P2):** Der dokumentierte lokale Supervisor-Build zieht
   wegen `image:` das Registry-Image statt der vorbereiteten Quellen.
-- **RQ-09-01 (PARTIAL, P2):** isolierter WebSocket-Error plant auch im
-  App-Modus keinen autonomen Reconnect.
-- **RQ-04-01 (PARTIAL, P1):** dieselben inkonsistenten immutable Wall-Assets
-  werden in das App-Image kopiert.
+- **RQ-09-01 (CODE CLOSED / MANUAL PENDING, P2):** isolierter WebSocket-Error
+  plant auch im App-Modus genau einen begrenzten Reconnect; reale Abnahme MT-50.
+- **RQ-04-01 (CODE CLOSED / MANUAL PENDING, P1):** App und Standalone
+  referenzieren aktuell denselben v53-Assetstand; reale HAOS-/Clientabnahme
+  bleibt offen.
 - **RQ-08-03 (BROKEN, P2):** `PROJECT_STATUS.md` beschreibt noch die entfernte
   `build.yaml`-Struktur.
-- **RQ-12-01 bis RQ-12-04:** dieselben Sprint-22-/23-Befunde gelten im
-  App-Betrieb, weil kein separater Codepfad existiert.
+- **RQ-12-01 bis RQ-12-03:** in Sprint 27.1-C code-seitig geschlossen;
+  **RQ-12-04** bleibt für die vollständige Testmatrix offen.
 
 ## Schlussfolgerung
 
@@ -222,7 +223,20 @@ laut `AUDIT_INDEX.md` ausschließlich Sprint 25.
 
 ## Sprint-27.1-B-Re-Audit
 
-Standalone- und App-Paket verteilen denselben nun v52-konsistent referenzierten
-Quellbaum. `test/asset-version.test.js`, App-/Standalone-Regressionen und die
-Gesamtsuite 331/331 sind grün. RQ-04-01 ist code-seitig geschlossen; HAOS-
+Standalone- und App-Paket verteilten nach Batch B denselben v52-konsistent
+referenzierten Quellbaum. `test/asset-version.test.js` und die damalige
+Gesamtsuite 331/331 waren grün. RQ-04-01 ist code-seitig geschlossen; HAOS-
 Runtime und reale Clients bleiben `NOT TESTED`.
+
+## Sprint-27.1-C-Re-Audit
+
+Der gemeinsame Standalone-/Supervisor-WebSocketpfad behandelt Error-only und
+Error+Close nun idempotent, begrenzt Reconnectversuche und respektiert
+explizites `close()`. Auch ein synchron werfendes natives Socket-`close()`
+beendet den Gateway-Prozess nicht. Dieselbe transportneutrale Reparatur schützt Registry-,
+Label-, Automation- und Trace-Adapter, ohne einen Browser-Proxy oder neue
+Commands einzuführen. Die Sprint-22-/23-Korrekturen laufen ebenfalls vor dem
+App-Transport und ändern keine App-Berechtigung. `RQ-09-01` sowie
+`RQ-12-01/-02/-03` sind code-seitig geschlossen; die Gesamtsuite bestand
+336/336. Reale HAOS-Prüfung MT-50 und die Packaging-/Releasebefunde bleiben
+offen.

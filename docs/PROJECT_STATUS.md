@@ -1,12 +1,15 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 9. September 2026. Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
+Stand: 10. September 2026. Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
 der anschließende Repair-Queue-Consolidation-Pass wurden auf Repository-Commit
 `593ba5a` abgeschlossen. Sprint 27.1-A reparierte `RQ-16-01`, Sprint 27.1-B
-vereinheitlicht auf Basis `3830259` die routeübergreifenden immutable
-Assetversionen aus `RQ-04-01`; beide automatisierten Gate- und Re-Audit-Läufe
-sind vollständig grün. Reale iPad-/HomeScreen-/Safari-, LXC-,
-Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate bleiben offen.
+vereinheitlichte die routeübergreifenden immutable Assetversionen aus
+`RQ-04-01`. Sprint 27.1-C repariert auf Basis `7fa67a8` WebSocket-Recovery,
+Regelherkunft, dynamischen Automation-Unknown-Kontext und frische Automation-
+Impactindizes (`RQ-09-01`, `RQ-12-01/-02/-03`). Alle drei automatisierten
+Gate- und Re-Audit-Läufe sind vollständig grün. Reale iPad-/HomeScreen-/
+Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate
+bleiben offen.
 
 Dieser Bericht beschreibt den tatsächlich geprüften Stand. Er enthält keine
 Werte aus `.env`, keine Home-Assistant-Zugangsdaten und keine Admin-Tokens.
@@ -28,6 +31,7 @@ Status:
 - Repair Queue Consolidation: **COMPLETE**
 - Sprint-27.1-A / RQ-16-01: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-B / RQ-04-01: **COMPLETE – MANUAL PENDING**
+- Sprint-27.1-C / RQ-09-01, RQ-12-01 bis -03: **COMPLETE – MANUAL PENDING**
 - Manuelle Abnahme: **PENDING**
 - Finales RC-Gate: **PENDING**
 
@@ -58,6 +62,20 @@ genutzten Theme-, Style-, Compat-, Navigation-, Icon- und Presentation-Dateien.
 Fokuslauf 46/46 und Gesamtsuite 331/331 sind grün. `RQ-04-01` ist code-seitig
 geschlossen; alle physischen/Betriebsresultate bleiben `NOT TESTED`, und es
 wurde keine RC-Freigabe abgeleitet.
+
+### Sprint 27.1-C – Recovery, Regelherkunft und Automation Diagnostics
+
+Der Backend-WebSocket führt Error und Close jetzt Socket-gebunden und
+idempotent zusammen, begrenzt Reconnects, respektiert explizites Schließen und
+überlebt auch einen synchronen Fehler des nativen `close()`. Der Rule Engine
+führt die Herkunft je wirksamem Regelfeld. Dynamische Automationreferenzen
+werden als sanitizierter, auf 50 Einträge begrenzter globaler Unknown-Kontext
+gezeigt, jedoch keinem konkreten Issue als Ursache zugeschrieben. Gecachte
+statische Referenzen werden bei jedem Snapshot mit aktuellen Namen, Zuständen,
+Disabled-/Availability- und Triggerdaten zusammengeführt. Die sichtbare
+Systemänderung erhöht alle Assetreferenzen konsistent auf v53. Gateway-/
+WebSocket-Fokus 52/52 und Gesamtsuite 336/336 sind grün; verknüpfte Realtests
+bleiben `NOT TESTED`, Batch 27.1-D und das finale RC-Gate sind nicht begonnen.
 
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 

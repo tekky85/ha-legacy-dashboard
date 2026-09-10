@@ -852,6 +852,32 @@ nicht, dass das Projekt RC-ready ist.
 - Ergebnis: `RQ-04-01` **CODE CLOSED / MANUAL PENDING**. Sprint 27.1 stoppt
   planmäßig nach Batch B; kein weiterer Repair wurde begonnen.
 
+## Sprint 27.1 – Repair Batch C
+
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Basiscommit: `7fa67a8`
+- Repairs: `RQ-09-01`, `RQ-12-01`, `RQ-12-02`, `RQ-12-03`
+- WebSocket: konkrete Socketinstanzen teilen einen idempotenten Error-/Close-
+  Pfad, planen genau einen begrenzten Reconnect und tolerieren auch ein
+  synchron werfendes natives `close()` ohne Prozessabbruch.
+- Rule Engine: Feldherkunft wird getrennt geführt; das öffentliche
+  `ruleSource` benennt die Quelle des tatsächlich wirksamen Expected-Offline-,
+  Grace-, Flapping- oder Recovery-Werts, ohne die Priorität zu verändern.
+- Automation Diagnostics: dynamische Referenzen erscheinen begrenzt und
+  sanitisiert als globaler Confidence-`unknown`-Kontext, niemals als
+  erfundene konkrete Issue-Ursache. Referenzindizes kombinieren gecachte
+  Referenzen mit jedem frischen Inventory-Snapshot.
+- Re-Audit: Sprint 21, 21.3, 22, 23, 24 und 25.4; übrige Findings und
+  Gesamtbewertungen bleiben erhalten.
+- Testevidenz: 52/52 Gateway-/WebSocket-Fokus und 336/336 vollständig. Alle
+  geänderten JavaScriptdateien bestehen `node --check`; Legacy-, Asset- und
+  Securityregressionen sind grün. Ausschließlich Localhost-Mocks und
+  Fake-Credentials, kein produktives Home Assistant.
+- Manuell: MT-30/32/35/36/43–49 sind jetzt ausführbar und bleiben
+  `NOT TESTED`; MT-50 bleibt wegen `RQ-13-01/-02` blockiert.
+- Ergebnis: alle vier Repairs **CODE CLOSED / MANUAL PENDING**. Batch 27.1-D
+  wurde nicht begonnen.
+
 ## Verifikation der Audit-Baseline
 
 - Vollständige Testsuite: 329 von 329 Tests bestanden, 0 fehlgeschlagen.

@@ -123,6 +123,27 @@ function mergeInventory(inventory, referencesByEntityId) {
 }
 
 
+function referencesByEntityId(inventory) {
+    return (inventory || []).reduce(function (map, automation) {
+        map[automation.entityId] = automation.references;
+        return map;
+    }, Object.create(null));
+}
+
+
+function mergeCurrentInventory(currentInventory, cachedInventory) {
+    const merged = mergeInventory(
+        currentInventory,
+        referencesByEntityId(cachedInventory)
+    );
+
+    return {
+        inventory: merged,
+        indexes: Indexes.create(merged)
+    };
+}
+
+
 function createService(options) {
     const settings = options || {};
     const client = settings.client;
@@ -325,10 +346,7 @@ function createService(options) {
         if (!includeConfiguration || currentInventory.length === 0) {
             const cachedReferences = configCache &&
                 configCache.signature === currentSignature
-                ? configCache.inventory.reduce(function (map, automation) {
-                    map[automation.entityId] = automation.references;
-                    return map;
-                }, Object.create(null))
+                ? referencesByEntityId(configCache.inventory)
                 : Object.create(null);
             const merged = mergeInventory(currentInventory, cachedReferences);
 
@@ -347,15 +365,14 @@ function createService(options) {
             configCache.signature === currentSignature &&
             clock() < configExpiresAt
         ) {
+            const current = mergeCurrentInventory(
+                currentInventory,
+                configCache.inventory
+            );
+
             return Promise.resolve({
-                inventory: mergeInventory(
-                    currentInventory,
-                    configCache.inventory.reduce(function (map, automation) {
-                        map[automation.entityId] = automation.references;
-                        return map;
-                    }, Object.create(null))
-                ),
-                indexes: configCache.indexes,
+                inventory: current.inventory,
+                indexes: current.indexes,
                 inventorySource: inventorySource(currentInventory, collectedAt),
                 configSource: configCache.source
             });
@@ -375,9 +392,14 @@ function createService(options) {
         }
 
         return configInFlight.then(function (result) {
+            const current = mergeCurrentInventory(
+                currentInventory,
+                result.inventory
+            );
+
             return {
-                inventory: result.inventory,
-                indexes: result.indexes,
+                inventory: current.inventory,
+                indexes: current.indexes,
                 inventorySource: inventorySource(
                     currentInventory,
                     collectedAt

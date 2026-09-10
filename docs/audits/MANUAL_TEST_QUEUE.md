@@ -88,7 +88,8 @@ Repair den Test blockiert; ein Explorationslauf darf dokumentiert werden.
 IDs. Release-/Stable-Tests verwenden zusätzlich immer einen exakten,
 commitbezogenen Kandidaten.
 
-Sprint 27.1-B entfernte `RQ-04-01` aus allen Abhängigkeiten. Die dadurch allein
+Sprint 27.1-B entfernte `RQ-04-01` aus allen Abhängigkeiten. Sprint 27.1-C
+entfernt zusätzlich `RQ-09-01` und `RQ-12-01/-02/-03`. Die dadurch allein
 blockierten Tests sind nun `CAN RUN NOW`; kombinierte Einträge bleiben nur von
 ihren übrigen Repairs blockiert. Sämtliche 72 Resultate bleiben `NOT TESTED`.
 
@@ -122,28 +123,28 @@ ihren übrigen Repairs blockiert. Sämtliche 72 Resultate bleiben `NOT TESTED`.
 | MT-26 | CAN RUN NOW | – |
 | MT-27 | CAN RUN NOW | – |
 | MT-28 | CAN RUN NOW | – |
-| MT-29 | RUN AFTER ALL VISIBLE REPAIRS | RQ-09-01, RQ-12-01/02/03, RQ-18-01 |
-| MT-30 | BLOCKED | RQ-09-01 |
+| MT-29 | RUN AFTER ALL VISIBLE REPAIRS | RQ-18-01 |
+| MT-30 | CAN RUN NOW | – |
 | MT-31 | CAN RUN NOW | – |
-| MT-32 | BLOCKED | RQ-09-01 |
+| MT-32 | CAN RUN NOW | – |
 | MT-33 | CAN RUN NOW | – |
 | MT-34 | CAN RUN NOW | – |
-| MT-35 | BLOCKED | RQ-09-01 |
-| MT-36 | BLOCKED | RQ-09-01 |
+| MT-35 | CAN RUN NOW | – |
+| MT-36 | CAN RUN NOW | – |
 | MT-37 | CAN RUN NOW | – |
 | MT-38 | CAN RUN NOW | – |
 | MT-39 | CAN RUN NOW | – |
 | MT-40 | CAN RUN NOW | – |
 | MT-41 | CAN RUN NOW | – |
 | MT-42 | CAN RUN NOW | – |
-| MT-43 | BLOCKED | RQ-12-01 |
-| MT-44 | BLOCKED | RQ-12-01 |
-| MT-45 | BLOCKED | RQ-12-01 |
-| MT-46 | BLOCKED | RQ-09-01, RQ-12-02, RQ-12-03 |
-| MT-47 | BLOCKED | RQ-12-02, RQ-12-03 |
-| MT-48 | BLOCKED | RQ-09-01, RQ-12-02, RQ-12-03 |
-| MT-49 | BLOCKED | RQ-12-02, RQ-12-03 |
-| MT-50 | BLOCKED | RQ-09-01, RQ-13-01, RQ-13-02 |
+| MT-43 | CAN RUN NOW | – |
+| MT-44 | CAN RUN NOW | – |
+| MT-45 | CAN RUN NOW | – |
+| MT-46 | CAN RUN NOW | – |
+| MT-47 | CAN RUN NOW | – |
+| MT-48 | CAN RUN NOW | – |
+| MT-49 | CAN RUN NOW | – |
+| MT-50 | BLOCKED | RQ-13-01, RQ-13-02 |
 | MT-51 | BLOCKED | RQ-13-01 |
 | MT-52 | BLOCKED | RQ-13-01, RQ-14-02 |
 | MT-53 | BLOCKED | RQ-13-01 |
@@ -2097,8 +2098,9 @@ Requirement: Reale Supervisor-Core-WebSocket-Kommunikation, sichere
 Teil-Ausfälle, autonome Recovery und secretfreie App-Logs.
 Device: Home Assistant OS auf amd64 mit einer kontrollierten Testinstanz;
 Desktop-Safari für die Beobachtung.
-Preconditions: `RQ-13-01`, `RQ-13-02` und `RQ-09-01` vor finaler Abnahme
-behoben; neue unveränderliche Testversion installiert; mindestens je eine
+Preconditions: `RQ-09-01` ist automatisiert geschlossen; `RQ-13-01` und
+`RQ-13-02` müssen vor finaler Abnahme behoben und eine neue unveränderliche
+Testversion installiert sein; mindestens je eine
 Registry-/Area-/Label-/Config-Entry-/Repair- und Automation-Testinformation;
 kein Long-Lived HA Token in den App-Optionen; separates Test-Admin-Token.
 Exact route/page: App-Logansicht, `/health`, `/api/status`, `/admin`,
@@ -3249,7 +3251,7 @@ Device: Mac mit macOS 13.7.8 und der dort installierten Safari-Version;
 Standalone-LXC `ha-legacy-dashboard` gegen ein kontrolliertes Test-Home-
 Assistant.
 Preconditions: Auditstand ist auf einem separaten Test-/LXC-Dienst ausgerollt;
-`RQ-04-01` und `RQ-09-01` sind vor der finalen Abnahme behoben; eigener
+die automatisierten Gates `RQ-04-01` und `RQ-09-01` sind geschlossen; eigener
 Test-Admin-Token; keine Produktions-`.env` oder Secrets im Browser/Screenshot;
 ein Proxy oder Testnetz kann den HA-WebSocket getrennt von REST unterbrechen.
 Exact route/page: `/system/errors`, `/system/summary`, `/admin` und
@@ -3436,7 +3438,8 @@ Sprint: 21, 21.1
 Requirement: Registry-Kontext, echte Device Groups, Filter/Details, Theme,
 Scroll und Partial-Failure-Verhalten auf Safari iOS 9 im HomeScreen-Modus.
 Device: iPad mini 1, iOS 9.3.5, als HomeScreen-Web-App.
-Preconditions: Aktueller Build ausgerollt; `RQ-04-01` und `RQ-09-01` behoben;
+Preconditions: Aktueller Build ausgerollt; die automatisierten Gates
+`RQ-04-01` und `RQ-09-01` sind geschlossen;
 HomeScreen-Link verwendet dieselbe HTTP-Origin; kontrollierte Testdaten aus
 MT-30/31; kein Admin-Token auf dem iPad; Cache nach Rollout erneuert.
 Exact route/page: `/d/<device-group-test-dashboard-id>`, `/system/errors` und
@@ -3783,7 +3786,7 @@ Device: macOS 13.7.8 Safari, Standalone-LXC und kontrolliertes Test-HA.
 Preconditions: Separater Test-Admin-Token; HA-Label und Labelmodus aus MT-35;
 ein gelabeltes Testdevice mit kritischem unknown/unavailable Child; Möglichkeit,
 Label-Registry-WebSocket getrennt von REST-States zu unterbrechen; `RQ-09-01`
-ist vor der finalen Recovery-Abnahme behoben.
+ist automatisiert geschlossen.
 Exact route/page: `/admin`, `/system/errors` und
 `/api/admin/system-diagnostics/status` derselben Origin.
 Test data/entity/card required: stabiles Label `critical-test` mit sichtbarem

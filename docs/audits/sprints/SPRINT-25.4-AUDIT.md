@@ -95,7 +95,7 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-REST-01 | Supervisor Core REST funktioniert in lokaler Isolation | PASS | Sprint-24-Test lädt States über lokalen Supervisor-Mock ohne HA-Token. |
 | 25.4-REST-02 | Supervisor REST funktioniert im aktuellen realen App-Container | NOT TESTED | Historisch RC.1 belegt; aktueller Build nicht veröffentlicht/installiert. MT-52. |
 | 25.4-WS-01 | Supervisor Core WebSocket funktioniert in lokaler Isolation | PASS | Authentifizierung und normalisierte Registrymetadaten im Sprint-24-Test. |
-| 25.4-WS-02 | Supervisor WebSocket funktioniert/recovert im aktuellen realen App-Container | NOT TESTED | Historische Checkliste selbst `BLOCKED`; MT-50. Error-only-Reconnect bleibt `RQ-09-01`. |
+| 25.4-WS-02 | Supervisor WebSocket funktioniert/recovert im aktuellen realen App-Container | NOT TESTED | Error-only-Reconnect ist seit Sprint 27.1-C automatisiert repariert; aktueller realer App-Container bleibt MT-50. |
 | 25.4-LAN-01 | App bindet nicht nur localhost | PASS | Wrapper setzt `BIND_ADDRESS=0.0.0.0`; Serverdefault ebenfalls; Portmapping 3000. |
 | 25.4-LAN-02 | Keine Ingress-/Hostnetwork-/Hostname-Pflicht | PASS | Relative Browserpfade, direkter Port, kein Ingress/host_network/DNS-Hack. |
 | 25.4-LAN-03 | Aktueller App-Build ist real per IP:Port und `/health` erreichbar | NOT TESTED | Historische IPv4-Evidenz gilt RC.1; Part 17 führt keinen Produktionsnetztest aus. MT-54. |
@@ -115,7 +115,7 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-CONTROL-02 | Reale bestehende Controls auf dem Kandidaten-iPad | NOT TESTED | Historische Einzelbestätigung ersetzt nicht den zusammenhängenden aktuellen Gate-Lauf. MT-54. |
 | 25.4-PERSIST-01 | Appdatenpfad `/data` und atomare Persistenz sind implementiert | PASS | Runtime/Wrapper/Config- und Assetstores; lokale Tests. |
 | 25.4-PERSIST-02 | Theme, Config, Regeln und Background über realen App-Restart | NOT TESTED | Theme ist browserlokal, Serverdaten unter `/data`; aktueller HAOS-Lauf fehlt. MT-51/52. |
-| 25.4-HA-RESTART-01 | HA-Neustart und automatische Recovery | PARTIAL | Grundlegender Retry/Stale-Pfad vorhanden; isolierter WS-Error ohne Close plant keinen Reconnect. `RQ-09-01`; realer Lauf MT-50/52. |
+| 25.4-HA-RESTART-01 | HA-Neustart und automatische Recovery | PARTIAL | Retry/Stale und Error-only-Reconnect sind automatisiert PASS (`RQ-09-01` code-seitig geschlossen); der reale HAOS-Lauf MT-50/52 fehlt. |
 | 25.4-HOST-01 | HAOS-Host-Reboot und App-Autostart | NOT TESTED | `boot:auto` statisch vorhanden; realer Reboot MT-52. |
 | 25.4-LXC-01 | Aktueller Standalone-Quellstand besteht lokale Regression | PASS | 92/92 Part-17-Fokus und 329/329 Gesamttests, ausschließlich lokale Mocks. |
 | 25.4-LXC-02 | Aktuelles Releasebundle installiert/startet auf realem LXC | NOT TESTED | Öffentlicher Tarball ist alter RC.1-Stand und operativ unvollständig; MT-56. |
@@ -164,7 +164,7 @@ ausdrücklich auf `741bba4` begrenzt.
 | Home Assistant App aktueller Kandidat | BLOCKED | Aktuelles Image fehlt; reale Prüfung kann erst danach erfolgen. |
 | Reale App-Installation/Startup | NOT TESTED | Nur historische RC.1-Evidenz. |
 | Supervisor REST real | NOT TESTED | Nur historisch RC.1; aktueller Kandidat fehlt. |
-| Supervisor WebSocket/Recovery real | NOT TESTED | MT-50; zusätzlich RQ-09-01. |
+| Supervisor WebSocket/Recovery real | NOT TESTED | Automatisiertes RQ-09-01-Gate PASS; reale Abnahme MT-50. |
 | Direct LAN/WebUI real | NOT TESTED | Statische Bind-/Portkonfiguration PASS; aktueller Kandidat nicht real geprüft. |
 | App-`/data`, Restart, Backup/Upgrade | NOT TESTED | MT-51/52. |
 | Default/Custom/Summary/Errors lokal | PASS | Aktuelle localhost-Regression grün. |
@@ -262,7 +262,21 @@ Stand für RC/Stable `BLOCKED`; es wurde kein Image oder Release veröffentlicht
 
 ## Sprint-27.1-B-Re-Audit
 
-Der Cache-P1-Befund RQ-04-01 ist durch einheitliches v52 und den neuen
+Der Cache-P1-Befund RQ-04-01 wurde in Batch B durch einheitliches v52 und den neuen
 Gleichheitstest code-seitig geschlossen; Gesamtsuite 331/331 ist grün. Die
 übrigen RC-Blocker und realen Gates bleiben unverändert offen, daher bleibt
 Sprint 25.4 insgesamt `FAIL`/RC `BLOCKED`.
+
+## Sprint-27.1-C-Re-Audit
+
+`RQ-09-01` ist automatisiert geschlossen: Der gemeinsame Standalone-/App-
+WebSocketpfad reconnectet bei Error-only genau einmal, dedupliziert ein
+nachfolgendes Close, begrenzt Backoffversuche und bleibt nach explizitem
+Client-Close beendet. Ein synchron werfendes natives Socket-`close()` beendet
+den Gateway-Prozess nicht. `RQ-12-01/-02/-03` sind ebenfalls code-seitig geschlossen
+und die aktuelle UI wird routeübergreifend mit v53 ausgeliefert; RQ-04-01
+bleibt damit geschlossen. Die Gesamtsuite bestand 336/336. MT-50 ist
+hinsichtlich des Transportfixes nicht mehr
+blockiert, bleibt wegen `RQ-13-01/-02` und fehlendem realem HAOS-Kandidaten
+`NOT TESTED`. Die übrigen P1-/RC-Blocker bleiben unverändert; Sprint 25.4 und
+das RC-Gate bleiben `BLOCKED`.

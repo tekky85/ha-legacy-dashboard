@@ -255,9 +255,69 @@ test("Reference Index und Impact unterscheiden direct, indirect und unvollständ
     assert.equal(indirect.disabled, true);
     assert.equal(analysis.dynamicCount, 1);
     assert.equal(analysis.unknownConfidence, "unknown");
+    assert.equal(analysis.unknownImpacts.length, 1);
+    assert.deepEqual(analysis.unknownImpacts[0], {
+        entityId: "automation.dynamic",
+        name: "Dynamische Automation",
+        state: "on",
+        available: true,
+        disabled: false,
+        lastTriggered: null,
+        confidence: "unknown",
+        reasons: ["dynamic"],
+        dynamicReferences: true
+    });
+    assert.equal(analysis.unknownImpactsTruncated, false);
     assert.equal(impact.some(function (item) {
         return item.entityId === "automation.dynamic";
     }), false);
+});
+
+
+test("Globaler Unknown-Kontext bleibt sanitisiert, kausalitätsfrei und begrenzt", function () {
+    const inventory = [];
+    let index;
+
+    for (index = 0; index < 55; index++) {
+        inventory.push({
+            entityId: "automation.dynamic_" + index,
+            name: "Dynamisch " + index,
+            state: index === 0 ? "off" : "on",
+            available: true,
+            lastTriggered: null,
+            references: Object.assign(
+                AutomationNormalizers.emptyReferences(),
+                {dynamicReferences: true}
+            ),
+            secret: "must-not-leak"
+        });
+    }
+
+    const snapshot = {
+        entities: [{entityId: "sensor.issue", context: {}}],
+        metadata: {entities: {}, devices: {}, areas: {}},
+        automations: {
+            inventory: inventory,
+            indexes: AutomationIndexes.create(inventory)
+        },
+        sources: {automationConfig: source()}
+    };
+    const analysis = AutomationImpact.analysis(snapshot);
+
+    assert.equal(analysis.dynamicCount, 55);
+    assert.equal(
+        analysis.unknownImpacts.length,
+        AutomationImpact.MAX_UNKNOWN_IMPACTS
+    );
+    assert.equal(analysis.unknownImpactsTruncated, true);
+    assert.equal(analysis.unknownImpacts[0].confidence, "unknown");
+    assert.equal(analysis.unknownImpacts[0].disabled, true);
+    assert.deepEqual(analysis.unknownImpacts[0].reasons, ["dynamic"]);
+    assert.equal(JSON.stringify(analysis).includes("must-not-leak"), false);
+    assert.deepEqual(
+        AutomationImpact.forIssue(snapshot, {entityId: "sensor.issue"}),
+        []
+    );
 });
 
 
@@ -374,6 +434,82 @@ test("Config Adapter nutzt feste Commands, Cache und Inflight-Deduplizierung", a
     assert.equal(results[0].indexes.automationsByEntityId["binary_sensor.window"].length, 2);
     assert.equal(JSON.stringify(results).includes("raw-secret"), false);
     assert.equal(JSON.stringify(logs).includes("raw-secret"), false);
+});
+
+
+test("Reference Cache kombiniert gecachte Referenzen mit aktuellen Automation-Metadaten", async function () {
+    let now = Date.parse("2026-08-24T10:00:00Z");
+    let calls = 0;
+    const service = AutomationService.createService({
+        client: {
+            request: function () {
+                calls += 1;
+                return Promise.resolve({config: {
+                    triggers: [{entity_id: "binary_sensor.window"}]
+                }});
+            }
+        },
+        logger: {info: function () {}, warn: function () {}},
+        clock: function () {
+            return now;
+        },
+        configTtlMs: 60000
+    });
+
+    function current(state, name, lastTriggered) {
+        return Snapshot.createSuccessful([
+            rawState("automation.one", state, {
+                id: "one",
+                friendly_name: name,
+                last_triggered: lastTriggered
+            }, new Date(now).toISOString())
+        ], new Date(now).toISOString()).entities;
+    }
+
+    await service.getMetadata(current(
+        "on",
+        "Alter Name",
+        "2026-08-24T09:00:00Z"
+    ), true);
+    now += 1000;
+    const second = await service.getMetadata(current(
+        "off",
+        "Neuer Name",
+        "2026-08-24T09:30:00Z"
+    ), true);
+    const indexed = second.indexes.inventoryByEntityId["automation.one"];
+
+    assert.equal(calls, 1);
+    assert.deepEqual(
+        second.indexes.automationsByEntityId["binary_sensor.window"],
+        ["automation.one"]
+    );
+    assert.equal(second.inventory[0].state, "off");
+    assert.equal(indexed.state, "off");
+    assert.equal(indexed.disabled, undefined);
+    assert.equal(indexed.name, "Neuer Name");
+    assert.equal(indexed.lastTriggered, "2026-08-24T09:30:00.000Z");
+
+    now += 1000;
+    const third = await service.getMetadata(current(
+        "on",
+        "Dritter Name",
+        "2026-08-24T09:45:00Z"
+    ), true);
+    const issueImpact = AutomationImpact.forIssue({
+        entities: [{entityId: "binary_sensor.window", context: {}}],
+        metadata: {entities: {}, devices: {}, areas: {}},
+        automations: third
+    }, {entityId: "binary_sensor.window"});
+
+    assert.equal(calls, 1);
+    assert.equal(issueImpact[0].state, "on");
+    assert.equal(issueImpact[0].disabled, false);
+    assert.equal(issueImpact[0].name, "Dritter Name");
+    assert.equal(
+        issueImpact[0].lastTriggered,
+        "2026-08-24T09:45:00.000Z"
+    );
 });
 
 

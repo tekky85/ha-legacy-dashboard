@@ -1117,6 +1117,49 @@
     }
 
 
+    function renderUnknownAutomationContext(analysis) {
+
+        var list = SystemDashboard.byId("advancedAutomationDynamicList");
+        var impacts = analysis && analysis.unknownImpacts
+            ? analysis.unknownImpacts
+            : [];
+        var item;
+        var index;
+
+        if (!list) {
+            return;
+        }
+
+        list.innerHTML = "";
+        list.hidden = impacts.length === 0;
+
+        for (index = 0; index < impacts.length; index++) {
+            item = createElement("li", "advanced-automation-dynamic-item");
+            item.appendChild(createElement(
+                "strong",
+                "advanced-automation-dynamic-name",
+                impacts[index].name || impacts[index].entityId
+            ));
+            item.appendChild(createElement(
+                "span",
+                "advanced-automation-dynamic-confidence",
+                "Confidence: unknown – keinem konkreten Problem zugeordnet"
+            ));
+            item.appendChild(createElement(
+                "span",
+                "advanced-automation-dynamic-state",
+                impacts[index].disabled
+                    ? "Automation ist deaktiviert"
+                    : impacts[index].available
+                        ? "Automation ist verfügbar"
+                        : "Automation ist nicht verfügbar"
+            ));
+            list.appendChild(item);
+        }
+
+    }
+
+
     function renderAdvancedDiagnostics(payload) {
 
         var details = SystemDashboard.byId("advancedDiagnosticsDetails");
@@ -1165,6 +1208,7 @@
                         " Automationen – Analyse möglicherweise unvollständig"
                 : "Keine erkannt"
         );
+        renderUnknownAutomationContext(analysis);
         SystemDashboard.setText(
             "advancedRegistryStatus",
             sourceLabel(sources.entityRegistry)

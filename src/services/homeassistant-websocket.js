@@ -161,9 +161,22 @@ function createClient(options) {
     }
 
 
-    function sendAuthentication() {
+    function closeSocket(activeSocket) {
+        if (!activeSocket || typeof activeSocket.close !== "function") {
+            return;
+        }
+
         try {
-            socket.send(JSON.stringify({
+            activeSocket.close();
+        } catch (error) {
+            log.warn("ha_ws_close_failed", {});
+        }
+    }
+
+
+    function sendAuthentication(activeSocket) {
+        try {
+            activeSocket.send(JSON.stringify({
                 type: "auth",
                 access_token: token
             }));
@@ -174,9 +187,7 @@ function createClient(options) {
             );
             rejectConnection(connectionError);
             rejectPending(connectionError);
-            if (socket && typeof socket.close === "function") {
-                socket.close();
-            }
+            closeSocket(activeSocket);
         }
     }
 
@@ -192,7 +203,11 @@ function createClient(options) {
     }
 
 
-    function handleMessage(event) {
+    function handleMessage(event, activeSocket) {
+
+        if (socket !== activeSocket) {
+            return;
+        }
 
         const message = parseMessage(event);
 
@@ -201,7 +216,7 @@ function createClient(options) {
         }
 
         if (message.type === "auth_required") {
-            sendAuthentication();
+            sendAuthentication(activeSocket);
             return;
         }
 
@@ -234,9 +249,7 @@ function createClient(options) {
             rejectConnection(error);
             rejectPending(error);
 
-            if (socket && typeof socket.close === "function") {
-                socket.close();
-            }
+            closeSocket(activeSocket);
             return;
         }
 
@@ -289,14 +302,18 @@ function createClient(options) {
     }
 
 
-    function handleDisconnect() {
+    function handleDisconnect(disconnectedSocket, disconnectError) {
+
+        if (socket !== disconnectedSocket) {
+            return;
+        }
 
         const wasAuthenticated = authenticated;
         authenticated = false;
         socket = null;
         clearConnectionTimer();
 
-        const error = createError(
+        const error = disconnectError || createError(
             "ha_websocket_unavailable",
             "Home-Assistant-WebSocket-Verbindung getrennt"
         );
@@ -331,8 +348,11 @@ function createClient(options) {
             connectionReject = reject;
         });
 
+        let activeSocket;
+
         try {
             socket = new WebSocketImplementation(url);
+            activeSocket = socket;
         } catch (error) {
             const failedConnection = connectionPromise;
             const connectionError = createError(
@@ -344,15 +364,20 @@ function createClient(options) {
             return failedConnection;
         }
 
-        socket.addEventListener("message", handleMessage);
-        socket.addEventListener("close", handleDisconnect);
+        activeSocket.addEventListener("message", function (event) {
+            handleMessage(event, activeSocket);
+        });
+        activeSocket.addEventListener("close", function () {
+            handleDisconnect(activeSocket);
+        });
         socket.addEventListener("error", function () {
-            if (!authenticated) {
-                rejectConnection(createError(
-                    "ha_websocket_unavailable",
-                    "Home-Assistant-WebSocket-Verbindungsfehler"
-                ));
-            }
+            const error = createError(
+                "ha_websocket_unavailable",
+                "Home-Assistant-WebSocket-Verbindungsfehler"
+            );
+
+            handleDisconnect(activeSocket, error);
+            closeSocket(activeSocket);
         });
 
         connectionTimer = schedule(function () {
@@ -360,11 +385,9 @@ function createClient(options) {
                 "ha_websocket_timeout",
                 "Home-Assistant-WebSocket-Verbindungs-Timeout"
             );
-            rejectConnection(error);
-            rejectPending(error);
-            if (socket && typeof socket.close === "function") {
-                socket.close();
-            }
+
+            handleDisconnect(activeSocket, error);
+            closeSocket(activeSocket);
         }, connectTimeoutMs);
 
         return connectionPromise;
@@ -432,9 +455,7 @@ function createClient(options) {
             "ha_websocket_unavailable",
             "Home-Assistant-WebSocket wurde geschlossen"
         ));
-        if (socket && typeof socket.close === "function") {
-            socket.close();
-        }
+        closeSocket(socket);
         socket = null;
         authenticated = false;
     }

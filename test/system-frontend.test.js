@@ -84,7 +84,8 @@ function createHarness(pathname, entryFile, options) {
         "advancedDiagnosticsTitle", "advancedDiagnosticsSummary",
         "advancedDiagnosticsDetails", "advancedAutomationInventory",
         "advancedAutomationConfig", "advancedAutomationTrace",
-        "advancedAutomationDynamic", "advancedRegistryStatus",
+        "advancedAutomationDynamic", "advancedAutomationDynamicList",
+        "advancedRegistryStatus",
         "advancedRepairsStatus", "advancedDiagnosticsNote"
     ].forEach(function (id) {
         elements[id] = createElement();
@@ -948,14 +949,40 @@ test("Advanced Diagnostics lädt Trace Summaries ausschließlich on-demand", fun
             }]
         }],
         automationAnalysis: {
-            inventoryCount: 1,
-            dynamicCount: 0,
+            inventoryCount: 2,
+            dynamicCount: 1,
+            unknownImpacts: [{
+                entityId: "automation.dynamic",
+                name: "Dynamische Automation",
+                state: "on",
+                available: true,
+                disabled: false,
+                confidence: "unknown"
+            }],
             configStatus: "available"
         },
         meta: meta(true, false, "2026-08-11T18:00:00.000Z")
     });
 
     assert.equal(harness.requests.length, 1);
+    assert.equal(
+        harness.elements.advancedAutomationDynamicList.hidden,
+        false
+    );
+    assert.equal(
+        harness.elements.advancedAutomationDynamicList.children.length,
+        1
+    );
+    assert.equal(
+        harness.elements.advancedAutomationDynamicList.children[0]
+            .children[0].children[0].textContent,
+        "Dynamische Automation"
+    );
+    assert.equal(
+        harness.elements.advancedAutomationDynamicList.children[0]
+            .children[1].children[0].textContent,
+        "Confidence: unknown – keinem konkreten Problem zugeordnet"
+    );
     harness.elements.advancedDiagnosticsToggle.onclick();
     assert.equal(harness.requests.length, 2);
     assert.equal(
@@ -1002,12 +1029,13 @@ test("System-Shell bleibt ES5 und frei von CSS Grid", function () {
     assert.match(html, /Daten werden geladen …/);
     assert.match(html, /class="theme-icon-moon"/);
     assert.match(html, /class="theme-icon-sun"/);
-    assert.match(html, /\/js\/core\/compat\.js\?v=52/);
+    assert.match(html, /\/js\/core\/compat\.js\?v=53/);
     assert.match(html, /id="dashboardReturnNavigation"/);
-    assert.match(html, /\/js\/core\/system-navigation\.js\?v=52/);
+    assert.match(html, /\/js\/core\/system-navigation\.js\?v=53/);
     assert.match(html, /id="errorOverallLabel"/);
     assert.match(html, /id="errorFilterAll"/);
     assert.match(html, /id="errorUnknownCount"/);
+    assert.match(html, /id="advancedAutomationDynamicList"/);
     assert.match(html, /Keine passenden aktiven Zustände\./);
     assert.match(source, /Legacy\.http\.get/);
     assert.match(source, /MAX_RENDERED_ISSUES\s*=\s*200/);

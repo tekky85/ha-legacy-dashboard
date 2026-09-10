@@ -23,15 +23,12 @@ Admin-Draft/Persistenz und vollständige serverseitige Validierung sind im
 aktuellen Code belegt. Es gibt keine History-Abfrage, keinen zusätzlichen HA-
 Poll und keine neue Write-Fähigkeit.
 
-Ein kontrollierter Direktnachweis fand jedoch einen kleinen aktuellen
-Korrektheitsdefekt: Bei einer wirksamen Domain-Regel meldet `resolveRule()`
-`ruleSource: "risk_class"`, sobald die darüberliegende Risk-Class-Schicht
-irgendeine Regelstruktur besitzt, obwohl der konkret wirksame Wert aus der
-Domain-Regel stammt. Die Regelwirkung selbst ist korrekt; die öffentliche
-Herkunftsmetadaten-Aussage ist falsch (`RQ-12-01`). Weitere `PARTIAL`-Punkte
-sind die nicht vollständig einzeln rückverfolgbare 80-Punkte-Testmatrix,
-routeabhängige immutable Cache-Buster, veraltete Screenshots und ausstehende
-reale HA-/LXC-/iPad-Abnahmen.
+Sprint 27.1-C schließt den zuvor reproduzierten Erklärbarkeitsdefekt
+`RQ-12-01`: Die Auflösung führt nun Herkunft pro wirksamem Regelfeld und wählt
+für Expected Offline, Grace, Flapping und Recovery die tatsächlich verwendete
+Quelle. Die fachliche Wertpriorität blieb unverändert. `PARTIAL` bleiben die
+nicht vollständig einzeln rückverfolgbare 80-Punkte-Testmatrix, veraltete
+Screenshots und ausstehende reale HA-/LXC-/iPad-Abnahmen.
 
 ## Requirement Matrix
 
@@ -77,7 +74,7 @@ reale HA-/LXC-/iPad-Abnahmen.
 | 22-PRIO3 | `securityEntities` vor Critical Detection und Risk | PASS | `classifyRisk()` | Explizite Security bleibt autoritativ. |
 | 22-PRIO4 | Critical Detection Mode vor automatisch klassifizierter Risk Class | PASS | `modeCriticalEligible`; Label-/Device-Class-Regressionen | Kein Browserentscheid. |
 | 22-PRIO5 | Risk Class vor Domain vor Default | PASS | Apply-Reihenfolge defaults → domain → risk | Effektive Feldwerte sind korrekt. |
-| 22-PRIO6 | `ruleSource` bezeichnet die tatsächlich wirksame Regelquelle | BROKEN | Direktprobe: Domain setzt `expectedOffline=true`, Ergebnis meldet trotzdem `ruleSource="risk_class"`; `resolveRule()` setzt Source bei jeder vorhandenen Risk-Regel | Regelwirkung korrekt, Herkunftsmetadatum falsch; `RQ-12-01`. |
+| 22-PRIO6 | `ruleSource` bezeichnet die tatsächlich wirksame Regelquelle | PASS | `rule-engine.js:applyRule()`, `ruleSources`, `sourceForField()`; gemischter Domain/Risk/Device/Entity-Test in `test/sprint-22.test.js` | Expected Offline, Unknown/Unavailable Grace, Flapping und Recovery verwenden die Quelle des tatsächlich wirksamen Felds; Wertpriorität unverändert. `RQ-12-01` code-seitig geschlossen. |
 | 22-PRIO7 | Error Ignore bleibt höchste Ausblendgrenze | PASS | `buildIssues()` überspringt Ignore vor `evaluate()` | Ignore erteilt keine Capability. |
 | 22-ADM1 | Entity Rule Manager bietet Summary Ignore, Security, Error Ignore und Expected Offline | PASS | `createEntityRuleCard()` | Gemeinsamer Batch-Draft. |
 | 22-ADM2 | Erweiterte Entity-/Device-Regeln sind standardmäßig eingeklappt | PASS | `<details class="entity-rule-advanced">` im modernen Admin | Admin darf moderne Browser voraussetzen. |
@@ -103,7 +100,7 @@ reale HA-/LXC-/iPad-Abnahmen.
 | 22-MAN3 | Error-/Health-/Device-Group-Darstellung auf iPad mini/iOS 9 | NOT TESTED | MT-45 | Keine physische Geräteprüfung. |
 | 22-SHOT1 | Aktuelle echte Errors-/Entity-Rules-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Bilder belegen den heutigen Stand nicht vollständig. |
 | 22-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Regeln | PASS | README DE/EN; `PROJECT_STATUS.md`; Roadmap | Semantik ist dokumentiert; allgemeine Statusdatei bleibt separat `RQ-08-03`. |
-| 22-CACHE1 | Geänderte gemeinsame Assets besitzen routeübergreifend gleiche Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js`; immutable Header bleiben erhalten. | RQ-04-01 code-seitig geschlossen. |
+| 22-CACHE1 | Geänderte gemeinsame Assets besitzen routeübergreifend gleiche Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v53; `test/asset-version.test.js`; immutable Header bleiben erhalten. | RQ-04-01 bleibt code-seitig geschlossen. |
 
 ## Current Rule Pipeline
 
@@ -159,7 +156,7 @@ weiterhin aus zuverlässigem `last_changed` rekonstruiert.
 
 ## Repair Mapping
 
-- `RQ-12-01` – tatsächlich wirksame Regelquelle korrekt attribuieren;
+- `RQ-12-01` – in Sprint 27.1-C code-seitig geschlossen;
 - `RQ-12-04` – nummerierte Sprint-22-/23-Testmatrizen rückverfolgbar härten;
 - `RQ-04-01` – in Sprint 27.1-B code-seitig geschlossen;
 - `RQ-08-02` – veraltete Produktbilder;
@@ -175,6 +172,16 @@ Tests bzw. Audit Part 13 vorbehalten.
 
 ## Remaining Sprint 22 Gaps
 
-Vor `COMPLETE` sind `RQ-12-01`, `RQ-12-04`, `RQ-08-02` und die
-realen MT-43 bis MT-45 zu schließen. Der zentrale Regel-, Grace-, Flapping-,
-Recovery- und Autorisierungsendzustand ist ansonsten vorhanden.
+Vor `COMPLETE` sind `RQ-12-04`, `RQ-08-02` und die realen MT-43 bis MT-45 zu
+schließen. Der zentrale Regel-, Grace-, Flapping-, Recovery- und
+Autorisierungsendzustand ist ansonsten vorhanden.
+
+## Sprint-27.1-C-Re-Audit
+
+`RQ-12-01` ist **CODE CLOSED / MANUAL PENDING**. `resolveRule()` speichert die
+Herkunft jedes effektiven Felds getrennt. Die Evaluation veröffentlicht für
+den jeweils entscheidenden Pfad – Expected Offline, zustandsspezifische Grace,
+Flapping oder Stable Recovery – die passende Quelle. Der Mischtest belegt
+Domain, Risk Class, Device, Entity, Security Override und Critical Detection,
+ohne die festgelegte Merge-Priorität zu verändern. MT-43 bis MT-45 sind nun
+ausführbar und bleiben `NOT TESTED`.

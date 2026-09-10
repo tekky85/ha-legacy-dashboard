@@ -22,15 +22,13 @@ Tracevariablen, Action-/Servicedaten und Credentials erreichen den Browser
 nicht. Trace Summaries werden nur bei geöffneten Advanced Diagnostics und
 vorhandenem Impact geladen; es existiert keine Automation-Write-Fläche.
 
-Zwei aktuelle fachliche Lücken sind reproduziert: Rein dynamische Referenzen
-werden zwar global gezählt, der Produktionspfad erzeugt aber niemals einen
-Impact mit der verbindlichen Confidence `unknown` (`RQ-12-02`). Außerdem gibt
-der Config-Cache bei gleichem Entity-ID-Satz einen alten `inventoryByEntityId`-
-Index zurück. Dadurch können Impact-Karten bis zum 60-s-TTL einen veralteten
-Automation-State, Disabled-Kontext oder `lastTriggered` zeigen, obwohl das
-öffentliche Inventory bereits aktuell ist (`RQ-12-03`). Der Sprint bleibt
-deshalb zusammen mit Testmatrix-, Cache-Buster-, Screenshot- und manuellen
-Abnahmelücken `PARTIAL`.
+Sprint 27.1-C schließt die zwei reproduzierten fachlichen Lücken: Dynamische
+Referenzen erscheinen nun als begrenzter, sanitizierter und ausdrücklich
+kausalitätsfreier globaler `unknown`-Kontext (`RQ-12-02`). Außerdem werden die
+Reference-Indizes bei jedem Snapshot aus frischem Inventory und gecachten
+Referenzen neu aufgebaut, sodass State, Disabled-Kontext, Name und
+`lastTriggered` nicht mehr bis zum 60-s-TTL veralten (`RQ-12-03`). Der Sprint
+bleibt wegen Testmatrix-, Screenshot- und manuellen Abnahmelücken `PARTIAL`.
 
 ## Requirement Matrix
 
@@ -55,7 +53,7 @@ Abnahmelücken `PARTIAL`.
 | 23-IDX2 | Inventory ist stabil nach Automation-Entity-ID indiziert | PASS | `inventoryByEntityId` | Dient dem Impact-Kontext. |
 | 23-CONF1 | Explizite Entity-/Device-Referenz ist `direct` | PASS | `impact.js:forIssue()` | Gründe `entity`/`device`. |
 | 23-CONF2 | Area-/Label-Referenz ist `indirect` | PASS | `forIssue()` | Metadaten verwenden stabile Registry-IDs. |
-| 23-CONF3 | Dynamische/nicht auflösbare Referenz kann als `unknown`-Impact dargestellt werden | MISSING | `CONFIDENCE_ORDER`/UI kennen `unknown`, aber `forIssue()` iteriert `dynamicAutomationEntityIds` nie; Direktprobe liefert leeres Impactarray | Nur globaler Dynamic Count; kein produktiver Unknown-Impact. `RQ-12-02`. |
+| 23-CONF3 | Dynamische/nicht auflösbare Referenz kann als `unknown`-Impact dargestellt werden | PASS | `impact.js:analysis()` liefert begrenzte `unknownImpacts`; `errors.js:renderUnknownAutomationContext()`; Backend-/Frontendtests | Globale Liste nennt Confidence `unknown` und ordnet die Automation ausdrücklich keinem konkreten Problem zu; `forIssue()` bleibt konservativ. `RQ-12-02` code-seitig geschlossen. |
 | 23-CONF4 | Confidence wird bei Mehrfachtreffern deterministisch auf stärksten Nachweis reduziert | PASS | `addReason()`/`merge()` | direct vor indirect vor unknown. |
 | 23-CAUS1 | UI behauptet keine Kausalität | PASS | „möglicherweise betroffen“; `advancedDiagnosticsNote` | Referenz wird nicht als Ursache bezeichnet. |
 | 23-DEV1 | Device Groups zeigen deduplizierten Impact Count und Liste | PASS | `presentation.js:createDeviceGroup()`/`addToDeviceGroup()` | Impacts mehrerer Children werden zusammengeführt. |
@@ -81,11 +79,11 @@ Abnahmelücken `PARTIAL`.
 | 23-ADM1 | Admin Diagnostic Sources enthält Inventory, Config Read und Trace Read | PASS | `src/admin/js/app.js:renderDiagnosticsStatus()` | Ausschließlich Status, keine Automation-Controls. |
 | 23-CACHE1 | Config-/Reference-Cache liegt im geforderten Bereich und dedupliziert Inflight | PASS | 60-s-TTL, `configInFlight`; Config-Adapter-Test | Workerpool max. acht Requests. |
 | 23-CACHE2 | Trace-Cache liegt im geforderten Bereich und dedupliziert Inflight | PASS | 30-s-TTL, `traceInFlight`; Trace-Cache-Test | Workerpool max. sechs Requests. |
-| 23-CACHE3 | Aktuelle Automation-State-/Trigger-Metadaten bleiben trotz Reference-Cache aktuell | BROKEN | Direktprobe `on→off`: `inventory.state=off`, aber `indexes.inventoryByEntityId.state=on`/alte Triggerzeit; Cache-Hit gibt `configCache.indexes` zurück | Impact verwendet den alten Index bis TTL; `RQ-12-03`. |
+| 23-CACHE3 | Aktuelle Automation-State-/Trigger-Metadaten bleiben trotz Reference-Cache aktuell | PASS | `service.js:mergeCurrentInventory()` baut bei Cache-Hit und Inflight-Rückgabe den Index neu; Cachetest `on→off→on`, Name und Triggerzeit | Referenz-TTL bleibt erhalten, während Impact-Metadaten jedem frischen State-Snapshot folgen. `RQ-12-03` code-seitig geschlossen. |
 | 23-FAIL1 | Unsupported Config lässt Inventory und Dashboard nutzbar | PASS | `configFailure()`; Unsupported-Test | Capability wird `unsupported`. |
 | 23-FAIL2 | Partial Config Failure behält verfügbare/last-known Referenzen | PASS | `refreshConfig()` merged vorherige Einzelreferenzen | Source meldet `automation_config_partial`; direkte Einzelmatrix bleibt `RQ-12-04`. |
 | 23-FAIL3 | Trace timeout/unsupported zerstört Impact und Error Dashboard nicht | PASS | `fetchTrace()` Catch/Cache; Unsupported-Test | Ohne Cache wird nur Summary ausgelassen. |
-| 23-FAIL4 | Automation-/Trace-Quelle reconnectet nach jedem Transportfehler selbständig | PARTIAL | gemeinsamer `homeassistant-websocket.js`-Transport; `RQ-09-01` | Ein isoliertes `error` ohne `close` plant keinen autonomen Reconnect; der nächste Source-Refresh kann neu verbinden. |
+| 23-FAIL4 | Automation-/Trace-Quelle reconnectet nach jedem Transportfehler selbständig | PASS | gemeinsamer `homeassistant-websocket.js`-Transport; Sprint-27.1-C-Error-only-/Backofftests | Isoliertes `error` und nachfolgendes `close` werden idempotent behandelt; `RQ-09-01` code-seitig geschlossen. |
 | 23-PERF1 | 3000 Entities, 500 Devices, 500 Automationen, 2000 Referenzen und 100 Traces | PASS | Sprint-23-Lasttest | 200 Impactlookups über Maps, Lauf aktuell grün. |
 | 23-PERF2 | Kein N+1-State-Poll | PASS | Inventory aus gemeinsamem Snapshot | Configlesevorgänge sind TTL-/workerbegrenzt und nur im Error-/Adminpfad. |
 | 23-PERF3 | Browserpayload und Rendering sind begrenzt | PASS | max. drei Traces/Automation, höchstens 50 Traceziele, `MAX_RENDERED_ISSUES=200` | Keine Raw Config/Traceobjekte auf Legacy-Clients. |
@@ -104,7 +102,7 @@ Abnahmelücken `PARTIAL`.
 | 23-MAN4 | Nichtregression auf iPad Air 2/iPadOS 15.8.5 | NOT TESTED | MT-49 | Keine physische Geräteprüfung. |
 | 23-SHOT1 | Aktuelle echte Errors-Impact-/Admin-Diagnostics-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vier Systembilder haben falsches Dateiformat; UI-Stand ist nicht belastbar aktuell. |
 | 23-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Read-only-Impact/Traces | PASS | README DE/EN; Projektstatus; Roadmap | Keine Automation-Write-Funktion versprochen. |
-| 23-CACHE4 | Gemeinsame Wall-Assets besitzen routeübergreifend gleiche Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen. |
+| 23-CACHE4 | Gemeinsame Wall-Assets besitzen routeübergreifend gleiche Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v53; `test/asset-version.test.js`. | RQ-04-01 bleibt code-seitig geschlossen. |
 
 ## Current Automation Diagnostics Flow
 
@@ -126,9 +124,10 @@ Advanced Diagnostics opened + affected automation exists
   -> generic error/condition-false/not-triggered context
 ```
 
-Rein dynamische Automationen werden aktuell nur als globaler
-„Analyse möglicherweise unvollständig“-Count sichtbar. Das ist konservativ,
-erfüllt aber nicht den spezifizierten produktiven `unknown`-Impactpfad.
+Rein dynamische Automationen werden in Advanced Diagnostics global und
+kausalitätsfrei mit Confidence `unknown` angezeigt. Die sanitizierte Liste ist
+auf 50 Einträge begrenzt; keine dynamische Automation wird ohne statischen
+Nachweis einem konkreten Issue als Ursache oder Impact zugeordnet.
 
 ## Superseded Requirements
 
@@ -162,11 +161,10 @@ erfüllt aber nicht den spezifizierten produktiven `unknown`-Impactpfad.
 
 ## Repair Mapping
 
-- `RQ-12-02` – produktiven `unknown`-Confidence-Pfad für dynamische Referenzen
-  fachlich korrekt ergänzen, ohne falsche Kausalität;
-- `RQ-12-03` – Reference-Index bei Cache-Hit mit frischem Inventory neu bauen;
+- `RQ-12-02` – in Sprint 27.1-C code-seitig geschlossen;
+- `RQ-12-03` – in Sprint 27.1-C code-seitig geschlossen;
 - `RQ-12-04` – vollständige Sprint-22-/23-Testmatrizen zuordnen/härten;
-- `RQ-09-01` – Error-only-Reconnect betrifft auch Automation Config/Trace;
+- `RQ-09-01` – in Sprint 27.1-C code-seitig geschlossen;
 - `RQ-08-02` und `RQ-08-03` bleiben anwendbar; `RQ-04-01` ist code-seitig
   geschlossen.
 
@@ -181,9 +179,19 @@ Part 13 bzw. MT-46.
 
 ## Remaining Sprint 23 Gaps
 
-Vor `COMPLETE` sind `RQ-12-02`, `RQ-12-03`, `RQ-12-04`, `RQ-09-01`,
-`RQ-08-02` sowie MT-46 bis MT-49 zu schließen; `RQ-04-01` ist code-seitig
-geschlossen. Insbesondere darf der
-`unknown`-Pfad keine dynamische Automation fälschlich einer konkreten Störung
-als Ursache zuordnen; die Reparatur muss Unsicherheit sichtbar, aber
-kausalitätsfrei darstellen.
+Vor `COMPLETE` sind `RQ-12-04`, `RQ-08-02` sowie MT-46 bis MT-49 zu schließen;
+`RQ-04-01`, `RQ-09-01`, `RQ-12-02` und `RQ-12-03` sind code-seitig
+geschlossen.
+
+## Sprint-27.1-C-Re-Audit
+
+`RQ-12-02` und `RQ-12-03` sind **CODE CLOSED / MANUAL PENDING**. Advanced
+Diagnostics zeigt dynamische Automationen in einem eigenen globalen Abschnitt
+mit Confidence `unknown`, ohne sie konkreten Issues zuzuordnen. Das Modell
+enthält nur Entity-ID, Namen, reduzierten State-/Availability-/Disabled-
+Kontext und `lastTriggered`; Rohkonfiguration und Traces bleiben ausgeschlossen.
+Der Reference-Cache behält ausschließlich die statischen Referenzen, während
+Inventory und alle Indizes je Snapshot neu zusammengesetzt werden. Backend-
+und UI-Regressionen decken Begrenzung, Sanitization, Kausalitätsfreiheit sowie
+`on→off→on`, Name und Triggerzeit innerhalb des TTL ab. MT-46 bis MT-49 sind
+ausführbar und bleiben `NOT TESTED`.

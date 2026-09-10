@@ -230,7 +230,18 @@ test("Regelauflösung folgt Entity, Device, Security, Risk, Domain und Default",
     configuration.rules.domains.sensor = {expectedOffline: true};
     let resolved = RuleEngine.resolveRule(item, configuration, false, false);
     assert.equal(resolved.effective.expectedOffline, true);
-    assert.equal(resolved.ruleSource, "risk_class");
+    assert.equal(resolved.ruleSource, "domain");
+    assert.equal(resolved.ruleSources.expectedOffline, "domain");
+    assert.equal(resolved.ruleSources.unavailableGraceMs, "risk_class");
+
+    const expectedOffline = evaluate(
+        new RuleEngine.RuleEngine(),
+        item,
+        configuration,
+        60000
+    );
+    assert.equal(expectedOffline.expectedOffline, true);
+    assert.equal(expectedOffline.ruleSource, "domain");
 
     configuration.rules.devices.device_priority = {
         expectedOffline: false,
@@ -240,6 +251,8 @@ test("Regelauflösung folgt Entity, Device, Security, Risk, Domain und Default",
     assert.equal(resolved.effective.expectedOffline, false);
     assert.equal(resolved.effective.unavailableGraceMs, 12000);
     assert.equal(resolved.ruleSource, "device");
+    assert.equal(resolved.ruleSources.expectedOffline, "device");
+    assert.equal(resolved.ruleSources.unavailableGraceMs, "device");
 
     configuration.rules.entities["sensor.priority"] = {
         unavailableGraceMs: 7000
@@ -247,6 +260,8 @@ test("Regelauflösung folgt Entity, Device, Security, Risk, Domain und Default",
     resolved = RuleEngine.resolveRule(item, configuration, false, false);
     assert.equal(resolved.effective.unavailableGraceMs, 7000);
     assert.equal(resolved.ruleSource, "entity");
+    assert.equal(resolved.ruleSources.expectedOffline, "device");
+    assert.equal(resolved.ruleSources.unavailableGraceMs, "entity");
 
     delete configuration.rules.entities["sensor.priority"];
     delete configuration.rules.devices.device_priority;

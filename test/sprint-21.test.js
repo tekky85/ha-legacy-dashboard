@@ -59,6 +59,12 @@ function createFakeWebSocketClass() {
         this.listeners.message({data: JSON.stringify(message)});
     };
 
+    FakeWebSocket.prototype.emitError = function () {
+        if (this.listeners.error) {
+            this.listeners.error({});
+        }
+    };
+
     FakeWebSocket.prototype.close = function () {
         if (this.listeners.close) {
             this.listeners.close({});
@@ -66,6 +72,54 @@ function createFakeWebSocketClass() {
     };
 
     return FakeWebSocket;
+}
+
+
+function createScheduler() {
+    const timers = [];
+    let nextId = 1;
+
+    return {
+        timers: timers,
+        setTimeout: function (handler, delay) {
+            const timer = {
+                id: nextId,
+                handler: handler,
+                delay: delay,
+                cancelled: false,
+                executed: false
+            };
+
+            nextId += 1;
+            timers.push(timer);
+            return timer.id;
+        },
+        clearTimeout: function (id) {
+            timers.forEach(function (timer) {
+                if (timer.id === id) {
+                    timer.cancelled = true;
+                }
+            });
+        },
+        run: function (delay) {
+            const timer = timers.find(function (candidate) {
+                return !candidate.cancelled &&
+                    !candidate.executed &&
+                    candidate.delay === delay;
+            });
+
+            assert.ok(timer, "Timer fehlt: " + delay);
+            timer.executed = true;
+            timer.handler();
+        },
+        pending: function (delay) {
+            return timers.filter(function (timer) {
+                return !timer.cancelled &&
+                    !timer.executed &&
+                    (typeof delay === "undefined" || timer.delay === delay);
+            }).length;
+        }
+    };
 }
 
 
@@ -209,6 +263,104 @@ test("WebSocket-Konstruktor- und Sendefehler hinterlassen keine offenen Requests
     await assert.rejects(sendRequest, {code: "ha_websocket_unavailable"});
     assert.equal(sendClient.getState().pendingRequests, 0);
     sendClient.close();
+});
+
+
+test("WebSocket Error-only plant genau einen begrenzten Reconnect", async function () {
+    const FakeWebSocket = createFakeWebSocketClass();
+    const scheduler = createScheduler();
+    const client = HomeAssistantWebSocket.createClient({
+        url: "ws://localhost/api/websocket",
+        token: "fake",
+        WebSocketImplementation: FakeWebSocket,
+        logger: silentLogger([]),
+        connectTimeoutMs: 60000,
+        maxReconnectAttempts: 2,
+        setTimeout: scheduler.setTimeout,
+        clearTimeout: scheduler.clearTimeout
+    });
+    const firstConnect = client.connect();
+    const firstSocket = FakeWebSocket.instances[0];
+
+    firstSocket.emitError();
+    await assert.rejects(firstConnect, {code: "ha_websocket_unavailable"});
+    assert.equal(client.getState().reconnectAttempts, 1);
+    assert.equal(scheduler.pending(1000), 1);
+
+    firstSocket.close();
+    assert.equal(client.getState().reconnectAttempts, 1);
+    assert.equal(scheduler.pending(1000), 1);
+
+    scheduler.run(1000);
+    assert.equal(FakeWebSocket.instances.length, 2);
+    FakeWebSocket.instances[1].emitError();
+    await tick();
+    assert.equal(client.getState().reconnectAttempts, 2);
+    assert.equal(scheduler.pending(2000), 1);
+
+    scheduler.run(2000);
+    assert.equal(FakeWebSocket.instances.length, 3);
+    FakeWebSocket.instances[2].emitError();
+    await tick();
+    assert.equal(client.getState().reconnectAttempts, 2);
+    assert.equal(scheduler.pending(1000), 0);
+    assert.equal(scheduler.pending(2000), 0);
+    client.close();
+});
+
+
+test("WebSocket-Fehler bleibt kontrolliert, wenn close synchron fehlschlägt", async function () {
+    const ThrowingCloseSocket = createFakeWebSocketClass();
+    const scheduler = createScheduler();
+    const logs = [];
+    const client = HomeAssistantWebSocket.createClient({
+        url: "ws://localhost/api/websocket",
+        token: "fake",
+        WebSocketImplementation: ThrowingCloseSocket,
+        logger: silentLogger(logs),
+        setTimeout: scheduler.setTimeout,
+        clearTimeout: scheduler.clearTimeout,
+        maxReconnectAttempts: 1
+    });
+    const request = client.request({type: "config/area_registry/list"});
+    const socket = ThrowingCloseSocket.instances[0];
+
+    socket.close = function () {
+        throw new Error("socket is not open");
+    };
+
+    assert.doesNotThrow(function () {
+        socket.emitError();
+    });
+    await assert.rejects(request, {code: "ha_websocket_unavailable"});
+    assert.equal(scheduler.pending(1000), 1);
+    assert.equal(logs.some(function (entry) {
+        return entry.event === "ha_ws_close_failed";
+    }), true);
+    client.close();
+});
+
+
+test("Explizites WebSocket close deaktiviert jeden weiteren Reconnect", async function () {
+    const FakeWebSocket = createFakeWebSocketClass();
+    const scheduler = createScheduler();
+    const client = HomeAssistantWebSocket.createClient({
+        url: "ws://localhost/api/websocket",
+        token: "fake",
+        WebSocketImplementation: FakeWebSocket,
+        logger: silentLogger([]),
+        connectTimeoutMs: 60000,
+        setTimeout: scheduler.setTimeout,
+        clearTimeout: scheduler.clearTimeout
+    });
+    const connection = client.connect();
+
+    FakeWebSocket.instances[0].emitMessage({type: "auth_required"});
+    FakeWebSocket.instances[0].emitMessage({type: "auth_ok"});
+    await connection;
+    client.close();
+    assert.equal(scheduler.pending(), 0);
+    assert.equal(FakeWebSocket.instances.length, 1);
 });
 
 

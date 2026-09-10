@@ -27,9 +27,9 @@ unverfügbare/unsupported oder gelöschte Labels erzeugen einen sichtbaren
 Fehler und keinen stillen Device-Class-Fallback.
 
 Der Sprint bleibt `PARTIAL` wegen `RQ-10-01`, `RQ-08-02` und
-ausstehender realer Admin-/HA-/iPad-Abnahmen. Der bekannte Error-only-
-WebSocket-Reconnectbefund `RQ-09-01` betrifft auch die Wiederherstellung der
-Labelquelle, ist aber kein Fehler in Klassifikation oder Fail-Safe-Ausgabe.
+ausstehender realer Admin-/HA-/iPad-Abnahmen. Der Error-only-
+WebSocket-Reconnectbefund `RQ-09-01` wurde in Sprint 27.1-C code-seitig
+geschlossen; reale Label-Recovery bleibt `NOT TESTED`.
 
 ## Requirement Matrix
 
@@ -71,7 +71,7 @@ Labelquelle, ist aber kein Fehler in Klassifikation oder Fail-Safe-Ausgabe.
 | 21.3-FAIL1 | Erste unavailable/unsupported Labelquelle bleibt sichtbar | PASS | `criticalDetectionIssue()`; Source-Status | Kein falsches Gesund und kein stiller Fallback. |
 | 21.3-FAIL2 | Gelöschtes konfiguriertes Label erzeugt Warn-/Fehlerzustand | PASS | Status `missing`; Sprint-21.3-Test; Adminwarnung | Konfiguration wird nicht heimlich ersetzt. |
 | 21.3-FAIL3 | Stale Labelquelle behält bekannte Zuweisungen | PASS | direkter Stale-Test | Detectionstatus `stale`, Child bleibt critical. |
-| 21.3-FAIL4 | Labelquelle erholt sich selbständig nach Transportstörung | PARTIAL | gemeinsamer Diagnosecache kann beim nächsten Refresh neu laden; `RQ-09-01` | Isoliertes WS-`error` ohne `close` plant keinen eigenen Reconnect. |
+| 21.3-FAIL4 | Labelquelle erholt sich selbständig nach Transportstörung | PASS | gemeinsamer Backend-WebSocket; Sprint-27.1-C-Tests für Error-only, Error+Close und Backoff | Der idempotente Disconnectpfad plant auch bei isoliertem `error` automatisch genau einen Reconnect. Reale Labelquelle bleibt MT-35/36. |
 | 21.3-ADM1 | Label-Modus ohne gültige ID wird serverseitig abgewiesen | PASS | Configvalidator; Migration-/Validationtest | Clientprüfung ist nicht Sicherheitsgrenze. |
 | 21.3-ADM2 | Unsupported/error/stale/missing werden im Admin unterscheidbar angezeigt | PASS | `src/admin/js/system-dashboards.js`; Admin-UI-Tests | Reale Safari-/HA-Wirkung bleibt MT-36. |
 | 21.3-ADM3 | Save/Discard und bestehende Regeln bleiben erhalten | PASS – superseded by Sprint 21.4 | Entity Rule Manager + System-Dashboard-Draft | Mode/Label liegen im gemeinsamen persistierten Draft. |
@@ -82,7 +82,7 @@ Labelquelle, ist aber kein Fehler in Klassifikation oder Fail-Safe-Ausgabe.
 | 21.3-MAN3 | Label-Rename/Ausfall/stale/delete/recovery | NOT TESTED | MT-36 | Keine echte Labelquellenstörung durchgeführt. |
 | 21.3-SHOT1 | Aktuelle echte Filter-/Label-Admin-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Systembilder sind nach späteren UI-Änderungen veraltet. |
 | 21.3-DOC1 | Modi, Policy, Filter, Fail-Safe und Grenzen dokumentiert | PASS | README DE/EN, Projektstatus, Roadmap | Keine Label-Writes versprochen. |
-| 21.3-ASSET1 | Geänderte geteilte Assets besitzen konsistente Cacheversion | PASS | System, Dashboard, Admin und Manifest verwenden v52; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen; Realgerät bleibt manuell. |
+| 21.3-ASSET1 | Geänderte geteilte Assets besitzen konsistente Cacheversion | PASS | System, Dashboard, Admin und Manifest verwenden v53; `test/asset-version.test.js`. | RQ-04-01 bleibt code-seitig geschlossen; Realgerät bleibt manuell. |
 
 ## Exact Error Filter Semantics
 
@@ -153,7 +153,7 @@ keine transitive Kritikalitätsquelle.
 
 ## Findings
 
-- `PARTIAL`: `RQ-10-01`, `RQ-09-01` und `RQ-08-02`; `RQ-04-01` ist
+- `PARTIAL`: `RQ-10-01` und `RQ-08-02`; `RQ-04-01` und `RQ-09-01` sind
   code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: kein aktueller fachlicher Filter-/Detection-Defekt bestätigt.
@@ -162,5 +162,12 @@ keine transitive Kritikalitätsquelle.
 ## Final Assessment
 
 Sprint 21.3 ist fachlich und sicherheitsseitig vorhanden. Vor `COMPLETE` sind
-der Transport-Reconnect zu härten, Assetversion/Testmatrix/Screenshots zu
-schließen und die reale Label-/Admin-/iPad-Abnahme zu dokumentieren.
+Testmatrix/Screenshots zu schließen und die reale Label-/Admin-/iPad-Abnahme
+zu dokumentieren.
+
+## Sprint-27.1-C-Re-Audit
+
+Die gemeinsame WebSocket-Recovery ist nach `RQ-09-01` automatisiert PASS. Der
+Labeladapter bleibt fest codiert, read-only und last-known/stale-fähig; der
+Transportfix ergänzt weder Label-Writes noch Browser-WebSocketzugriff. MT-35
+und MT-36 sind nun ausführbar, ihre Resultate bleiben `NOT TESTED`.

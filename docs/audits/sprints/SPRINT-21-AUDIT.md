@@ -24,11 +24,8 @@ Snapshot eingehängt; Matter bleibt mangels belastbarer read-only API bewusst
 Quellenstatus, keine Tokens, Rohregistries oder frei wählbaren WebSocket-
 Commands.
 
-Der Sprint bleibt `PARTIAL`: Ein isoliertes WebSocket-`error`-Event ohne
-nachfolgendes `close` plant derzeit keinen Reconnect (`RQ-09-01`), die
-umfangreiche 93-Punkte-Testmatrix ist nur teilweise als gezielte
-Anforderungsmatrix nachvollziehbar (`RQ-09-02`), die routeabhängige immutable
-Cacheversion betrifft auch die System-/Diagnoseoberflächen (`RQ-04-01`), und
+Der Sprint bleibt `PARTIAL`: Die umfangreiche 93-Punkte-Testmatrix ist nur
+teilweise als gezielte Anforderungsmatrix nachvollziehbar (`RQ-09-02`), und
 reale Home-Assistant-/Safari-/iPad-Abnahmen stehen aus. Kein Sicherheitsbruch,
 keine Registry-Schreibroute und kein Datenverlust des REST-State-Snapshots
 wurde gefunden.
@@ -44,7 +41,7 @@ wurde gefunden.
 | 21-WS1 | Auth-Handshake `auth_required`, `auth_ok`, `auth_invalid` | PASS | `src/services/homeassistant-websocket.js:195-257`; drei direkte WS-Tests | Token wird nur in der Backend-Auth-Nachricht verwendet und nie geloggt. |
 | 21-WS2 | Eindeutige IDs und zuverlässige Antwortkorrelation | PASS | `homeassistant-websocket.js:375-420`; direkter Korrelations-/Pending-Test | Pending Requests sind ID-basiert und besitzen eigene Timeouts. |
 | 21-WS3 | Connect-/Request-Timeout, Disconnect, begrenztes Backoff und kein Tight Loop | PASS | `homeassistant-websocket.js:242-290,316-372`; Timeout-/Disconnect-/Reconnect-Test | Maximal fünf Versuche, exponentiell und auf 10 s begrenzt. |
-| 21-WS4 | Verbindungsfehler lösen kontrollierte automatische Erholung aus | PARTIAL | `homeassistant-websocket.js:348-356`; reproduzierter Error-only-Lauf | `error` verwirft den Connect, plant aber ohne `close` keinen Reconnect; nächster Source-Abruf kann neu verbinden. `RQ-09-01`. |
+| 21-WS4 | Verbindungsfehler lösen kontrollierte automatische Erholung aus | PASS | `homeassistant-websocket.js`; `test/sprint-21.test.js` „WebSocket Error-only …“ und „Explizites WebSocket close …“ | Sprint 27.1-C führt Error/Close idempotent zusammen, plant genau einen begrenzten Reconnect, respektiert das Backoff-Limit und reconnectet nach explizitem `close()` nicht. `RQ-09-01` code-seitig geschlossen. |
 | 21-WS5 | Keine Tokens in Logs; Fehler pro Quelle isoliert | PASS | Logger-Events; Token-Logtest; unabhängige `SourceCache`-Instanzen | Logs enthalten Event/Fehlercode, keine Rohantworten. |
 | 21-CAP1 | Capability-gesteuerte Quellen, unsupported statt Systemfehler | PASS | `diagnostics/index.js:88-171`; Probe-/Cache-Test | Unbekannter Command wird `unsupported`; Matter ist kontrolliert unsupported. |
 | 21-ENT1 | Entity-Registry-Felder werden normalisiert | PASS | `diagnostics/normalizers.js:67-105`; Normalisierungstest | Enthält stabile IDs, Zuordnungen, Kategorie, Disabled/Hidden, Namen und Icon. |
@@ -74,7 +71,7 @@ wurde gefunden.
 | 21-T1 | Vollständige 93-Punkte-Testanforderung nachvollziehbar abgesichert | PARTIAL | 15 direkte Sprint-21-Tests plus breite Regression; 153/153 Fokus | Mehrere Einzelvarianten sind nur indirekt oder nicht als eigene Assertion verknüpft; `RQ-09-02`. |
 | 21-MAN1 | Reale Registry-/Diagnose-/Partial-Failure-Abnahme im modernen Safari/LXC | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-30 | Kein reales HA kontaktiert. |
 | 21-MAN2 | Reale Zielgeräteabnahme mit Enrichment und Metadatenfehlern | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-32 | Kein physischer iPad-Lauf in Part 09. |
-| 21-CACHE2 | Geänderte System-/Shared-Assets haben konsistente Cacheversion | PASS | Dashboard, Systemseite, Admin und Manifest referenzieren v52; `test/asset-version.test.js`; immutable Auslieferung bleibt unverändert. | RQ-04-01 code-seitig geschlossen. |
+| 21-CACHE2 | Geänderte System-/Shared-Assets haben konsistente Cacheversion | PASS | Dashboard, Systemseite, Admin und Manifest referenzieren v53; `test/asset-version.test.js`; immutable Auslieferung bleibt unverändert. | RQ-04-01 bleibt code-seitig geschlossen. |
 | 21-SHOT1 | Error/Summary/Admin-Diagnose-Screenshots geprüft/aktualisiert | PARTIAL | D1-Audit und `RQ-08-02` | Vorhandene System-/Adminbilder sind nach späteren sichtbaren Sprints nicht belastbar aktuell. |
 | 21-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Architektur | PASS | README DE/EN Registry-/Diagnoseabschnitte; Roadmap; Projektstatus Sprint-21-Abschnitt | README-Sprachen sind inhaltlich parallel; der globale Statuskopf ist separat in `RQ-08-03` veraltet. |
 
@@ -86,7 +83,9 @@ Ein isolierter Fake-WebSocket wurde verbunden und löste ausschließlich sein
 keine zweite Socketinstanz und nur der ursprüngliche 10-s-Connect-Timer war
 registriert. Erst ein späterer Source-Abruf würde `connect()` erneut anstoßen.
 Das ist kein Token-/Writeproblem und zerstört den REST-Snapshot nicht, erfüllt
-aber die automatische Fehlererholung nicht vollständig (`RQ-09-01`).
+aber die automatische Fehlererholung nicht vollständig (`RQ-09-01`). Dieser
+Baseline-Nachweis bleibt als Fehlerhistorie erhalten; Sprint 27.1-C behebt den
+Pfad und regressiert Error+Close, Backoff-Limit und explizites Client-Close.
 
 ## Explicit Test-Coverage Audit
 
@@ -160,7 +159,7 @@ vollständig; dies war kein Produktfehler.
 
 ## Findings
 
-- `PARTIAL`: `RQ-09-01`, `RQ-09-02` und `RQ-08-02`; `RQ-04-01` ist
+- `PARTIAL`: `RQ-09-02` und `RQ-08-02`; `RQ-04-01` und `RQ-09-01` sind
   code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: keine bestätigte fachliche oder sicherheitsrelevante Funktion.
@@ -170,6 +169,16 @@ vollständig; dies war kein Produktfehler.
 ## Final Assessment
 
 Sprint 21 ist als read-only Registry-/Diagnoseanreicherung fachlich und
-sicherheitsseitig implementiert. Für `COMPLETE` fehlen die dokumentierte
-Error-only-Reconnect-Härtung, die explizite Testmatrix, konsistente
-Cacheversionen sowie reale Safari-/HA-/iPad-Abnahmen.
+sicherheitsseitig implementiert. Für `COMPLETE` fehlen noch die explizite
+Testmatrix, aktuelle Produktbilder sowie reale Safari-/HA-/iPad-Abnahmen.
+
+## Sprint-27.1-C-Re-Audit
+
+`RQ-09-01` ist **CODE CLOSED / MANUAL PENDING**. Der Backendclient bindet
+`error` und `close` an die konkrete Socketinstanz und verarbeitet beide über
+einen idempotenten Disconnectpfad. Dadurch erzeugt `error` auch ohne
+nachfolgendes `close` genau einen Reconnect; verspätete Events alter Sockets
+können keine neue Verbindung verwerfen. Selbst ein synchron werfendes natives
+Socket-`close()` wird kontrolliert protokolliert, ohne den Gateway-Prozess zu
+beenden. Der Gateway-/WebSocket-Fokuslauf bestand 52/52 Tests. MT-30 und MT-32
+sind ausführbar, bleiben aber `NOT TESTED`.

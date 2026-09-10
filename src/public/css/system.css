@@ -889,6 +889,29 @@
     line-height: 17px;
 }
 
+.advanced-automation-dynamic-list {
+    margin: 5px 0 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 600;
+}
+
+.advanced-automation-dynamic-list li {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid #cbd5e1;
+}
+
+.advanced-automation-dynamic-list strong,
+.advanced-automation-dynamic-list span {
+    display: block;
+}
+
+.advanced-automation-dynamic-confidence {
+    color: #9a3412;
+    font-size: 11px;
+}
+
 .advanced-diagnostics-note {
     margin: 6px 0 0;
     color: #64748b;
@@ -1367,6 +1390,14 @@ body.theme-dark .advanced-diagnostics-toggle span:last-child,
 body.theme-dark .advanced-diagnostics-list dt,
 body.theme-dark .advanced-diagnostics-note {
     color: #aebdd0;
+}
+
+body.theme-dark .advanced-automation-dynamic-list li {
+    border-color: #475569;
+}
+
+body.theme-dark .advanced-automation-dynamic-confidence {
+    color: #fdba74;
 }
 
 body.theme-dark .network-banner.is-warning {
