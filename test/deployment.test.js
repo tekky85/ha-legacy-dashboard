@@ -87,6 +87,13 @@ test("Deployment-Skripte sind ausführbar und nicht destruktiv", function () {
         /ReadWritePaths=\/home\/dashboard\/ha-legacy-dashboard\/data/
     );
 
+    assert.match(
+        readProjectFile(
+            "deploy/systemd/ha-legacy-dashboard.service"
+        ),
+        /ReadWritePaths=-\/home\/dashboard\/ha-legacy-dashboard-state\/data/
+    );
+
 });
 
 

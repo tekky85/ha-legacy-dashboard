@@ -56,7 +56,7 @@ deshalb ausdrücklich `NOT TESTED`.
 | 24-REP-01 | Valides App-Repository mit `repository.yaml` | PASS | Root-`repository.yaml` besitzt Name, URL und Maintainer; YAML-Prüfung erfolgreich. |
 | 24-REP-02 | Vollständige App-Struktur und auflösbare Referenzen | PASS | `ha_legacy_dashboard/{config.yaml,Dockerfile,run.sh,DOCS.md,README.md,CHANGELOG.md,icon.png,logo.png,translations/}` vorhanden; Icons sind valide PNGs. |
 | 24-REP-03 | Keine widersprüchliche obsolete Verpackungsstruktur | PASS – superseded by Sprint 25 | Sprint 25 entfernte `build.yaml` zugunsten des Dockerfile-/BuildKit-Modells; kein konkurrierendes App-Quellverzeichnis vorhanden. |
-| 24-REP-04 | Dokumentierter lokaler Supervisor-Build verwendet die kopierten aktuellen Quellen | BROKEN | `deploy/prepare-home-assistant-app.sh` kopiert `config.yaml` samt `image: ghcr.io/...`; Supervisor verwendet dadurch das veröffentlichte Image statt des lokalen Dockerfile-Kontexts. Siehe `RQ-13-02`. |
+| 24-REP-04 | Dokumentierter lokaler Supervisor-Build verwendet die kopierten aktuellen Quellen | PASS | Sprint 27.1-D entfernt `image:` ausschließlich aus dem vorbereiteten Development-Kontext und kopiert den aktuellen Root-Quellbaum. Die getrackte Production-`config.yaml` behält das generische GHCR-Image; `test/sprint-24.test.js`. Reale HAOS-Abnahme bleibt MT-50/52. |
 | 24-MODE-01 | Explizite Runtime Modes und sichere Auto-Erkennung | PASS | `src/config/runtime.js`: `standalone`, `home_assistant_app`, expliziter Modus vor Auto-Erkennung über vorhandenes `SUPERVISOR_TOKEN`; ungültige Modi werden abgewiesen. |
 | 24-MODE-02 | Standalone nutzt vorhandene HA-URL und backend-only HA-Token | PASS | `resolveStandalone()` erzeugt `/api` und `/api/websocket`; `src/services/homeassistant.js` setzt Bearer nur serverseitig. |
 | 24-MODE-03 | App-Modus benötigt keinen Long-Lived HA Token | PASS | `resolveHomeAssistantApp()` verlangt `SUPERVISOR_TOKEN`; `run.sh` setzt App-Modus ohne `HA_TOKEN`. |
@@ -96,7 +96,7 @@ deshalb ausdrücklich `NOT TESTED`.
 | 24-VERSION-01 | Versionen in Package/App/Changelogs sind formal konsistent | PASS – superseded by Sprint 25 | `release/check-version.js --tag v1.0.0-rc.1` ist grün; alle formalen Felder nennen `1.0.0-rc.1`. |
 | 24-VERSION-02 | Immutable Version bezeichnet genau den aktuellen App-Inhalt | BROKEN | Der reine Stringcheck erkennt keine laufzeitrelevanten Änderungen nach dem Tag. Aktuelle Quellen und veröffentlichtes RC.1-Image divergieren; `RQ-13-01`. |
 | 24-DOC-01 | App- und Standalone-Installation dokumentiert | PASS | `README.de.md`, `README.en.md`, `docs/DEPLOYMENT.md`, App-`DOCS.md` und App-`README.md`; beide Betriebsarten klar getrennt. |
-| 24-DOC-02 | Lokale App-Installation baut tatsächlich den aktuellen lokalen Kontext | BROKEN | Dokumentation verspricht einen lokalen Supervisor-Build, aber der vorbereitete Kontext behält `image:` und zieht das Registry-Artefakt; `RQ-13-02`. |
+| 24-DOC-02 | Lokale App-Installation baut tatsächlich den aktuellen lokalen Kontext | PASS | `docs/DEPLOYMENT.md` trennt lokalen Quellbuild ohne `image:` vom unveränderten Produktionspaket mit GHCR-Image; Tar-/Metadatenregression in `test/sprint-24.test.js`. |
 | 24-DOC-03 | Technische Statusdokumentation entspricht der aktuellen Struktur | PARTIAL | `PROJECT_STATUS.md` nennt noch `build.yaml`, obwohl Sprint 25 es entfernte; bestehender Befund `RQ-08-03` erhält Part-13-Evidenz. |
 | 24-LEGACY-01 | Wall-Display bleibt ES5/iOS-9-kompatibel | PASS | App verwendet denselben Wall-Build; Legacy-Suite und statischer Scan grün, kein CSS Grid/Flex-gap oder verbotene moderne Syntax. |
 | 24-LEGACY-02 | Reale iPad-mini-Abnahme über App-Direktport | NOT TESTED | Historisch waren Default/Custom sowie Light/Climate-Grundsteuerung erreichbar; vollständige aktuelle Route-/HomeScreen-Abnahme siehe `MT-54`. |
@@ -208,14 +208,28 @@ Repositoryinhalt hochgerechnet. Neu beziehungsweise weiterhin offen sind:
 - **RQ-12-01 bis RQ-12-03:** in Sprint 27.1-C code-seitig geschlossen;
   **RQ-12-04** bleibt für die vollständige Testmatrix offen.
 
+## Sprint-27.1-D-Re-Audit
+
+`RQ-13-02` ist code-seitig geschlossen. Der erzeugte lokale Supervisor-
+Development-Kontext enthält kein `image:` mehr und verwendet damit seine
+kopierten Quellen und sein Dockerfile. Die versionierte Produktionsmetadatei
+bleibt bewusst unverändert registrybasiert und behält ausschließlich die
+minimalen bestehenden App-Rechte. Der fokussierte Sprint-24-/25-/Deployment-
+Lauf bestand 22/22 Tests, die Gesamtsuite 339/339; Secret-Scan und Shell-/JavaScript-Syntaxprüfungen
+sind grün. Eine reale lokale HAOS-Installation wurde nicht durchgeführt.
+
+Sprint 24 bleibt insgesamt **PARTIAL**, weil `RQ-13-01` (aktuelle immutable
+Version/Image) und die zugeordneten realen HAOS-/aarch64-/iPad-Abnahmen offen
+sind. Der frühere lokale Builddefekt ist kein aktueller BROKEN-Befund mehr.
+
 ## Schlussfolgerung
 
 Sprint 24 ist als Architektur- und Sicherheitsfundament weitgehend vorhanden,
 aber im aktuellen Repositoryzustand **PARTIAL**. Die App lässt sich in der
 historisch veröffentlichten RC.1-Version real betreiben; sie liefert jedoch
-nicht den heutigen Code, und der dokumentierte lokale Supervisor-Build umgeht
-die lokalen Quellen. Vor einer aktuellen RC-Freigabe müssen `RQ-13-01` und
-`RQ-13-02` behoben und die resultierende Version anhand `MT-50` bis `MT-54`
+nicht den heutigen Code. Der lokale Source-Build ist seit Sprint 27.1-D
+repariert. Vor einer aktuellen RC-Freigabe muss `RQ-13-01` behoben und die
+resultierende Version anhand `MT-50` bis `MT-54`
 real validiert werden.
 
 Audit Part 13 ist abgeschlossen. Audit Part 14 wurde nicht begonnen und umfasst

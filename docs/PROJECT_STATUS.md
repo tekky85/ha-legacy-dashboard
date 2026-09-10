@@ -4,10 +4,13 @@ Stand: 10. September 2026. Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
 der anschließende Repair-Queue-Consolidation-Pass wurden auf Repository-Commit
 `593ba5a` abgeschlossen. Sprint 27.1-A reparierte `RQ-16-01`, Sprint 27.1-B
 vereinheitlichte die routeübergreifenden immutable Assetversionen aus
-`RQ-04-01`. Sprint 27.1-C repariert auf Basis `7fa67a8` WebSocket-Recovery,
+`RQ-04-01`. Sprint 27.1-C reparierte auf Basis `7fa67a8` WebSocket-Recovery,
 Regelherkunft, dynamischen Automation-Unknown-Kontext und frische Automation-
-Impactindizes (`RQ-09-01`, `RQ-12-01/-02/-03`). Alle drei automatisierten
-Gate- und Re-Audit-Läufe sind vollständig grün. Reale iPad-/HomeScreen-/
+Impactindizes (`RQ-09-01`, `RQ-12-01/-02/-03`). Sprint 27.1-D repariert auf
+Basis `c20f7b7` lokalen Supervisor-Quellbuild, Standalone-Bundle, Cross-
+Version-/Rollbacknachweis und die moderate Produktionsdependency
+(`RQ-13-02`, `RQ-14-01/-02/-05`). Die automatisierten Gate- und Re-Audit-
+Läufe sind grün. Reale iPad-/HomeScreen-/
 Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate
 bleiben offen.
 
@@ -32,6 +35,8 @@ Status:
 - Sprint-27.1-A / RQ-16-01: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-B / RQ-04-01: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-C / RQ-09-01, RQ-12-01 bis -03: **COMPLETE – MANUAL PENDING**
+- Sprint-27.1-D / RQ-13-02, RQ-14-01, RQ-14-02, RQ-14-05:
+  **COMPLETE – MANUAL PENDING**
 - Manuelle Abnahme: **PENDING**
 - Finales RC-Gate: **PENDING**
 
@@ -75,7 +80,22 @@ statische Referenzen werden bei jedem Snapshot mit aktuellen Namen, Zuständen,
 Disabled-/Availability- und Triggerdaten zusammengeführt. Die sichtbare
 Systemänderung erhöht alle Assetreferenzen konsistent auf v53. Gateway-/
 WebSocket-Fokus 52/52 und Gesamtsuite 336/336 sind grün; verknüpfte Realtests
-bleiben `NOT TESTED`, Batch 27.1-D und das finale RC-Gate sind nicht begonnen.
+bleiben `NOT TESTED`; das finale RC-Gate ist nicht begonnen.
+
+### Sprint 27.1-D – App-Development, Standalone-Release und Dependencies
+
+Der lokale Supervisor-Development-Kontext entfernt `image:` ausschließlich in
+der erzeugten Kopie und baut dadurch die aktuellen Quellen; die getrackten
+Produktionsmetadaten behalten das generische Multi-Arch-GHCR-Image. Das
+Standalone-Tar enthält eigene deutsch-/englischsprachige Fresh-Install-,
+Upgrade-, Backup- und Rollbackanleitungen ohne Git-Abhängigkeit. Ein
+eingefrorener älterer Release-/Schema-Prozess und der gebaute aktuelle Tarball
+prüfen N→N+1 und Rollback mit gemeinsamem Standalone-/App-Datenpfad. `qs` ist
+kompatibel auf 6.16.0 aktualisiert; der Produktionsaudit blockiert ab Moderate
+und meldet null Befunde. Fokussiert bestanden 22/22, vollständig 339/339
+Tests. Reale HAOS-/LXC-/
+Release-/iPad-Abnahmen bleiben `NOT TESTED`; `RQ-13-01`, `RQ-14-04` und
+`RQ-17-01` verhindern weiterhin eine RC-Freigabe.
 
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 

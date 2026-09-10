@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 4,
+  "defaultDashboardId": "legacy",
+  "dashboards": [
+    {
+      "id": "legacy",
+      "title": "Release 0.9 Fixture",
+      "refreshIntervalMs": 5000,
+      "widgets": [
+        {
+          "id": "legacy-temperature",
+          "entity": "sensor.release_fixture_temperature",
+          "type": "sensor",
+          "title": "Fixture Room",
+          "subtitle": "Temperature",
+          "icon": "temperature",
+          "iconClass": "temperature",
+          "unit": "°C",
+          "order": 10,
+          "visible": true,
+          "size": "normal"
+        }
+      ],
+      "layouts": {
+        "portrait": {
+          "columns": 6,
+          "items": {
+            "legacy-temperature": {"x": 0, "y": 0, "w": 3, "h": 1}
+          }
+        },
+        "landscape": {
+          "columns": 12,
+          "items": {
+            "legacy-temperature": {"x": 0, "y": 0, "w": 3, "h": 1}
+          }
+        }
+      }
+    }
+  ]
+}

@@ -31,6 +31,8 @@ PrivateTmp=true
 ProtectSystem=full
 ProtectHome=read-only
 ReadWritePaths=/home/dashboard/ha-legacy-dashboard/data
+# Optional persistent state path used by versioned standalone bundles.
+ReadWritePaths=-/home/dashboard/ha-legacy-dashboard-state/data
 UMask=0077
 
 [Install]

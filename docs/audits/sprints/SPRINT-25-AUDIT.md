@@ -86,13 +86,13 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 25-BUNDLE-01 | Reproduzierbares versioniertes Standalone-Archiv | PASS | `create-standalone-bundle.js`; zwei lokale Builds von HEAD hatten identischen SHA256 `0e74ee0b…456d0`. |
 | 25-BUNDLE-02 | Laufzeitdateien, Lockfile, Beispielkonfiguration, Unit, Lizenz und Changelog | PASS | Öffentlicher und lokaler Tar-Inhalt geprüft; `src`, Paketdateien, `.env.example`, systemd-Unit, README, Lizenz, Changelog und `VERSION` vorhanden. |
 | 25-BUNDLE-03 | Keine Secrets, `.env`, Nutzerdaten, Logs, Tests, Git oder `node_modules` | PASS | Explizite Include-Liste, Tar-Inhaltsprüfung und Secret-Scan; keine verbotenen Einträge im öffentlichen Artefakt. |
-| 25-BUNDLE-04 | Archiv enthält verwendbare vollständige Install-/Upgrade-/Rollbackanleitung | BROKEN | Verweis auf fehlendes `docs/RELEASING.md`; enthaltenes `DEPLOYMENT.md` verlangt vier nicht enthaltene Git-Deployskripte. `RQ-14-01`. |
+| 25-BUNDLE-04 | Archiv enthält verwendbare vollständige Install-/Upgrade-/Rollbackanleitung | PASS | Sprint 27.1-D liefert archivlokale README-/INSTALL-Dateien in Deutsch/Englisch, versionierte Runtime-/State-Pfade und Backup/Rollback ohne Git-Checkout. Der Tar-Test löst lokale Links/Pfade auf und verbietet Verweise auf Git-Deployskripte. |
 | 25-CHECKSUM-01 | SHA256 entsteht nach dem finalen Archiv | PASS | Generator komprimiert zuerst, hasht exakt diesen Buffer und schreibt danach `SHA256SUMS`. |
 | 25-CHECKSUM-02 | Checksum-Name und Referenz sind eindeutig | PASS | `SHA256SUMS` nennt exakt `ha-legacy-dashboard-<version>.tar.gz`; Workflow führt `sha256sum --check` aus. |
 | 25-CHECKSUM-03 | Öffentliches Artefakt verifiziert | PASS | Heruntergeladene RC.1-Datei stimmt mit `c7db4e1874334195aaf00147f5a58e6d46b31cc3c14cfbb04c93c3c96880d984` überein. |
-| 25-UPGRADE-01 | Standalone-Konfiguration über Update erhalten | PARTIAL | Test bewahrt Konfiguration beim zweiten Initialisieren derselben Codeversion; kein echtes altes/neues Release, Prozesswechsel oder Rollback. `RQ-14-02`, `MT-56`. |
-| 25-UPGRADE-02 | App-`/data` über Update erhalten | PARTIAL | Dieselbe simulierte Reinitialisierung nutzt einen App-ähnlichen Pfad; reales HAOS-Update/Backup steht in `MT-52` und `MT-57`. `RQ-14-02`. |
-| 25-UPGRADE-03 | Dashboards, Regeln, Critical Mode, Labels, Grace und Admin-Konfiguration | PARTIAL | Reinitialisierung prüft zentrale Felder, aber kein N→N+1-Release und Theme liegt browserlokal. `RQ-14-02`. |
+| 25-UPGRADE-01 | Standalone-Konfiguration über Update erhalten | PASS | Eingefrorener Release-0.9-/Schema-4-Prozess → entpackter aktueller Tarball-Prozess mit gemeinsamem Datenpfad, Migration, externem Zustandssnapshot und Rückprüfung durch den alten Prozess; `test/sprint-25.test.js`. Reales LXC bleibt MT-56. |
+| 25-UPGRADE-02 | App-`/data` über Update erhalten | PASS | Derselbe getrennte N→N+1-Prozesslauf verwendet `HA_RUNTIME_MODE=home_assistant_app` und einen isolierten App-Datenpfad. Reales HAOS-Update/Backup bleibt ausdrücklich MT-52/57 `NOT TESTED`. |
+| 25-UPGRADE-03 | Dashboards, Regeln, Critical Mode, Labels, Grace und Admin-Konfiguration | PASS | Cross-Version-Test prüft Dashboardidentität, Summary-/Error-Regeln, Critical/Label, Grace, Entity Rule, Background und Rollback. Theme bleibt separat browserlokal und wird durch bestehende Theme-Regressionen abgesichert. |
 | 25-ROLLBACK-01 | Nichtdestruktiver Standalone-Rollback dokumentiert und geprüft | PARTIAL | `docs/RELEASING.md` beschreibt Verzeichnis-/Datensicherung; reale Archivkette und Rückweg nicht geprüft. `MT-56`. |
 | 25-ROLLBACK-02 | App-Rollback behauptet keine ungetestete Supervisorfunktion | PASS | Dokumentation nennt Backup als verlässliche Grundlage und macht keine falsche Rollbackzusage. |
 | 25-CHANGE-01 | Nutzerorientierte Root-/App-Changelogs | PASS | Beide Changelogs besitzen RC.1 Added/Changed/Fixed/Security statt eines Sprint-Dumps. |
@@ -101,7 +101,7 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 25-SEC-01 | Secret-Gate über Quellen und Releaseartefakt | PASS | `release/secret-scan.js`, `.dockerignore`, explizite Bundle-Include-Liste und Tests; keine Token-/Key-Datei gefunden. |
 | 25-SEC-02 | Keine Credentials als Buildargument/GitHub Secret erforderlich | PASS | Releaseworkflow verwendet keine HA-/Supervisor-/Admin-Secrets; Smoke nutzt festes Fake-Credential im lokalen Netz. |
 | 25-SEC-03 | Produktionsabhängigkeiten ohne High/Critical-Befund | PASS | `npm audit --omit=dev --audit-level=high` Exit 0 am 8. September 2026. |
-| 25-SEC-04 | Aktueller Produktionsaudit vollständig ohne Befund | PARTIAL | `qs@6.15.3` besitzt zwei moderate DoS-Advisories; bewusst kein blindes Major-Upgrade. `RQ-14-05`. |
+| 25-SEC-04 | Aktueller Produktionsaudit vollständig ohne Befund | PASS | Sprint 27.1-D aktualisiert kompatibel auf `qs@6.16.0`, Express bleibt 5.2.1; `npm audit --omit=dev --audit-level=moderate` meldet null Befunde. Parser-/Prototype- und Requestlimitregressionen sind grün. |
 | 25-TELEMETRY-01 | Keine Analytics, Crashuploads oder Phone-Home-Funktion | PASS | Source-/Dependency-/Workflow-Scan ohne Telemetrie-SDK oder externen Callback; nur HA/Supervisor- und Release-Infrastrukturzugriffe. |
 | 25-GATE-01 | Tests, Syntax, Version, Secret, Paket und Checksum im Gate | PASS | `release/test-gate.sh`, Workflow und lokaler Part-14-Lauf: 329/329 Tests; Versions-/Syntax-/Secret-/Bundleprüfung grün. |
 | 25-GATE-02 | Docker, beide Architekturen, Manifest und Smoke im Gate | PASS | Historische RC-Evidenz: öffentlicher RC.1-Workflow mit allen sechs Jobs erfolgreich; aktueller HEAD bleibt wegen `RQ-13-01` ungebaut. |
@@ -109,7 +109,7 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 25-GATE-04 | Legacy-iPad-Gate automatisiert plus manuell | PARTIAL | ES5-/CSS- und Regressionstests grün; reale aktuelle Release-Abnahme steht in `MT-54` und den früheren UI-Tests. |
 | 25-GATE-05 | HA-App-Gate einschließlich realem Update | PARTIAL | Historischer RC.1-Fresh-Install/REST/LAN PASS; WS, Update, `/data`, Backup, Reboot und aarch64 in `MT-50` bis `MT-53`/`MT-57`. |
 | 25-DOC-01 | README DE/EN semantisch synchron | PASS | Release-/Installationsabschnitte haben dieselbe Betriebsarten-, Image-, RC- und Securityaussage. |
-| 25-DOC-02 | Standalone-Distribution aus dem Artefakt heraus korrekt dokumentiert | BROKEN | Das Bundle enthält die tatsächlich passende Releaseanleitung nicht und verweist auf fehlende Skripte. `RQ-14-01`. |
+| 25-DOC-02 | Standalone-Distribution aus dem Artefakt heraus korrekt dokumentiert | PASS | Bundle-spezifische deutsche/englische README-/Installationsdateien sind direkt enthalten und benötigen weder Repositorydateien noch Git-Skripte; automatisierte Link-/Inhaltsprüfung. |
 | 25-DOC-03 | Releaseanleitung entspricht dem aktuellen Lebenszyklus | PARTIAL | Sie nennt RC.1 noch als „ersten geplanten Release“ und zeigt denselben bereits existierenden Tag als nächsten Erzeugungsschritt. Zusatzbeleg zu `RQ-13-01`. |
 | 25-DOC-04 | Technischer Projektstatus/Roadmap aktuell | PARTIAL | `PROJECT_STATUS.md` ist bereits über `RQ-08-03` als veraltet erfasst; Release-/Auditstand ist nicht vollständig nachgeführt. |
 | 25-DOC-05 | Keine echten Secrets oder privaten lokalen Pfade in Beispielen | PASS | Nur generische Platzhalter/Testwerte; Bundle-/Dokumentationsscan ohne Credential oder privaten SSH-/Mac-Pfad. |
@@ -139,13 +139,13 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 18 | Health-Smoke | PASS | öffentlicher Job |
 | 19 | Nur Mock HA/Supervisor | PASS | Workflow-/Skriptnachweis |
 | 20 | Keine Produktionsnetzabhängigkeit | PASS | statischer Scan und Mocklauf |
-| 21 | Standalone-Konfiguration über Update | PARTIAL | nur Same-Version-Reinitialisierung; `RQ-14-02` |
-| 22 | App-`/data` über Update | PARTIAL | nur Same-Version-Reinitialisierung; `MT-52`/`MT-57` |
-| 23 | Dashboards über Update | PARTIAL | kein echter Versionswechsel; `RQ-14-02` |
-| 24 | Entity Rules über Update | PARTIAL | kein echter Versionswechsel; `RQ-14-02` |
-| 25 | Critical Mode über Update | PARTIAL | kein echter Versionswechsel; `RQ-14-02` |
-| 26 | Grace Rules über Update | PARTIAL | kein echter Versionswechsel; `RQ-14-02` |
-| 27 | Admin-Konfiguration über Update | PARTIAL | kein echter Versionswechsel; `RQ-14-02` |
+| 21 | Standalone-Konfiguration über Update | PASS | reproduzierbarer Schema-4-/Release-Fixtureprozess → aktueller Tarballprozess plus Rollback |
+| 22 | App-`/data` über Update | PASS | Getrennter Schema-4-/Release-Fixtureprozess → aktueller Tarballprozess verwendet `HA_RUNTIME_MODE=home_assistant_app` und denselben isolierten App-Datenpfad; reale HAOS-Abnahme bleibt separat `MT-52`/`MT-57` `NOT TESTED`. |
+| 23 | Dashboards über Update | PASS | im getrennten N→N+1-Prozess erhalten |
+| 24 | Entity Rules über Update | PASS | im getrennten N→N+1-Prozess erhalten |
+| 25 | Critical Mode über Update | PASS | im getrennten N→N+1-Prozess erhalten |
+| 26 | Grace Rules über Update | PASS | im getrennten N→N+1-Prozess erhalten |
+| 27 | Admin-Konfiguration über Update | PASS | System-/Admin-Konfiguration im getrennten N→N+1-Prozess erhalten |
 | 28 | Theme über Update | NOT TESTED | browserlokal und reale Releasekette offen |
 | 29 | Kein HA-Token im Image | PASS | Docker-/Secret-/Frontendscan |
 | 30 | Kein Supervisor-Token im Image | PASS | Docker-/Secret-/Frontendscan |
@@ -160,9 +160,9 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 39 | Deutsche Installationsdoku | PASS | README.de/Deployment/Releasing |
 | 40 | Englische Installationsdoku | PASS | README.en; technische Detaildocs bewusst deutsch |
 | 41 | App-Repository-Anleitung | PASS | README DE/EN und App-DOCS |
-| 42 | Standalone-Anleitung | BROKEN | im Bundle nicht ausführbar; `RQ-14-01` |
-| 43 | Upgradeanleitung | PARTIAL | richtige Datei fehlt im Bundle; `RQ-14-01` |
-| 44 | Rollbackanleitung | PARTIAL | richtige Datei fehlt im Bundle; `RQ-14-01` |
+| 42 | Standalone-Anleitung | PASS | archivlokale deutsche/englische Fresh-Install-Anleitung |
+| 43 | Upgradeanleitung | PASS | archivlokaler versionierter N→N+1-Pfad mit Zustandsbackup |
+| 44 | Rollbackanleitung | PASS | archivlokaler Rückweg mit passendem Pre-Upgrade-Zustand |
 | 45 | Release Notes | PASS | öffentliche RC.1-Notes |
 | 46 | Changelog | PASS | Root und App |
 | 47 | Supportlinks | PASS | GitHub-Issues/Repository |
@@ -307,14 +307,34 @@ Zusätzliche Evidenz erhielten:
 - `RQ-08-03`: Statusdokumentation bildet den tatsächlichen Release-/Auditstand
   nicht vollständig ab.
 
+## Sprint-27.1-D-Re-Audit
+
+`RQ-14-01`, `RQ-14-02` und `RQ-14-05` sind code-seitig geschlossen. Das
+Standalone-Artefakt besitzt jetzt eine vom Git-Checkout unabhängige, intern
+vollständig verlinkte deutsch-/englischsprachige Betriebsanleitung. Der
+Upgrade-Test verwendet einen eingefrorenen älteren Release-/Schema-Prozess und
+den tatsächlich gebauten und entpackten aktuellen Tarball als zweite
+Laufzeit, erhält den gemeinsamen Datenpfad und prüft einen extern gesicherten
+Rollback mit der alten Laufzeit. Die indirekte Abhängigkeit `qs` ist ohne
+Express-Major-Wechsel auf 6.16.0 aktualisiert; der Moderate-Audit meldet null
+Befunde und ist nun CI-/Releasepolicy.
+
+Fokussierte Sprint-24-/25-/Deployment-Tests: 22/22 PASS; Gesamtsuite 339/339
+PASS. Der reale
+Standalone-N→N+1-/Rollbacklauf bleibt MT-56, das reale HAOS-`/data`-Update
+MT-52 und die neue Veröffentlichung MT-55/57. Sprint 25 bleibt insgesamt
+**PARTIAL**, weil `RQ-13-01`, `RQ-14-03`, `RQ-14-04`, `RQ-17-01` und reale
+Release-/Gerätegates weiterhin offen sind.
+
 ## Schlussfolgerung
 
 Sprint 25 hat eine funktionsfähige und bereits einmal erfolgreiche Release-
 und Distributionspipeline geschaffen. Sein heutiger Gesamtstatus ist dennoch
 `PARTIAL`, weil das veröffentlichte RC nicht den heutigen Code abbildet, das
-Standalone-Bundle keinen konsistenten eigenständigen Betriebsweg dokumentiert,
-echte Upgrade-/Stable-Gates nicht hinreichend nachgewiesen sind und aktuelle
-P1-Befunde offenstehen.
+vollständige commitbezogene Testmapping und das technisch erzwungene Stable-
+Gate noch fehlen und reale Release-/Geräteabnahmen offen sind. Bundle-
+Betriebsweg, automatisierter Cross-Version-/Rollbackpfad und Dependency-Audit
+sind seit Sprint 27.1-D geschlossen.
 
 Audit Part 14 ist abgeschlossen. Audit Part 15 wurde nicht begonnen und
 umfasst laut `AUDIT_INDEX.md` ausschließlich Sprint 25.1 und 25.2.

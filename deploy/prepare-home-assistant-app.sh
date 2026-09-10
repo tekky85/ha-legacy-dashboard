@@ -20,7 +20,13 @@ esac
 
 mkdir -p "$target_path/translations" "$target_path/src"
 
-cp "$source_path/config.yaml" "$target_path/config.yaml"
+# A local Supervisor development package must build the copied sources. The
+# tracked production metadata deliberately keeps its generic GHCR image, but
+# that image key would make Supervisor pull the published image instead of
+# using this prepared Dockerfile context.
+sed '/^image:[[:space:]]/d' \
+    "$source_path/config.yaml" > "$target_path/.config.yaml.tmp"
+mv "$target_path/.config.yaml.tmp" "$target_path/config.yaml"
 cp "$source_path/Dockerfile" "$target_path/Dockerfile"
 cp "$source_path/.dockerignore" "$target_path/.dockerignore"
 cp "$source_path/run.sh" "$target_path/run.sh"

@@ -29,7 +29,10 @@ Development-Tests vorbereitet werden.
 
 Das App-Paket wird ohne zweite Quellcodekopie gepflegt. Für die lokale
 Supervisor-Installation erzeugt das Vorbereitungsskript einen in sich
-geschlossenen Build-Kontext:
+geschlossenen Build-Kontext. Nur in dieser erzeugten Development-Kopie wird
+der Produktionsschlüssel `image:` entfernt. Dadurch baut Supervisor den
+kopierten lokalen Dockerfile-/Quellstand; das versionierte, getrackte
+Produktionspaket behält dagegen weiterhin sein generisches GHCR-Image:
 
 ```bash
 ./deploy/prepare-home-assistant-app.sh \
@@ -140,6 +143,15 @@ iPad-URL zu prüfen. Produktionszugangsdaten dürfen nicht in Testprotokollen
 oder Screenshots erscheinen.
 
 ## Standalone/LXC
+
+Für ein versioniertes Release-Archiv ist ausschließlich die im Archiv
+enthaltene `docs/INSTALL.de.md` beziehungsweise `docs/INSTALL.en.md`
+maßgeblich. Diese Anleitungen verwenden versionierte Runtime-Verzeichnisse,
+einen separaten persistenten Zustandsordner und ein dazu passendes Backup für
+Rollback. Sie benötigen keinen Git-Arbeitsbaum und keine `deploy/*.sh`-Skripte.
+
+Die folgenden Abschnitte beschreiben dagegen das Git-basierte Deployment aus
+einem vollständigen Repository-Checkout.
 
 ## Ziel
 

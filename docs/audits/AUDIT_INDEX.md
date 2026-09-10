@@ -878,6 +878,37 @@ nicht, dass das Projekt RC-ready ist.
 - Ergebnis: alle vier Repairs **CODE CLOSED / MANUAL PENDING**. Batch 27.1-D
   wurde nicht begonnen.
 
+## Sprint 27.1 – Repair Batch D
+
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Basiscommit: `c20f7b7`
+- Repairs: `RQ-13-02`, `RQ-14-01`, `RQ-14-02`, `RQ-14-05`
+- Supervisor Development: Das Vorbereitungsskript entfernt `image:` nur aus
+  der erzeugten lokalen App-Kopie. Der aktuelle Root-Quellbaum wird damit
+  gebaut; die getrackte Production-`config.yaml` behält das generische GHCR-
+  Image und die minimalen Berechtigungsgrenzen.
+- Standalone-Bundle: Archivlokale README-/INSTALL-Dateien in Deutsch und
+  Englisch beschreiben Fresh Install, N→N+1, geschützten gemeinsamen Zustand
+  und Rollback ohne Git-Checkout. Tar-Tests prüfen lokale Links und Pflichtpfade.
+- Cross-Version: Ein eingefrorener Release-0.9-/Schema-4-Prozess erzeugt den
+  Ausgangszustand. Der gebaute und entpackte aktuelle Tarball migriert ihn in
+  einem zweiten Prozess für Standalone und App-Datenpfad; Dashboard, Regeln,
+  Admin-/Critical-Konfiguration, Background, Backup und Rückprüfung durch die
+  alte Laufzeit werden verifiziert.
+- Dependency: `qs` wurde innerhalb der vorhandenen Express-Range von 6.15.3
+  auf 6.16.0 aktualisiert. Der Produktionsaudit mit Schwelle Moderate meldet
+  null Befunde; Parser-/Prototype- und Requestlimitregression bleiben grün.
+- Re-Audit: Sprint 24, 25 und 25.4; übrige Findings und reale `NOT TESTED`-
+  Anforderungen bleiben erhalten.
+- Testevidenz: 22/22 fokussiert und 339/339 vollständig PASS. Alle 122
+  JavaScriptdateien und acht Shellskripte bestehen die Syntaxprüfung;
+  Secret-, Legacy- und Securityregressionen sind grün. Nur lokale Dateien,
+  Localhost-Mocks und Fake-Credentials; kein produktives HA.
+- Manuell: MT-56 ist code-seitig ausführbar; MT-50/52/55/61/62/70 behalten
+  ihre übrigen Blocker. Sämtliche Resultate bleiben `NOT TESTED`.
+- Ergebnis: alle vier Repairs **CODE CLOSED / MANUAL PENDING**. Batch 27.1-E
+  wurde nicht begonnen.
+
 ## Verifikation der Audit-Baseline
 
 - Vollständige Testsuite: 329 von 329 Tests bestanden, 0 fehlgeschlagen.

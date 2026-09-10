@@ -9,17 +9,36 @@ const VersionCheck = require("./check-version");
 
 const ROOT = path.join(__dirname, "..");
 const INCLUDED_PATHS = [
-    ".env.example",
-    "CHANGELOG.md",
-    "LICENSE",
-    "README.md",
-    "README.de.md",
-    "README.en.md",
-    "deploy/systemd/ha-legacy-dashboard.service",
-    "docs/DEPLOYMENT.md",
-    "package-lock.json",
-    "package.json",
-    "src"
+    {source: ".env.example", target: ".env.example"},
+    {source: "CHANGELOG.md", target: "CHANGELOG.md"},
+    {source: "LICENSE", target: "LICENSE"},
+    {
+        source: "release/standalone/README.md",
+        target: "README.md"
+    },
+    {
+        source: "release/standalone/README.de.md",
+        target: "README.de.md"
+    },
+    {
+        source: "release/standalone/README.en.md",
+        target: "README.en.md"
+    },
+    {
+        source: "release/standalone/INSTALL.de.md",
+        target: "docs/INSTALL.de.md"
+    },
+    {
+        source: "release/standalone/INSTALL.en.md",
+        target: "docs/INSTALL.en.md"
+    },
+    {
+        source: "deploy/systemd/ha-legacy-dashboard.service",
+        target: "deploy/systemd/ha-legacy-dashboard.service"
+    },
+    {source: "package-lock.json", target: "package-lock.json"},
+    {source: "package.json", target: "package.json"},
+    {source: "src", target: "src"}
 ];
 
 
@@ -84,27 +103,31 @@ function createHeader(fileName, size, mode, type, mtime) {
 }
 
 
-function collectPath(relativePath, entries) {
-    const absolutePath = path.join(ROOT, relativePath);
+function collectPath(sourcePath, targetPath, entries) {
+    const absolutePath = path.join(ROOT, sourcePath);
     const status = fs.statSync(absolutePath);
 
     if (status.isDirectory()) {
         entries.push({
-            path: relativePath.replace(/\/$/, "") + "/",
+            path: targetPath.replace(/\/$/, "") + "/",
             directory: true,
             content: Buffer.alloc(0)
         });
         fs.readdirSync(absolutePath).sort().forEach(function (name) {
-            collectPath(path.join(relativePath, name), entries);
+            collectPath(
+                path.join(sourcePath, name),
+                path.join(targetPath, name),
+                entries
+            );
         });
         return;
     }
 
     if (!status.isFile()) {
-        throw new Error("Unsupported bundle entry: " + relativePath);
+        throw new Error("Unsupported bundle entry: " + sourcePath);
     }
     entries.push({
-        path: relativePath,
+        path: targetPath,
         directory: false,
         content: fs.readFileSync(absolutePath)
     });
@@ -119,8 +142,8 @@ function buildTar(version) {
         : 0;
     const entries = [];
 
-    INCLUDED_PATHS.forEach(function (relativePath) {
-        collectPath(relativePath, entries);
+    INCLUDED_PATHS.forEach(function (entry) {
+        collectPath(entry.source, entry.target, entries);
     });
     entries.push({
         path: "VERSION",
@@ -208,6 +231,11 @@ if (require.main === module) {
 
 
 module.exports = {
-    INCLUDED_PATHS: INCLUDED_PATHS.slice(0),
+    INCLUDED_PATHS: INCLUDED_PATHS.map(function (entry) {
+        return {
+            source: entry.source,
+            target: entry.target
+        };
+    }),
     createBundle: createBundle
 };

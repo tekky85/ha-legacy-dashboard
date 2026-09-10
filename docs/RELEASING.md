@@ -47,8 +47,9 @@ Ein Release erzeugt:
 - BuildKit-Provenance und SBOM für die Architektur-Images
 
 Das Standalone-Archiv enthält ausschließlich Laufzeitcode, Lockfile,
-Beispielkonfiguration, systemd-Unit, Installationsdokumentation, Lizenz,
-Changelog und `VERSION`. Es enthält weder `node_modules`, Tests, `.env`, Daten,
+Beispielkonfiguration, systemd-Unit, eigenständige deutsch-/englischsprachige
+Installations-, Upgrade- und Rollbackanleitungen, Lizenz, Changelog und
+`VERSION`. Es enthält weder `node_modules`, Tests, `.env`, Daten,
 Git-Metadaten noch Screenshots.
 
 ## Unterstützte Plattformen
@@ -74,7 +75,7 @@ Produktionsaudit bleiben Teil jedes Release Gates.
 2. Syntaxprüfungen für JavaScript und Shell
 3. Versions- und Secret-Prüfung
 4. vollständige Mock-/Integrationstests
-5. `npm audit --omit=dev --audit-level=high`
+5. `npm audit --omit=dev --audit-level=moderate`
 6. reproduzierbares Standalone-Archiv samt Checksum
 7. Docker-BuildKit-Build für `linux/amd64` und `linux/arm64`, ohne Push
 
@@ -210,6 +211,11 @@ importiert.
 
 ## Standalone: Fresh Install
 
+Die nachfolgenden Punkte sind die Release-Maintainer-Übersicht. Im Archiv
+selbst führen `docs/INSTALL.de.md` und `docs/INSTALL.en.md` vollständig und
+ohne Git-Checkout durch Neuinstallation, versioniertes Umschalten und
+Rollback.
+
 1. Release-Archiv und `SHA256SUMS` herunterladen.
 2. `sha256sum --check SHA256SUMS` ausführen.
 3. in ein neues Zielverzeichnis entpacken.
@@ -221,10 +227,12 @@ importiert.
 
 ## Standalone: Upgrade und Rollback
 
-Vor einem Upgrade `.env` und den vollständigen `data`-Ordner sichern. Den
-Dienst stoppen, Release in ein neues Verzeichnis entpacken, `.env` und `data`
-unverändert übernehmen, `npm ci --omit=dev` ausführen und den Dienst starten.
-Erst nach erfolgreichem Health Check die vorherige Runtime-Version entfernen.
+Vor einem Upgrade `.env` und den vollständigen `data`-Ordner als zusammen-
+gehörigen, geschützten Zustand sichern. Den Dienst stoppen, Release in ein
+neues versioniertes Verzeichnis entpacken, die bestehenden Zustandsdateien
+verlinken, `npm ci --omit=dev` ausführen und erst dann den stabilen Runtime-
+Link umschalten. Erst nach erfolgreichem Health Check die vorherige Runtime-
+Version und ihr Backup entfernen.
 
 Für Rollback Dienst stoppen, das alte Release-Verzeichnis und das passende
 Konfigurationsbackup aktivieren, danach erneut Health Check durchführen. Eine
@@ -241,6 +249,12 @@ Ein Release wird abgebrochen bei:
 - verfolgter `.env`, privatem Schlüssel oder bekannten Tokenmustern
 - `.env`, Daten oder `node_modules` im Standalone-Archiv
 - fehlender amd64- oder arm64-Plattform
+
+Der Produktionsdependency-Audit ist bewusst auf `moderate` gesetzt. Moderate,
+High- und Critical-Advisories blockieren das Gate, solange nicht eine
+explizite, versionierte und zeitlich begrenzte Risikoakzeptanz dokumentiert
+ist. Für den aktuellen Kandidaten gilt keine solche Ausnahme; erwartet werden
+null bekannte Produktionsadvisories.
 
 Home-Assistant-, Supervisor- und Admin-Secrets werden weder als Build-Argument
 noch als GitHub Secret benötigt. Es gibt keine Telemetrie, Analytics,

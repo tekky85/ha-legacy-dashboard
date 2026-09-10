@@ -14,6 +14,14 @@ const Manifest = require("../release/validate-manifest");
 const VersionCheck = require("../release/check-version");
 
 const ROOT = path.join(__dirname, "..");
+const PREVIOUS_RELEASE_RUNTIME = path.join(
+    ROOT,
+    "test",
+    "fixtures",
+    "releases",
+    "0.9.0",
+    "runtime.js"
+);
 
 
 function readProjectFile(fileName) {
@@ -28,66 +36,112 @@ function sha256(fileName) {
 }
 
 
-function verifyPersistentUpgrade(configPath) {
-    DashboardConfig.initialize({configPath: configPath});
-    const configured = DashboardConfig.getConfiguration();
+function extractBundle(bundle, directory) {
+    childProcess.execFileSync(
+        "tar",
+        ["-xzf", bundle.archivePath, "-C", directory]
+    );
+    return path.join(
+        directory,
+        "ha-legacy-dashboard-" +
+            require("../package.json").version
+    );
+}
 
-    configured.systemDashboards.summary.ignoredEntities = [
-        "sensor.release_test"
-    ];
-    configured.systemDashboards.summary.showMediaTitles = true;
-    configured.systemDashboards.errors.securityEntities = [
-        "binary_sensor.release_test"
-    ];
-    configured.systemDashboards.errors.ignoredEntities = [
-        "sensor.release_ignored"
-    ];
-    configured.systemDashboards.errors.criticalDetectionMode = "ha_label";
-    configured.systemDashboards.errors.criticalLabelId = "release_test";
-    configured.systemDashboards.errors.rules.defaults.unknownGraceMs = 1234;
-    configured.systemDashboards.errors.rules.entities[
-        "sensor.release_test"
-    ] = {
-        expectedOffline: true
-    };
 
-    DashboardConfig.replaceConfiguration(configured);
-    const beforeUpgrade = fs.readFileSync(configPath, "utf8");
+function currentReleaseProcess(releaseDirectory, dataDirectory, mode) {
+    const source = [
+        "const DashboardConfig = require('./src/config/dashboard');",
+        "const result = DashboardConfig.initialize();",
+        "const configured = DashboardConfig.getConfiguration();",
+        "configured.systemDashboards.summary.ignoredEntities = ['sensor.release_test'];",
+        "configured.systemDashboards.summary.showMediaTitles = true;",
+        "configured.systemDashboards.errors.securityEntities = ['binary_sensor.release_test'];",
+        "configured.systemDashboards.errors.ignoredEntities = ['sensor.release_ignored'];",
+        "configured.systemDashboards.errors.criticalDetectionMode = 'ha_label';",
+        "configured.systemDashboards.errors.criticalLabelId = 'release_test';",
+        "configured.systemDashboards.errors.rules.defaults.unknownGraceMs = 1234;",
+        "configured.systemDashboards.errors.rules.entities['sensor.release_test'] = {expectedOffline: true};",
+        "DashboardConfig.replaceConfiguration(configured);",
+        "process.stdout.write(JSON.stringify({migrated: result.migrated, configuration: DashboardConfig.getConfiguration()}));"
+    ].join("\n");
 
-    DashboardConfig.initialize({configPath: configPath});
-    const afterUpgrade = fs.readFileSync(configPath, "utf8");
-    const reloaded = DashboardConfig.getConfiguration();
+    return JSON.parse(childProcess.execFileSync(
+        process.execPath,
+        ["-e", source],
+        {
+            cwd: releaseDirectory,
+            env: Object.assign({}, process.env, {
+                HA_RUNTIME_MODE: mode,
+                DATA_DIR: dataDirectory
+            })
+        }
+    ).toString("utf8"));
+}
 
-    assert.equal(afterUpgrade, beforeUpgrade);
+
+function verifyCrossVersionUpgrade(mode, root) {
+    const dataDirectory = path.join(root, mode, "data");
+    const rollbackDirectory = path.join(root, mode, "rollback-data");
+    const extractedDirectory = path.join(root, mode, "current-release");
+    const bundleDirectory = path.join(root, mode, "bundle");
+
+    fs.mkdirSync(dataDirectory, {recursive: true});
+    fs.mkdirSync(extractedDirectory, {recursive: true});
+    fs.mkdirSync(bundleDirectory, {recursive: true});
+
+    childProcess.execFileSync(
+        process.execPath,
+        [PREVIOUS_RELEASE_RUNTIME, "initialize", dataDirectory]
+    );
+    fs.cpSync(dataDirectory, rollbackDirectory, {recursive: true});
+
+    const bundle = Bundle.createBundle(bundleDirectory);
+    const releaseDirectory = extractBundle(bundle, extractedDirectory);
+    const result = currentReleaseProcess(
+        releaseDirectory,
+        dataDirectory,
+        mode === "home-assistant-app-data"
+            ? "home_assistant_app"
+            : "standalone"
+    );
+
+    assert.equal(result.migrated, true);
+    assert.equal(result.configuration.schemaVersion, DashboardConfig.SCHEMA_VERSION);
+    assert.equal(result.configuration.defaultDashboardId, "legacy");
+    assert.equal(result.configuration.dashboards[0].title, "Release 0.9 Fixture");
     assert.deepEqual(
-        reloaded.systemDashboards.summary.ignoredEntities,
+        result.configuration.systemDashboards.summary.ignoredEntities,
         ["sensor.release_test"]
     );
     assert.equal(
-        reloaded.systemDashboards.summary.showMediaTitles,
-        true
-    );
-    assert.deepEqual(
-        reloaded.systemDashboards.errors.securityEntities,
-        ["binary_sensor.release_test"]
-    );
-    assert.equal(
-        reloaded.systemDashboards.errors.criticalDetectionMode,
-        "ha_label"
-    );
-    assert.equal(
-        reloaded.systemDashboards.errors.criticalLabelId,
-        "release_test"
-    );
-    assert.equal(
-        reloaded.systemDashboards.errors.rules.defaults.unknownGraceMs,
+        result.configuration.systemDashboards.errors.rules.defaults.unknownGraceMs,
         1234
     );
     assert.equal(
-        reloaded.systemDashboards.errors.rules.entities[
+        result.configuration.systemDashboards.errors.rules.entities[
             "sensor.release_test"
         ].expectedOffline,
         true
+    );
+    assert.equal(
+        fs.readFileSync(
+            path.join(dataDirectory, "backgrounds", "release-fixture.jpg"),
+            "utf8"
+        ),
+        "release-fixture-background"
+    );
+    assert.equal(
+        JSON.parse(fs.readFileSync(
+            path.join(dataDirectory, "dashboards.json.bak"),
+            "utf8"
+        )).schemaVersion,
+        12
+    );
+
+    childProcess.execFileSync(
+        process.execPath,
+        [PREVIOUS_RELEASE_RUNTIME, "verify", rollbackDirectory]
     );
 }
 
@@ -181,6 +235,36 @@ test("CI und Release trennen Builds, Manifest, Smoke Test und latest atomar", fu
     assert.match(workflow, /password: \$\{\{ github\.token \}\}/);
     assert.doesNotMatch(workflow, /secrets\.[A-Za-z_]+/);
     assert.doesNotMatch(workflow, /HA_TOKEN|homeassistant\.local|192\.168\./);
+    assert.match(
+        ci + workflow,
+        /npm audit --omit=dev --audit-level=moderate/
+    );
+    assert.doesNotMatch(
+        ci + workflow,
+        /npm audit --omit=dev --audit-level=high/
+    );
+});
+
+
+test("Produktionsparser verwendet korrigiertes qs und bleibt begrenzt", function () {
+    const lock = require("../package-lock.json");
+    const qsPackage = lock.packages["node_modules/qs"];
+    const qs = require("qs");
+    const started = Date.now();
+    const parsed = qs.parse(
+        "items[0]=a,b&items[1]=c,d&__proto__[polluted]=yes",
+        {
+            arrayLimit: 1,
+            comma: true,
+            depth: 5,
+            parameterLimit: 20
+        }
+    );
+
+    assert.equal(qsPackage.version, "6.16.0");
+    assert.equal({}.polluted, undefined);
+    assert.ok(Date.now() - started < 1000);
+    assert.equal(Object.keys(parsed).length <= 2, true);
 });
 
 
@@ -236,6 +320,18 @@ test("Standalone-Bundle ist reproduzierbar, vollständig und secret-frei", funct
         return /\/VERSION$/.test(entry);
     }));
     [
+        "/README.md",
+        "/README.de.md",
+        "/README.en.md",
+        "/docs/INSTALL.de.md",
+        "/docs/INSTALL.en.md",
+        "/deploy/systemd/ha-legacy-dashboard.service"
+    ].forEach(function (requiredPath) {
+        assert.ok(entries.some(function (entry) {
+            return entry.slice(-requiredPath.length) === requiredPath;
+        }), "Missing standalone entry: " + requiredPath);
+    });
+    [
         /(^|\/)\.env$/,
         /\/node_modules\//,
         /\/test\//,
@@ -255,7 +351,72 @@ test("Standalone-Bundle ist reproduzierbar, vollständig und secret-frei", funct
 });
 
 
-test("Standalone- und App-Daten bleiben über ein Release-Upgrade erhalten", function (t) {
+test("Standalone-Dokumentation ist archivlokal und benötigt keinen Git-Checkout", function (t) {
+    const root = fs.mkdtempSync(
+        path.join(os.tmpdir(), "ha-release-docs-")
+    );
+    const bundleDirectory = path.join(root, "bundle");
+    const extractDirectory = path.join(root, "extract");
+
+    fs.mkdirSync(bundleDirectory);
+    fs.mkdirSync(extractDirectory);
+    t.after(function () {
+        fs.rmSync(root, {recursive: true, force: true});
+    });
+
+    const releaseDirectory = extractBundle(
+        Bundle.createBundle(bundleDirectory),
+        extractDirectory
+    );
+    const markdownFiles = [
+        "README.md",
+        "README.de.md",
+        "README.en.md",
+        "docs/INSTALL.de.md",
+        "docs/INSTALL.en.md"
+    ];
+
+    markdownFiles.forEach(function (fileName) {
+        const content = fs.readFileSync(
+            path.join(releaseDirectory, fileName),
+            "utf8"
+        );
+        const linkPattern = /\[[^\]]+\]\(([^)]+)\)/g;
+        let match;
+
+        while ((match = linkPattern.exec(content)) !== null) {
+            if (/^(?:https?:|#)/.test(match[1])) {
+                continue;
+            }
+            assert.equal(
+                fs.existsSync(path.resolve(
+                    path.dirname(path.join(releaseDirectory, fileName)),
+                    match[1]
+                )),
+                true,
+                fileName + " links missing archive path " + match[1]
+            );
+        }
+    });
+
+    const guides = markdownFiles.slice(3).map(function (fileName) {
+        return fs.readFileSync(
+            path.join(releaseDirectory, fileName),
+            "utf8"
+        );
+    }).join("\n");
+
+    assert.match(guides, /Fresh install|Neuinstallation/);
+    assert.match(guides, /Upgrade N to N\+1|Update N nach N\+1/);
+    assert.match(guides, /Rollback/);
+    assert.doesNotMatch(
+        guides,
+        /deploy\/(?:deploy|check|health-check|rollback)\.sh/
+    );
+});
+
+
+test("Standalone und App-Simulation wechseln reproduzierbar N nach N+1 und erlauben Rollback", function (t) {
     const root = fs.mkdtempSync(
         path.join(os.tmpdir(), "ha-release-upgrade-")
     );
@@ -263,20 +424,8 @@ test("Standalone- und App-Daten bleiben über ein Release-Upgrade erhalten", fun
         fs.rmSync(root, {recursive: true, force: true});
     });
 
-    const standalonePath = path.join(
-        root,
-        "standalone",
-        "data",
-        "dashboards.json"
-    );
-    const appDataPath = path.join(
-        root,
-        "app-data",
-        "dashboards.json"
-    );
-
-    verifyPersistentUpgrade(standalonePath);
-    verifyPersistentUpgrade(appDataPath);
+    verifyCrossVersionUpgrade("standalone", root);
+    verifyCrossVersionUpgrade("home-assistant-app-data", root);
 });
 
 

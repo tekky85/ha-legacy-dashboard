@@ -56,7 +56,7 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | ID | Requirement | Status | Evidence / Begründung |
 |---|---|---|---|
 | 25.4-SCOPE-01 | Sprint ist Validierung, kein Feature-Sprint | PASS | Commit `d0313b0` änderte nur Projektstatus, Roadmap und `docs/RC_CHECKLIST.md`; Part 17 ändert ebenfalls keinen Anwendungscode. |
-| 25.4-PRE-01 | Sprint-24-/25-/25.1-/25.2-/25.3-Endzustände tatsächlich prüfen | PARTIAL | RQ-04-01 und RQ-16-01 sind code-seitig geschlossen; RQ-13-01 und RQ-14-01/-02/-04/-05 sowie reale Gates widerlegen weiterhin eine vollständige Freigabe. |
+| 25.4-PRE-01 | Sprint-24-/25-/25.1-/25.2-/25.3-Endzustände tatsächlich prüfen | PARTIAL | RQ-04-01, RQ-14-01/-02/-05 und RQ-16-01 sind code-seitig geschlossen; RQ-13-01, RQ-14-04, RQ-17-01 sowie reale Gates verhindern weiterhin eine vollständige Freigabe. |
 | 25.4-A1-01 | `repository.yaml` vorhanden und valides YAML | PASS | Datei vorhanden; Ruby-YAML-Parser erfolgreich. |
 | 25.4-A1-02 | Repositoryname, URL und Maintainer ohne Platzhalter/interne URL | PASS | `HA Legacy Dashboard Apps`, öffentliches GitHub-Repository, `tky <mbp@tky.cloud>`; kein Platzhalter/interner Host. |
 | 25.4-A2-01 | App-`config.yaml` vorhanden und valides YAML | PASS | `ha_legacy_dashboard/config.yaml`; Parser und Sprint-24-Test grün. |
@@ -76,8 +76,8 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-IMAGE-04 | Aktuelles Image lokal gebaut und inspiziert | NOT TESTED | Docker ist auf dem Audit-Mac nicht installiert; kein Artefakt wurde gebaut oder veröffentlicht. |
 | 25.4-RELEASE-01 | GitHub-Prerelease und Workflow existieren | PASS | Öffentliche API: Release `v1.0.0-rc.1`, prerelease=true; Runs 33203376391/33203376334 beide success auf `741bba4`. |
 | 25.4-RELEASE-02 | Bundle und SHA256SUMS verfügbar | PASS | Öffentliche Release-API listet Tarball und Checksum; veröffentlichter Digest dokumentiert/verifiziert. |
-| 25.4-RELEASE-03 | Standalone-Bundle ist aus sich heraus installier-/upgrade-/rollbackfähig | BROKEN | Bundle fehlt verlinkte Releaseanleitung und geforderte Git-Deployskripte passen nicht zum Archivmodell. `RQ-14-01`. |
-| 25.4-RELEASE-04 | Upgradeprüfung verwendet zwei echte Versionen und Rollback | PARTIAL | Automatisierter Test lädt dieselbe Implementierung zweimal; reales N→N+1 fehlt. `RQ-14-02`, MT-52/56. |
+| 25.4-RELEASE-03 | Standalone-Bundle ist aus sich heraus installier-/upgrade-/rollbackfähig | PASS | Sprint 27.1-D enthält bundle-spezifische DE/EN-Anleitungen, versionierte Runtime-/State-Pfade, Backup und Rollback ohne Git-Checkout; Tar-Link-/Pfadtest grün. Reale LXC-Abnahme MT-56. |
+| 25.4-RELEASE-04 | Upgradeprüfung verwendet zwei getrennte Releasezustände und Rollback | PASS | Eingefrorener Release-0.9-/Schema-4-Prozess und entpackter aktueller Tarballprozess teilen isolierten Standalone-/App-Datenpfad; Migration, Backup, Regeln, Background und Rückprüfung durch die alte Laufzeit sind automatisiert. Reale MT-52/56 bleiben NOT TESTED. |
 | 25.4-PERM-01 | Nur benötigtes `homeassistant_api: true` | PASS | Config enthält genau diese HA-Berechtigung; kein `hassio_api`. |
 | 25.4-PERM-02 | Kein full_access, Docker, host_pid, host_network, privileged oder HA-Config-Mount | PASS | Schlüssel fehlen; statischer Test und offizielle aktuelle App-Konvention bestätigen Minimalmodell. |
 | 25.4-PERM-03 | AppArmor bleibt aktiv | PASS | `apparmor:true` nutzt das Supervisor-Defaultprofil; ein eigenes `apparmor.txt` ist nur für ein benutzerdefiniertes Profil nötig. |
@@ -118,7 +118,7 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-HA-RESTART-01 | HA-Neustart und automatische Recovery | PARTIAL | Retry/Stale und Error-only-Reconnect sind automatisiert PASS (`RQ-09-01` code-seitig geschlossen); der reale HAOS-Lauf MT-50/52 fehlt. |
 | 25.4-HOST-01 | HAOS-Host-Reboot und App-Autostart | NOT TESTED | `boot:auto` statisch vorhanden; realer Reboot MT-52. |
 | 25.4-LXC-01 | Aktueller Standalone-Quellstand besteht lokale Regression | PASS | 92/92 Part-17-Fokus und 329/329 Gesamttests, ausschließlich lokale Mocks. |
-| 25.4-LXC-02 | Aktuelles Releasebundle installiert/startet auf realem LXC | NOT TESTED | Öffentlicher Tarball ist alter RC.1-Stand und operativ unvollständig; MT-56. |
+| 25.4-LXC-02 | Aktuelles Releasebundle installiert/startet auf realem LXC | NOT TESTED | Der aktuelle lokale Tarball ist automatisiert vollständig, aber nicht veröffentlicht oder real installiert; MT-56. |
 | 25.4-LOG-01 | Strukturierte Logs redigieren Secrets | PASS | `logger`-/Securitytest und Release-Secret-Scan. |
 | 25.4-LOG-02 | Aktuelle reale App-/LXC-Logs ohne Crash-/Reconnect-Schleifen | NOT TESTED | Historische LXC-Logs gelten nicht als aktueller Kandidat; MT-50/52/56. |
 | 25.4-PERF-01 | Aktuelle reale iPad-Ladezeiten ohne harte Regression | NOT TESTED | Kein physischer Lauf in Part 17; MT-54/58. |
@@ -126,18 +126,18 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-BACKUP-02 | Reales Backup/Restore bewahrt Config/Regeln/Background | NOT TESTED | MT-52. |
 | 25.4-UPGRADE-01 | Reales RC-N→RC-N+1 bewahrt Daten | NOT TESTED | Nur ein veröffentlichtes RC vorhanden; MT-52/56. |
 | 25.4-DOC-01 | README DE/EN trennt App und Standalone | PASS | Beide Fassungen beschreiben Repository/App/Port/LAN sowie Bundle/LXC getrennt. |
-| 25.4-DOC-02 | Standalone-Artefakt enthält alle versprochenen Anleitungen | BROKEN | `docs/RELEASING.md` fehlt im Tar; Deployment verweist auf nicht enthaltene Git-Skripte. `RQ-14-01`. |
+| 25.4-DOC-02 | Standalone-Artefakt enthält alle versprochenen Anleitungen | PASS | Archivlokale README-/INSTALL-Dateien in Deutsch/Englisch; alle relativen Links werden gegen den Tar-Inhalt geprüft, keine Git-Deployskriptreferenz. |
 | 25.4-DOC-03 | Projektstatus/Roadmap bilden aktuellen Stand korrekt ab | PARTIAL | Historischer Sprintabschnitt vorhanden; globaler Status nennt weiter Schema 11 und veralteten Auditstand. `RQ-08-03`. |
 | 25.4-TELEM-01 | Keine Telemetrie/Analytics/Crash-Uploads | PASS | Source-/Dependency-/Networkscan ohne entsprechende Integration. |
 | 25.4-MATRIX-01 | RC Result Matrix vorhanden und verwendet nur PASS/FAIL/BLOCKED/NOT TESTED | PASS | `docs/RC_CHECKLIST.md`; 145 Statuszeilen, keine fremden Statuswerte. |
 | 25.4-MATRIX-02 | Matrix ist ein commitbezogener, aktueller Kandidatennachweis | BROKEN | Kopf RC.1/741bba4, LXC 42d88f3, Tests 275/283/290, später angehängte Sprints; aktueller HEAD 329 Tests. `RQ-17-01`. |
-| 25.4-MATRIX-03 | PASS-Aussagen entsprechen dem aktuellen Repositoryzustand | BROKEN | Falscher Dockerfile-Pfad und „0 Schwachstellen“ trotz aktuellem Moderate-Befund bleiben falsch. Der frühere PNG-Widerspruch ist repariert. `RQ-17-01`, RQ-14-05. |
+| 25.4-MATRIX-03 | PASS-Aussagen entsprechen dem aktuellen Repositoryzustand | BROKEN | Der Moderate-Dependency-Befund ist seit Sprint 27.1-D geschlossen; die historische RC-Checkliste mischt weiterhin Commit-/Artefaktstände und einen falschen Dockerfile-Pfad. `RQ-17-01`. |
 | 25.4-BLOCK-01 | Expliziter Abschnitt `RC BLOCKERS` vorhanden | PASS | Fünf Punkte plus Abschlussreihenfolge; RC-Empfehlung ausdrücklich BLOCKED. |
-| 25.4-BLOCK-02 | Blockerliste enthält alle aktuell offenen P1-Befunde | BROKEN | RQ-13-01 und RQ-14-01/-02/-04 sind nicht vollständig als heutige Gatebedingungen enthalten. `RQ-17-01`; RQ-04-01 und RQ-16-01 sind code-seitig geschlossen. |
+| 25.4-BLOCK-02 | Blockerliste enthält alle aktuell offenen P1-Befunde | BROKEN | RQ-13-01 und RQ-14-04 sind nicht vollständig commitbezogen als heutige Gatebedingungen abgeleitet. `RQ-17-01`; RQ-04-01, RQ-14-01/-02 und RQ-16-01 sind code-seitig geschlossen. |
 | 25.4-MANUAL-01 | Reale HAOS-, LXC-, Netzwerk- und iPad-Punkte nicht künstlich PASS | PARTIAL | Alte Evidenz ist überwiegend korrekt begrenzt; einige Matrix-PASS-Zeilen werden aber ohne klare Buildgrenze neben späteren Ständen wiederverwendet. MT-Zuordnung und RQ-17-01. |
 | 25.4-MANUAL-02 | Vollständige ausführbare Manuelltests vorhanden | PASS | MT-13/34/40/42 und MT-50 bis MT-56/58 bis MT-60 besitzen Voraussetzungen, Routen, Schritte, Expected, Fail, Evidence und Result. |
 | 25.4-RC-01 | RC nur bei vollständigen Pflicht-PASS freigeben | PASS | Dokument empfiehlt ausdrücklich `BLOCKED`; kein Stable-/Tag-/Publish in Part 17. |
-| 25.4-RC-02 | Aktueller HEAD ist RC-freigabefähig | BROKEN | Aktuelles Image fehlt, mehrere P1-Befunde und reale Pflichtgates sind offen; zusammengeführt in `RQ-17-01` mit verbleibenden Abhängigkeiten RQ-13-01/RQ-14-01/-02/-04. RQ-04-01 ist code-seitig geschlossen. |
+| 25.4-RC-02 | Aktueller HEAD ist RC-freigabefähig | BROKEN | Aktuelles Image fehlt, P1-Befunde und reale Pflichtgates sind offen; `RQ-17-01` mit verbleibenden Abhängigkeiten RQ-13-01/RQ-14-04. RQ-04-01 und RQ-14-01/-02 sind code-seitig geschlossen. |
 
 ## Aktuelle RC Result Matrix
 
@@ -154,12 +154,12 @@ ausdrücklich auf `741bba4` begrenzt.
 | Öffentliches RC.1-Multi-Arch-Image | PASS | OCI-Index amd64/arm64, aber alter Quellstand. |
 | Aktuelles Containerimage | BLOCKED | Vor Reparaturen keine neue unveränderliche Version veröffentlicht. |
 | Aktueller lokaler Containerbuild | NOT TESTED | Docker nicht verfügbar; CI baut nur bei neuem Commit/Tag erneut. |
-| Automatisierte Tests/Syntax | PASS | 92/92 fokussiert, 329/329 vollständig, 119 JS und 8 Shell-Dateien syntaktisch gültig. |
+| Automatisierte Tests/Syntax | PASS | Sprint 27.1-D: 22/22 fokussiert, 339/339 vollständig, 122 JS- und 8 Shell-Dateien syntaktisch gültig; die frühere Part-14-Evidenz bleibt in der Audit-Historie erhalten. |
 | Credential-/Permission-Sicherheit | PASS | Secret-Scan grün, backend-only Tokens, keine breiten Apprechte. |
 | Uploadvalidierung | PASS | JPEG und PNG einschließlich Struktur-/CRC-Negativfällen sowie Last-valid-Replace automatisiert grün. Reale Runtime-Abnahme bleibt separat NOT TESTED. |
-| Produktionsabhängigkeiten | FAIL | Eine moderate `qs`-Schwachstelle mit zwei Advisories; RQ-14-05. |
+| Produktionsabhängigkeiten | PASS | `qs@6.16.0`; offizieller Audit mit Schwelle Moderate meldet null Befunde, Policy und Parserregression grün. |
 | RC-Evidenzdokument | FAIL | Mehrere Commit-/Teststände und veraltete PASS-Aussagen vermischt; RQ-17-01. |
-| Standalone-Bundle | FAIL | Operativ nicht selbsttragende Dokumentation; RQ-14-01. |
+| Standalone-Bundle | PASS | Reproduzierbar, secretfrei und mit archivlokalem Fresh-Install-/Upgrade-/Rollbackpfad; reale MT-56 offen. |
 | Standalone/LXC aktueller Kandidat | NOT TESTED | Kein aktuelles versioniertes Bundle/Real-LXC-Gate. |
 | Home Assistant App aktueller Kandidat | BLOCKED | Aktuelles Image fehlt; reale Prüfung kann erst danach erfolgen. |
 | Reale App-Installation/Startup | NOT TESTED | Nur historische RC.1-Evidenz. |
@@ -178,14 +178,13 @@ ausdrücklich auf `741bba4` begrenzt.
 1. `RQ-04-01`: in Sprint 27.1-B code-seitig geschlossen; Realtests bleiben ausstehend.
 2. `RQ-13-01`: erst nach Reparaturen eine neue unveränderliche Version aus
    genau dem Kandidatencommit veröffentlichen; RC.1 nicht überschreiben.
-3. `RQ-14-01`: Standalone-Bundle mit tatsächlich enthaltenem Install-/Upgrade-/
-   Rollbackpfad selbsttragend machen.
-4. `RQ-14-02`: echten N→N+1-/Rollbacknachweis herstellen.
-5. `RQ-14-04`: Stable technisch an commitbezogene Gates/offene P1-Befunde
+3. `RQ-14-01` und `RQ-14-02` sind seit Sprint 27.1-D automatisiert
+   geschlossen; die reale Standalone-/HAOS-Abnahme bleibt MT-52/56.
+4. `RQ-14-04`: Stable technisch an commitbezogene Gates/offene P1-Befunde
    koppeln.
-6. `RQ-17-01`: RC-Checkliste in einen commit-/artefaktkohärenten Nachweis
+5. `RQ-17-01`: RC-Checkliste in einen commit-/artefaktkohärenten Nachweis
    überführen und alle aktuellen Blocker/Statuswerte synchronisieren.
-7. Die zugeordneten realen HAOS-, LXC-, Netzwerk-, App-Restart-/Backup- und
+6. Die zugeordneten realen HAOS-, LXC-, Netzwerk-, App-Restart-/Backup- und
    iPad-mini-Pflichtprüfungen auf genau dem neuen Kandidaten ausführen.
 
 Bis alle P1-Befunde geschlossen/re-auditiert und alle Pflichtprüfungen für
@@ -277,6 +276,24 @@ den Gateway-Prozess nicht. `RQ-12-01/-02/-03` sind ebenfalls code-seitig geschlo
 und die aktuelle UI wird routeübergreifend mit v53 ausgeliefert; RQ-04-01
 bleibt damit geschlossen. Die Gesamtsuite bestand 336/336. MT-50 ist
 hinsichtlich des Transportfixes nicht mehr
-blockiert, bleibt wegen `RQ-13-01/-02` und fehlendem realem HAOS-Kandidaten
+blockiert, bleibt nach Sprint 27.1-D nur wegen `RQ-13-01` und fehlendem realem HAOS-Kandidaten
 `NOT TESTED`. Die übrigen P1-/RC-Blocker bleiben unverändert; Sprint 25.4 und
 das RC-Gate bleiben `BLOCKED`.
+
+## Sprint-27.1-D-Re-Audit
+
+`RQ-13-02`, `RQ-14-01`, `RQ-14-02` und `RQ-14-05` sind automatisiert
+geschlossen. Lokale Supervisor-Development-Pakete bauen jetzt nachweislich
+die kopierten Quellen, während Production das generische GHCR-Image behält.
+Das erzeugte Standalone-Tar enthält vollständige, intern auflösbare DE/EN-
+Anleitungen ohne Git-Abhängigkeit. Der Cross-Version-Test wechselt zwischen
+einem eingefrorenen alten Release-/Schema-Prozess und dem entpackten aktuellen
+Tarballprozess, erhält Standalone-/App-Daten und prüft den Rollback. `qs` ist
+kompatibel auf 6.16.0 aktualisiert; der Produktionsaudit mit Moderate-Schwelle
+meldet null Befunde.
+
+Fokussiert bestanden 22/22 Tests, vollständig 339/339. Reale HAOS-, LXC-, Release- und iPad-Gates
+wurden nicht ausgeführt. MT-56 ist code-seitig entblockt und bleibt `NOT
+TESTED`; MT-50/52/55 sowie weitere Kandidatentests bleiben wegen `RQ-13-01`
+beziehungsweise `RQ-14-04`/`RQ-17-01` blockiert. Sprint 25.4 und das aktuelle
+RC-Gate bleiben daher **BLOCKED**, nicht PASS.

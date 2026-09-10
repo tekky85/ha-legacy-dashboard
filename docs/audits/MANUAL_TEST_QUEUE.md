@@ -144,19 +144,19 @@ ihren übrigen Repairs blockiert. Sämtliche 72 Resultate bleiben `NOT TESTED`.
 | MT-47 | CAN RUN NOW | – |
 | MT-48 | CAN RUN NOW | – |
 | MT-49 | CAN RUN NOW | – |
-| MT-50 | BLOCKED | RQ-13-01, RQ-13-02 |
+| MT-50 | BLOCKED | RQ-13-01 |
 | MT-51 | BLOCKED | RQ-13-01 |
-| MT-52 | BLOCKED | RQ-13-01, RQ-14-02 |
+| MT-52 | BLOCKED | RQ-13-01 |
 | MT-53 | BLOCKED | RQ-13-01 |
 | MT-54 | BLOCKED | RQ-13-01 |
-| MT-55 | BLOCKED | RQ-13-01, RQ-14-01/02/04/05, RQ-17-01 |
-| MT-56 | BLOCKED | RQ-14-01, RQ-14-02 |
+| MT-55 | BLOCKED | RQ-13-01, RQ-14-04, RQ-17-01 |
+| MT-56 | CAN RUN NOW | – |
 | MT-57 | RUN AFTER ALL REPAIRS | RQ-13-01, RQ-14-04, RQ-17-01 |
 | MT-58 | CAN RUN NOW | – |
 | MT-59 | CAN RUN NOW | – |
 | MT-60 | CAN RUN NOW | – |
-| MT-61 | BLOCKED | RQ-13-01, RQ-13-02 |
-| MT-62 | BLOCKED | RQ-13-01, RQ-13-02 |
+| MT-61 | BLOCKED | RQ-13-01 |
+| MT-62 | BLOCKED | RQ-13-01 |
 | MT-63 | BLOCKED | RQ-18-01 |
 | MT-64 | BLOCKED | RQ-13-01 |
 | MT-65 | BLOCKED | RQ-13-01 |
@@ -164,7 +164,7 @@ ihren übrigen Repairs blockiert. Sämtliche 72 Resultate bleiben `NOT TESTED`.
 | MT-67 | CAN RUN NOW | – |
 | MT-68 | CAN RUN NOW | – |
 | MT-69 | BLOCKED | RQ-18-01 |
-| MT-70 | BLOCKED | RQ-13-01, RQ-13-02 |
+| MT-70 | BLOCKED | RQ-13-01 |
 | MT-71 | CAN RUN NOW | – |
 | MT-72 | BLOCKED | RQ-18-01 |
 
@@ -2098,8 +2098,8 @@ Requirement: Reale Supervisor-Core-WebSocket-Kommunikation, sichere
 Teil-Ausfälle, autonome Recovery und secretfreie App-Logs.
 Device: Home Assistant OS auf amd64 mit einer kontrollierten Testinstanz;
 Desktop-Safari für die Beobachtung.
-Preconditions: `RQ-09-01` ist automatisiert geschlossen; `RQ-13-01` und
-`RQ-13-02` müssen vor finaler Abnahme behoben und eine neue unveränderliche
+Preconditions: `RQ-09-01` und `RQ-13-02` sind automatisiert geschlossen;
+`RQ-13-01` muss vor finaler Abnahme behoben und eine neue unveränderliche
 Testversion installiert sein; mindestens je eine
 Registry-/Area-/Label-/Config-Entry-/Repair- und Automation-Testinformation;
 kein Long-Lived HA Token in den App-Optionen; separates Test-Admin-Token.
@@ -2232,7 +2232,8 @@ Requirement: Cold Backup/Restore, Upgrade zwischen zwei unveränderlichen App-
 Versionen sowie HAOS-Reboot und `boot: auto` ohne Datenverlust.
 Device: Home Assistant OS auf amd64 in einer kontrollierten Testumgebung.
 Preconditions: Zwei veröffentlichte und voneinander unterscheidbare Test-/RC-
-Versionen aus exakten Commits; `RQ-13-01`/`RQ-13-02` behoben; MT-51-Datensatz
+Versionen aus exakten Commits; `RQ-13-01` behoben, `RQ-13-02` ist bereits
+automatisiert geschlossen; MT-51-Datensatz
 vorhanden; vollständige HAOS-Sicherungsmöglichkeit; Wartungsfenster.
 Exact route/page: `/health`, `/admin`, `/d/<persistence-test-dashboard-id>`,
 Home-Assistant-App-Verwaltung sowie Backup-/Restore-Oberfläche.

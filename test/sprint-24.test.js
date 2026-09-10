@@ -487,6 +487,53 @@ test("App-Metadaten sind minimal, direkt erreichbar und multi-arch vorbereitet",
 });
 
 
+test("Lokaler App-Kontext baut Quellen, Produktionsmetadaten behalten GHCR-Image", function (t) {
+
+    const temporaryDirectory = fs.mkdtempSync(
+        path.join(os.tmpdir(), "ha-local-app-context-")
+    );
+
+    t.after(function () {
+        fs.rmSync(temporaryDirectory, {
+            recursive: true,
+            force: true
+        });
+    });
+
+    childProcess.execFileSync(
+        path.join(ROOT, "deploy", "prepare-home-assistant-app.sh"),
+        [temporaryDirectory],
+        {cwd: ROOT}
+    );
+
+    const productionConfig = readProjectFile(
+        "ha_legacy_dashboard/config.yaml"
+    );
+    const developmentConfig = fs.readFileSync(
+        path.join(temporaryDirectory, "config.yaml"),
+        "utf8"
+    );
+
+    assert.match(
+        productionConfig,
+        /^image: "ghcr\.io\/tekky85\/ha-legacy-dashboard"$/m
+    );
+    assert.doesNotMatch(developmentConfig, /^image:/m);
+    assert.match(developmentConfig, /^homeassistant_api: true$/m);
+    assert.doesNotMatch(
+        developmentConfig,
+        /hassio_api|docker_api|host_network|full_access|privileged/
+    );
+    assert.equal(
+        fs.readFileSync(
+            path.join(temporaryDirectory, "src", "server.js"),
+            "utf8"
+        ),
+        readProjectFile("src/server.js")
+    );
+});
+
+
 test("App-Image und Startup Wrapper schließen Secrets und unnötige Artefakte aus", function () {
 
     const dockerfile = readProjectFile(
