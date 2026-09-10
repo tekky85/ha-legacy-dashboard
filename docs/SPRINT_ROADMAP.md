@@ -24,13 +24,14 @@ Codex muss vor jedem Sprint den tatsächlichen Repository-Stand prüfen.
 
 ## Aktueller Test-Release
 
-Sprint 27.2 bereitet `1.0.0-rc.3` als öffentlichen, ausdrücklich nicht
-stabilen Test-Release vor. `rc.2` wurde bereits veröffentlicht, aber wegen
-eines plattformabhängigen rein informativen gzip-Host-OS-Bytes bei identischem
-Tar-Inhalt als Reproduzierbarkeitskandidat durch `rc.3` ersetzt. Er friert die
+Sprint 27.2 hat `1.0.0-rc.3` als öffentlichen, ausdrücklich nicht
+stabilen Test-Release veröffentlicht. `rc.2` wurde zuvor veröffentlicht, aber
+wegen eines plattformabhängigen rein informativen gzip-Host-OS-Bytes bei
+identischem Tar-Inhalt als Reproduzierbarkeitskandidat durch `rc.3` ersetzt.
+Er friert die
 abgeschlossenen Reparaturbatches
 27.1-A bis 27.1-D für HAOS-, Standalone-/LXC- und Legacy-iPad-Tests ein.
-Nach der Veröffentlichung werden die geplanten Batches 27.1-E bis 27.1-J
+Nach dieser Veröffentlichung werden die geplanten Batches 27.1-E bis 27.1-J
 fortgesetzt; der Test-Tag bleibt dabei unverändert als reproduzierbare
 Referenz erhalten. Details stehen in
 [`PUBLIC_TEST_RELEASE.md`](PUBLIC_TEST_RELEASE.md).

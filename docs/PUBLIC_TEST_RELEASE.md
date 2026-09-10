@@ -11,8 +11,7 @@ without changing application behavior or security boundaries.
 ## Immutable release targets
 
 - Git tag: `v1.0.0-rc.3`
-- Source commit: resolve with `git rev-parse v1.0.0-rc.3^{}`; the published tag
-  is immutable and the final release report records the resulting full hash.
+- Source commit: `771683b804f0b7c684eb3d457b58fb579a3ccdb6`
 - Home Assistant App image:
   `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.3`
 - Standalone archive: `ha-legacy-dashboard-1.0.0-rc.3.tar.gz`
@@ -22,6 +21,18 @@ The release workflow builds both `linux/amd64` and `linux/arm64` from
 `ha_legacy_dashboard/Dockerfile`, creates one versioned manifest, runs the
 container against an isolated local mock, and publishes the GitHub prerelease
 only after all gates pass.
+
+Published verification:
+
+- GitHub prerelease:
+  `https://github.com/tekky85/ha-legacy-dashboard/releases/tag/v1.0.0-rc.3`
+- Release workflow: `34471183386`
+- GHCR manifest digest:
+  `sha256:7aa35767909de4b12119386112887845705f9e29214069d5ab4c1350a6432550`
+- Standalone SHA256:
+  `4d6ca325365d041b21b2fc06512dfd9e029a53cbbf6db2a9577ec6e682437295`
+- Archive size: 217208 bytes; 117 archive entries
+- Stable `latest`: not published
 
 ## Home Assistant App smoke test
 
