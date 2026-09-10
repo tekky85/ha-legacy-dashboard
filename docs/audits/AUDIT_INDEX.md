@@ -1050,8 +1050,13 @@ nicht, dass das Projekt RC-ready ist.
 
 ## Sprint 27.2 – Public Test Release
 
-- Vorgesehene Version: `1.0.0-rc.2`
-- Vorgesehener Tag: `v1.0.0-rc.2`
+- Vorgesehene aktuelle Version: `1.0.0-rc.3`
+- Vorgesehener aktueller Tag: `v1.0.0-rc.3`
+- Veröffentlichte Zwischenversion: `1.0.0-rc.2` / `v1.0.0-rc.2`, Workflow
+  `34469833201`, erfolgreich; als Reproduzierbarkeitskandidat durch `rc.3`
+  ersetzt, weil macOS und Linux ausschließlich im informativen gzip-Host-OS-
+  Headerbyte voneinander abwichen, während der entpackte Tar-Hash identisch
+  war.
 - Zweck: reproduzierbarer öffentlicher Zwischenstand nach den automatisiert
   abgeschlossenen Reparaturbatches 27.1-A bis 27.1-D.
 - Releaseart: GitHub Prerelease/Public Test Release; niemals Stable oder
@@ -1062,8 +1067,10 @@ nicht, dass das Projekt RC-ready ist.
   Gate; keine Produktions-HA-, Supervisor- oder Admin-Credentials.
 - Manuell: alle HAOS-, LXC- und iPad-Ergebnisse bleiben bis zur echten
   Durchführung `NOT TESTED`.
-- Status: **PREPARATION IN PROGRESS – PUBLICATION EVIDENCE PENDING**.
+- Status: **RC.3 PREPARATION IN PROGRESS – PUBLICATION EVIDENCE PENDING**.
 - Scope: Kein Repair aus 27.1-E oder später wurde begonnen.
-- Lokales Gate: 60/60 fokussiert und 340/340 vollständig; Version, Secret,
-  Legacy-Syntax und Produktionsaudit grün. Lokales Archiv und Checksum sind
-  konsistent; Docker war auf dem Prüf-Mac nicht verfügbar.
+- Lokales `rc.2`-Gate: 60/60 fokussiert und 340/340 vollständig; Version,
+  Secret, Legacy-Syntax und Produktionsaudit grün. Die nach der erfolgreichen
+  Veröffentlichung erkannte gzip-Portabilitätsabweichung wird in `rc.3`
+  normalisiert und durch eine Regression abgesichert. Docker war auf dem
+  Prüf-Mac nicht verfügbar.

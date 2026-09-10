@@ -14,7 +14,7 @@ body:
     id: dashboard-version
     attributes:
       label: HA Legacy Dashboard version
-      description: For example, 1.0.0-rc.2.
+      description: For example, 1.0.0-rc.3.
     validations:
       required: true
   - type: dropdown

@@ -2,9 +2,12 @@
 
 ## Sprint-27.2-Testkandidat
 
-Der vorgesehene öffentliche Teststand ist `1.0.0-rc.2` / `v1.0.0-rc.2` mit
-dem Image `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.2` und dem Archiv
-`ha-legacy-dashboard-1.0.0-rc.2.tar.gz`. Nach erfolgreicher Veröffentlichung
+Der vorgesehene öffentliche Teststand ist `1.0.0-rc.3` / `v1.0.0-rc.3` mit
+dem Image `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.3` und dem Archiv
+`ha-legacy-dashboard-1.0.0-rc.3.tar.gz`. Das bereits veröffentlichte `rc.2`
+wurde wegen eines plattformabhängigen, rein informativen gzip-Headerbytes bei
+identischem Tar-Inhalt als Reproduzierbarkeitskandidat ersetzt. Nach
+erfolgreicher Veröffentlichung von `rc.3`
 kann er als feste Referenz für die bereits beschriebenen HAOS-, Standalone-/
 LXC- und iPad-Prüfungen verwendet werden. Dieser Hinweis ändert kein Resultat:
 Alle nicht real ausgeführten Tests bleiben `NOT TESTED`, und vorhandene

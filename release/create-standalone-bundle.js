@@ -185,6 +185,19 @@ function buildTar(version) {
 }
 
 
+function normalizeGzipHeader(archive) {
+    if (!Buffer.isBuffer(archive) || archive.length < 10) {
+        throw new Error("Invalid gzip archive");
+    }
+
+    /* RFC 1952 byte 9 is informational. Node/zlib writes the host OS there,
+     * which otherwise makes the same archive differ between macOS and Linux.
+     */
+    archive[9] = 255;
+    return archive;
+}
+
+
 function createBundle(outputDirectory) {
     const release = VersionCheck.validate(ROOT, null);
     const targetDirectory = path.resolve(outputDirectory || "dist");
@@ -194,10 +207,12 @@ function createBundle(outputDirectory) {
     );
     const checksumPath = path.join(targetDirectory, "SHA256SUMS");
     const tar = buildTar(release.version);
-    const archive = zlib.gzipSync(tar, {
-        level: 9,
-        mtime: 0
-    });
+    const archive = normalizeGzipHeader(
+        zlib.gzipSync(tar, {
+            level: 9,
+            mtime: 0
+        })
+    );
     const digest = crypto.createHash("sha256")
         .update(archive)
         .digest("hex");
@@ -237,5 +252,6 @@ module.exports = {
             target: entry.target
         };
     }),
-    createBundle: createBundle
+    createBundle: createBundle,
+    normalizeGzipHeader: normalizeGzipHeader
 };

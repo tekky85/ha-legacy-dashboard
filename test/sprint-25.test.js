@@ -336,6 +336,16 @@ test("Standalone-Bundle ist reproduzierbar, vollständig und secret-frei", funct
     ).toString("utf8").trim().split(/\r?\n/);
 
     assert.equal(sha256(first.archivePath), sha256(second.archivePath));
+    assert.equal(fs.readFileSync(first.archivePath)[9], 255);
+
+    const linuxHeader = Buffer.alloc(10, 0);
+    const macHeader = Buffer.alloc(10, 0);
+    linuxHeader[9] = 3;
+    macHeader[9] = 19;
+    assert.deepEqual(
+        Bundle.normalizeGzipHeader(linuxHeader),
+        Bundle.normalizeGzipHeader(macHeader)
+    );
     assert.match(
         fs.readFileSync(first.checksumPath, "utf8"),
         new RegExp("^" + first.digest + "  ha-legacy-dashboard-")

@@ -1,10 +1,13 @@
 # Projektstatus – HA Legacy Dashboard
 
 Stand: 10. September 2026. Sprint 27.2 bereitet den aktuellen Stand als
-`1.0.0-rc.2` Public Test Release vor. Der vorgesehene Tag
-`v1.0.0-rc.2`, das generische GHCR-Image und das Standalone-Artefakt werden
-erst nach dem vollständigen lokalen Gate veröffentlicht. Dieser Zwischenstand
-ist kein Stable Release; reale HAOS-/LXC-/iPad-Abnahmen bleiben `NOT TESTED`.
+`1.0.0-rc.3` Public Test Release vor. `1.0.0-rc.2` wurde mit erfolgreichem
+GitHub-Workflow, Multi-Arch-Image und Standalone-Artefakt veröffentlicht. Eine
+anschließende unabhängige macOS-/Linux-Reproduktion zeigte jedoch einen
+unterschiedlichen rein informativen gzip-Host-OS-Headerbyte bei identischem
+entpacktem Tar-Inhalt. `rc.3` normalisiert dieses Byte und ersetzt `rc.2` als
+Reproduzierbarkeitskandidat. Dieser Zwischenstand ist kein Stable Release;
+reale HAOS-/LXC-/iPad-Abnahmen bleiben `NOT TESTED`.
 
 Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
 der anschließende Repair-Queue-Consolidation-Pass wurden auf Repository-Commit
@@ -43,7 +46,7 @@ Status:
 - Sprint-27.1-C / RQ-09-01, RQ-12-01 bis -03: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-D / RQ-13-02, RQ-14-01, RQ-14-02, RQ-14-05:
   **COMPLETE – MANUAL PENDING**
-- Sprint 27.2 / Public Test Release 1.0.0-rc.2:
+- Sprint 27.2 / Public Test Release 1.0.0-rc.3:
   **PREPARATION IN PROGRESS – PUBLICATION PENDING**
 - Manuelle Abnahme: **PENDING**
 - Finales RC-Gate: **PENDING**
@@ -105,7 +108,7 @@ Tests. Reale HAOS-/LXC-/
 Release-/iPad-Abnahmen bleiben `NOT TESTED`; `RQ-13-01`, `RQ-14-04` und
 `RQ-17-01` verhindern weiterhin eine RC-Freigabe.
 
-### Sprint 27.2 – Public Test Release 1.0.0-rc.2
+### Sprint 27.2 – Public Test Release 1.0.0-rc.3
 
 Der Kandidat bündelt die automatisiert abgeschlossenen Reparaturbatches
 27.1-A bis 27.1-D als reproduzierbaren öffentlichen Teststand. Paket, App,
@@ -116,17 +119,28 @@ Installationsart, HA-/Browserkontext, Reproduktion, Soll/Ist sowie nur
 sanitisierte Logs. Die genauen App-/LXC-/Standalone-Smoke- und Rollbackschritte
 stehen in `docs/PUBLIC_TEST_RELEASE.md`.
 
+`1.0.0-rc.2` wurde über Workflow-Run `34469833201` erfolgreich als GitHub-
+Prerelease mit amd64-/arm64-Manifest, Standalone-Tar und `SHA256SUMS`
+veröffentlicht. Der Tag bleibt unverändert auf Commit `dd592da`. Der danach
+ermittelte plattformabhängige gzip-Header ist kein Laufzeit- oder
+Sicherheitsfehler, verhindert aber die geforderte byteidentische unabhängige
+Reproduktion des Archivs. Deshalb bleibt `rc.2` als nachvollziehbare Historie
+erhalten und `rc.3` wird als korrigierter Kandidat veröffentlicht.
+
 Veröffentlichungscommit, Tagziel, Workflow, GHCR-Manifest, Architekturen,
-Standalone-SHA256 und GitHub-Prerelease werden nach erfolgreicher Publikation
-in diesem Abschnitt nachgetragen. Offene Reparatur- und Manuellteststände
-werden durch den Public Test Release nicht als bestanden umbewertet.
+Standalone-SHA256 und GitHub-Prerelease für `rc.3` werden nach erfolgreicher
+Publikation in diesem Abschnitt nachgetragen. Offene Reparatur- und
+Manuellteststände werden durch den Public Test Release nicht als bestanden
+umbewertet.
 
 Das lokale Release-Gate für `v1.0.0-rc.2` bestand einschließlich 340/340
 Tests, JavaScript-/Shellsyntax, Versions- und Secret-Prüfung. Der
 Produktionsaudit mit Schwelle Moderate meldete null Schwachstellen. Das lokal
-erzeugte Standalone-Archiv bestand seine SHA256-Prüfung; Docker ist auf dem
-Prüf-Mac nicht installiert, daher bleibt der Multi-Arch-Build dem vorhandenen
-GitHub-BuildKit-Workflow vorbehalten.
+erzeugte Standalone-Archiv bestand seine SHA256-Prüfung, wich aber im gzip-
+Host-OS-Byte vom Linux-CI-Artefakt ab; der entpackte Tar-Hash war identisch.
+`rc.3` ergänzt die Normalisierung und eine gezielte Regression. Docker ist auf
+dem Prüf-Mac nicht installiert, daher bleibt der Multi-Arch-Build dem
+vorhandenen GitHub-BuildKit-Workflow vorbehalten.
 
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 

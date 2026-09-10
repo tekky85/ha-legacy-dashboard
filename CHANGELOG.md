@@ -8,6 +8,18 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.3 – 2026-09-10
+
+This release candidate supersedes `1.0.0-rc.2` as the reproducible public test
+release. Runtime features and security boundaries are unchanged.
+
+### Fixed
+
+- Normalized the informational gzip OS header byte so the standalone archive
+  is byte-identical across macOS and Linux for identical release sources.
+- Added a cross-platform header regression after independent verification of
+  the published `1.0.0-rc.2` artifact.
+
 ## 1.0.0-rc.2 – 2026-09-10
 
 This release candidate is a public test release, not a stable release.

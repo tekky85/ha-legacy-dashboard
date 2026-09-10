@@ -5,6 +5,12 @@
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.3 – 2026-09-10
+
+This release candidate supersedes `1.0.0-rc.2` as the reproducible public test
+release. App runtime behavior and permissions are unchanged; the release
+bundle now has a platform-neutral gzip header.
+
 ## 1.0.0-rc.2 – 2026-09-10
 
 This release candidate is a public test release, not a stable release.

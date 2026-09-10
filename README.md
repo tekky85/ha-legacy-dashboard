@@ -18,7 +18,7 @@ Choose an installation:
 - [Home Assistant App documentation](./ha_legacy_dashboard/DOCS.md)
 - [Standalone and App deployment](./docs/DEPLOYMENT.md)
 - [Release and distribution process](./docs/RELEASING.md)
-- [Public Test Release 1.0.0-rc.2](./docs/PUBLIC_TEST_RELEASE.md)
+- [Public Test Release 1.0.0-rc.3](./docs/PUBLIC_TEST_RELEASE.md)
 - [GitHub Releases](https://github.com/tekky85/ha-legacy-dashboard/releases)
 
 ## Screenshots

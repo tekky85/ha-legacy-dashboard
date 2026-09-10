@@ -1,17 +1,21 @@
-# Public Test Release 1.0.0-rc.2
+# Public Test Release 1.0.0-rc.3
 
-`1.0.0-rc.2` is an installable public test release. It is not stable, does
+`1.0.0-rc.3` is an installable public test release. It is not stable, does
 not update the container tag `latest`, and does not replace the outstanding
 Sprint 27 repair and manual acceptance work.
 
+It supersedes `1.0.0-rc.2`, whose standalone archives differed between macOS
+and Linux only in gzip's informational host-OS byte. Rc.3 normalizes that byte
+without changing application behavior or security boundaries.
+
 ## Immutable release targets
 
-- Git tag: `v1.0.0-rc.2`
-- Source commit: resolve with `git rev-parse v1.0.0-rc.2^{}`; the published tag
+- Git tag: `v1.0.0-rc.3`
+- Source commit: resolve with `git rev-parse v1.0.0-rc.3^{}`; the published tag
   is immutable and the final release report records the resulting full hash.
 - Home Assistant App image:
-  `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.2`
-- Standalone archive: `ha-legacy-dashboard-1.0.0-rc.2.tar.gz`
+  `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.3`
+- Standalone archive: `ha-legacy-dashboard-1.0.0-rc.3.tar.gz`
 - Integrity file: `SHA256SUMS`
 
 The release workflow builds both `linux/amd64` and `linux/arm64` from
@@ -24,7 +28,7 @@ only after all gates pass.
 Before an install or update, create a Home Assistant backup that contains the
 App data. Then:
 
-1. Refresh the custom App repository and verify that version `1.0.0-rc.2` is
+1. Refresh the custom App repository and verify that version `1.0.0-rc.3` is
    offered.
 2. Install or update the App and verify that it starts without startup errors.
 3. Inspect sanitized logs; they must contain no token or secret.
@@ -44,7 +48,7 @@ Long-Lived Access Token, or browser-to-Home-Assistant WebSocket.
 
 The project does not claim that the Home Assistant App UI supports arbitrary
 downgrades. Keep the previous tag and image
-`ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.1` available and create a backup
+`ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.2` available and create a backup
 before updating. If rollback is required, restore the matching Home Assistant
 backup and deploy a repository package whose `config.yaml` references the
 compatible earlier version. Confirm the exact procedure on a test HAOS system
@@ -61,7 +65,7 @@ complete `data` directory before switching versions. On the LXC as
 cd /home/dashboard/ha-legacy-dashboard
 git status
 git fetch --tags origin
-./deploy/rollback.sh v1.0.0-rc.2
+./deploy/rollback.sh v1.0.0-rc.3
 ./deploy/health-check.sh
 ```
 
@@ -83,13 +87,12 @@ Git checkout; the standalone release archive instead contains its own
 
 ### Git-based LXC rollback
 
-The immediately preceding tested source commit is
-`070748b9f8f119f1d1d03c9e0fb151a86fbc4ea5`. Keep the matching pre-update
-configuration backup. To return to it:
+The immediately preceding public test source is `v1.0.0-rc.2`. Keep the
+matching pre-update configuration backup. To return to it:
 
 ```bash
 cd /home/dashboard/ha-legacy-dashboard
-./deploy/rollback.sh 070748b9f8f119f1d1d03c9e0fb151a86fbc4ea5
+./deploy/rollback.sh v1.0.0-rc.2
 ./deploy/health-check.sh
 ```
 
@@ -104,7 +107,7 @@ extracting:
 
 ```bash
 sha256sum --check SHA256SUMS
-tar -xzf ha-legacy-dashboard-1.0.0-rc.2.tar.gz
+tar -xzf ha-legacy-dashboard-1.0.0-rc.3.tar.gz
 ```
 
 Follow only the bundled installation guide. Confirm service startup,
