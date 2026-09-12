@@ -23,6 +23,12 @@ zu. Keiner dieser Tests war durch `RQ-07-01`, `RQ-08-01`, `RQ-09-02` oder
 `RQ-10-01` als Produktrepair blockiert; ihre Ausführungszustände bleiben daher
 unverändert `CAN RUN NOW` und alle Resultate ehrlich `NOT TESTED`.
 
+Sprint 27.1-F ordnet die verbliebenen realen Anforderungen aus Sprint 21.4,
+21.5, 22, 23, 25.1, 25.2 und 25.3 konkret MT-13, MT-34, MT-37 bis MT-49,
+MT-51, MT-52, MT-54 und MT-58 bis MT-62 zu. Die vier geschlossenen
+Traceability-Repairs blockierten keine Ausführung. Alle zugeordneten
+Realgeräte-/Runtime-Ergebnisse bleiben unverändert `NOT TESTED`.
+
 | ID | Sprint | Requirement | Gerät/System | Prüfschritte | Status |
 |---|---|---|---|---|---|
 | MT-01 | 12 | Climate-Controls, kompakte Karte und allgemeine Kartengeometrie auf der Zielhardware | iPad mini 1, iOS 9.3.5, Safari/HomeScreen | Portrait und Landscape sowie Light/Dark öffnen; Minus/Plus zentriert und mindestens ca. 44 px prüfen; Busy/Disabled, Erfolgs-/Fehlerstatus, Refreshschutz, lange Werte und Clipping prüfen. | NOT TESTED |
@@ -113,6 +119,10 @@ vier Test-Traceability-Repairs, die selbst keine Ausführung blockierten. Die
 dadurch allein blockierten Tests sind nun `CAN RUN NOW`; kombinierte Einträge
 bleiben nur von ihren übrigen Repairs blockiert. Sämtliche 72 Resultate bleiben
 `NOT TESTED`.
+
+Sprint 27.1-F schließt weitere vier Traceability-Repairs. Auch diese waren
+keine Produktrepair-Abhängigkeiten und verändern deshalb weder Execution State
+noch Ergebnis eines manuellen Tests.
 
 | Manual Test | Execution State | Blocked By Repairs |
 |---|---|---|

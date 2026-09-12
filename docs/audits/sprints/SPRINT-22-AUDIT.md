@@ -27,8 +27,8 @@ Sprint 27.1-C schließt den zuvor reproduzierten Erklärbarkeitsdefekt
 `RQ-12-01`: Die Auflösung führt nun Herkunft pro wirksamem Regelfeld und wählt
 für Expected Offline, Grace, Flapping und Recovery die tatsächlich verwendete
 Quelle. Die fachliche Wertpriorität blieb unverändert. `PARTIAL` bleiben die
-nicht vollständig einzeln rückverfolgbare 80-Punkte-Testmatrix, veraltete
-Screenshots und ausstehende reale HA-/LXC-/iPad-Abnahmen.
+in Sprint 27.1-F geschlossene 80-Punkte-Testtraceability, veraltete Screenshots
+und ausstehende reale HA-/LXC-/iPad-Abnahmen.
 
 ## Requirement Matrix
 
@@ -94,7 +94,7 @@ Screenshots und ausstehende reale HA-/LXC-/iPad-Abnahmen.
 | 22-SEC3 | Expected Offline und Sichtbarkeit erteilen keine HA-Capability | PASS | getrennte `control-authorization.js`; Securityregression | Keine Verbindung zu Control Grants. |
 | 22-DEP1 | Rule Engine ist in Standalone und HA App transportneutral | PASS | `runtime.js` löst HA-REST/Supervisor-Verbindung backendseitig; Rule Engine erhält in beiden Modi denselben Snapshot | Vollständiges Sprint-24-Packaging wird erst in Part 13 auditiert. |
 | 22-REG1 | Sprint 21.x, Grid/Focus, Light/Climate, Theme und Navigation bleiben erhalten | PASS | Part-12-Fokus 118/118; Gesamtsuite 329/329 | Keine Anwendungscodeänderung im Audit. |
-| 22-T1 | Alle 80 nummerierten Testanforderungen sind einzeln rückverfolgbar | PARTIAL | 11 breite direkte Sprint-22-Tests plus Issue/Admin/Gateway/21.x-Regressions | Mehrere Grenz-, UI-, Restart-, Failure- und Einzelfälle sind nur gruppiert/indirekt belegt; `RQ-12-04`. |
+| 22-T1 | Alle 80 nummerierten Testanforderungen sind einzeln rückverfolgbar | PASS | Sprint-22-/Issue-/Admin-/Gateway-/21.x-Tests plus maschinengeprüfte Sprint-27.1-F-Traceability | Jede Nummer ist direkt oder äquivalent zugeordnet; reale Timing-/Restart-/UI-Wirkung bleibt MT-43 bis MT-45. |
 | 22-MAN1 | Timing-, Rule-, Expected-Offline- und Health-Abnahme gegen kontrolliertes reales HA | NOT TESTED | MT-43 | Kein reales HA in Part 12 kontaktiert. |
 | 22-MAN2 | Prozessneustart, Historyverlust und Persistenz auf Standalone-LXC | NOT TESTED | MT-44 | Kein produktiver Runtime-Test in diesem Audit. |
 | 22-MAN3 | Error-/Health-/Device-Group-Darstellung auf iPad mini/iOS 9 | NOT TESTED | MT-45 | Keine physische Geräteprüfung. |
@@ -157,7 +157,7 @@ weiterhin aus zuverlässigem `last_changed` rekonstruiert.
 ## Repair Mapping
 
 - `RQ-12-01` – in Sprint 27.1-C code-seitig geschlossen;
-- `RQ-12-04` – nummerierte Sprint-22-/23-Testmatrizen rückverfolgbar härten;
+- `RQ-12-04` – in Sprint 27.1-F code-seitig geschlossen;
 - `RQ-04-01` – in Sprint 27.1-B code-seitig geschlossen;
 - `RQ-08-02` – veraltete Produktbilder;
 - `RQ-08-03` – veralteter globaler Projektstatus.
@@ -172,9 +172,9 @@ Tests bzw. Audit Part 13 vorbehalten.
 
 ## Remaining Sprint 22 Gaps
 
-Vor `COMPLETE` sind `RQ-12-04`, `RQ-08-02` und die realen MT-43 bis MT-45 zu
-schließen. Der zentrale Regel-, Grace-, Flapping-, Recovery- und
-Autorisierungsendzustand ist ansonsten vorhanden.
+Vor `COMPLETE` sind `RQ-08-02` und die realen MT-43 bis MT-45 zu schließen.
+`RQ-12-04` ist code-seitig geschlossen. Der zentrale Regel-, Grace-, Flapping-,
+Recovery- und Autorisierungsendzustand ist ansonsten vorhanden.
 
 ## Sprint-27.1-C-Re-Audit
 
@@ -185,3 +185,12 @@ Flapping oder Stable Recovery – die passende Quelle. Der Mischtest belegt
 Domain, Risk Class, Device, Entity, Security Override und Critical Detection,
 ohne die festgelegte Merge-Priorität zu verändern. MT-43 bis MT-45 sind nun
 ausführbar und bleiben `NOT TESTED`.
+
+## Sprint-27.1-F-Re-Audit
+
+`RQ-12-04` ist **CODE CLOSED / MANUAL PENDING**. Alle 80 Nummern sind
+lückenlos zugeordnet und beziehen die Sprint-27.1-C-Regressionsbelege für
+korrekte Feldherkunft ausdrücklich ein. Grace, Expected Offline, begrenzte
+Flapping-Historie, Stable Recovery, Device Aggregation, Rule Priority und
+read-only Grenzen bleiben grün. Fokuslauf 151/151 und Gesamtsuite 377/377
+bestanden; MT-43 bis MT-45 bleiben `NOT TESTED`.

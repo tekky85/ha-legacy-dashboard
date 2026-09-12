@@ -217,9 +217,13 @@ Code-/UI-Änderungen erneut erzeugt.
 
 - Repairs: `RQ-11-01`, `RQ-12-04`, `RQ-15-01`, `RQ-16-02`
 - Sprints: 21.4, 21.5, 22, 23, 25.1, 25.2, 25.3
-- Erwartete Komponenten: fokussierte Testmatrizen/Traceability
-- Re-Audit: nur die genannten Sprints
-- Entsperrt: vollständige Entity-Rule-/Health-/HomeScreen-/Background-Gates
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Ergebnis: maschinengeprüfte 521-Punkte-Traceability für alle sieben
+  Spezifikationen; ausschließlich Test- und Auditänderungen, kein Produktcode
+- Re-Audit: alle sieben betroffenen Auditdateien abgeschlossen
+- Evidenz: Fokuslauf 151/151, Gesamtsuite 377/377; reale Tests bleiben
+  `NOT TESTED`
+- Entsperrt: belastbare Entity-Rule-/Health-/HomeScreen-/Background-Gates
 
 ### 27.1-G – Current Card Matrix
 

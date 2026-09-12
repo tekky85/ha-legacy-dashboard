@@ -23,11 +23,11 @@ bestehenden geschützten Konfigurations-Write, Verwerfen stellt den gespeicherte
 Entwurf wieder her. Summary und Errors teilen eine kompakte Headerstruktur und
 zeigen die dominante Gesamtzahl nur einmal.
 
-Der fachliche Endzustand ist vorhanden. `PARTIAL` entsteht durch den bekannten
-P1-Cache-Buster-Befund `RQ-04-01`, die nicht vollständig einzeln
-rückverfolgbare 75-Punkte-Testmatrix (`RQ-11-01`), veraltete Screenshots
-(`RQ-08-02`) und noch ausstehende reale Safari-/Tablet-/iPad-Abnahmen. Kein
-neuer fachlicher Laufzeit- oder Sicherheitsdefekt wurde gefunden.
+Der fachliche Endzustand ist vorhanden. Sprint 27.1-F schließt die
+75-Punkte-Testtraceability aus `RQ-11-01`; auch `RQ-04-01` ist code-seitig
+geschlossen. `PARTIAL` bleibt wegen veralteter Screenshots (`RQ-08-02`) und
+noch ausstehender realer Safari-/Tablet-/iPad-Abnahmen. Kein neuer fachlicher
+Laufzeit- oder Sicherheitsdefekt wurde gefunden.
 
 ## Requirement Matrix
 
@@ -79,13 +79,13 @@ neuer fachlicher Laufzeit- oder Sicherheitsdefekt wurde gefunden.
 | 21.4-LEG3 | Admin selbst darf gemäß Sprint-15-Architektur moderne Browsertechnik nutzen | N/A – governed by Sprint 15 architecture | [`SPRINT-15-AUDIT.md`](SPRINT-15-AUDIT.md); `src/admin/js/*.js` | Die verbindliche Trennung lautet: modernes Admin-Bundle, ES5-Wall-Bundle. |
 | 21.4-REG1 | Sprint-21.3-Device-Class-/Label-Modi und Risk Severity bleiben erhalten | PASS | `test/sprint-21-3.test.js`; `system-dashboards.js` | Entity Rule Manager ergänzt, ersetzt aber keine Critical-Mode-Felder. |
 | 21.4-REG2 | User-Dashboards, Focus, Light/Climate, Theme bleiben erhalten | PASS | vollständige Regression 329/329; fokussierter Lauf 165/165 | Kein Anwendungscode wurde im Audit verändert. |
-| 21.4-T1 | Vollständige nummerierte 75-Punkte-Testmatrix ist einzeln rückverfolgbar | PARTIAL | 4 breite direkte Sprint-21.4-Tests plus Admin-/System-/Gateway-/Securityregressionen | Nicht jeder historische Einzelpunkt hat eine direkte Zuordnung; `RQ-11-01`. |
+| 21.4-T1 | Vollständige nummerierte 75-Punkte-Testmatrix ist einzeln rückverfolgbar | PASS | Sprint-21.4-/Admin-/System-/Gateway-/Securitytests plus maschinengeprüfte Sprint-27.1-F-Traceability | Alle Nummern sind direkt oder dokumentiert äquivalent zugeordnet; reale Wirkung bleibt MT-37 bis MT-39. |
 | 21.4-MAN1 | Entity Rule Manager im aktuellen Desktop-Safari | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-37 | Kein realer Safari-Lauf in Part 11. |
 | 21.4-MAN2 | Entity Rule Manager auf modernem Touch-Tablet | NOT TESTED | MT-38 | Kein physischer Tablet-Test in Part 11. |
 | 21.4-MAN3 | Summary-/Error-Header auf iPad mini/iOS 9 | NOT TESTED | MT-39 | Kein physischer Legacy-Gerätetest. |
 | 21.4-SHOT1 | Aktuelle echte Admin-/Summary-/Error-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Aufnahmen belegen den heutigen Entity-Rule-/Headerstand nicht zuverlässig. |
 | 21.4-DOC1 | README DE/EN, Roadmap und Projektstatus dokumentieren die Funktion | PASS | `README.de.md`; `README.en.md`; `docs/SPRINT_ROADMAP.md`; `docs/PROJECT_STATUS.md` | Die Sprint-21.4-Fachbeschreibung ist semantisch vorhanden. |
-| 21.4-CACHE1 | Geänderte gemeinsam genutzte Assets besitzen eine konsistente Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js`; immutable Static Cache unverändert. | RQ-04-01 code-seitig geschlossen. |
+| 21.4-CACHE1 | Geänderte gemeinsam genutzte Assets besitzen eine konsistente Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v53; `test/asset-version.test.js`; immutable Static Cache unverändert. | RQ-04-01 code-seitig geschlossen. |
 
 ## Current Entity Rule Flow
 
@@ -134,8 +134,8 @@ Autorisierung und löst beim Suchen oder Umschalten keinen HA-Aufruf aus.
 
 - `RQ-04-01` – in Sprint 27.1-B code-seitig geschlossen;
 - `RQ-08-02` – veraltete bzw. formatinkonsistente Produktbilder;
-- `RQ-11-01` – fehlende vollständige Einzelzuordnung der 75-/73-Punkte-
-  Testmatrizen.
+- `RQ-11-01` – in Sprint 27.1-F code-seitig geschlossen; reale Abnahmen
+  bleiben `NOT TESTED`.
 
 ## Security and Deployment Review
 
@@ -148,5 +148,14 @@ Lauf ist nicht Teil dieses Parts.
 ## Remaining Sprint 21.4 Gaps
 
 Keine bestätigte fachliche Laufzeitlücke. Vor einer finalen RC-Freigabe sind
-`RQ-08-02`, `RQ-11-01` sowie MT-37 bis MT-39 abzuarbeiten; `RQ-04-01` ist
+`RQ-08-02` sowie MT-37 bis MT-39 abzuarbeiten; `RQ-11-01` und `RQ-04-01` sind
 code-seitig geschlossen.
+
+## Sprint-27.1-F-Re-Audit
+
+`RQ-11-01` ist **CODE CLOSED / MANUAL PENDING**. Alle 75 nummerierten
+Anforderungen sind lückenlos direkter oder dokumentiert äquivalenter Evidenz
+zugeordnet. Entity-Suche, kombinierte Filter, drei Regeln im gemeinsamen
+Draft, Batch Save/Discard, große Inventare, Headercounts und Securitygrenzen
+bleiben unverändert grün. Fokuslauf 151/151 und Gesamtsuite 377/377 bestanden;
+MT-37 bis MT-39 bleiben `NOT TESTED`.

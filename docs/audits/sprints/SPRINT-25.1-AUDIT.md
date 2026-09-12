@@ -30,7 +30,8 @@ getrennt.
 
 `PARTIAL` entsteht nicht aus einem fachlichen Filter- oder Themefehler.
 Sprint 27.1-B hat die früher inkonsistenten immutable Cacheversionen aus
-`RQ-04-01` mit v52 und einem Gleichheitstest code-seitig geschlossen. Es fehlt
+`RQ-04-01` mit der aktuellen gemeinsamen Version v53 und einem Gleichheitstest
+code-seitig geschlossen. Es fehlt
 weiterhin eine lückenlose direkte Zuordnung aller 74
 Spezifikationsfälle (`RQ-15-01`), und die vorgeschriebene reale iPad-/Safari-
 Abnahme steht aus.
@@ -54,7 +55,7 @@ Abnahme steht aus.
 | 25.1-THEME-13 | Ungültiger gespeicherter Wert fällt sicher zurück | PASS | Nur `dark`/`light` werden akzeptiert; Tests mit `sepia`/`contrast` starten sicher in Light. |
 | 25.1-THEME-14 | Totaler Storage-Ausfall lässt Umschaltung in der Sitzung zu | PASS | `Theme.current` und Klassenänderung hängen nicht vom Erfolg der Persistenz ab; gezielter Test ist grün. |
 | 25.1-THEME-15 | Keine Secrets in der Theme-Preference | PASS | Gespeichert wird ausschließlich der String `dark` oder `light`; kein Token-/Entityinhalt. |
-| 25.1-CACHE-01 | Aktuelle Theme-/Systemlogik wird routeübergreifend konsistent ausgeliefert | PASS | `index.html`, `system.html`, Admin und Manifest verwenden v52; `test/asset-version.test.js` prüft insbesondere Theme/Style/Compat/Systemnavigation. | RQ-04-01 code-seitig geschlossen; reale HomeScreen-Abnahme bleibt `NOT TESTED`. |
+| 25.1-CACHE-01 | Aktuelle Theme-/Systemlogik wird routeübergreifend konsistent ausgeliefert | PASS | `index.html`, `system.html`, Admin und Manifest verwenden v53; `test/asset-version.test.js` prüft insbesondere Theme/Style/Compat/Systemnavigation. | RQ-04-01 code-seitig geschlossen; reale HomeScreen-Abnahme bleibt `NOT TESTED`. |
 | 25.1-SEV-01 | `All` zeigt alle Severity-Stufen | PASS | `activeSeverityFilter === "all"` umgeht nur die Severity-Bedingung; System-Frontendtest prüft die vollständige Fixture. |
 | 25.1-SEV-02 | `Critical` zeigt ausschließlich Critical | PASS | `issue.severity === activeSeverityFilter`; Test prüft sichtbares Critical-Child und schließt Nachbarstufen aus. |
 | 25.1-SEV-03 | `Error` zeigt ausschließlich Error | PASS | Exakter Stringvergleich; keine kumulative Ranglogik im Filter. |
@@ -84,7 +85,7 @@ Abnahme steht aus.
 | 25.1-SEC-01 | HA_TOKEN und SUPERVISOR_TOKEN bleiben backend-only | PASS | Kein Treffer in Public/Admin-Assets; Theme und Filter benötigen keine Credentials. |
 | 25.1-SEC-02 | Keine neue Write- oder generische HA-Service-/WebSocket-API | PASS | Route-/Frontendscan ohne neue System-Writefläche; bestehende Controls bleiben eng serverseitig autorisiert. |
 | 25.1-SEC-03 | Filter erteilen keine Write-Berechtigung | PASS | Filterzustand bleibt rein lokal und wird nicht an Control-Authorization übergeben. |
-| 25.1-TEST-01 | Alle 74 nummerierten Fälle sind direkt rückverfolgbar | PARTIAL | Direkte Theme- und umfassende tabellenartige Filtertests plus Gesamtregression belegen den Endzustand, aber nicht jeder der 74 Punkte hat eine einzelne Zuordnung. `RQ-15-01`. |
+| 25.1-TEST-01 | Alle 74 nummerierten Fälle sind direkt rückverfolgbar | PASS | Theme-/Filter-/System-/Gateway-/Securitytests plus maschinengeprüfte Sprint-27.1-F-Traceability | Jede Nummer besitzt direkte oder dokumentiert äquivalente Evidenz; reale Gates bleiben MT-13/34/40/42. |
 | 25.1-MAN-01 | Theme auf iPad mini/iOS 9 HomeScreen vollständig abgenommen | NOT TESTED | MT-13; in Part 15 wurde kein physisches Gerät verwendet. |
 | 25.1-MAN-02 | Exakte Filter und Device Groups auf iPad mini vollständig abgenommen | NOT TESTED | MT-34; vollständige Schritte und Expected/Fail-Kriterien vorhanden. |
 | 25.1-MAN-03 | HomeScreen-Health-/Return-Nichtregression auf iPad mini | NOT TESTED | MT-40. |
@@ -139,11 +140,20 @@ ungefiltertes Error-Payload
 - MT-42: Desktop-Safari, Failure-Fallback und Langzeitlauf;
 - `RQ-04-01`: in Sprint 27.1-B code-seitig geschlossen;
 - `RQ-08-02`: veraltete Produktbilder;
-- `RQ-15-01`: fehlende vollständige Einzelzuordnung der 74 Testfälle.
+- `RQ-15-01`: in Sprint 27.1-F code-seitig geschlossen; reale Gates bleiben
+  `NOT TESTED`.
 
 ## Abschluss
 
 Die aktuelle fachliche Theme- und Filterlogik erfüllt den spezifizierten
-Endzustand. Sprint 25.1 kann wegen der unvollständigen direkten
-Testtraceability und der ausstehenden realen Safari-/iPad-Abnahme noch nicht
-als vollständig freigegeben gelten. Es wurde kein Anwendungscode repariert.
+Endzustand. Die Testtraceability ist geschlossen; wegen der ausstehenden
+realen Safari-/iPad-Abnahme kann Sprint 25.1 noch nicht als vollständig
+freigegeben gelten. Es wurde kein Anwendungscode repariert.
+
+## Sprint-27.1-F-Re-Audit
+
+`RQ-15-01` ist für Sprint 25.1 **CODE CLOSED / MANUAL PENDING**. Alle 74
+Nummern sind lückenlos zugeordnet. Globale Theme-Persistenz einschließlich
+Storage-Fallback und exakte Severity-/State-/Same-Child-Filter bleiben
+automatisiert grün. Fokuslauf 151/151 und Gesamtsuite 377/377 bestanden;
+MT-13, MT-34, MT-40 und MT-42 bleiben `NOT TESTED`.

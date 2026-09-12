@@ -940,6 +940,35 @@ nicht, dass das Projekt RC-ready ist.
 - Ergebnis: alle vier Repairs **CODE CLOSED / MANUAL PENDING**. Batch 27.1-F
   wurde nicht begonnen.
 
+## Sprint 27.1 – Repair Batch F
+
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Basiscommit: `8d2e06a`
+- Repairs: `RQ-11-01`, `RQ-12-04`, `RQ-15-01`, `RQ-16-02`
+- Root Cause: Die fachlichen Laufzeitpfade waren breit regressiert, aber 521
+  nummerierte Anforderungen aus Sprint 21.4, 21.5, 22, 23, 25.1, 25.2 und
+  25.3 waren nicht lückenlos auf direkte, äquivalente oder manuelle Evidenz
+  abgebildet.
+- Implementierung: `test/fixtures/sprint-27-1-f-traceability.js` bildet jede
+  Nummer ab; `test/sprint-27-1-f.test.js` prüft Vollständigkeit, Evidenzmarker,
+  unverändert `NOT TESTED` bleibende Manual-Verweise sowie die zentralen
+  Legacy-/Securitygrenzen. Produktcode und Produktverhalten blieben
+  unverändert.
+- Re-Audit: Sprint 21.4, 21.5, 22, 23, 25.1, 25.2 und 25.3; die vier Repairs
+  sind code-seitig geschlossen, reale Anforderungen bleiben ehrlich
+  `NOT TESTED`.
+- Testevidenz: 151/151 fokussiert und 377/377 vollständig PASS. Die beiden
+  neuen JavaScript-Testdateien bestehen `node --check`; Legacy-, Security-,
+  Standalone-, App- und frühere Repairregressionen sind grün. Ausschließlich
+  lokale/synthetische Daten und Localhost-Mocks, keine Produktionszugänge.
+- Manuell: MT-13/34/37–49/51/52/54/58–62 sind konkret zugeordnet und bleiben
+  `NOT TESTED`; kein physischer oder produktiver Lauf wurde durchgeführt.
+- Public Test Release: `v1.0.0-rc.3` bleibt unverändert auf
+  `771683b804f0b7c684eb3d457b58fb579a3ccdb6`; Batch F ist neuer als dieser
+  Teststand und verschiebt oder ersetzt dessen Tag nicht.
+- Ergebnis: alle vier Repairs **CODE CLOSED / MANUAL PENDING**. Batch 27.1-G
+  wurde nicht begonnen.
+
 ## Verifikation der Audit-Baseline
 
 - Vollständige Testsuite: 329 von 329 Tests bestanden, 0 fehlgeschlagen.

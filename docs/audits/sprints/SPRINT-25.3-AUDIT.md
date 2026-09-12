@@ -36,12 +36,11 @@ Replacementtests bestätigen, dass dabei die letzte gültige Konfiguration und
 Datei erhalten bleiben und keine Temp-/Waisendatei entsteht. `RQ-16-01` ist
 damit automatisiert geschlossen; JPEG bleibt durch Sprint 25.5 gehärtet.
 
-Zusätzlich sind die 84 nummerierten Prüfpunkte der Spezifikation nicht
-vollständig direkt rückverfolgbar (`RQ-16-02`) und die bereits bekannte
-routeabhängige immutable Assetversion (`RQ-04-01`) betrifft auch Theme,
-Admin-Preview und Wall-Runtime. Reale iPad-, LXC-Restart- und HAOS-`/data`-
-Abnahmen stehen aus. Daher bleibt Sprint 25.3 trotz des bestandenen Re-Audits
-und 330/330 vollständigen Tests bis zu den bestehenden Matrix-/Realgerätegates
+Sprint 27.1-F schließt zusätzlich die Traceability aller 84 nummerierten
+Prüfpunkte (`RQ-16-02`); die routeabhängige immutable Assetversion
+(`RQ-04-01`) ist ebenfalls code-seitig geschlossen. Reale iPad-, LXC-Restart-
+und HAOS-`/data`-Abnahmen stehen aus. Daher bleibt Sprint 25.3 trotz der
+bestandenen automatisierten Re-Audits bis zu den bestehenden Realgerätegates
 `PARTIAL`.
 
 ## Requirement-Matrix
@@ -82,7 +81,7 @@ und 330/330 vollständigen Tests bis zu den bestehenden Matrix-/Realgerätegates
 | 25.3-ROUTE-02 | Richtiger MIME-Typ, `nosniff` und restriktive CSP | PASS | Route setzt JPEG/PNG-Type, `X-Content-Type-Options: nosniff`; CSP erlaubt Bilder nur von `self`/`data:`. |
 | 25.3-ROUTE-03 | Fehlendes/unreferenziertes Asset liefert kontrolliert 404 | PASS | Serverroute gibt generischen 404; Wall-Renderer bleibt bedienbar und behält keine vorherige Bilddarstellung. |
 | 25.3-CACHE-01 | Ersatz verwendet eine neue Asset-ID und umgeht alten Bildcache | PASS | Jeder Upload erzeugt neue Random-ID; Public URL ändert sich, Assetantwort ist immutable cachebar. |
-| 25.3-CACHE-02 | Gemeinsame UI-Assets werden auf allen Routen konsistent versioniert | PASS | Dashboard, Systemseite, Admin und Manifest laden v52; `test/asset-version.test.js` prüft zusätzlich die geteilten Presentation-/Icon- und Theme-/Navigationsassets. | RQ-04-01 code-seitig geschlossen; reale Background-/Preview-Abnahme bleibt `NOT TESTED`. |
+| 25.3-CACHE-02 | Gemeinsame UI-Assets werden auf allen Routen konsistent versioniert | PASS | Dashboard, Systemseite, Admin und Manifest laden v53; `test/asset-version.test.js` prüft zusätzlich die geteilten Presentation-/Icon- und Theme-/Navigationsassets. | RQ-04-01 code-seitig geschlossen; reale Background-/Preview-Abnahme bleibt `NOT TESTED`. |
 | 25.3-RUNTIME-01 | Wall-Display rendert das jeweilige Dashboardbild | PASS | `src/public/js/app.js:applyDashboardAppearance()` setzt Body-Background aus ausschließlich validiertem `image_url`. |
 | 25.3-RUNTIME-02 | Position, Cover/Contain und Overlay werden angewendet | PASS | Enumprüfung im Client, Body-Position/-Size/-Repeat und separate Overlay-Opacity; Sprint-25.3-Test grün. |
 | 25.3-RUNTIME-03 | Dashboardwechsel entfernt alte Appearance vollständig | PASS | `applyDashboardAppearance()` löscht Image/Position/Size und versteckt Overlay, wenn kein gültiger Background vorliegt. |
@@ -108,7 +107,7 @@ und 330/330 vollständigen Tests bis zu den bestehenden Matrix-/Realgerätegates
 | 25.3-DOC-01 | README DE/EN und technische Dokumentation beschreiben Backgrounds synchron | PASS | Beide Sprachfassungen dokumentieren Upload, Felder, `DATA_DIR` und Sicherheit; Roadmap/Projektstatus enthalten Sprint 25.3. Globaler Statusdrift bleibt `RQ-08-03`. |
 | 25.3-DOC-02 | Echte/kontrollierte Screenshots für Dashboard und Admin vorhanden | PASS | `docs/screenshots/dashboards/background-image.png` und `docs/screenshots/admin/dashboard-background.png` sind echte PNGs aus kontrollierter Real-App, ohne sichtbare Tokens/IPs. Die allgemeine spätere D1-Galerielücke bleibt `RQ-08-02`. |
 | 25.3-TEST-01 | Kernpfad besitzt isolierte automatisierte Regressionen | PASS | `test/sprint-25-3.test.js` enthält neun direkte Tests; Admin-, Gateway-, Persistenz-, JPEG-, Focus-, Navigation-, Security- und Deploymenttests ergänzen den Pfad. |
-| 25.3-TEST-02 | Alle 84 nummerierten Testfälle sind direkt nachvollziehbar | PARTIAL | Die zuvor fehlenden PNG-Struktur-/CRC-/Replace-Fälle sind jetzt direkt regressiert. Nicht jede Größen-/Viewport-/Restart-/Failure-Kombination ist jedoch einzeln zugeordnet; `RQ-16-02` bleibt offen. |
+| 25.3-TEST-02 | Alle 84 nummerierten Testfälle sind direkt nachvollziehbar | PASS | Sprint-25.3-/25.5-/Admin-/Gateway-/Persistenz-/Securitytests plus maschinengeprüfte Sprint-27.1-F-Traceability | Automatisierbare Fälle sind direkt/äquivalent zugeordnet; reale Viewport-/Restart-/HAOS-Fälle verweisen auf MT-51/52/54/58–60. |
 | 25.3-MAN-01 | Reales iPad mini: Background, Titel, Full Height, Footer, Focus, Theme, Cache und HomeScreen | NOT TESTED | MT-58; Part 16 führte keine physische Prüfung aus. |
 | 25.3-MAN-02 | Aktuelles Safari/Admin: Uploadmatrix, Preview/Runtime, Validierung und Ersatz | NOT TESTED | MT-59. |
 | 25.3-MAN-03 | Standalone/LXC: DATA_DIR, Rechte, Restart und Backup | NOT TESTED | MT-60. |
@@ -182,7 +181,8 @@ für PNG zuverlässig.
 - MT-60: Standalone/LXC-Persistenz und Neustart;
 - `RQ-16-01`: automatisiert geschlossen; reale Background-Abnahmen bleiben
   `NOT TESTED`;
-- `RQ-16-02`: unvollständige direkte Zuordnung der 84 Testfälle;
+- `RQ-16-02`: in Sprint 27.1-F code-seitig geschlossen; reale Abnahmen
+  bleiben `NOT TESTED`;
 - `RQ-04-01`: in Sprint 27.1-B code-seitig geschlossen;
 - `RQ-13-01`: veröffentlichte RC.1-Artefakte enthalten nicht den heutigen Code;
 - `RQ-14-04`: Stable-Pipeline erzwingt diese manuellen Gates nicht.
@@ -191,6 +191,15 @@ für PNG zuverlässig.
 
 Die per-Dashboard Background-/Titel-/Full-Height-/Footerarchitektur ist im
 aktuellen Repository vorhanden und breit regressiert. Der nachgewiesene PNG-
-Akzeptanz- und Erhaltsfehler ist repariert. Sprint 25.3 bleibt wegen
-`RQ-16-02`, des offenen P1-Cachebefunds und fehlender realer Zielgeräte-/
-Betriebsabnahmen `PARTIAL`; daraus folgt ausdrücklich noch keine RC-Freigabe.
+Akzeptanz- und Erhaltsfehler sowie die Testtraceability sind repariert. Sprint
+25.3 bleibt wegen fehlender realer Zielgeräte-/Betriebsabnahmen `PARTIAL`;
+daraus folgt ausdrücklich noch keine RC-Freigabe.
+
+## Sprint-27.1-F-Re-Audit
+
+`RQ-16-02` ist **CODE CLOSED / MANUAL PENDING**. Alle 84 Nummern sind
+lückenlos zugeordnet; die Sprint-27.1-A-PNG-CRC-/IDAT-/Replacement-
+Regressionen und Sprint-25.5-JPEG-Matrix sind ausdrücklich eingebunden.
+Fokuslauf 151/151 und Gesamtsuite 377/377 bestanden. Reale Viewport-, Footer-,
+Rotation-, HomeScreen-, LXC- und HAOS-Persistenz bleiben MT-51/52/54/58–60
+sowie MT-62 zugeordnet und `NOT TESTED`.

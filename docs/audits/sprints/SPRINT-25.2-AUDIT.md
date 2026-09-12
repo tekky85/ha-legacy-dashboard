@@ -31,10 +31,8 @@ und keine `navigator.standalone`-Sonderlogik.
 
 `PARTIAL` ist zwingend, weil der bestätigte Fehler nur auf einem echten
 iPad-mini-HomeScreen abschließend widerlegt werden kann. Dieser Lauf wurde im
-Audit nicht ausgeführt. Zusätzlich kann der bereits bekannte immutable
-Cacheversionsunterschied (`RQ-04-01`) auf Systemseiten eine ältere
-`system-navigation.js`-Version halten. Die 51 nummerierten Testanforderungen
-sind fachlich breit, aber nicht einzeln vollständig zugeordnet (`RQ-15-01`).
+Audit nicht ausgeführt. Die früheren Code-/Traceability-Befunde `RQ-04-01` und
+`RQ-15-01` sind inzwischen geschlossen.
 
 ## Requirement-Matrix
 
@@ -83,8 +81,8 @@ sind fachlich breit, aber nicht einzeln vollständig zugeordnet (`RQ-15-01`).
 | 25.2-LEG-03 | CSS benötigt kein Grid/Flex-gap/ResizeObserver/Container Query | PASS | Relevanter Wall-CSS-/Source-Scan grün. |
 | 25.2-DEP-01 | Standalone/LXC funktioniert ohne Hostannahme | PASS | Relative Pfade folgen dem ausgelieferten Origin einschließlich Host und Port; keine LXC-Adresse im Code. Reale Rollout-Abnahme ist nicht Teil des Auditlaufs. |
 | 25.2-DEP-02 | Home Assistant App funktioniert bei direktem LAN-Port ohne Ingressannahme | PASS | Ebenfalls relative Pfade; keine Ingress-/Supervisor-Navigation oder originändernde WebUI-URL im Browsercode. Reale HAOS-Abnahme bleibt spätere Queue. |
-| 25.2-CACHE-01 | Aktueller Navigationhelper wird auf allen Routen konsistent ausgeliefert | PASS | Dashboard und Systemseite laden `system-navigation.js?v=52`; Admin/Manifest sind ebenfalls v52; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen; HomeScreen-Same-Window bleibt real zu prüfen. |
-| 25.2-TEST-01 | Alle 51 nummerierten Fälle sind direkt rückverfolgbar | PARTIAL | Fünf breite Sprint-25.2-Tests plus Sprint-21.5-, Gateway-, Theme-, Filter- und Gesamttests; nicht jeder Einzelpunkt besitzt eine direkte Zuordnung. `RQ-15-01`. |
+| 25.2-CACHE-01 | Aktueller Navigationhelper wird auf allen Routen konsistent ausgeliefert | PASS | Dashboard und Systemseite laden `system-navigation.js?v=53`; Admin/Manifest sind ebenfalls v53; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen; HomeScreen-Same-Window bleibt real zu prüfen. |
+| 25.2-TEST-01 | Alle 51 nummerierten Fälle sind direkt rückverfolgbar | PASS | Sprint-25.2-/21.5-/Gateway-/Theme-/Filtertests plus maschinengeprüfte Sprint-27.1-F-Traceability | Alle Nummern sind direkt/äquivalent zugeordnet; Touch/Portrait/Landscape bleiben MT-40/41. |
 | 25.2-MAN-01 | iPad mini: Default→Summary→Back bleibt HomeScreen | NOT TESTED | MT-40; Part 15 verwendete kein physisches iPad. |
 | 25.2-MAN-02 | iPad mini: Default/Custom→Errors→Back bleibt HomeScreen | NOT TESTED | MT-40. |
 | 25.2-MAN-03 | iPad mini: Mehrfachwechsel, Portrait/Landscape und Theme | NOT TESTED | MT-40 kombiniert den vollständigen Ablauf. |
@@ -138,13 +136,23 @@ Systemseite
 - MT-41: iPad Air 2 in Safari und optional HomeScreen;
 - MT-42: macOS Safari, Redirectabwehr und Langzeitlauf;
 - `RQ-04-01`: in Sprint 27.1-B code-seitig geschlossen;
-- `RQ-15-01`: unvollständige Einzelzuordnung der 51 Testfälle;
+- `RQ-15-01`: in Sprint 27.1-F code-seitig geschlossen;
 - `RQ-14-04`: Stable-Gate erzwingt die realen 25.1/25.2-Abnahmen noch nicht.
 
 ## Abschluss
 
 Der aktuelle Quellcode erfüllt das sichere Same-Window-/Same-Origin- und
 Return-Target-Enddesign. Ohne echte iPad-mini-HomeScreen-Abnahme und vor
-Behebung des routeabhängigen immutable Cachezustands darf die bestätigte reale
-Regression dennoch nicht als endgültig geschlossen oder als Release Gate
-freigegeben gelten. Es wurde kein Anwendungscode repariert.
+der commitbezogenen Release-Gate-Freigabe darf die bestätigte reale Regression
+dennoch nicht als endgültig geschlossen gelten. Der routeabhängige immutable
+Cachezustand ist code-seitig bereits behoben. Es wurde kein Anwendungscode
+repariert.
+
+## Sprint-27.1-F-Re-Audit
+
+`RQ-15-01` ist für Sprint 25.2 **CODE CLOSED / MANUAL PENDING**. Alle 51
+Nummern sind lückenlos zugeordnet; `_self`/`window.location.href`, relative
+same-origin Routen, sichere Returnziele, Theme und exakte Filter sind
+automatisiert belegt. Fokuslauf 151/151 und Gesamtsuite 377/377 bestanden. Der
+reale Touch-/Portrait-/Landscape-HomeScreen-Lauf MT-40/MT-41 bleibt
+`NOT TESTED`.

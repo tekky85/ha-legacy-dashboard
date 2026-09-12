@@ -22,7 +22,10 @@ Version-/Rollbacknachweis und die moderate Produktionsdependency
 (`RQ-13-02`, `RQ-14-01/-02/-05`). Sprint 27.1-E schloss auf Basis `d3fde0e`
 die vier Test-/Traceability-Repairs `RQ-07-01`, `RQ-08-01`, `RQ-09-02` und
 `RQ-10-01`, ohne Produktverhalten zu ändern. Die automatisierten Gate- und
-Re-Audit-Läufe sind grün. Reale iPad-/HomeScreen-/
+Re-Audit-Läufe sind grün. Sprint 27.1-F schloss auf Basis `8d2e06a` die vier
+weiteren Traceability-Repairs `RQ-11-01`, `RQ-12-04`, `RQ-15-01` und
+`RQ-16-02` für insgesamt 521 nummerierte Anforderungen, ebenfalls ohne
+Produktverhalten zu ändern. Reale iPad-/HomeScreen-/
 Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate
 bleiben offen.
 
@@ -50,6 +53,8 @@ Status:
 - Sprint-27.1-D / RQ-13-02, RQ-14-01, RQ-14-02, RQ-14-05:
   **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-E / RQ-07-01, RQ-08-01, RQ-09-02, RQ-10-01:
+  **COMPLETE – MANUAL PENDING**
+- Sprint-27.1-F / RQ-11-01, RQ-12-04, RQ-15-01, RQ-16-02:
   **COMPLETE – MANUAL PENDING**
 - Sprint 27.2 / Public Test Release 1.0.0-rc.3:
   **COMPLETE – PUBLIC TESTS PENDING**
@@ -124,6 +129,18 @@ Zustände, Error-Grenzen, Registry-/Repair-Sanitization und den Label-Lifecycle.
 Fokussiert bestanden 178/178, vollständig 375/375 Tests. Produktcode,
 HA-Aufrufe, Controls, Write-Berechtigungen und Releaseversion blieben
 unverändert; reale MT-24 bis MT-36 sowie MT-42 bleiben `NOT TESTED`.
+
+### Sprint 27.1-F – Rules, Navigation und Upload-Testabdeckung
+
+Die sieben Spezifikationen Sprint 21.4, 21.5, 22, 23, 25.1, 25.2 und 25.3
+umfassen zusammen 521 nummerierte Anforderungen. Eine maschinengeprüfte
+Zuordnung verbindet jede Nummer mit direkter oder dokumentiert äquivalenter
+Automatisierung beziehungsweise einer vollständigen manuellen Anleitung. Sie
+bezieht die bereits reparierten WebSocket-, Rule-Source-, Automation-Cache-,
+Assetversions- und PNG-Pfade ausdrücklich ein. Produktcode, HA-Aufrufe,
+Controls, Write-Berechtigungen und Releaseversion blieben unverändert. Die
+zugeordneten iPad-, HomeScreen-, LXC- und HAOS-Tests bleiben `NOT TESTED`.
+Fokussiert bestanden 151/151, vollständig 377/377 Tests.
 
 ### Sprint 27.2 – Public Test Release 1.0.0-rc.3
 

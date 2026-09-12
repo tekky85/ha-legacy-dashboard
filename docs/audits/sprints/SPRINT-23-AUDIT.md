@@ -95,7 +95,7 @@ bleibt wegen Testmatrix-, Screenshot- und manuellen Abnahmelücken `PARTIAL`.
 | 23-SEC3 | Keine generische WebSocket- oder HA-Service-Proxy-Route | PASS | `system-dashboards.js`; Securitytests | Browser kann keine Domain/Service/Command-Kombination liefern. |
 | 23-DEP1 | Standalone-HA-Token bzw. HA-App-Supervisor-Token bleiben hinter demselben Backendadapter | PASS | `runtime.js`; `homeassistant-websocket.js`; Sprint-24-Regressionen im Gesamtlauf | Sprint-23-Kommandos sind transportunabhängig fest; vollständiges App-Paket folgt in Part 13. |
 | 23-REG1 | Sprint-22-Regeln und Sprint-21.x-Systemfunktionen bleiben erhalten | PASS | Part-12-Fokus 118/118; Gesamtsuite 329/329 | Keine Anwendungscodeänderung im Audit. |
-| 23-T1 | Alle 84 nummerierten Testanforderungen sind einzeln rückverfolgbar | PARTIAL | 12 breite direkte Sprint-23-Tests plus System/Gateway/Security/22-Regressions | Timeout-, Partial-, Inflight-, UI-/Viewport- und Einzelfälle sind nicht alle separat zugeordnet; `RQ-12-04`. |
+| 23-T1 | Alle 84 nummerierten Testanforderungen sind einzeln rückverfolgbar | PASS | Sprint-23-/System-/Gateway-/Security-/22-Tests plus maschinengeprüfte Sprint-27.1-F-Traceability | Jede Nummer ist direkt oder äquivalent zugeordnet; reale HA-/Browser-/Viewport-Wirkung bleibt MT-46 bis MT-49. |
 | 23-MAN1 | Inventory/Referenzen/Capabilities/Traces gegen kontrolliertes reales HA | NOT TESTED | MT-46 | Kein reales HA in Part 12 kontaktiert. |
 | 23-MAN2 | Advanced Diagnostics/Impact im aktuellen macOS Safari | NOT TESTED | MT-47 | Kein realer Safari-Lauf. |
 | 23-MAN3 | Impact/Diagnostics auf iPad mini/iOS 9 | NOT TESTED | MT-48 | Keine physische Geräteprüfung. |
@@ -163,7 +163,7 @@ Nachweis einem konkreten Issue als Ursache oder Impact zugeordnet.
 
 - `RQ-12-02` – in Sprint 27.1-C code-seitig geschlossen;
 - `RQ-12-03` – in Sprint 27.1-C code-seitig geschlossen;
-- `RQ-12-04` – vollständige Sprint-22-/23-Testmatrizen zuordnen/härten;
+- `RQ-12-04` – in Sprint 27.1-F code-seitig geschlossen;
 - `RQ-09-01` – in Sprint 27.1-C code-seitig geschlossen;
 - `RQ-08-02` und `RQ-08-03` bleiben anwendbar; `RQ-04-01` ist code-seitig
   geschlossen.
@@ -179,8 +179,8 @@ Part 13 bzw. MT-46.
 
 ## Remaining Sprint 23 Gaps
 
-Vor `COMPLETE` sind `RQ-12-04`, `RQ-08-02` sowie MT-46 bis MT-49 zu schließen;
-`RQ-04-01`, `RQ-09-01`, `RQ-12-02` und `RQ-12-03` sind code-seitig
+Vor `COMPLETE` sind `RQ-08-02` sowie MT-46 bis MT-49 zu schließen;
+`RQ-04-01`, `RQ-09-01` und `RQ-12-02` bis `RQ-12-04` sind code-seitig
 geschlossen.
 
 ## Sprint-27.1-C-Re-Audit
@@ -195,3 +195,12 @@ Inventory und alle Indizes je Snapshot neu zusammengesetzt werden. Backend-
 und UI-Regressionen decken Begrenzung, Sanitization, Kausalitätsfreiheit sowie
 `on→off→on`, Name und Triggerzeit innerhalb des TTL ab. MT-46 bis MT-49 sind
 ausführbar und bleiben `NOT TESTED`.
+
+## Sprint-27.1-F-Re-Audit
+
+`RQ-12-04` ist **CODE CLOSED / MANUAL PENDING**. Alle 84 Nummern sind
+lückenlos zugeordnet. Die Matrix bindet die Sprint-27.1-C-Korrekturen für
+dynamischen Unknown-Kontext und frische Impactindizes sowie Inventory,
+References, direct/indirect/unknown, Trace-, Timeout-, Partial-/Inflight- und
+On-demand-Pfade ein. Fokuslauf 151/151 und Gesamtsuite 377/377 bestanden;
+MT-46 bis MT-49 bleiben `NOT TESTED`.
