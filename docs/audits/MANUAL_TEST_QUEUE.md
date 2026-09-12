@@ -17,6 +17,12 @@ Automatisierte Tests ersetzen keine reale iPad-, HomeScreen- oder
 Home-Assistant-Abnahme. Ein Eintrag bleibt `NOT TESTED`, bis die beschriebene
 Prüfung tatsächlich durchgeführt und mit Datum/System dokumentiert wurde.
 
+Sprint 27.1-E ordnet die verbleibenden realen Anforderungen der Testmatrizen
+aus Sprint 19 bis 21.3 ausdrücklich MT-24 bis MT-28, MT-30 bis MT-36 und MT-42
+zu. Keiner dieser Tests war durch `RQ-07-01`, `RQ-08-01`, `RQ-09-02` oder
+`RQ-10-01` als Produktrepair blockiert; ihre Ausführungszustände bleiben daher
+unverändert `CAN RUN NOW` und alle Resultate ehrlich `NOT TESTED`.
+
 | ID | Sprint | Requirement | Gerät/System | Prüfschritte | Status |
 |---|---|---|---|---|---|
 | MT-01 | 12 | Climate-Controls, kompakte Karte und allgemeine Kartengeometrie auf der Zielhardware | iPad mini 1, iOS 9.3.5, Safari/HomeScreen | Portrait und Landscape sowie Light/Dark öffnen; Minus/Plus zentriert und mindestens ca. 44 px prüfen; Busy/Disabled, Erfolgs-/Fehlerstatus, Refreshschutz, lange Werte und Clipping prüfen. | NOT TESTED |
@@ -102,9 +108,11 @@ IDs. Release-/Stable-Tests verwenden zusätzlich immer einen exakten,
 commitbezogenen Kandidaten.
 
 Sprint 27.1-B entfernte `RQ-04-01` aus allen Abhängigkeiten. Sprint 27.1-C
-entfernt zusätzlich `RQ-09-01` und `RQ-12-01/-02/-03`. Die dadurch allein
-blockierten Tests sind nun `CAN RUN NOW`; kombinierte Einträge bleiben nur von
-ihren übrigen Repairs blockiert. Sämtliche 72 Resultate bleiben `NOT TESTED`.
+entfernt zusätzlich `RQ-09-01` und `RQ-12-01/-02/-03`. Sprint 27.1-E schließt
+vier Test-Traceability-Repairs, die selbst keine Ausführung blockierten. Die
+dadurch allein blockierten Tests sind nun `CAN RUN NOW`; kombinierte Einträge
+bleiben nur von ihren übrigen Repairs blockiert. Sämtliche 72 Resultate bleiben
+`NOT TESTED`.
 
 | Manual Test | Execution State | Blocked By Repairs |
 |---|---|---|

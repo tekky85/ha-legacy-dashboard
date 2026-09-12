@@ -114,6 +114,79 @@ test("Summary lässt inaktive, numerische und nicht definierte Zustände weg", f
 });
 
 
+test("Sprint-19-Zustandsmatrix prüft jede ausdrücklich genannte Variante", async function (t) {
+
+    const cases = [
+        ["Light on", "light.matrix", "on", {}, "powered"],
+        ["Light off", "light.matrix", "off", {}, null],
+        ["Switch on", "switch.matrix", "on", {}, "powered"],
+        ["Window on", "binary_sensor.window", "on", {device_class: "window"}, "open"],
+        ["Window off", "binary_sensor.window", "off", {device_class: "window"}, null],
+        ["Door on", "binary_sensor.door", "on", {device_class: "door"}, "open"],
+        ["irrelevanter Binary Sensor", "binary_sensor.motion", "on", {device_class: "motion"}, null],
+        ["Cover open", "cover.matrix", "open", {}, "open"],
+        ["Cover opening", "cover.matrix", "opening", {}, "running"],
+        ["Cover closing", "cover.matrix", "closing", {}, "running"],
+        ["Cover closed", "cover.matrix", "closed", {}, null],
+        ["Vacuum cleaning", "vacuum.matrix", "cleaning", {}, "cleaning"],
+        ["Vacuum returning", "vacuum.matrix", "returning", {}, "cleaning"],
+        ["Vacuum paused", "vacuum.matrix", "paused", {}, "cleaning"],
+        ["Vacuum docked", "vacuum.matrix", "docked", {}, null],
+        ["Climate heating", "climate.matrix", "heat", {hvac_action: "heating"}, "climate"],
+        ["Climate cooling", "climate.matrix", "cool", {hvac_action: "cooling"}, "climate"],
+        ["Climate idle", "climate.matrix", "heat", {hvac_action: "idle"}, null],
+        ["Media playing", "media_player.matrix", "playing", {}, "media"],
+        ["Media idle", "media_player.matrix", "idle", {}, null],
+        ["Fan on", "fan.matrix", "on", {}, "powered"],
+        ["Lock unlocked", "lock.matrix", "unlocked", {}, "security"],
+        ["Lock locked", "lock.matrix", "locked", {}, null],
+        ["numerische Temperatur", "sensor.temperature", "21.5", {device_class: "temperature"}, null],
+        ["numerische Leistung", "sensor.power", "315.7", {device_class: "power"}, null],
+        ["unavailable", "light.unavailable", "unavailable", {}, null],
+        ["unknown", "light.unknown", "unknown", {}, null]
+    ];
+
+    for (const entry of cases) {
+        await t.test(entry[0], function () {
+            const summary = build([
+                rawState(entry[1], entry[2], entry[3])
+            ]);
+
+            assert.equal(summary.activeCount, entry[4] ? 1 : 0);
+            if (entry[4]) {
+                assert.equal(summary.items[0].category, entry[4]);
+            } else {
+                assert.deepEqual(summary.items, []);
+            }
+        });
+    }
+
+});
+
+
+test("Sprint-19-Ignore-Matrix toleriert unbekannte IDs und lässt andere Entities sichtbar", function () {
+
+    const result = build(
+        [
+            rawState("switch.ignored", "on", {}),
+            rawState("switch.visible", "on", {})
+        ],
+        {
+            ignoredEntities: ["switch.ignored", "switch.not_present"],
+            showMediaTitles: false
+        }
+    );
+
+    assert.deepEqual(
+        result.items.map(function (item) {
+            return item.entityIds[0];
+        }),
+        ["switch.visible"]
+    );
+
+});
+
+
 test("Ignorierliste und Medientitel-Opt-in bleiben reine Anzeigeoptionen", function () {
 
     const states = [

@@ -205,9 +205,12 @@ Code-/UI-Änderungen erneut erzeugt.
 
 - Repairs: `RQ-07-01`, `RQ-08-01`, `RQ-09-02`, `RQ-10-01`
 - Sprints: 19, 20, 21, 21.1, 21.2, 21.3
-- Erwartete Komponenten: ausschließlich fokussierte Tabellen-/Gateway-/UI-
-  Tests und Traceability
-- Re-Audit: die sechs betroffenen Auditdateien
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Ergebnis: ausschließlich fokussierte Tabellen-/Gateway-/UI-Tests und eine
+  maschinengeprüfte 510-Punkte-Traceability; kein Produktcode geändert
+- Re-Audit: die sechs betroffenen Auditdateien abgeschlossen
+- Evidenz: Fokuslauf 178/178, Gesamtsuite 375/375; reale Tests bleiben
+  `NOT TESTED`
 - Entsperrt: belastbare Summary-/Error-/Registry-Featureabnahme
 
 ### 27.1-F – Rules, Navigation and Upload Test Coverage

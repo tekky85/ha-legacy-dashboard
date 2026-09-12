@@ -21,11 +21,10 @@ ES5-Darstellung sind vorhanden. Spätere Sprints haben Filter, Spalten,
 Entity-Rule-Manager, sichere Rücknavigation und globale Theme-Persistenz
 gezielt ergänzt; sie erhalten den ursprünglichen Endzustand.
 
-Kein aktuelles Verhalten ist `BROKEN` oder `MISSING`. `PARTIAL` entsteht aus
-drei Gründen: reale Browser-/iPad-Abnahmen fehlen, der gemeinsame
-Asset-Cache-Buster aus `RQ-04-01` ist inkonsistent, und die spezifizierte
-Aktivitäts-Testmatrix ist trotz grüner Gesamtsuite nicht für alle geforderten
-Zustandsvarianten explizit abgesichert (`RQ-07-01`).
+Kein aktuelles Verhalten ist `BROKEN` oder `MISSING`. Nach Sprint 27.1-E ist
+auch die 70-Punkte-Testmatrix lückenlos rückverfolgbar; `RQ-07-01` ist
+code-seitig geschlossen. `PARTIAL` bleibt ausschließlich wegen der noch nicht
+real ausgeführten Browser-/iPad-Abnahmen bestehen.
 
 ## Requirement Matrix
 
@@ -77,37 +76,26 @@ Zustandsvarianten explizit abgesichert (`RQ-07-01`).
 | 19-PERF2 | Große Installation bleibt deterministisch und Payload reduziert | PASS | 1500 aktive Summary-Entities und 3000 irrelevante Entities in Tests | Laufzeiten unter 2 s; irrelevante Rohattribute/Entities fehlen in Public-Payload. |
 | 19-PRIV1 | Antwort filtert Token, Header, Rohattribute, Allowlists und Medientitel standardmäßig | PASS | Gateway-/Summarytests | Fehlerlogs enthalten nur kontrollierte Typen/Codes. |
 | 19-ERR1 | Einzelne unpassende/fehlende Attribute brechen Engine nicht | PASS | defensive Defaults in `rules.js`; System-/Summarytests | Unbekannte Zustände werden ausgelassen. |
-| 19-T1 | Fachlogik ist automatisiert abgedeckt | PARTIAL | `test/summary.test.js` besitzt sechs breite Tests; Gesamtsuite 329/329 | Mehrere der 70 vorgeschriebenen Einzelvarianten besitzen keine gezielte Assertion; `RQ-07-01`. |
-| 19-T2 | API-, Admin-, Legacy- und Regressionstests | PASS | Gateway-, Admin-UI/API-, Persistenz-, System-Frontend-, Security- und Layouttests | 104/104 Fokuslauf und 329/329 Gesamtsuite. |
+| 19-T1 | Fachlogik ist automatisiert abgedeckt | PASS | `test/summary.test.js`; `test/sprint-27-1-e.test.js`; `SPRINT-27.1-E-TEST-TRACEABILITY.md` | Alle 70 nummerierten Anforderungen sind direkt oder über dokumentiert äquivalente Regressionen zugeordnet; fehlende Zustands-/Ignore-/Grant-Fälle sind direkt ergänzt. |
+| 19-T2 | API-, Admin-, Legacy- und Regressionstests | PASS | Gateway-, Admin-UI/API-, Persistenz-, System-Frontend-, Security- und Layouttests | Historischer Part-07-Lauf 104/104; Sprint-27.1-E-Fokus 178/178 und aktuelle Gesamtsuite 375/375. |
 | 19-MAN1 | Manuelle Abnahme im modernen Browser einschließlich Adminsettings | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-24 und MT-26 | Keine aktuelle manuelle Safari-Abnahme. |
 | 19-MAN2 | Reale iPad-mini-Abnahme Portrait/Landscape, Themes, lange/große Listen | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-25 | Gemäß Part-07-Regel nicht physisch ausgeführt. |
-| 19-CACHE1 | Nach Frontendänderungen einheitlich erhöhte Cacheversion | PASS | System, Dashboard, Admin und Manifest verwenden einheitlich v52; `test/asset-version.test.js`; immutable Header unverändert. | RQ-04-01 code-seitig geschlossen. |
+| 19-CACHE1 | Nach Frontendänderungen einheitlich erhöhte Cacheversion | PASS | System, Dashboard, Admin und Manifest verwenden einheitlich v53; `test/asset-version.test.js`; immutable Header unverändert. | RQ-04-01 code-seitig geschlossen. |
 | 19-DOC1 | README, Projektstatus und Roadmap dokumentieren Regeln, Datenschutz, Route und Error-Abgrenzung | PASS – superseded by Sprint D1 | README DE/EN; Projektstatus; Roadmap | Root-README ist seit D1 Sprach-/Projekt-Landingpage; D1 wird erst in Part 08 auditiert. |
 | 19-N1 | Keine Error-Fachlogik, Registryanalyse, Historie, Templates, neuen Writes oder generische Automation | N/A – replaced by later Sprints | Sprint 20–23 | Historische Nicht-Ziele waren erfüllt; spätere geplante Erweiterungen bleiben read-only. |
 
 ## Explicit Activity and Test-Coverage Audit
 
-Die aktuelle Implementierung deckt die vollständige spezifizierte
-Zustandsmenge ab. Die fokussierten Unit-Tests prüfen jedoch nicht jede in der
-Spezifikation nummerierte Variante eigenständig. Ohne direkte Regression sind
-insbesondere:
-
-- Door `on`, Window `off`;
-- Cover `closing`;
-- Vacuum `returning` und `paused`;
-- Climate `hvac_action=cooling`;
-- Media Player `idle`;
-- numerischer Power-Sensor;
-- `unknown` als eigener Summaryfall;
-- unbekannte syntaktisch gültige Ignore-ID;
-- expliziter Nachweis, dass Ignore keine Control Grants ändert;
-- mehrere Admin/API-Kombinationen wie Reload des Ignore-Werts und Offline-
-  Summary ohne früheren Snapshot als eigenständige Summary-API-Assertion.
-
-Breite Aggregat-, Persistenz-, Security- und Systemtests liefern teilweise
-indirekte Evidenz, ersetzen aber nicht die verlangte explizite Matrix. Deshalb
-ist dies kein bestätigter Funktionsdefekt, aber ein umsetzbarer P2-Testbefund
-`RQ-07-01`.
+Die aktuelle Implementierung und Sprint 27.1-E decken die spezifizierte
+Zustandsmenge vollständig und nachvollziehbar ab. Die neue tabellengetriebene
+Regression enthält auch Door `on`, Window `off`, Cover `closing`, Vacuum
+`returning`/`paused`, Climate `cooling`, Media `idle`, numerische
+Power-Sensoren sowie `unknown`. Ignore-ID- und Grant-Trennung sind eigene
+Negativtests. Die maschinengeprüfte Zuordnung in
+[`SPRINT-27.1-E-TEST-TRACEABILITY.md`](../SPRINT-27.1-E-TEST-TRACEABILITY.md)
+weist alle 70 nummerierten Anforderungen ohne Lücke aus. Damit ist
+`RQ-07-01` code-seitig geschlossen; MT-24 bis MT-26 bleiben real
+`NOT TESTED`.
 
 ## Current Summary Data Flow
 
@@ -153,13 +141,21 @@ Der erste eingeschränkte Sandboxlauf scheiterte ausschließlich viermal an
 ## Findings
 
 - Kein aktuelles `MISSING` oder `BROKEN`.
-- `PARTIAL`: `RQ-07-01` (P2 explizite Summary-Testmatrix); `RQ-04-01` ist
-  code-seitig geschlossen.
+- `PARTIAL`: keine automatisierbare Sprint-19-Anforderung; `RQ-07-01` und
+  `RQ-04-01` sind code-seitig geschlossen.
 - `NOT TESTED`: MT-24 bis MT-26.
 
 ## Final Assessment
 
-Sprint 19 ist fachlich implementiert und die vorhandenen Tests sind grün. Der
-Sprint bleibt im Baseline-Audit `PARTIAL`, bis die explizite Zustandsmatrix
-nachgerüstet, die gemeinsame Cacheversion repariert und die realen Browser-
-Abnahmen dokumentiert sind.
+Sprint 19 ist fachlich implementiert und automatisiert vollständig
+rückverfolgbar. Der Sprint bleibt im Re-Audit `PARTIAL`, bis die realen
+Browser-/iPad-Abnahmen MT-24 bis MT-26 dokumentiert sind.
+
+## Sprint-27.1-E-Re-Audit
+
+`RQ-07-01` ist code-seitig geschlossen. Eine tabellengetriebene Regression
+prüft nun alle ausdrücklich fehlenden Domain-/State-Varianten sowie unbekannte
+Ignore-IDs. Eine separate Persistenzregression beweist, dass Summary Ignore
+und Error Security/Ignore bestehende Light-/Climate-Control-Grants weder
+erweitern noch entziehen. Die maschinengeprüfte Traceability ordnet alle 70
+Nummern lückenlos zu. MT-24 bis MT-26 bleiben `NOT TESTED`.

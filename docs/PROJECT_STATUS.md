@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 10. September 2026. Sprint 27.2 hat den aktuellen Stand als
+Stand: 12. September 2026. Sprint 27.2 hat den Stand nach Batch 27.1-D als
 `1.0.0-rc.3` Public Test Release veröffentlicht. `1.0.0-rc.2` wurde zuvor mit
 erfolgreichem GitHub-Workflow, Multi-Arch-Image und Standalone-Artefakt
 veröffentlicht. Eine
@@ -16,11 +16,13 @@ der anschließende Repair-Queue-Consolidation-Pass wurden auf Repository-Commit
 vereinheitlichte die routeübergreifenden immutable Assetversionen aus
 `RQ-04-01`. Sprint 27.1-C reparierte auf Basis `7fa67a8` WebSocket-Recovery,
 Regelherkunft, dynamischen Automation-Unknown-Kontext und frische Automation-
-Impactindizes (`RQ-09-01`, `RQ-12-01/-02/-03`). Sprint 27.1-D repariert auf
+Impactindizes (`RQ-09-01`, `RQ-12-01/-02/-03`). Sprint 27.1-D reparierte auf
 Basis `c20f7b7` lokalen Supervisor-Quellbuild, Standalone-Bundle, Cross-
 Version-/Rollbacknachweis und die moderate Produktionsdependency
-(`RQ-13-02`, `RQ-14-01/-02/-05`). Die automatisierten Gate- und Re-Audit-
-Läufe sind grün. Reale iPad-/HomeScreen-/
+(`RQ-13-02`, `RQ-14-01/-02/-05`). Sprint 27.1-E schloss auf Basis `d3fde0e`
+die vier Test-/Traceability-Repairs `RQ-07-01`, `RQ-08-01`, `RQ-09-02` und
+`RQ-10-01`, ohne Produktverhalten zu ändern. Die automatisierten Gate- und
+Re-Audit-Läufe sind grün. Reale iPad-/HomeScreen-/
 Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate
 bleiben offen.
 
@@ -46,6 +48,8 @@ Status:
 - Sprint-27.1-B / RQ-04-01: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-C / RQ-09-01, RQ-12-01 bis -03: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-D / RQ-13-02, RQ-14-01, RQ-14-02, RQ-14-05:
+  **COMPLETE – MANUAL PENDING**
+- Sprint-27.1-E / RQ-07-01, RQ-08-01, RQ-09-02, RQ-10-01:
   **COMPLETE – MANUAL PENDING**
 - Sprint 27.2 / Public Test Release 1.0.0-rc.3:
   **COMPLETE – PUBLIC TESTS PENDING**
@@ -108,6 +112,18 @@ und meldet null Befunde. Fokussiert bestanden 22/22, vollständig 339/339
 Tests. Reale HAOS-/LXC-/
 Release-/iPad-Abnahmen bleiben `NOT TESTED`; `RQ-13-01`, `RQ-14-04` und
 `RQ-17-01` verhindern weiterhin eine RC-Freigabe.
+
+### Sprint 27.1-E – System-Dashboard-Testabdeckung
+
+Die sechs Spezifikationen Sprint 19, 20, 21, 21.1, 21.2 und 21.3 umfassen
+zusammen 510 nummerierte Testanforderungen. Eine maschinengeprüfte Zuordnung
+verbindet jede Nummer mit direkter oder äquivalenter Automatisierung,
+vollständiger manueller Anleitung oder einem begründeten capability-bedingten
+`N/A`. Ergänzte Tabellenfälle schließen die konkret fehlenden Summary-
+Zustände, Error-Grenzen, Registry-/Repair-Sanitization und den Label-Lifecycle.
+Fokussiert bestanden 178/178, vollständig 375/375 Tests. Produktcode,
+HA-Aufrufe, Controls, Write-Berechtigungen und Releaseversion blieben
+unverändert; reale MT-24 bis MT-36 sowie MT-42 bleiben `NOT TESTED`.
 
 ### Sprint 27.2 – Public Test Release 1.0.0-rc.3
 

@@ -909,6 +909,37 @@ nicht, dass das Projekt RC-ready ist.
 - Ergebnis: alle vier Repairs **CODE CLOSED / MANUAL PENDING**. Batch 27.1-E
   wurde nicht begonnen.
 
+## Sprint 27.1 – Repair Batch E
+
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Basiscommit: `d3fde0e`
+- Repairs: `RQ-07-01`, `RQ-08-01`, `RQ-09-02`, `RQ-10-01`
+- Root Cause: Die fachliche Laufzeit war breit regressiert, aber 510
+  nummerierte Anforderungen aus Sprint 19, 20, 21, 21.1, 21.2 und 21.3 waren
+  nicht lückenlos auf direkte, äquivalente, manuelle oder bedingte Evidenz
+  abgebildet. Einzelne ausdrücklich verlangte Zustands- und Grenzfälle fehlten
+  als gezielte Regression.
+- Implementierung: tabellengetriebene Summary-Zustandsmatrix, echte Error-
+  Gesamtstatus-/Zeit-/Tie-Breaker-Fälle, explizite Trennung von Anzeige-/
+  Risikoregeln und Control Grants, Registry-/Repair-Sanitization,
+  Label-First-Failure/Rename sowie eine maschinengeprüfte vollständige
+  Traceability. Kein Produktcode oder Produktverhalten wurde verändert.
+- Re-Audit: Sprint 19, 20, 21, 21.1, 21.2 und 21.3; die vier Repairs sind
+  code-seitig geschlossen, reale Anforderungen bleiben ehrlich
+  `NOT TESTED`.
+- Testevidenz: 178/178 fokussiert und 375/375 vollständig. Die vier geänderten
+  JavaScript-Testdateien bestehen `node --check`; Legacy-, Security-,
+  Standalone-, App- und frühere Repairregressionen sind grün. Ausschließlich
+  lokale/synthetische Daten und Localhost-Mocks, keine Produktionszugänge.
+- Manuell: MT-24 bis MT-28, MT-30 bis MT-36 und MT-42 sind den Anforderungen
+  konkret zugeordnet, ausführbar und weiterhin `NOT TESTED`; kein Ergebnis
+  wurde fälschlich auf `PASS` gesetzt.
+- Public Test Release: `v1.0.0-rc.3` bleibt unverändert auf
+  `771683b804f0b7c684eb3d457b58fb579a3ccdb6`; Batch E ist neuer als dieser
+  Teststand und verschiebt oder ersetzt dessen Tag nicht.
+- Ergebnis: alle vier Repairs **CODE CLOSED / MANUAL PENDING**. Batch 27.1-F
+  wurde nicht begonnen.
+
 ## Verifikation der Audit-Baseline
 
 - Vollständige Testsuite: 329 von 329 Tests bestanden, 0 fehlgeschlagen.

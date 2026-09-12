@@ -25,10 +25,10 @@ read-only um Registry-Kontext, Geräteaggregation, Regeln und Automation-
 Diagnostik; sie ersetzen das MVP nicht durch einen zweiten Fehlerpfad.
 
 Kein aktuelles fachliches Verhalten wurde als `MISSING` oder `BROKEN`
-gefunden. Der Gesamtstatus bleibt `PARTIAL`, weil die reale Safari-/iPad-
-Abnahme aussteht, der bekannte routeabhängige Cache-Buster `RQ-04-01` auch die
-Error-Seite betrifft und die ausdrücklich verlangte 82-Punkte-Testmatrix nur
-teilweise mit gezielten Einzelassertions belegt ist (`RQ-08-01`).
+gefunden. Sprint 27.1-E schließt die 82-Punkte-Traceability aus `RQ-08-01`;
+der gemeinsame Cache-Buster ist bereits code-seitig geschlossen. Der
+Gesamtstatus bleibt `PARTIAL`, weil reale Safari-/iPad-Abnahme und aktuelle
+Produktbilder ausstehen.
 
 ## Requirement Matrix
 
@@ -79,38 +79,25 @@ teilweise mit gezielten Einzelassertions belegt ist (`RQ-08-01`).
 | 20-ROB1 | Fehlende/ungewöhnliche Attribute brechen die Engine nicht | PASS | Issue-Robustheitstest; defensive Defaults | Unbekannte normale States erzeugen kein erfundenes Issue. |
 | 20-T1 | Unavailable-/Unknown-/Security-Basisfälle | PASS | `test/issues.test.js`; Gateway-/Sprint-21.2-/21.3-Tests | Kernklassifikation ist direkt belegt. |
 | 20-T2 | Severity-, Sortier-, Dauer-, Status-, stale- und Recovery-Basisfälle | PASS | Issue-, System-Foundation- und Frontendtests | Die breiten aktuellen Regressionen sind grün. |
-| 20-T3 | API-, Admin-, Legacy-, Security- und Regressionstests | PARTIAL | 147/147 Part-08-Fokustests; 329/329 Gesamtsuite | Nicht jede der 82 nummerierten Sprint-20-Varianten besitzt eine gezielte Assertion; `RQ-08-01`. |
+| 20-T3 | API-, Admin-, Legacy-, Security- und Regressionstests | PASS | `test/issues.test.js`; `test/sprint-27-1-e.test.js`; maschinengeprüfte 82-Punkte-Traceability | Eigener Error-Gesamtstatus, fehlende Zeitwerte, vollständige Tie-Breaker, Grant-Trennung und Long-Name-Schutz sind direkt belegt; übrige Nummern sind dokumentiert äquivalent zugeordnet. |
 | 20-MAN1 | Manuelle moderne Browserabnahme aller Zustände und Adminregeln | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-27 | In Part 08 wurde kein physischer Safari-Lauf durchgeführt. |
 | 20-MAN2 | Reale iPad-mini-/iOS-9-Abnahme Portrait/Landscape, Theme und große Listen | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-28 | Kein realer Zielgerätetest in Part 08. |
 | 20-LOG1 | Keine sensitiven Attribute/Secrets in Logs | PASS | `src/services/logger.js`; Securitytest; Gateway-Outputassertions | Fehler werden auf Typ/Code reduziert. |
-| 20-CACHE1 | Geänderte Legacy-Assets besitzen konsistente Cacheversion | PASS | Dashboard, Systemseite, Admin und Manifest verwenden v52; `test/asset-version.test.js`; immutable Static Cache bleibt beabsichtigt. | RQ-04-01 code-seitig geschlossen. |
+| 20-CACHE1 | Geänderte Legacy-Assets besitzen konsistente Cacheversion | PASS | Dashboard, Systemseite, Admin und Manifest verwenden v53; `test/asset-version.test.js`; immutable Static Cache bleibt beabsichtigt. | RQ-04-01 code-seitig geschlossen. |
 | 20-DOC1 | Route, States, Severity, Security/Ignore, stale/offline und Abgrenzung sind dokumentiert | PASS – superseded by Sprint D1/later docs | README DE/EN; Projektstatus; Roadmap | Grace Periods werden heute als umgesetzte Sprint-22-Regeln dokumentiert. |
 | 20-N1 | Keine Registry-/Repair-/Matter-/Automation-/Grace-Erweiterung im historischen Sprint 20 | N/A – replaced by Sprints 21–23 | aktuelle read-only Diagnosearchitektur | Die später ausdrücklich geplanten Funktionen sind additiv und führen keine HA-Schreibaktionen ein. |
 
 ## Explicit Test-Coverage Audit
 
-Die vorhandenen acht direkten Issue-Tests und die breiten Gateway-, Admin-,
-Persistenz-, System-Frontend-, Security- und späteren Risk-/Rule-Tests belegen
-die fachliche Basis. Sie bilden die 82 nummerierten Sprint-20-Fälle jedoch
-nicht eins zu eins ab. Direkte Einzelassertions fehlen oder sind nur indirekt
-vorhanden insbesondere für:
-
-- die vollständigen vier Sortier-/Tie-Breaker-Kombinationen als Tabelle;
-- `Error` als eigener Entity-/System-Gesamtstatusfall;
-- fehlendes `last_changed` mit ausdrücklich `null` statt normalisiertem
-  Fallback sowie stale Startzeit als eigener Fall;
-- Security-Markierung eines Light und Climate gegen unveränderte Control
-  Grants in demselben Test;
-- Admin Save → Reload für Security und Error Ignore sowie explizite
-  Nichtänderung eines User-Dashboards;
-- Loading, Critical-/Warning-Gruppe, unavailable/unknown, Empty, stale,
-  offline, Recovery und langer Name als jeweils eigenständige Legacy-UI-
-  Regression;
-- alle 82 historischen Regressionserwartungen als nachvollziehbare
-  Anforderungszuordnung.
-
-Das ist kein bestätigter Laufzeitdefekt, aber ein umsetzbarer P2-Testbefund
-`RQ-08-01`.
+Sprint 27.1-E schließt die frühere Traceability-Lücke ohne Änderung der
+Error-Fachlogik. Direkte Regressionen belegen den echten `error`-Gesamtstatus,
+fehlende Zeitangaben mit sicherem Fallback, sämtliche Severity-Tie-Breaker,
+die Trennung von Security-Regeln und Control Grants sowie den Long-Name-
+Schutz. Die übrigen API-, Admin-, Legacy-, Security- und Recoveryfälle sind
+konkreten aktuellen Regressionen zugeordnet. Die maschinengeprüfte Matrix in
+[`SPRINT-27.1-E-TEST-TRACEABILITY.md`](../SPRINT-27.1-E-TEST-TRACEABILITY.md)
+weist 82/82 Anforderungen aus. `RQ-08-01` ist damit code-seitig geschlossen;
+MT-27, MT-28, MT-34 und MT-42 bleiben `NOT TESTED`.
 
 ## Current Error Data Flow
 
@@ -163,12 +150,22 @@ erlaubtem 127.0.0.1-Bind war vollständig grün.
 ## Findings
 
 - Kein aktuelles `MISSING` oder fachlich `BROKEN`.
-- `PARTIAL`: `RQ-08-01` (P2 explizite Sprint-20-Testmatrix); `RQ-04-01` ist
-  code-seitig geschlossen.
+- `PARTIAL`: `RQ-08-02` betrifft weiterhin aktuelle echte Produktbilder;
+  `RQ-08-01` und `RQ-04-01` sind code-seitig geschlossen.
 - `NOT TESTED`: MT-27 und MT-28.
 
 ## Final Assessment
 
 Sprint 20 ist fachlich, sicherheitsseitig und architektonisch vorhanden. Der
-Baseline-Auditstatus bleibt `PARTIAL`, bis Cacheversion und Testmatrix
-repariert sowie moderne Safari- und reale iPad-Abnahmen dokumentiert sind.
+Re-Auditstatus bleibt `PARTIAL`, bis aktuelle echte Produktbilder und die
+realen Browserabnahmen vorliegen. Die automatisierbare 82-Punkte-Matrix ist
+geschlossen.
+
+## Sprint-27.1-E-Re-Audit
+
+`RQ-08-01` ist code-seitig geschlossen. Der Statuspfad besitzt nun einen
+direkten `error`-Fall über ein `setup_error`-Config-Entry; fehlendes
+`last_changed`, alle Tie-Breaker, Security-Light/-Climate gegen unveränderte
+Grants und Legacy-Long-Name-Schutz sind direkt regressiert. Alle 82 Nummern
+sind maschinell lückenlos direkter oder äquivalenter Evidenz zugeordnet.
+MT-27, MT-28, MT-34 und MT-42 bleiben `NOT TESTED`.

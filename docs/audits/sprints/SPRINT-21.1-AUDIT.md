@@ -64,10 +64,10 @@ Cross-Device-Grouping und keine Write-Erweiterung wurde gefunden.
 | 21.1-ERR1 | Sprint-20/21-Erkennung und Severity bleiben vor Presentation erhalten | PASS | Data Flow `Issues.buildIssues()` → `Presentation.build()` | Spätere Risk-Regeln ändern zentral die Children, nicht die Gruppierungsregel. |
 | 21.1-PERF1 | 3000 Entities/500 Devices/200 Issues effizient per Map | PASS | Sprint-21.1-Performance-Test | 50 Device Groups, 200 Issues, Lauf unter gesetzter Grenze. |
 | 21.1-CACHE1 | Gruppierung erzeugt keine neue HA-Abfrage | PASS | `system/index.js`; Route nutzt vorhandenen Error-Snapshot | Presentation arbeitet synchron auf Snapshot/Issues. |
-| 21.1-T1 | Vollständige 77-Punkte-Testanforderung nachvollziehbar abgesichert | PARTIAL | 5 direkte Sprint-21.1-Tests plus breite Frontend-/Issue-/Securitytests; Fokus 153/153 | Mehrere Layout-/UI-/Long-Name-/Statusvarianten nur indirekt oder manuell; `RQ-09-02`. |
+| 21.1-T1 | Vollständige 77-Punkte-Testanforderung nachvollziehbar abgesichert | PASS | Sprint-21.1-/System-Frontendtests plus maschinengeprüfte Traceability | Alle Nummern sind direkt, äquivalent oder für reale Layoutwirkung explizit MT-31/MT-32 zugeordnet. |
 | 21.1-MAN1 | Moderne Safari-Abnahme von Gruppen, Filtern, Details und Layout | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-31 | Kein realer Safari-Lauf in Part 09. |
 | 21.1-MAN2 | iPad mini/iOS 9 Portrait/Landscape/HomeScreen | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-32 | Kein physischer Zielgerätetest. |
-| 21.1-CACHE2 | Systemassets besitzen konsistente Cacheversion | PASS | Systemseite, Dashboard, Admin und Manifest verwenden v52; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen. |
+| 21.1-CACHE2 | Systemassets besitzen konsistente Cacheversion | PASS | Systemseite, Dashboard, Admin und Manifest verwenden v53; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen. |
 | 21.1-SHOT1 | Stark geändertes Error Dashboard besitzt aktuellen echten Screenshot | PARTIAL | D1-Audit; `RQ-08-02`; MT-29 | Vorhandene Error-Aufnahme ist formatseitig falsch benannt und nach späteren Änderungen nicht belastbar. |
 | 21.1-DOC1 | Device Groups, Filter, Spalten, Standalone und Details dokumentiert | PASS | README DE/EN, Projektstatus, Roadmap | Spätere Filter-/Spaltensemantik ist als aktuelle Wahrheit dokumentiert. |
 
@@ -93,18 +93,13 @@ Sortierung, 3000/500/200-Performance sowie ES5/read-only/CSS-Grenzen. Die
 System-Frontendtests ergänzen Filter, Details ohne Reload, exakte spätere
 AND-Filter, Empty State und Spaltenfallback.
 
-Nicht vollständig als 77-Punkte-Matrix explizit verknüpft sind insbesondere:
-
-- jede historische Filtertaste samt sichtbarem Active State und Reset als
-  eigener Testfall;
-- lange Entity-/Device-Namen, unterschiedliche Card-Höhen, Expanded-Card-
-  Stabilität und horizontaler Overflow mit echter Layoutmessung;
-- jede Standalone-Source sowie fehlender Device-/Area-/Config-Kontext als
-  getrennte Payload-/Renderassertion;
-- DOM-Größenvergleich zur früheren flachen Liste;
-- reale iOS-9-Touch-, Scroll-, Portrait-/Landscape- und Theme-Wirkung.
-
-Diese Testhärtung ist gemeinsam mit Sprint 21 als `RQ-09-02` erfasst.
+Sprint 27.1-E verknüpft alle 77 Anforderungen lückenlos mit direkter,
+dokumentiert äquivalenter oder manueller Evidenz. Long-Name-Schutz sowie
+fehlender Device-/Area-/Config-Kontext besitzen automatisierte Regressionen;
+Filter, Details und Standalone-Gruppen verweisen auf konkrete aktuelle Tests.
+Reale iOS-9-Touch-, Scroll-, Portrait-/Landscape-, variable-Höhen- und
+Theme-Wirkung bleibt korrekt MT-31/MT-32 zugeordnet und `NOT TESTED`.
+`RQ-09-02` ist code-seitig geschlossen.
 
 ## Current Error Presentation Data Flow
 
@@ -149,7 +144,7 @@ noch den globalen Health-Status oder Write Grants.
 
 ## Findings
 
-- `PARTIAL`: `RQ-09-02` und `RQ-08-02`; `RQ-04-01` ist code-seitig geschlossen.
+- `PARTIAL`: `RQ-08-02`; `RQ-09-02` und `RQ-04-01` sind code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: keine fachliche Gruppierungs-/Navigationsfunktion bestätigt.
 - `NOT TESTED`: MT-31 und MT-32.
@@ -157,6 +152,12 @@ noch den globalen Health-Status oder Write Grants.
 ## Final Assessment
 
 Sprint 21.1 ist fachlich, architektonisch und sicherheitsseitig vorhanden.
-Für `COMPLETE` fehlen die explizite Testhärtung, konsistente Cacheversionen,
-aktuelle echte Screenshots sowie dokumentierte moderne Safari- und reale
-iPad-mini-/iOS-9-Abnahmen.
+Für `COMPLETE` fehlen aktuelle echte Screenshots sowie dokumentierte moderne
+Safari- und reale iPad-mini-/iOS-9-Abnahmen.
+
+## Sprint-27.1-E-Re-Audit
+
+`RQ-09-02` ist code-seitig geschlossen. Alle 77 Nummern sind lückenlos
+zugeordnet. Der statische Legacy-Test prüft Long-Name-Schutz; reine physische
+Overflow-, variable-Höhen- und Expanded-Details-Wirkung bleibt ehrlich auf
+MT-31/MT-32 abgebildet und `NOT TESTED`.

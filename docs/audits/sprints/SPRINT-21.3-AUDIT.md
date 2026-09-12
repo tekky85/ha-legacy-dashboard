@@ -26,7 +26,7 @@ ausgewertet, nicht aus Areas. Last-known Labeldaten bleiben bei stale erhalten;
 unverfügbare/unsupported oder gelöschte Labels erzeugen einen sichtbaren
 Fehler und keinen stillen Device-Class-Fallback.
 
-Der Sprint bleibt `PARTIAL` wegen `RQ-10-01`, `RQ-08-02` und
+Der Sprint bleibt `PARTIAL` wegen `RQ-08-02` und
 ausstehender realer Admin-/HA-/iPad-Abnahmen. Der Error-only-
 WebSocket-Reconnectbefund `RQ-09-01` wurde in Sprint 27.1-C code-seitig
 geschlossen; reale Label-Recovery bleibt `NOT TESTED`.
@@ -76,7 +76,7 @@ geschlossen; reale Label-Recovery bleibt `NOT TESTED`.
 | 21.3-ADM2 | Unsupported/error/stale/missing werden im Admin unterscheidbar angezeigt | PASS | `src/admin/js/system-dashboards.js`; Admin-UI-Tests | Reale Safari-/HA-Wirkung bleibt MT-36. |
 | 21.3-ADM3 | Save/Discard und bestehende Regeln bleiben erhalten | PASS – superseded by Sprint 21.4 | Entity Rule Manager + System-Dashboard-Draft | Mode/Label liegen im gemeinsamen persistierten Draft. |
 | 21.3-PERF1 | 3000 Entities/500 Devices/100 Labels/500 Zuweisungen performant | PASS | Sprint-21.3-Performance-Test | Lineare Maps/Sets; Testgrenze <1,5 s. |
-| 21.3-T1 | Vollständige nummerierte 96-Punkte-Testmatrix ist rückverfolgbar | PARTIAL | 11 direkte Sprint-21.3-Tests plus breite Frontend-/Admin-/Issue-/Securitytests; Fokus 142/142 | Einzelne UI-/Failure-/Rename-/Realbrowserpunkte nur indirekt/manuell; `RQ-10-01`. |
+| 21.3-T1 | Vollständige nummerierte 96-Punkte-Testmatrix ist rückverfolgbar | PASS | Sprint-21.3-/System-/WebSockettests plus maschinengeprüfte Traceability | Alle Nummern sind direkt/äquivalent zugeordnet; horizontaler Realgeräte-Overflow bleibt MT-34. |
 | 21.3-MAN1 | Error-Filter/Risk auf iPad mini | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-34 | Kein physischer Zielgerätetest. |
 | 21.3-MAN2 | Device-Class-/Label-Modi gegen reales Test-HA | NOT TESTED | MT-35 | Keine reale HA-/Admin-Abnahme in Part 10. |
 | 21.3-MAN3 | Label-Rename/Ausfall/stale/delete/recovery | NOT TESTED | MT-36 | Keine echte Labelquellenstörung durchgeführt. |
@@ -153,7 +153,7 @@ keine transitive Kritikalitätsquelle.
 
 ## Findings
 
-- `PARTIAL`: `RQ-10-01` und `RQ-08-02`; `RQ-04-01` und `RQ-09-01` sind
+- `PARTIAL`: `RQ-08-02`; `RQ-10-01`, `RQ-04-01` und `RQ-09-01` sind
   code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: kein aktueller fachlicher Filter-/Detection-Defekt bestätigt.
@@ -162,8 +162,8 @@ keine transitive Kritikalitätsquelle.
 ## Final Assessment
 
 Sprint 21.3 ist fachlich und sicherheitsseitig vorhanden. Vor `COMPLETE` sind
-Testmatrix/Screenshots zu schließen und die reale Label-/Admin-/iPad-Abnahme
-zu dokumentieren.
+Screenshots zu schließen und die reale Label-/Admin-/iPad-Abnahme zu
+dokumentieren.
 
 ## Sprint-27.1-C-Re-Audit
 
@@ -171,3 +171,11 @@ Die gemeinsame WebSocket-Recovery ist nach `RQ-09-01` automatisiert PASS. Der
 Labeladapter bleibt fest codiert, read-only und last-known/stale-fähig; der
 Transportfix ergänzt weder Label-Writes noch Browser-WebSocketzugriff. MT-35
 und MT-36 sind nun ausführbar, ihre Resultate bleiben `NOT TESTED`.
+
+## Sprint-27.1-E-Re-Audit
+
+`RQ-10-01` ist für Sprint 21.3 code-seitig geschlossen. Der neue direkte
+Label-Lifecycle-Test belegt First Failure und eine Umbenennung bei stabiler
+Label-ID; die vollständige 96-Punkte-Zuordnung bindet exakte Filter,
+Same-Child-AND, child-first Groups sowie Sprint-27.1-C-Recovery ein. MT-34 bis
+MT-36 bleiben `NOT TESTED`.

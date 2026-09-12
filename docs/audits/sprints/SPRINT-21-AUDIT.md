@@ -24,8 +24,8 @@ Snapshot eingehängt; Matter bleibt mangels belastbarer read-only API bewusst
 Quellenstatus, keine Tokens, Rohregistries oder frei wählbaren WebSocket-
 Commands.
 
-Der Sprint bleibt `PARTIAL`: Die umfangreiche 93-Punkte-Testmatrix ist nur
-teilweise als gezielte Anforderungsmatrix nachvollziehbar (`RQ-09-02`), und
+Der Sprint bleibt `PARTIAL`: Die umfangreiche 93-Punkte-Testmatrix ist seit
+Sprint 27.1-E lückenlos nachvollziehbar (`RQ-09-02` code-seitig geschlossen), aber
 reale Home-Assistant-/Safari-/iPad-Abnahmen stehen aus. Kein Sicherheitsbruch,
 keine Registry-Schreibroute und kein Datenverlust des REST-State-Snapshots
 wurde gefunden.
@@ -68,7 +68,7 @@ wurde gefunden.
 | 21-PERF1 | 3000 Entities/500 Devices/50 Areas/100 Entries/100 Repairs linear und kompakt | PASS | `test/sprint-21.test.js` Performancefall | Lauf grün; Map-Indizes und sanitisiertes Payload bestätigt. |
 | 21-LEG1 | Betroffener Wall-Frontendpfad bleibt ES5/iOS-9-kompatibel | PASS | `src/public/js/system/*.js`; `node --check`; Forbidden-Syntax-Scan | Kein fetch, Promise, Modul, moderne Syntax oder Browser-WS. |
 | 21-LEG2 | Kein CSS Grid/Flex-gap/ResizeObserver/Container Query | PASS | `src/public/css/system.css`; statischer Scan | Präfixiertes Flexbox und Media Queries. |
-| 21-T1 | Vollständige 93-Punkte-Testanforderung nachvollziehbar abgesichert | PARTIAL | 15 direkte Sprint-21-Tests plus breite Regression; 153/153 Fokus | Mehrere Einzelvarianten sind nur indirekt oder nicht als eigene Assertion verknüpft; `RQ-09-02`. |
+| 21-T1 | Vollständige 93-Punkte-Testanforderung nachvollziehbar abgesichert | PASS | Sprint-21-Tests plus `test/sprint-27-1-e.test.js` und maschinengeprüfte Traceability | Alle Nummern sind direkt/äquivalent zugeordnet; Matter 55–57 sind als capability-abhängiges N/A dokumentiert. |
 | 21-MAN1 | Reale Registry-/Diagnose-/Partial-Failure-Abnahme im modernen Safari/LXC | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-30 | Kein reales HA kontaktiert. |
 | 21-MAN2 | Reale Zielgeräteabnahme mit Enrichment und Metadatenfehlern | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-32 | Kein physischer iPad-Lauf in Part 09. |
 | 21-CACHE2 | Geänderte System-/Shared-Assets haben konsistente Cacheversion | PASS | Dashboard, Systemseite, Admin und Manifest referenzieren v53; `test/asset-version.test.js`; immutable Auslieferung bleibt unverändert. | RQ-04-01 bleibt code-seitig geschlossen. |
@@ -94,21 +94,12 @@ Disconnect/Reconnect, Konstruktor-/Sendefehler, Registry-Normalisierung,
 Single-/Legacy-Config-Entry, Area-Priorität, Disabled/Hidden/Registry-only,
 Config-/Repair-Issues, Summary-Enrichment, Source-Cache, Capability-Probes,
 Partial Failure, vollständigen WS-Ausfall, Performance und Security ab.
-
-Nicht als gezielte vollständige 93-Punkte-Matrix belegt sind insbesondere:
-
-- Error-only-Reconnect, alle Backoff-Grenzen und Tight-Loop-Negativfall;
-- unbekannte Area-ID, einzelne Device-Felder sowie `config`-Kategorie als
-  jeweils eigenständige Assertions;
-- alle Repair-Fehlervarianten und die vier Adminstatus
-  Available/Unsupported/Stale/Error als UI-Matrix;
-- bedingte Matter-Supported-Aggregation (derzeit N/A, weil bewusst
-  unsupported);
-- jede historische Summary/Error/Focus/Control/Theme-Regression mit
-  ausdrücklicher Zuordnung zu den Nummern 67–93.
-
-Das ist zusätzlich zum konkreten Error-only-Befund ein P2-Testhärtungspunkt
-`RQ-09-02`, kein Nachweis weiterer Laufzeitfehler.
+Sprint 27.1-E ergänzt gezielte Grenzfälle für unbekannte Areas, sanitisierte
+Device-/Config-Entry-Felder und fehlertolerante Repair-Antworten. Zusammen mit
+der in Sprint 27.1-C reparierten Error-only-Recovery sind 93/93 Anforderungen
+maschinengeprüft zugeordnet. Die capability-abhängigen Matter-Supported-Fälle
+55–57 sind nachvollziehbar `N/A`. `RQ-09-02` ist code-seitig geschlossen;
+MT-30 bis MT-32 bleiben `NOT TESTED`.
 
 ## Current Registry and System Data Flow
 
@@ -159,7 +150,7 @@ vollständig; dies war kein Produktfehler.
 
 ## Findings
 
-- `PARTIAL`: `RQ-09-02` und `RQ-08-02`; `RQ-04-01` und `RQ-09-01` sind
+- `PARTIAL`: `RQ-08-02`; `RQ-09-02`, `RQ-04-01` und `RQ-09-01` sind
   code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: keine bestätigte fachliche oder sicherheitsrelevante Funktion.
@@ -169,8 +160,8 @@ vollständig; dies war kein Produktfehler.
 ## Final Assessment
 
 Sprint 21 ist als read-only Registry-/Diagnoseanreicherung fachlich und
-sicherheitsseitig implementiert. Für `COMPLETE` fehlen noch die explizite
-Testmatrix, aktuelle Produktbilder sowie reale Safari-/HA-/iPad-Abnahmen.
+sicherheitsseitig implementiert. Für `COMPLETE` fehlen aktuelle Produktbilder
+sowie reale Safari-/HA-/iPad-Abnahmen.
 
 ## Sprint-27.1-C-Re-Audit
 
@@ -182,3 +173,12 @@ können keine neue Verbindung verwerfen. Selbst ein synchron werfendes natives
 Socket-`close()` wird kontrolliert protokolliert, ohne den Gateway-Prozess zu
 beenden. Der Gateway-/WebSocket-Fokuslauf bestand 52/52 Tests. MT-30 und MT-32
 sind ausführbar, bleiben aber `NOT TESTED`.
+
+## Sprint-27.1-E-Re-Audit
+
+`RQ-09-02` ist code-seitig geschlossen. Registry-/Diagnose-Grenztests decken
+unbekannte Areas, zusätzliche sanitisierte Device-/Config-Entry-Felder und
+fehlertolerante Repair-Antworten ab. Die vollständige 93-Punkte-Zuordnung
+bezieht die in Sprint 27.1-C gehärtete Error-only-WebSocket-Recovery ein und
+markiert nur die bedingten Matter-Supported-Fälle 55–57 als `N/A`. MT-30 und
+MT-32 bleiben `NOT TESTED`.

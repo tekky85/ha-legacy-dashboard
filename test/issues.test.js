@@ -179,10 +179,29 @@ test("Dauer nutzt last_changed mit sicherer Gateway-Beobachtungszeit", function 
 test("Gesamtstatus unterscheidet OK, Warning, Error, Critical und stale", function () {
     assert.equal(build([]).overallStatus, "ok");
     assert.equal(build([rawState("sensor.warning", "unavailable")]).overallStatus, "warning");
-    assert.equal(build(
-        [rawState("sensor.error", "unknown")],
-        settings(["sensor.error"])
-    ).overallStatus, "critical");
+
+    const errorSnapshot = Snapshot.createSuccessful(
+        [],
+        "2026-08-11T18:00:00.000Z"
+    );
+    errorSnapshot.metadata = {
+        entities: {},
+        devices: {},
+        areas: {},
+        labels: {},
+        configEntries: {
+            "entry-error": {
+                entryId: "entry-error",
+                domain: "demo",
+                title: "Fehlerhafte Integration",
+                state: "setup_error"
+            }
+        }
+    };
+    assert.equal(
+        Issues.buildIssues(errorSnapshot, settings()).overallStatus,
+        "error"
+    );
     assert.equal(build(
         [rawState("sensor.critical", "unavailable")],
         settings(["sensor.critical"])
@@ -217,6 +236,42 @@ test("Gesamtstatus unterscheidet OK, Warning, Error, Critical und stale", functi
     assert.equal(offline.overallStatus, "unknown");
     assert.equal(offline.issues.length, 0);
     assert.match(offline.message, /noch nicht verfügbar/i);
+});
+
+
+test("Sprint-20-Grenzmatrix behandelt fehlende Zeitwerte und alle Severity-Tie-Breaker", function () {
+
+    const missingTimestamp = {
+        entity_id: "sensor.without_timestamp",
+        state: "unknown",
+        attributes: {}
+    };
+    const result = build([missingTimestamp]);
+
+    assert.equal(result.issues.length, 1);
+    assert.equal(result.issues[0].durationSeconds, 0);
+    assert.equal(result.issues[0].startedAt, "2026-08-11T18:00:00.000Z");
+
+    const equalSeverity = [
+        {severity: "warning", securityRelevant: false, durationSeconds: 60, title: "Beta", entityId: "sensor.beta"},
+        {severity: "warning", securityRelevant: false, durationSeconds: 60, title: "Alpha", entityId: "sensor.zulu"},
+        {severity: "warning", securityRelevant: false, durationSeconds: 60, title: "Alpha", entityId: "sensor.alpha"},
+        {severity: "warning", securityRelevant: true, durationSeconds: 1, title: "Security", entityId: "sensor.security"}
+    ];
+
+    Severity.sortIssues(equalSeverity);
+    assert.deepEqual(
+        equalSeverity.map(function (issue) {
+            return issue.entityId;
+        }),
+        [
+            "sensor.security",
+            "sensor.alpha",
+            "sensor.zulu",
+            "sensor.beta"
+        ]
+    );
+
 });
 
 

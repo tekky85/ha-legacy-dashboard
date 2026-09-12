@@ -23,11 +23,11 @@ Die zentrale Risk-Klassifikation und Severity behandeln Safety-/Security-
 Entities bei `unknown` und `unavailable` fail-safe als `critical` und bewahren
 normale bzw. diagnostische Entities auf milderen Stufen.
 
-Der fachliche Endzustand ist vorhanden. `PARTIAL` entsteht durch die bereits
-bekannte inkonsistente immutable Assetversion (`RQ-04-01`), die nicht
-vollständig einzeln rückverfolgbare 92-Punkte-Testmatrix (`RQ-10-01`), nicht
-aktuelle System-Screenshots (`RQ-08-02`) und ausstehende reale Safari-/iPad-
-Abnahmen. Kein neuer aktueller Laufzeitdefekt wurde gefunden.
+Der fachliche Endzustand ist vorhanden. Assetversion und 92-Punkte-
+Traceability sind inzwischen code-seitig geschlossen (`RQ-04-01`,
+`RQ-10-01`). `PARTIAL` entsteht weiterhin durch nicht aktuelle System-
+Screenshots (`RQ-08-02`) und ausstehende reale Safari-/iPad-Abnahmen. Kein
+neuer aktueller Laufzeitdefekt wurde gefunden.
 
 ## Requirement Matrix
 
@@ -75,12 +75,12 @@ Abnahmen. Kein neuer aktueller Laufzeitdefekt wurde gefunden.
 | 21.2-GRP2 | Counts/State bleiben Child-basiert | PASS | `presentation.js:filterCounts()`; Tests | Späterer Filter bildet sichtbare Counts erneut. |
 | 21.2-GRP3 | Filterung verändert keine globale Issue-Severity | PASS – superseded by Sprint 25.1 | `errors.js` erstellt flache sichtbare Kopie; `/status` nutzt Servergesamtmenge | Kein Mutieren des Payloads. |
 | 21.2-PERF1 | Filter/Spalten bleiben bei großen Listen performant | PASS | reine lineare DOM-/Arrayfilter; 3000-Entity-Test in Sprint 21.3 | Keine N+1-Aufrufe. |
-| 21.2-T1 | Vollständige nummerierte 92-Punkte-Testmatrix ist rückverfolgbar | PARTIAL | 7 direkte Sprint-21.2-Tests plus breite System-/Issue-/Securitytests; Fokus 142/142 | Nicht jeder historische Einzelpunkt besitzt eine direkte Zuordnung; `RQ-10-01`. |
+| 21.2-T1 | Vollständige nummerierte 92-Punkte-Testmatrix ist rückverfolgbar | PASS | Sprint-21.2-/Systemtests plus maschinengeprüfte Traceability | Jede Nummer ist direkt, äquivalent oder für reale Viewportwirkung MT-33/MT-34 zugeordnet. |
 | 21.2-MAN1 | Summary-Abnahme Portrait/Landscape auf iPad mini | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-33 | Kein physischer Test in Part 10. |
 | 21.2-MAN2 | Error-/Spalten-/Risk-Abnahme auf iPad mini | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-34 | Kein physischer Test in Part 10. |
 | 21.2-SHOT1 | Aktuelle echte Summary-/Error-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Systembilder belegen den heutigen Stand nicht vollständig. |
 | 21.2-DOC1 | Filter, Spalten und Risk Severity dokumentiert | PASS | README DE/EN, Roadmap, Projektstatus | Spätere Rule-/Filtersemantik als aktuelle Wahrheit dokumentiert. |
-| 21.2-CACHE1 | Geänderte geteilte Assets besitzen konsistente Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js`; immutable Header unverändert. | RQ-04-01 code-seitig geschlossen. |
+| 21.2-CACHE1 | Geänderte geteilte Assets besitzen konsistente Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v53; `test/asset-version.test.js`; immutable Header unverändert. | RQ-04-01 code-seitig geschlossen. |
 
 ## Current Filter and Column Flow
 
@@ -125,7 +125,7 @@ sandboxbedingte `listen EPERM`-Fehler. Der unveränderte Lauf mit erlaubtem
 
 ## Findings
 
-- `PARTIAL`: `RQ-10-01` und `RQ-08-02`; `RQ-04-01` ist code-seitig geschlossen.
+- `PARTIAL`: `RQ-08-02`; `RQ-10-01` und `RQ-04-01` sind code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: kein aktueller fachlicher Filter-/Risk-/Spaltendefekt bestätigt.
 - `NOT TESTED`: MT-33 und MT-34.
@@ -133,6 +133,11 @@ sandboxbedingte `listen EPERM`-Fehler. Der unveränderte Lauf mit erlaubtem
 ## Final Assessment
 
 Sprint 21.2 ist fachlich, architektonisch und sicherheitsseitig implementiert.
-Für `COMPLETE` fehlen konsistente Assetversionen, eine explizit
-rückverfolgbare Testmatrix, aktuelle echte Screenshots und die dokumentierte
-reale iPad-/Safari-Abnahme.
+Für `COMPLETE` fehlen aktuelle echte Screenshots und die dokumentierte reale
+iPad-/Safari-Abnahme.
+
+## Sprint-27.1-E-Re-Audit
+
+`RQ-10-01` ist für Sprint 21.2 code-seitig geschlossen. Die 92 Nummern sind
+lückenlos direkter oder äquivalenter Evidenz zugeordnet; nur die ausdrücklich
+reale Portrait-/Landscape-Wirkung bleibt über MT-33/MT-34 `NOT TESTED`.
