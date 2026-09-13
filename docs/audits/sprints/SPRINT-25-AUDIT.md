@@ -63,7 +63,7 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 25-VERSION-04 | Buildargumente, Image- und Archivnamen verwenden dieselbe Version | PASS | `release/metadata.json`, `release.yml`, `config.yaml`, Bundle-Generator und OCI-Buildargumente verwenden `1.0.0-rc.1`. |
 | 25-TYPE-01 | Development, RC und Stable sind getrennt definiert | PASS | `docs/RELEASING.md`, `check-version.js` und `metadata.channel`; RC nur `-rc.N`, Stable ohne Suffix. |
 | 25-TYPE-02 | RC ist Prerelease und aktualisiert niemals `latest` | PASS | Releaseworkflow setzt `--prerelease`; `latest`-Schritt besitzt `stable == 'true'`. Öffentlicher RC.1-Run ließ alle `latest`-Schritte aus. |
-| 25-TYPE-03 | Stable veröffentlicht erst nach explizitem Promotionsschritt | PARTIAL | Neuer Stable-Tag ist explizit und folgt Smoke-Test; dokumentierte manuelle Gates/offene Blocker werden aber nicht technisch an die Freigabe gebunden. `RQ-14-04`. |
+| 25-TYPE-03 | Stable veröffentlicht erst nach explizitem Promotionsschritt | PASS | Sprint 27.1-H: Stable läuft vor jedem Image-Push durch das geschützte `stable-release`-Environment, die versionierte RC-Freigabe, alle Pflicht-Manuellresultate und den P0/P1-Queue-Check. RC verwendet einen getrennten Gatepfad. |
 | 25-WF-01 | Tagworkflow checkt exakt den Tag aus | PASS | `.github/workflows/release.yml`: `ref: github.ref`, vollständige Historie und Main-Ancestor-Prüfung. |
 | 25-WF-02 | Lockfilebasierte Installation und vollständiges Release-Gate | PASS | `npm ci`, `release/test-gate.sh`, Produktionsaudit und Bundleprüfung im Validate-Job. |
 | 25-WF-03 | Failure Atomicity | PASS | Manifest benötigt beide Arch-Builds; Smoke benötigt Manifest; GitHub Release und `latest` benötigen erfolgreichen Smoke-Test. Interne Arch-Tags dürfen diagnostisch verbleiben. |
@@ -105,7 +105,7 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 25-TELEMETRY-01 | Keine Analytics, Crashuploads oder Phone-Home-Funktion | PASS | Source-/Dependency-/Workflow-Scan ohne Telemetrie-SDK oder externen Callback; nur HA/Supervisor- und Release-Infrastrukturzugriffe. |
 | 25-GATE-01 | Tests, Syntax, Version, Secret, Paket und Checksum im Gate | PASS | `release/test-gate.sh`, Workflow und lokaler Part-14-Lauf: 329/329 Tests; Versions-/Syntax-/Secret-/Bundleprüfung grün. |
 | 25-GATE-02 | Docker, beide Architekturen, Manifest und Smoke im Gate | PASS | Historische RC-Evidenz: öffentlicher RC.1-Workflow mit allen sechs Jobs erfolgreich; aktueller HEAD bleibt wegen `RQ-13-01` ungebaut. |
-| 25-GATE-03 | Bekannte Blocker verhindern Stable | PARTIAL | Prozessdokumentation verlangt Abnahme, Workflow liest weder Repair-/RC-Checkliste noch geschützte Environment-Freigabe. `RQ-14-04`. |
+| 25-GATE-03 | Bekannte Blocker verhindern Stable | PASS | `release/check-stable-gate.js` blockiert fehlendes/falsches Approval, jeden Pflichtlauf ohne `PASS` sowie offene P0/P1-Repairs; Workflow benötigt zusätzlich das Environment `stable-release`, bevor Images gebaut/gepusht werden. |
 | 25-GATE-04 | Legacy-iPad-Gate automatisiert plus manuell | PARTIAL | ES5-/CSS- und Regressionstests grün; reale aktuelle Release-Abnahme steht in `MT-54` und den früheren UI-Tests. |
 | 25-GATE-05 | HA-App-Gate einschließlich realem Update | PARTIAL | Historischer RC.1-Fresh-Install/REST/LAN PASS; WS, Update, `/data`, Backup, Reboot und aarch64 in `MT-50` bis `MT-53`/`MT-57`. |
 | 25-DOC-01 | README DE/EN semantisch synchron | PASS | Release-/Installationsabschnitte haben dieselbe Betriebsarten-, Image-, RC- und Securityaussage. |
@@ -113,7 +113,7 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 25-DOC-03 | Releaseanleitung entspricht dem aktuellen Lebenszyklus | PARTIAL | Sie nennt RC.1 noch als „ersten geplanten Release“ und zeigt denselben bereits existierenden Tag als nächsten Erzeugungsschritt. Zusatzbeleg zu `RQ-13-01`. |
 | 25-DOC-04 | Technischer Projektstatus/Roadmap aktuell | PARTIAL | `PROJECT_STATUS.md` ist bereits über `RQ-08-03` als veraltet erfasst; Release-/Auditstand ist nicht vollständig nachgeführt. |
 | 25-DOC-05 | Keine echten Secrets oder privaten lokalen Pfade in Beispielen | PASS | Nur generische Platzhalter/Testwerte; Bundle-/Dokumentationsscan ohne Credential oder privaten SSH-/Mac-Pfad. |
-| 25-MATRIX-01 | Alle 60 Releasefälle gezielt rückverfolgbar | PARTIAL | Sieben breite Sprint-25-Tests plus Gesamtregression/Workflow/Manuellisten; mehrere Fälle nur indirekt oder noch manuell. `RQ-14-03`. |
+| 25-MATRIX-01 | Alle 60 Releasefälle gezielt rückverfolgbar | PASS | `release/sprint-25-test-matrix.json` ordnet alle 60 Nummern exakt einmal direkter Automatisierung, commitgebundenem Workflow oder vollständigem versions-/artefaktbezogenem MT zu; `test/sprint-27-1-h.test.js` prüft Nummern und Evidenzmarker. Reale Resultate bleiben ehrlich separat. |
 
 ## Die 60 Sprint-25-Releasefälle
 
@@ -330,11 +330,11 @@ Release-/Gerätegates weiterhin offen sind.
 
 Sprint 25 hat eine funktionsfähige und bereits einmal erfolgreiche Release-
 und Distributionspipeline geschaffen. Sein heutiger Gesamtstatus ist dennoch
-`PARTIAL`, weil das veröffentlichte RC nicht den heutigen Code abbildet, das
-vollständige commitbezogene Testmapping und das technisch erzwungene Stable-
-Gate noch fehlen und reale Release-/Geräteabnahmen offen sind. Bundle-
-Betriebsweg, automatisierter Cross-Version-/Rollbackpfad und Dependency-Audit
-sind seit Sprint 27.1-D geschlossen.
+`PARTIAL`, weil das veröffentlichte RC nicht den heutigen Code abbildet und
+reale Release-/Geräteabnahmen offen sind. Commitbezogenes Testmapping und das
+technisch erzwungene Stable-Gate sind seit Sprint 27.1-H, Bundle-Betriebsweg,
+Cross-Version-/Rollbackpfad und Dependency-Audit seit Sprint 27.1-D
+code-seitig geschlossen.
 
 Audit Part 14 ist abgeschlossen. Audit Part 15 wurde nicht begonnen und
 umfasst laut `AUDIT_INDEX.md` ausschließlich Sprint 25.1 und 25.2.
@@ -344,3 +344,25 @@ umfasst laut `AUDIT_INDEX.md` ausschließlich Sprint 25.1 und 25.2.
 Release-/Standalone-/App-Quellen enthalten dieselben v52-Referenzen. Der neue
 Assetversions-Test und die Gesamtsuite 331/331 sind grün. RQ-04-01 ist
 code-seitig geschlossen; daraus folgt keine Artefakt- oder RC-Freigabe.
+
+## Sprint-27.1-H-Re-Audit
+
+`RQ-14-04` ist **CODE CLOSED / MANUAL PENDING**. Stable benötigt jetzt vor
+jedem Image-Push das GitHub-Environment `stable-release`, eine versionierte
+Freigabe mit unveränderlichen RC-Artefaktdigests, `PASS` für die 13
+verbindlichen iPad-/Safari-/HAOS-/Standalone-Tests und eine leere P0/P1-Menge
+aus der kanonischen Repair Queue. Der Workflow erzeugt für den exakten
+Stable-Commit ein `stable-gate-result.json` und hängt es dem Release an. RCs
+bleiben getrennte Prereleases ohne Stable-Approval und ohne `latest`.
+
+`RQ-14-03` ist ebenfalls **CODE CLOSED / MANUAL PENDING**. Alle 60
+Sprint-25-Fälle sind einzeln maschinengeprüft einem direkten Test, einem
+commitbezogenen Workflownachweis oder einem konkreten Manual Test zugeordnet.
+Die Zuordnung ändert kein `NOT TESTED` in `PASS`. RQ-13-01, RQ-17-01 und
+MT-55–57 bleiben offen; Sprint 25 bleibt deshalb insgesamt `PARTIAL` und
+Stable `BLOCKED`.
+
+H-spezifisch bestanden 7/7, im fokussierten Release-/App-/Standalone-Lauf
+44/44 und in der Gesamtsuite 385/385 Tests. Der verpflichtende Browser-Harness
+bestand 1.576/1.576 Fälle; Syntax-, Versions-, Secret- und
+Produktionsdependency-Gates waren grün.

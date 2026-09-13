@@ -297,3 +297,23 @@ wurden nicht ausgeführt. MT-56 ist code-seitig entblockt und bleibt `NOT
 TESTED`; MT-50/52/55 sowie weitere Kandidatentests bleiben wegen `RQ-13-01`
 beziehungsweise `RQ-14-04`/`RQ-17-01` blockiert. Sprint 25.4 und das aktuelle
 RC-Gate bleiben daher **BLOCKED**, nicht PASS.
+
+## Sprint-27.1-H-Re-Audit
+
+`RQ-14-04` ist code-seitig geschlossen. Vor jedem Stable-Image-Push muss der
+Workflow nun das GitHub-Environment `stable-release`, ein versioniertes
+Approval mit RC-Commit-/Image-/Bundle-Digests, alle 13 Pflicht-Manuelltests
+als `PASS` und eine leere offene P0/P1-Repairmenge bestätigen. Das erzeugte
+`stable-gate-result.json` bindet den Nachweis an den exakten Workflowcommit und
+wird dem Stable-Release beigefügt. Fehlendes Approval, P0/P1, fehlende
+Manuellabnahme, falsche Version/Digests/Evidenz werden negativ getestet.
+
+Die bestehende gemischte `docs/RC_CHECKLIST.md` wird absichtlich erst mit
+`RQ-17-01` für den neuen Kandidaten ersetzt. MT-50/52/54–60 und weitere reale
+Gates bleiben `NOT TESTED`; `RQ-13-01` und `RQ-17-01` bleiben offen. Deshalb
+bleiben Sprint 25.4 und die heutige RC-/Stable-Empfehlung **BLOCKED**.
+
+H-spezifisch bestanden 7/7, fokussiert 44/44 und vollständig 385/385 Tests.
+Das Release-Gate bestand Syntax, Version und Secret-Scan, der
+Produktionsaudit meldete 0 Schwachstellen. Diese lokale Evidenz ersetzt weder
+die Environment-Administration noch MT-57.

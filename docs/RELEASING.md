@@ -87,13 +87,17 @@ ausgelöst:
 1. exakten Tag auschecken und Zugehörigkeit zu `main` prüfen
 2. vollständiges Test Gate ausführen
 3. Standalone-Artefakte erzeugen
-4. amd64 und aarch64 getrennt mit BuildKit bauen und pushen
-5. erst nach beiden Erfolgen das versionierte Multi-Arch-Manifest erzeugen
-6. Manifest auf amd64 und arm64 prüfen
-7. Image gegen einen lokalen Supervisor-/HA-Mock starten
-8. `/health`, `/api/status` und statische Assets prüfen
-9. bei Stable erst jetzt `latest` erzeugen
-10. GitHub Release erstellen und Standalone-Artefakte anhängen
+4. den Release-Kanal prüfen: RCs passieren das Prerelease-Gate; Stable muss
+   vor jedem Image-Push das geschützte `stable-release`-Environment und das
+   versionierte Stable-Gate bestehen
+5. amd64 und aarch64 getrennt mit BuildKit bauen und pushen
+6. erst nach beiden Erfolgen das versionierte Multi-Arch-Manifest erzeugen
+7. Manifest auf amd64 und arm64 prüfen
+8. Image gegen einen lokalen Supervisor-/HA-Mock starten
+9. `/health`, `/api/status` und statische Assets prüfen
+10. bei Stable erst jetzt `latest` erzeugen
+11. GitHub Release erstellen und Standalone-Artefakte sowie bei Stable den
+    commitbezogenen Gate-Nachweis anhängen
 
 Die Pipeline verwendet `github.token`; ein Registry-PAT ist nicht erforderlich.
 Nur Image-Jobs erhalten `packages: write`, erst der letzte Release-Job erhält
@@ -169,13 +173,34 @@ RC-Feedback zuerst in einem neuen Commit beheben. RC-Artefakte werden nicht
 nachträglich als Stable umgetaggt. Danach Version und Release-Metadaten auf die
 stabile Version ändern, Changelog abschließen und erneut alle Gates ausführen:
 
+1. Alle verpflichtenden Manuelltests aus
+   `release/stable-gate-policy.json` auf demselben freigegebenen RC ausführen
+   und in `docs/audits/MANUAL_TEST_QUEUE.md` als `PASS` mit Evidenz erfassen.
+2. Sämtliche offenen P0-/P1-Repairs schließen und re-auditieren.
+3. `release/approvals/<stable-version>.json` anhand
+   `release/approvals/README.md` anlegen. Der Datensatz bindet die Freigabe an
+   RC-Commit, Image-Digest und Standalone-Prüfsumme.
+4. In den GitHub-Repository-Einstellungen das Environment `stable-release`
+   mit Required Reviewers konfigurieren und Self-Review verhindern.
+5. Stable-Version vorbereiten, reviewen und erst danach taggen.
+
 ```bash
 git tag -a v1.0.0 -m "Release v1.0.0"
 git push origin v1.0.0
 ```
 
-`latest` entsteht ausschließlich im letzten Job nach bestandenem Smoke Test.
-Die konkrete Version bleibt immer die bevorzugte unveränderliche Referenz.
+Vor jedem Architektur-Image-Push wartet der Workflow bei Stable auf das
+geschützte Environment. `release/check-stable-gate.js` prüft zusätzlich das
+Approval, die Pflichtresultate und die kanonische Repair Queue. Fehlendes
+Approval, ein nicht als `PASS` protokollierter Pflichtlauf oder ein offener
+P0/P1-Repair stoppt die Pipeline. Das danach erzeugte
+`stable-gate-result.json` enthält exakten Tag/Commit, Approval-Checksumme,
+RC-Artefaktdigests und die leere Blockerliste und wird dem Release angehängt.
+
+`latest` entsteht ausschließlich im letzten Job nach bestandenem Gate,
+Architektur-Build, Manifestprüfung und Smoke Test. Die konkrete Version bleibt
+immer die bevorzugte unveränderliche Referenz. MT-57 dokumentiert den realen
+Promotionslauf selbst und ist deshalb kein zirkuläres Vorabkriterium.
 
 ## Container und Manifest prüfen
 
@@ -251,6 +276,10 @@ Ein Release wird abgebrochen bei:
 - verfolgter `.env`, privatem Schlüssel oder bekannten Tokenmustern
 - `.env`, Daten oder `node_modules` im Standalone-Archiv
 - fehlender amd64- oder arm64-Plattform
+- bei Stable: fehlendem geschütztem Environment-Approval
+- bei Stable: fehlendem oder ungültigem versioniertem Approval-Datensatz
+- bei Stable: einem Pflicht-Manuelltest ohne `PASS`
+- bei Stable: einem offenen P0-/P1-Repair
 
 Der Produktionsdependency-Audit ist bewusst auf `moderate` gesetzt. Moderate,
 High- und Critical-Advisories blockieren das Gate, solange nicht eine

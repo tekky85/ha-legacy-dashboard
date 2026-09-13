@@ -203,3 +203,15 @@ Regressionen und Sprint-25.5-JPEG-Matrix sind ausdrücklich eingebunden.
 Fokuslauf 151/151 und Gesamtsuite 377/377 bestanden. Reale Viewport-, Footer-,
 Rotation-, HomeScreen-, LXC- und HAOS-Persistenz bleiben MT-51/52/54/58–60
 sowie MT-62 zugeordnet und `NOT TESTED`.
+
+## Sprint-27.1-H-Re-Audit
+
+Das Stable-Gate verlangt MT-51/52/54/58/59/60 als `PASS` und gleicht dies
+sowohl mit dem versionierten Approval als auch der Manual Test Queue ab.
+Background-, Full-Height-, Footer-, Cache-, Admin- und Persistenzabnahmen
+können daher nicht mehr durch einen ausschließlich automatisierten Release-
+Lauf übersprungen werden. Die Runtime- und Uploadstatus bleiben unverändert;
+die sechs realen Tests sind `NOT TESTED`, Sprint 25.3 bleibt `PARTIAL`.
+Die H-Negativtests und die vollständige Suite bestanden 7/7 beziehungsweise
+385/385; der Browser-Harness bestand zusätzlich 1.576/1.576 Fälle. Dadurch
+wird keine reale Persistenz-, Upload- oder Viewportabnahme ersetzt.

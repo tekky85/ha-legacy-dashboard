@@ -77,8 +77,76 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  build-images:
+  release-candidate-gate:
     needs: validate
+    if: needs.validate.outputs.stable != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Confirm prerelease channel
+        run: test "${{ needs.validate.outputs.stable }}" = "false"
+
+  stable-gate:
+    needs: validate
+    if: needs.validate.outputs.stable == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: stable-release
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out exact stable tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Validate protected stable approval, manual results and repair blockers
+        run: >-
+          node release/check-stable-gate.js
+          --version "${{ needs.validate.outputs.version }}"
+          --tag "$GITHUB_REF_NAME"
+          --commit "$GITHUB_SHA"
+          --output stable-gate-result.json
+
+      - name: Upload commit-bound stable gate result
+        uses: actions/upload-artifact@v4
+        with:
+          name: stable-gate-result
+          path: stable-gate-result.json
+          if-no-files-found: error
+          retention-days: 90
+
+  release-gate:
+    needs:
+      - validate
+      - release-candidate-gate
+      - stable-gate
+    if: always() && needs.validate.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      RELEASE_STABLE: ${{ needs.validate.outputs.stable }}
+      RC_GATE_RESULT: ${{ needs.release-candidate-gate.result }}
+      STABLE_GATE_RESULT: ${{ needs.stable-gate.result }}
+
+    steps:
+      - name: Require the matching channel gate
+        run: |
+          if [ "$RELEASE_STABLE" = "true" ]; then
+            test "$STABLE_GATE_RESULT" = "success"
+          else
+            test "$RC_GATE_RESULT" = "success"
+          fi
+
+  build-images:
+    needs:
+      - validate
+      - release-gate
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -244,6 +312,13 @@ jobs:
           name: standalone-release
           path: dist
 
+      - name: Download stable gate evidence
+        if: needs.validate.outputs.stable == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: stable-gate-result
+          path: dist
+
       - name: Create GitHub Release and attach checksums
         env:
           GH_TOKEN: ${{ github.token }}
@@ -263,3 +338,7 @@ jobs:
           gh release upload "$GITHUB_REF_NAME" \
             "dist/${{ needs.validate.outputs.standalone_artifact }}" \
             dist/SHA256SUMS
+          if [ "${{ needs.validate.outputs.stable }}" = "true" ]; then
+            gh release upload "$GITHUB_REF_NAME" \
+              dist/stable-gate-result.json
+          fi

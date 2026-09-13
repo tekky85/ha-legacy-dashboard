@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "protectedEnvironment": "stable-release",
+  "blockingRepairPriorities": ["P0", "P1"],
+  "requiredManualTests": [
+    "MT-13",
+    "MT-34",
+    "MT-40",
+    "MT-42",
+    "MT-50",
+    "MT-51",
+    "MT-52",
+    "MT-54",
+    "MT-55",
+    "MT-56",
+    "MT-58",
+    "MT-59",
+    "MT-60"
+  ]
+}

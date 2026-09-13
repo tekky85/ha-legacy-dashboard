@@ -244,10 +244,24 @@ Code-/UI-Änderungen erneut erzeugt.
 
 - Repairs: `RQ-14-04`, `RQ-14-03`
 - Sprints: 25 bis 25.4
-- Erwartete Komponenten: geschütztes Stable-Approval, commitbezogene
-  Resultmatrix und Releasechecks
-- Re-Audit: Sprint 25/25.1–25.4
-- Entsperrt: MT-55/57 nach aktuellem Kandidaten
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Ergebnis: Stable wartet vor jedem Image-Push auf das GitHub-Environment
+  `stable-release` und prüft versioniertes RC-Approval, 13 verpflichtende
+  Manuellresultate sowie offene P0/P1-Repairs. Der exakte Workflowcommit wird
+  in `stable-gate-result.json` mit Approval-Checksumme und RC-Artefaktdigests
+  festgehalten. RC-Veröffentlichungen bleiben getrennt möglich.
+- Traceability: alle 60 Sprint-25-Fälle sind exakt einmal als direkter Test,
+  commitgebundener Workflow oder versions-/artefaktbezogener Manual Test
+  maschinengeprüft zugeordnet.
+- Evidenz: 7/7 H-spezifisch, 44/44 fokussiert, 385/385 vollständig und
+  Browser-Matrix 1.576/1.576; Release-Syntax, Version, Secret-Scan und
+  Produktionsaudit sind grün.
+- Re-Audit: Sprint 25/25.1–25.4 abgeschlossen; reale Resultate bleiben
+  `NOT TESTED` und Stable `BLOCKED`.
+- Entsperrt: `RQ-14-04` aus MT-55/57 entfernt; beide bleiben wegen
+  `RQ-13-01`/`RQ-17-01` blockiert.
+- Public Test Release: `v1.0.0-rc.3` bleibt unverändert; kein Tag, Image oder
+  Release wurde in Batch H erzeugt.
 
 ### 27.1-I – Status and Screenshot Documentation
 

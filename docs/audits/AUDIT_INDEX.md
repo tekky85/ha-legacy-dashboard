@@ -1005,6 +1005,47 @@ nicht, dass das Projekt RC-ready ist.
 - Ergebnis: `RQ-18-01` **CODE CLOSED / MANUAL PENDING**. Batch 27.1-H wurde
   nicht begonnen.
 
+## Sprint 27.1 – Repair Batch H
+
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Basiscommit: `a70cc96`
+- Repairs: `RQ-14-04`, `RQ-14-03`
+- Root Cause RQ-14-04: Der Stable-Pfad konnte Images veröffentlichen, bevor
+  eine commitbezogene manuelle Freigabe und die offenen P0/P1-Befunde geprüft
+  wurden. Es gab weder geschütztes Environment noch versioniertes Approval-
+  Artefakt oder maschinenlesbares Stable-Gate-Ergebnis.
+- Implementierung RQ-14-04: Stable wartet nun vor jedem Image-Push auf das
+  GitHub-Environment `stable-release`. Das lokale Gate prüft ein
+  versionsgebundenes Approval mit RC-Commit sowie Image-/Bundle-Digests, die
+  13 verpflichtenden Realtests und eine leere offene P0/P1-Menge. Das
+  commitgebundene `stable-gate-result.json` wird als Workflowartefakt und im
+  Stable-Release aufbewahrt. RC-Prereleases bleiben ein getrennter Pfad.
+- Root Cause RQ-14-03: Die 60 nummerierten Sprint-25-Testanforderungen waren
+  nur durch zehn breite Tests und nicht als vollständige, commitbezogene
+  Einzelmatrix rückverfolgbar.
+- Implementierung RQ-14-03: `release/sprint-25-test-matrix.json` ordnet alle
+  60 Nummern genau einmal direkter Test-, Workflow- oder vollständiger
+  Manual-Evidenz zu. Ein Regressionstest prüft Nummern, Marker, Manual-
+  Anleitungen und Status; die Zuordnung behauptet keinen realen PASS.
+- Testevidenz: 7/7 H-spezifisch, 44/44 fokussiert, 385/385 vollständig und
+  Card-Matrix-Browser 1.576/1.576. Das Release-Gate bestand sämtliche
+  JavaScript-/Shell-Syntax-, Versions- und Secret-Prüfungen; der
+  Produktionsaudit meldete 0 Schwachstellen.
+- Re-Audit: Sprint 25, 25.1, 25.2, 25.3 und 25.4. Die betroffenen
+  Gate-/Matrixanforderungen wechseln code-seitig auf `PASS`; physische und
+  produktive Anforderungen bleiben `NOT TESTED`, die Sprintgesamtstände
+  deshalb `PARTIAL` beziehungsweise Stable `BLOCKED`.
+- Manuell: MT-55 und MT-57 sind nicht mehr durch `RQ-14-04` blockiert, bleiben
+  wegen `RQ-13-01`/`RQ-17-01` blockiert. Kein manueller Status wurde auf
+  `PASS` gesetzt. Das Environment benötigt weiterhin administrativ Required
+  Reviewers und deaktivierte Self-Review; dies wird in MT-57 real geprüft.
+- Public Test Release: `v1.0.0-rc.3` bleibt unverändert auf
+  `771683b804f0b7c684eb3d457b58fb579a3ccdb6`. Batch H veröffentlicht weder
+  Tag, Image noch Release und verschiebt `latest` nicht.
+- Ergebnis: beide Repairs **CODE CLOSED / MANUAL PENDING**. Nächster
+  kanonischer Batch ist 27.1-I (`RQ-08-02`, `RQ-08-03`); er wurde nicht
+  begonnen.
+
 ## Verifikation der Audit-Baseline
 
 - Vollständige Testsuite: 329 von 329 Tests bestanden, 0 fehlgeschlagen.

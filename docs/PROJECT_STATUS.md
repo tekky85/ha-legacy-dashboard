@@ -27,7 +27,10 @@ weiteren Traceability-Repairs `RQ-11-01`, `RQ-12-04`, `RQ-15-01` und
 `RQ-16-02` für insgesamt 521 nummerierte Anforderungen, ebenfalls ohne
 Produktverhalten zu ändern. Sprint 27.1-G schloss auf Basis `50d481e` die
 aktuelle Card-/Room-/Capability-Matrix `RQ-18-01` und band den real
-ausgeführten Browser-Harness als Test-/Release-Gate ein. Reale iPad-/HomeScreen-/
+ausgeführten Browser-Harness als Test-/Release-Gate ein. Sprint 27.1-H schloss
+auf Basis `a70cc96` das commitbezogene Stable-Approval-/Blocker-Gate
+`RQ-14-04` und die vollständige 60-Punkte-Release-Traceability `RQ-14-03`.
+Reale iPad-/HomeScreen-/
 Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate
 bleiben offen.
 
@@ -59,6 +62,7 @@ Status:
 - Sprint-27.1-F / RQ-11-01, RQ-12-04, RQ-15-01, RQ-16-02:
   **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-G / RQ-18-01: **COMPLETE – MANUAL PENDING**
+- Sprint-27.1-H / RQ-14-04, RQ-14-03: **COMPLETE – MANUAL PENDING**
 - Sprint 27.2 / Public Test Release 1.0.0-rc.3:
   **COMPLETE – PUBLIC TESTS PENDING**
 - Manuelle Abnahme: **PENDING**
@@ -118,8 +122,8 @@ prüfen N→N+1 und Rollback mit gemeinsamem Standalone-/App-Datenpfad. `qs` ist
 kompatibel auf 6.16.0 aktualisiert; der Produktionsaudit blockiert ab Moderate
 und meldet null Befunde. Fokussiert bestanden 22/22, vollständig 339/339
 Tests. Reale HAOS-/LXC-/
-Release-/iPad-Abnahmen bleiben `NOT TESTED`; `RQ-13-01`, `RQ-14-04` und
-`RQ-17-01` verhindern weiterhin eine RC-Freigabe.
+Release-/iPad-Abnahmen bleiben `NOT TESTED`; nach Batch H verhindern
+`RQ-13-01` und `RQ-17-01` weiterhin eine RC-Freigabe.
 
 ### Sprint 27.1-E – System-Dashboard-Testabdeckung
 
@@ -167,7 +171,28 @@ v54.
 `RQ-18-01` ist **CODE CLOSED / MANUAL PENDING**. MT-09/29/63/69/72 sind
 ausführbar, bleiben jedoch `NOT TESTED`. `v1.0.0-rc.3` und sein Tag bleiben
 unverändert; Batch G veröffentlicht keinen neuen Release. Nächster kanonischer
-Batch ist 27.1-H (`RQ-14-04`, `RQ-14-03`).
+Batch war 27.1-H (`RQ-14-04`, `RQ-14-03`).
+
+### Sprint 27.1-H – Stable-Gate und Release-Traceability
+
+Stable-Releases werden nun vor jedem Image-Push technisch angehalten, bis das
+geschützte GitHub-Environment `stable-release`, eine versionierte Freigabe mit
+unveränderlichen RC-Commit-/Image-/Bundle-Digests, 13 verpflichtende reale
+Abnahmen und eine leere offene P0/P1-Reparaturmenge bestätigt sind. Ein
+commitgebundenes `stable-gate-result.json` hält die geprüfte Freigabe und
+Artefakte fest; RC-Prereleases bleiben getrennt möglich.
+
+Die 60 nummerierten Sprint-25-Releaseanforderungen besitzen zusätzlich eine
+maschinengeprüfte Einzelzuordnung zu direkter Test-, Workflow- oder
+vollständiger Manual-Evidenz. Diese Traceability wertet keinen noch nicht
+ausgeführten Realtest als bestanden. H-spezifisch bestanden 7/7, fokussiert
+44/44, vollständig 385/385 und im Browser-Harness 1.576/1.576 Fälle;
+Syntax-, Versions-, Secret- und Produktionsdependency-Gates sind grün.
+`RQ-14-04` und `RQ-14-03` sind daher
+**CODE CLOSED / MANUAL PENDING**. MT-55/57 bleiben wegen `RQ-13-01` und
+`RQ-17-01` blockiert; alle Realresultate bleiben `NOT TESTED`. Das bestehende
+Public Test Release `v1.0.0-rc.3` wurde nicht verändert. Nächster kanonischer
+Batch ist 27.1-I (`RQ-08-02`, `RQ-08-03`).
 
 ### Sprint 27.2 – Public Test Release 1.0.0-rc.3
 

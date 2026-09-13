@@ -157,3 +157,14 @@ Nummern sind lückenlos zugeordnet. Globale Theme-Persistenz einschließlich
 Storage-Fallback und exakte Severity-/State-/Same-Child-Filter bleiben
 automatisiert grün. Fokuslauf 151/151 und Gesamtsuite 377/377 bestanden;
 MT-13, MT-34, MT-40 und MT-42 bleiben `NOT TESTED`.
+
+## Sprint-27.1-H-Re-Audit
+
+Das Stable-Gate führt MT-13, MT-34, MT-40 und MT-42 als verbindliche
+Pflichtresultate. Ein bloß grüner automatisierter Theme-/Filterlauf kann sie
+nicht mehr ersetzen: Jeder Eintrag muss im versionierten Approval und in der
+Manual Test Queue `PASS` sein, sonst stoppt Stable vor dem Image-Push. Die
+fachlichen Status bleiben unverändert; alle vier Tests sind aktuell weiterhin
+`NOT TESTED`, Sprint 25.1 bleibt `PARTIAL` und Stable `BLOCKED`.
+Die H-Negativtests und die vollständige Suite bestanden 7/7 beziehungsweise
+385/385; dadurch wird keine reale Geräteabnahme ersetzt.

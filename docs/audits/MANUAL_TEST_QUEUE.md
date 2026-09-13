@@ -129,6 +129,13 @@ MT-63, MT-69 und MT-72 ausführbar. Ihre Ergebnisse bleiben ausdrücklich
 `NOT TESTED`; der grüne Chromium-Gate ersetzt keine physische iPad-/HAOS-
 Abnahme.
 
+Sprint 27.1-H schließt `RQ-14-04` und `RQ-14-03` code-seitig. Das neue
+Stable-Gate verlangt die hier protokollierten Pflichtresultate und stoppt bei
+offenen P0/P1-Repairs vor dem ersten Image-Push. MT-55 und MT-57 sind deshalb
+nicht mehr durch `RQ-14-04` blockiert, bleiben jedoch wegen `RQ-13-01` und
+`RQ-17-01` gesperrt. Alle Ergebnisse bleiben `NOT TESTED`; MT-57 prüft später
+zusätzlich den real geschützten Environment-/Promotionslauf.
+
 | Manual Test | Execution State | Blocked By Repairs |
 |---|---|---|
 | MT-01 | CAN RUN NOW | – |
@@ -185,9 +192,9 @@ Abnahme.
 | MT-52 | BLOCKED | RQ-13-01 |
 | MT-53 | BLOCKED | RQ-13-01 |
 | MT-54 | BLOCKED | RQ-13-01 |
-| MT-55 | BLOCKED | RQ-13-01, RQ-14-04, RQ-17-01 |
+| MT-55 | BLOCKED | RQ-13-01, RQ-17-01 |
 | MT-56 | CAN RUN NOW | – |
-| MT-57 | RUN AFTER ALL REPAIRS | RQ-13-01, RQ-14-04, RQ-17-01 |
+| MT-57 | RUN AFTER ALL REPAIRS | RQ-13-01, RQ-17-01 |
 | MT-58 | CAN RUN NOW | – |
 | MT-59 | CAN RUN NOW | – |
 | MT-60 | CAN RUN NOW | – |

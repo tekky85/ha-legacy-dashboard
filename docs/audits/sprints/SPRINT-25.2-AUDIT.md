@@ -156,3 +156,13 @@ same-origin Routen, sichere Returnziele, Theme und exakte Filter sind
 automatisiert belegt. Fokuslauf 151/151 und Gesamtsuite 377/377 bestanden. Der
 reale Touch-/Portrait-/Landscape-HomeScreen-Lauf MT-40/MT-41 bleibt
 `NOT TESTED`.
+
+## Sprint-27.1-H-Re-Audit
+
+MT-40 ist jetzt ein verbindliches Stable-Pflichtresultat; das Approval muss
+seine commit-/gerätbezogene Evidenz referenzieren. MT-41 bleibt die optionale
+iPad-Air-2-Ergänzung. Das neue Gate verändert weder Navigation noch
+Return-Target-Validierung. Da MT-40 weiterhin `NOT TESTED` ist, bleibt Sprint
+25.2 `PARTIAL` und Stable wird technisch blockiert.
+Die H-Negativtests und die vollständige Suite bestanden 7/7 beziehungsweise
+385/385; dadurch wird keine reale HomeScreen-Abnahme ersetzt.
