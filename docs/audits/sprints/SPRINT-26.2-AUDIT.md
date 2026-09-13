@@ -21,9 +21,12 @@ drei engen Endpunkte für Light Power, Climate Power und Climate Target.
 Mehrere unterschiedliche Entity-IDs, Modekombinationen, Off-State-Sollwerte,
 Range/Step sowie Ablehnungs- und Fehlerpfade sind mit lokalen HA-Mocks geprüft.
 
-`PARTIAL` ist allein wegen ausstehender realer Home-Assistant-/iPad-Abnahmen
-und der sprintübergreifenden Cache-/Matrixbefunde korrekt. Es wurde kein neuer
-Control- oder Securitydefekt gefunden.
+Sprint 27.1-G schließt den sprintübergreifenden Matrixbefund: Der zentrale
+Browser-Harness erwartet Controls nun aus denselben Gateway-Capabilities wie
+Grid, Focus und Room und ist als Test-/Release-CI-Gate grün. `PARTIAL` ist
+allein wegen ausstehender realer Home-Assistant-/iPad-Abnahmen und weiterer
+globaler RC-Blocker korrekt. Es wurde kein neuer Control- oder Securitydefekt
+gefunden.
 
 ## Requirement-Matrix
 
@@ -87,8 +90,8 @@ Control- oder Securitydefekt gefunden.
 | 26.2-S3 | HA-/Supervisor-/Admin-Token getrennt und backend-only | PASS | Runtime-/Adminauth und Frontendscan; keine Tokenwerte im Public Payload. |
 | 26.2-S4 | Keine Registry-/Area-/Label-Writes | PASS | Read-only Metadatenpfade unverändert. |
 | 26.2-LEG1 | Safari iOS 9 / ES5 | PASS | Syntax-/Verbotscan über alle Wall-JS-Dateien grün. |
-| 26.2-CACHE1 | Aktuelle Control-/Capability-UI konsistent ausgeliefert | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js` prüft shared Presentation-/Icon-Assets und alle Entry Points. | RQ-04-01 code-seitig geschlossen; echte iPad-Control-Abnahme bleibt `NOT TESTED`. |
-| 26.2-MATRIX1 | Card-Matrix erwartet capabilityabhängige Controls korrekt | BROKEN | Alter Haupt-Harness verlangt bei Climate unknown/unavailable pauschal drei Controls. Bestehendes `RQ-18-01`; Produktlogik selbst korrekt. |
+| 26.2-CACHE1 | Aktuelle Control-/Capability-UI konsistent ausgeliefert | PASS | Dashboard, System, Admin und Manifest verwenden nach Sprint 27.1-G konsistent v54; `test/asset-version.test.js` prüft alle Entry Points. |
+| 26.2-MATRIX1 | Card-Matrix erwartet capabilityabhängige Controls korrekt | PASS | `expectedControlCount()` verwendet je Light/Climate/Room die konkreten Gateway-Capabilities; Chromium-Gate 1.576/1.576 ohne Missing-/Duplicate-Control. |
 | 26.2-T1 | Lightfälle 1–10 automatisiert | PASS | `test/sprint-26-2.test.js` und `test/gateway.test.js`, mehrere IDs. |
 | 26.2-T2 | Climate-Powerfälle 11–20 automatisiert | PASS | Mehrere Modusmatrizen, no-off, preferred/last/fallback/unavailable/unauthorized. |
 | 26.2-T3 | Targetfälle 21–31 automatisiert | PASS | Active/off, no-auto-power, Grenzen, Step, invalid, unavailable und HA-Fehler. |
@@ -97,7 +100,7 @@ Control- oder Securitydefekt gefunden.
 | 26.2-M2 | Reale iPad-Controls über Grid/Focus/Room | NOT TESTED | MT-72. |
 | 26.2-DOD1 | Zentraler produktiver Endzustand | PASS | Kein verbleibender Code-/Securitydefekt im kontrollierten Audit gefunden. |
 | 26.2-DOD2 | Reale Zielsystemabnahme | NOT TESTED | Keine Produktion/physische Hardware in Part 19. |
-| 26.2-DOD3 | Vollständig RC-freigabefähig | PARTIAL | RQ-04-01 ist code-seitig geschlossen; reale Gates, RQ-18-01 und weitere globale RC-P1-Blocker bleiben offen. |
+| 26.2-DOD3 | Vollständig RC-freigabefähig | PARTIAL | RQ-04-01 und RQ-18-01 sind code-seitig geschlossen; reale Gates und weitere globale RC-P1-Blocker bleiben offen. |
 
 ## Root Causes und finale Architektur
 
@@ -132,6 +135,18 @@ auf.
 - Kein neuer Part-19-Reparatureintrag.
 - `RQ-04-01`: Capability-/Controlassets seit Sprint 27.1-B konsistent als v52
   ausgeliefert.
-- `RQ-18-01`: Harnesserwartungen aus echten Capabilities ableiten.
+- `RQ-18-01`: in Sprint 27.1-G code-seitig geschlossen; Harness und
+  Produktoberflächen nutzen dieselbe Capabilitysemantik.
 - MT-71: reale HA-Integrationsmatrix mit drei Lights und mehreren Climates.
 - MT-72: Grid-/Focus-/Room-Controlmatrix auf dem iPad mini.
+
+## Sprint-27.1-G-Re-Audit
+
+`26.2-MATRIX1` wechselt von `BROKEN` zu `PASS`. Der Harness nimmt weder drei
+Climate-Controls pauschal an noch leitet er Rechte aus Sichtbarkeit ab:
+Target-Steps und Power werden je Zustand aus `can_set_temperature` und
+`supports_power` berechnet, Light aus `can_light_power_on/off`, Room aus den
+Capabilities seiner explizit konfigurierten Light-/Climate-Rollen. Read-only,
+Target-ohne-Power sowie unavailable/unknown sind enthalten. Der echte
+Browser-Gate und die fokussierten Control-/Securitytests sind grün. MT-71/72
+bleiben `NOT TESTED`.

@@ -10,30 +10,31 @@ nachvollziehbaren Re-Audit-Eintrag.
 
 ## Konsolidierte Zusammenfassung
 
-- Stand: 12. September 2026
+- Stand: 13. September 2026
 - Auditabdeckung: Parts 01 bis 19 vollständig
 - Nicht-PASS-Anforderungszeilen geprüft: 139
 - Davon umsetzbare, auf Repairs abgebildete Findings: 121
 - Rein manuelle/nicht umsetzbare Findings: 18
 - Total canonical repairs: 25
-- Code repairs completed: 18 (`RQ-16-01`, `RQ-04-01`, `RQ-09-01`,
+- Code repairs completed: 19 (`RQ-16-01`, `RQ-04-01`, `RQ-09-01`,
   `RQ-12-01`, `RQ-12-02`, `RQ-12-03`, `RQ-13-02`, `RQ-14-01`,
   `RQ-14-02`, `RQ-14-05`, `RQ-07-01`, `RQ-08-01`, `RQ-09-02`,
-  `RQ-10-01`, `RQ-11-01`, `RQ-12-04`, `RQ-15-01`, `RQ-16-02`)
-- Open code repairs: 7
+  `RQ-10-01`, `RQ-11-01`, `RQ-12-04`, `RQ-15-01`, `RQ-16-02`,
+  `RQ-18-01`)
+- Open code repairs: 6
 - P0: 0
 - P1 open: 3
 - P1 code-closed/manual-pending: 4
-- P2 open: 4
-- P2 code-closed/manual-pending: 14
+- P2 open: 3
+- P2 code-closed/manual-pending: 15
 - P3: 0
 - RC Blocker `YES` open: 2
 - RC Blocker code-closed/manual-pending: 4
-- RC Blocker `CONDITIONAL`: 5
+- RC Blocker `CONDITIONAL` open: 2; code-closed/manual-pending: 1
 - Security-sensitive repairs open: 3; code-closed/manual-pending: 8
-- Repairs blocking manual tests: 4
+- Repairs blocking manual tests: 3
 - Repairs with dependencies: 8
-- Status: **SPRINT 27.1-A BIS 27.1-F COMPLETE – MANUAL PENDING**
+- Status: **SPRINT 27.1-A BIS 27.1-G COMPLETE – MANUAL PENDING**
 
 Der geordnete Reparaturbacklog bleibt die Grundlage für Sprint 27.1. Der
 Abschluss eines automatisierten Codebatches bedeutet weder RC-ready noch, dass
@@ -72,7 +73,7 @@ eine reale iPad-/HAOS-/LXC-/Home-Assistant-Abnahme bestanden wurde.
 | RQ-16-01 | 25.3, 25.5, 26.1 | Der PNG-Validator akzeptierte strukturell ungültige oder manipulierte PNG-Dateien; beim Ersatz konnte dadurch das letzte gültige Background-Asset verloren gehen. | BROKEN | P1 | Ausgangsdefekt auf `dec0c54` reproduziert: PNG ohne `IDAT` und mit manipulierter CRC wurden akzeptiert. Sprint 27.1-A ergänzt in `src/services/dashboard-backgrounds.js` CRC32 je Chunk, gültige IHDR-Felder, strikte bekannte Critical-Chunk-Reihenfolge, zusammenhängende IDATs und sauberes IEND/EOF. `test/fixtures/png-samples.js`, `test/sprint-25-3.test.js` und `test/admin-api.test.js` regressieren fehlendes IDAT, CRC-Tamper, Truncation, trailing data, unknown critical, duplicate IHDR sowie Dashboard-/Room-Last-valid-Replace. Fokus 85/85 und Gesamtsuite 330/330 PASS. | **UMGESETZT.** Gemeinsamer begrenzter PNG-Parser gehärtet; keine Validierung abgeschaltet, kein Room-Sonderpfad. Ungültige Uploads werden vor dem Store abgewiesen, Altconfig/Altasset bleiben allein erhalten. | Code-/Automationsgate erfüllt. Reale iPad-/LXC-/HAOS-Background-, Restart- und `/data`-Abnahmen bleiben `NOT TESTED`; keine RC-Freigabe abgeleitet. | CODE CLOSED / MANUAL PENDING – Sprint 27.1-A; Audits 25.3/25.4/25.5/26.1 re-auditiert |
 | RQ-16-02 | 25.3 | Die 84 nummerierten Sprint-25.3-Testanforderungen waren fachlich breit, aber nicht vollständig als direkte Einzelmatrix rückverfolgbar. | PARTIAL | P2 | Sprint 27.1-F ordnet 84/84 Anforderungen sicheren Upload-/Asset-, Admin-, Persistenz-, Preview-/Runtime-, Layout-, Theme-, Focus-, Navigation-, Standalone-/App- und Legacytests oder MT-51/52/54/58–62 zu. Die in 27.1-A ergänzten PNG-Struktur-/CRC- und Last-valid-Replacement-Regressionsfälle aus `RQ-16-01` sind Bestandteil der Evidenz. | **UMGESETZT.** Vollständige Background-/Upload-Traceability mit maschineller Evidenzprüfung; kein zweiter Uploadpfad und keine Produktänderung. | Kein RC-Blocker. Reale `/data`-, LXC-, iPad-, Viewport- und Uploadabnahmen bleiben MT-51/52/54/58–62 `NOT TESTED`. | CODE CLOSED / MANUAL PENDING – Sprint 27.1-F; Sprint 25.3 re-auditiert |
 | RQ-17-01 | 25.4 | Die lebende RC-Checkliste ist kein commit- und artefaktkohärenter Nachweis mehr und enthält veraltete beziehungsweise aktuell falsche PASS-Aussagen. | BROKEN | P1 | `docs/RC_CHECKLIST.md` nennt im Kopf RC.1/Commit `741bba4`, verwendet für LXC später `42d88f3` und für Gates 275, 283 beziehungsweise 290 Tests, während der aktuelle Reparaturstand 330 Tests besitzt. Sie behauptet ein Root-`Dockerfile`, obwohl die Workflows `ha_legacy_dashboard/Dockerfile` nutzen, sowie null npm-Schwachstellen, obwohl der Audit eine moderate `qs@6.15.3`-Schwachstelle mit zwei Advisories meldet. Der frühere PNG-Widerspruch ist mit `RQ-16-01` behoben; die nachträglich angehängte Sprint-25.5-/25.6-Evidenz besitzt weiterhin keine eigene Kandidaten-/Commitgrenze und aktuelle P1-Befunde sind nicht vollständig in `RC BLOCKERS` synchronisiert. | Historische RC.1-Evidenz unverändert und klar auf `741bba4` begrenzen. Für den nächsten Kandidaten eine neue datierte Matrix mit exakt einem Sourcecommit, Tag, Image-/Manifestdigest, Bundlechecksum, Workflow, LXC-/HAOS-Build und Geräteteststand erzeugen. PASS-Zeilen aus automatischer/realer Evidenz ableiten, Repair-Queue-P0/P1 synchron als Blocker übernehmen und falsche Dockerfile-/Auditangaben korrigieren. | Muss vor dem nächsten RC behoben werden: Eine gemischte Matrix kann einen alten oder unvollständig geprüften Build fälschlich freigabefähig erscheinen lassen. | offen |
-| RQ-18-01 | 25.6, 26.1, 26.2 | Card-Matrix-Inventar, Dokumentation und ausführbarer Browser-Harness bilden die aktuelle Renderer-/Capability-Oberfläche nicht vollständig und fehlerfrei ab. | BROKEN | P2 | `docs/CARD_MATRIX.md` und `test/fixtures/card-matrix.js` inventarisieren nur Sensor, Binary, Light und Climate; der seit Sprint 26.1 produktive Typ `room` fehlt in der vollständigen Typ×Größe×State-Matrix. `test/fixtures/room-card-matrix-harness.js` deckt nur compact/standard/wide/large-Beispiele ab, nicht alle gültigen Größen/Zustände und kein gezieltes Tall-Szenario. Zusätzlich erwartet `card-matrix-harness.js` für jedes Climate pauschal drei Controls. Kontrollierter Chromium-Lauf in Part 18: 1.128 Fälle, fünf Tiers, keine Overflow-/Clipping-/Touch-/Tierfehler, aber 120 `missing-control`-False-Positives ausschließlich für `unknown`/`unavailable`, bei denen Sprint 26.2 korrekt keinen unbestätigten Power-Control rendert. Der Node-Test prüft nur, dass die Prüfschlüssel im Harnessquelltext vorkommen, nicht dass der Harness grün läuft. Part 19 führte den separaten Room-Harness tatsächlich aus: vier Compact/Standard/Wide/Large-Fälle bestanden einschließlich Background und Collapse, bestätigen aber weder Tall noch die vollständige gültige Room×Size×State×Capability-Matrix. | Aktuelles Renderer-Inventar aus der produktiven Registry ableiten oder synchron halten; Room in eine vollständige gültige Type×Size×Representative-State-Matrix inklusive Tall, Background, Collapsed/Expanded und Capabilities integrieren; erwartete Controls pro Zustand aus denselben Gateway-Capabilities ableiten; Browser-Harness als tatsächlich ausgeführtes CI-Gate anbinden und `docs/CARD_MATRIX.md` aktualisieren. | P2 vor/um RC: Kein bestätigter visueller Produktdefekt, aber das zentrale visuelle Gate ist rot und lässt aktuelle Room-/Capabilityregressionen unzuverlässig erkennen. | offen |
+| RQ-18-01 | 25.6, 26.1, 26.2 | Card-Matrix-Inventar, Dokumentation und ausführbarer Browser-Harness bildeten die aktuelle Renderer-/Capability-Oberfläche nicht vollständig und fehlerfrei ab. | BROKEN | P2 | Ausgangsstand `50d481e`: Room fehlte in Dokument/Hauptmatrix, Climate erwartete pauschal drei Controls, und der Node-Test führte keinen Browser aus. Sprint 27.1-G synchronisiert exakt fünf produktive Renderer, 316 gültige Größenkombinationen und 1.576 Zustandsfälle. 448 Room-Fälle enthalten alle 64 Größen, fünf Tiers, sieben Collapsed-/Expanded-/Background-/Capabilityvarianten. Control-Anzahlen stammen je Zustand aus Gateway-Capabilities. Der erste echte Browserlauf deckte zusätzlich einen realen einzeiligen Room-Clippingfehler auf; die Presentation priorisiert nun Compact/Standard/Wide korrekt, Expanded-Inhalt bleibt scrollbar. Finale Chrome-for-Testing-Ausführung: 1.576/1.576, 0 Befunde. | **UMGESETZT.** `npm run test:card-matrix-browser` ist verpflichtendes Test-/Release-CI-Gate; Dokument, Fixture, produktive Registry und capabilityabhängige Erwartungen sind regressiert. Gemeinsame sichtbare Assets konsistent auf v54. | Automatisches visuelles Gate erfüllt. MT-63/69/72 und weitere physische iPad-/HAOS-Prüfungen bleiben `NOT TESTED`; keine RC-/Realgerätefreigabe abgeleitet. | CODE CLOSED / MANUAL PENDING – Sprint 27.1-G; Sprints 25.6/26.1/26.2 re-auditiert |
 
 ## Kanonische Ausführungsmetadaten
 
@@ -87,7 +88,7 @@ für jeden Batch Pflicht.
 | RQ-04-01 | Public HTML, gemeinsame Wall-CSS/JS, Static-Cache-Header, Admin-Preview | YES | NO | – | Codepfad geschlossen; verbindliche Legacy-Abnahme bleibt | MT-01/02/05/06/09/11–16/18–25/28/32–34/39–42/45/48/54/58/63–69/71/72 | Sprint 17.2–17.7, 18–26.2 soweit im Finding genannt – re-auditiert | 27.1-B COMPLETE |
 | RQ-07-01 | Summary Engine und tabellengetriebene Tests | NO | NO | – | belastbarer Sprint-19-Re-Audit | MT-24–26 | Sprint 19 | 27.1-E COMPLETE |
 | RQ-08-01 | Issue Engine, Adminregeln, Error UI/API und Tests | NO | NO | – | belastbarer Sprint-20-Re-Audit | MT-27/28/34/42 | Sprint 20 | 27.1-E COMPLETE |
-| RQ-08-02 | README-Galerie, echte Screenshots, Dateiformate/Datenschutz | CONDITIONAL – vor öffentlicher RC-Dokumentation | YES | RQ-09-01, RQ-12-01/02/03, RQ-18-01 | finaler Dokumentationsstand | MT-29 | D1 sowie Screenshot-Findings in Sprint 21–23, 25.1, 26/26.1 | 27.1-I |
+| RQ-08-02 | README-Galerie, echte Screenshots, Dateiformate/Datenschutz | CONDITIONAL – vor öffentlicher RC-Dokumentation | YES | RQ-09-01, RQ-12-01/02/03 und RQ-18-01 erfüllt | finaler Dokumentationsstand | MT-29 | D1 sowie Screenshot-Findings in Sprint 21–23, 25.1, 26/26.1 | 27.1-I |
 | RQ-08-03 | PROJECT_STATUS, Roadmap-/Auditstatus, Verpackungsstruktur | NO | NO | alle fachlichen Batches, damit Aussagen final sind | RQ-17-01 | keine; Dokumentabgleich | D1, Sprint 24/25 | 27.1-I |
 | RQ-09-01 | Backend-HA-WebSocket-Lifecycle/Reconnect | NO | YES | – | RQ-09-02, RQ-12-04; reale Registry-/Automation-/HAOS-Recovery | MT-30/32/35/36/46/48/50 | Sprint 21, 21.3, 23, 24, 25.4 | 27.1-C COMPLETE |
 | RQ-09-02 | Registry/Device/Area/Repair/Matter-Testmatrix | NO | NO | RQ-09-01 | Sprint-21/21.1-Re-Audit | MT-30–32 | Sprint 21/21.1 | 27.1-E COMPLETE |
@@ -97,7 +98,7 @@ für jeden Batch Pflicht.
 | RQ-12-02 | Automation Impact, Dynamic-/Unknown-Kontext, Sanitizer/UI | NO | YES | – | RQ-12-04; reale Automation-Abnahme | MT-46–49 | Sprint 23 | 27.1-C COMPLETE |
 | RQ-12-03 | Automation-Reference-Cache und frisches Inventory-Merge | NO | YES | – | RQ-12-04; reale Automation-Abnahme | MT-46–49 | Sprint 23 | 27.1-C COMPLETE |
 | RQ-12-04 | Sprint-22-/23-Testmatrix | NO | NO | RQ-09-01, RQ-12-01/02/03 erfüllt | belastbarer Regel-/Automation-Re-Audit | MT-43–49 | Sprint 22/23 | 27.1-F COMPLETE |
-| RQ-13-01 | Versionen, Tag/Commit, GHCR, App-Image, Release Notes | YES | YES | RQ-14-04, RQ-18-01 | RQ-17-01; aktuelle HAOS-/Release-Abnahme | MT-50–62/64–66/70 | Sprint 24, 25, 25.4 | 27.1-J |
+| RQ-13-01 | Versionen, Tag/Commit, GHCR, App-Image, Release Notes | YES | YES | RQ-14-04; RQ-18-01 erfüllt | RQ-17-01; aktuelle HAOS-/Release-Abnahme | MT-50–62/64–66/70 | Sprint 24, 25, 25.4 | 27.1-J |
 | RQ-13-02 | Supervisor-Dev-Kontext, App-Metadaten `image`, Build-Dokumentation | CLOSED | YES | – | RQ-13-01; lokale HAOS-Validierung | MT-50–54/61/62/70 | Sprint 24 | 27.1-D COMPLETE |
 | RQ-14-01 | Standalone-Bundle und enthaltene Install-/Upgrade-/Rollbackdocs | CLOSED | YES | – | RQ-14-03, RQ-13-01, RQ-17-01 | MT-55/56 | Sprint 25/25.4 | 27.1-D COMPLETE |
 | RQ-14-02 | Cross-Version-Upgrade-/Rollbackfixtures und Datenintegrität | CLOSED | YES | RQ-14-01 erfüllt | RQ-14-03, RQ-13-01, RQ-17-01 | MT-52/56 | Sprint 25/25.4 | 27.1-D COMPLETE |
@@ -108,7 +109,7 @@ für jeden Batch Pflicht.
 | RQ-16-01 | PNG-Parser, atomarer Background-Replace, Dashboard/Room Upload | YES | YES | – | Codepfad geschlossen; reale Background-Abnahmen bleiben | MT-51/54/58–62/69/70 | Sprint 25.3/25.4/25.5/26.1 – re-auditiert | 27.1-A COMPLETE |
 | RQ-16-02 | vollständige Background-/Upload-Testmatrix | NO | NO | RQ-16-01 erfüllt | belastbarer Sprint-25.3-Re-Audit | MT-51/52/54/58–62 | Sprint 25.3 | 27.1-F COMPLETE |
 | RQ-17-01 | commit-/artefaktkohärente RC-Checkliste und Blockerableitung | YES | NO | RQ-08-03, RQ-13-01, RQ-14-04 | finaler RC-Gate-Lauf | MT-50–57/61–66 | Sprint 25.4 | 27.1-J |
-| RQ-18-01 | Card-/Room-Matrix, Capability-Erwartungen, Browser-CI-Gate | CONDITIONAL – vor visueller RC-/iPad-Abnahme | NO | – | RQ-08-02, RQ-13-01; visuelles Gate | MT-63/69/72 | Sprint 25.6/26.1/26.2 | 27.1-G |
+| RQ-18-01 | Card-/Room-Matrix, Capability-Erwartungen, Browser-CI-Gate | CLOSED – manuelle Zielgeräteabnahme ausstehend | NO | – | RQ-08-02/RQ-13-01-Voraussetzung erfüllt; visuelles Automatengate grün | MT-63/69/72 | Sprint 25.6/26.1/26.2 – re-auditiert | 27.1-G COMPLETE |
 
 ## Prioritätsbegründung
 
@@ -225,6 +226,11 @@ betroffener Fläche – gezielt zu regressieren.
   84/84 Anforderungen aus Sprint 25.3 sind einschließlich der gehärteten PNG-
   und Last-valid-Replacement-Pfade lückenlos zugeordnet; MT-51/52/54/58–62
   bleiben `NOT TESTED`.
+- `RQ-18-01` – **CODE CLOSED / MANUAL PENDING** (Sprint 27.1-G):
+  fünf produktive Renderer, 316 Größenkombinationen und 1.576 Zustandsfälle
+  einschließlich vollständiger Room-/Tall-/Capability-Matrix; ausführbarer
+  Chrome-Gate in Test und Release, lokal 1.576/1.576 ohne Befund. MT-63/69/72
+  bleiben `NOT TESTED`.
 
 ## Zusätzliche Evidenz aus Audit Part 19
 
@@ -244,9 +250,9 @@ betroffener Fläche – gezielt zu regressieren.
 
 ## Finale Baseline-Konsistenz
 
-- Offene Code-Repair-Einträge: 7; zusätzlich 18 code-seitig geschlossene,
+- Offene Code-Repair-Einträge: 6; zusätzlich 19 code-seitig geschlossene,
   teils manuell noch nicht abgenommene Einträge.
-- Offene Prioritäten: P0 0, P1 3, P2 4, P3 0.
+- Offene Prioritäten: P0 0, P1 3, P2 3, P3 0.
 - Jeder Eintrag besitzt Finding/Requirement, Evidence, vorgeschlagene
   Reparatur, RC-Relevanz und Re-Audit-Status.
 - Alle aus Auditdateien referenzierten Repair-IDs sind definiert; jeder

@@ -240,8 +240,10 @@ var LegacyPresentation = (function () {
                     ? 180
                     : 160;
         var wideWidth =
-            type === "climate" || type === "room"
-                ? 400
+            type === "room"
+                ? 360
+                : type === "climate"
+                    ? 400
                 : details.controlCount > 0
                     ? 380
                     : 360;
@@ -273,7 +275,9 @@ var LegacyPresentation = (function () {
             if (
                 effectiveHeight < 150
             ) {
-                return effectiveWidth >= wideWidth
+                return type === "room"
+                    ? "compact"
+                    : effectiveWidth >= wideWidth
                     ? "wide"
                     : "compact";
             }

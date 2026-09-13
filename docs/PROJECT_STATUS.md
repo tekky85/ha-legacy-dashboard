@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 12. September 2026. Sprint 27.2 hat den Stand nach Batch 27.1-D als
+Stand: 13. September 2026. Sprint 27.2 hat den Stand nach Batch 27.1-D als
 `1.0.0-rc.3` Public Test Release veröffentlicht. `1.0.0-rc.2` wurde zuvor mit
 erfolgreichem GitHub-Workflow, Multi-Arch-Image und Standalone-Artefakt
 veröffentlicht. Eine
@@ -25,7 +25,9 @@ die vier Test-/Traceability-Repairs `RQ-07-01`, `RQ-08-01`, `RQ-09-02` und
 Re-Audit-Läufe sind grün. Sprint 27.1-F schloss auf Basis `8d2e06a` die vier
 weiteren Traceability-Repairs `RQ-11-01`, `RQ-12-04`, `RQ-15-01` und
 `RQ-16-02` für insgesamt 521 nummerierte Anforderungen, ebenfalls ohne
-Produktverhalten zu ändern. Reale iPad-/HomeScreen-/
+Produktverhalten zu ändern. Sprint 27.1-G schloss auf Basis `50d481e` die
+aktuelle Card-/Room-/Capability-Matrix `RQ-18-01` und band den real
+ausgeführten Browser-Harness als Test-/Release-Gate ein. Reale iPad-/HomeScreen-/
 Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate
 bleiben offen.
 
@@ -56,6 +58,7 @@ Status:
   **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-F / RQ-11-01, RQ-12-04, RQ-15-01, RQ-16-02:
   **COMPLETE – MANUAL PENDING**
+- Sprint-27.1-G / RQ-18-01: **COMPLETE – MANUAL PENDING**
 - Sprint 27.2 / Public Test Release 1.0.0-rc.3:
   **COMPLETE – PUBLIC TESTS PENDING**
 - Manuelle Abnahme: **PENDING**
@@ -141,6 +144,30 @@ Assetversions- und PNG-Pfade ausdrücklich ein. Produktcode, HA-Aufrufe,
 Controls, Write-Berechtigungen und Releaseversion blieben unverändert. Die
 zugeordneten iPad-, HomeScreen-, LXC- und HAOS-Tests bleiben `NOT TESTED`.
 Fokussiert bestanden 151/151, vollständig 377/377 Tests.
+
+### Sprint 27.1-G – aktuelle Card Matrix
+
+Die Matrix entspricht nun exakt den fünf produktiven Renderern `sensor`,
+`binary`, `light`, `climate` und `room`: 316 gültige Größenkombinationen und
+1.576 repräsentative Zustandsfälle. Room läuft über alle 64 gültigen Größen
+mit sieben Varianten einschließlich Tall, Collapsed/Expanded, Background,
+read-only, Target-ohne-Power, unavailable/unknown und langen Inhalten.
+Control-Erwartungen werden aus den jeweiligen Gateway-Capabilities abgeleitet.
+
+Der echte Browser-Gate deckte zusätzlich eine Room-Presentationlücke auf:
+Einzeilige Rooms erbten bei großer Breite den generischen Wide-Flexpfad und
+ließen Primärwerte/Alerts aus der 108-Pixel-Karte laufen. Sie bleiben nun
+unabhängig von der Breite compact; Standard/Wide priorisieren Room-Inhalte,
+ohne die Grid-Geometrie zu übernehmen. Expanded-Inhalt bleibt im vorgesehenen
+inneren Scrollbereich erreichbar. `npm run test:card-matrix-browser` ist in
+Test- und Release-CI verpflichtend. Lokal bestanden 1.576/1.576 Browserfälle,
+34/34 Fokustests und 378/378 Gesamttests. Gemeinsame sichtbare Assets verwenden
+v54.
+
+`RQ-18-01` ist **CODE CLOSED / MANUAL PENDING**. MT-09/29/63/69/72 sind
+ausführbar, bleiben jedoch `NOT TESTED`. `v1.0.0-rc.3` und sein Tag bleiben
+unverändert; Batch G veröffentlicht keinen neuen Release. Nächster kanonischer
+Batch ist 27.1-H (`RQ-14-04`, `RQ-14-03`).
 
 ### Sprint 27.2 – Public Test Release 1.0.0-rc.3
 

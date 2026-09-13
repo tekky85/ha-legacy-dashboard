@@ -26,11 +26,13 @@
 
     function widgetFor(entry) {
         var config = {
-            id: entry.type + "-matrix",
+            id: entry.id,
             type: entry.type,
             entity: entry.type === "binary"
                 ? "binary_sensor.matrix"
-                : entry.type + ".matrix",
+                : entry.type === "room"
+                    ? ""
+                    : entry.type + ".matrix",
             title: entry.state.title,
             subtitle: entry.state.subtitle,
             icon: entry.type === "binary"
@@ -40,6 +42,12 @@
             unit: entry.state.unit || "",
             size: "normal"
         };
+
+        if (entry.type === "room") {
+            config.icon = "room";
+            config.room = entry.state.room;
+            return new RoomWidget(config);
+        }
 
         if (entry.type === "sensor") {
             return new SensorWidget(config);
@@ -105,7 +113,9 @@
         fixture.setAttribute("data-case-id", entry.id);
         fixture.setAttribute("data-type", entry.type);
         fixture.setAttribute("data-tier", tier);
-        fixture.innerHTML = widget.render(entry.state.data);
+        fixture.innerHTML = entry.type === "room"
+            ? widget.render(entry.state.data, entry.state.alerts || [])
+            : widget.render(entry.state.data);
 
         card = fixture.getElementsByClassName("card")[0];
         card.className += " card-presentation-" + tier;
@@ -142,31 +152,55 @@
 
 
     function addFailure(failures, fixture, code, detail) {
+        var entry = fixture._matrixEntry;
+
         failures.push({
             caseId: fixture.getAttribute("data-case-id"),
+            type: fixture.getAttribute("data-type"),
+            profile: entry ? entry.profile : "",
+            size: entry ? entry.size.w + "x" + entry.size.h : "",
+            state: entry ? entry.state.id : "",
             code: code,
             detail: detail || ""
         });
     }
 
 
+    function failureSummary(failures) {
+        var summary = {};
+        var index;
+        var key;
+
+        for (index = 0; index < failures.length; index += 1) {
+            key = failures[index].code + ":" + failures[index].type + ":" +
+                failures[index].profile + ":" + failures[index].size + ":" +
+                failures[index].state;
+            summary[key] = (summary[key] || 0) + 1;
+        }
+        return summary;
+    }
+
+
     function analyzeFixture(fixture, failures) {
         var card = fixture.getElementsByClassName("card")[0];
         var type = fixture.getAttribute("data-type");
-        var expectedControls = type === "climate"
-            ? 3
-            : type === "light"
-                ? 1
-                : 0;
+        var entry = fixture._matrixEntry;
+        var expectedControls =
+            CardMatrixFixtures.expectedControlCount(entry);
         var controls = card.querySelectorAll(
             ".climate-control, .dashboard-control-power"
         );
-        var identity = card.querySelectorAll(".card-identity");
+        var identity = card.querySelectorAll(
+            type === "room" ? ".room-title" : ".card-identity"
+        );
         var tierClasses = [];
         var semantic;
         var cardBounds;
         var index;
         var bounds;
+        var background;
+        var shouldHaveBackground;
+        var shouldBeExpanded;
 
         VALID_TIERS.forEach(function (tier) {
             if (
@@ -214,6 +248,47 @@
             );
         }
 
+        if (type === "room") {
+            shouldHaveBackground = Boolean(
+                entry.state.room.background
+            );
+            background = card.getElementsByClassName(
+                "room-background-image"
+            );
+            if (
+                shouldHaveBackground &&
+                (
+                    !background.length ||
+                    window.getComputedStyle(background[0]).backgroundImage === "none"
+                )
+            ) {
+                addFailure(
+                    failures,
+                    fixture,
+                    "runtime-background-missing"
+                );
+            } else if (!shouldHaveBackground && background.length) {
+                addFailure(
+                    failures,
+                    fixture,
+                    "unexpected-background"
+                );
+            }
+
+            shouldBeExpanded = entry.state.room.defaultExpanded === true;
+            if (
+                (shouldBeExpanded && card.className.indexOf("is-expanded") === -1) ||
+                (!shouldBeExpanded && card.className.indexOf("is-collapsed") === -1)
+            ) {
+                addFailure(
+                    failures,
+                    fixture,
+                    "room-state",
+                    shouldBeExpanded ? "expanded" : "collapsed"
+                );
+            }
+        }
+
         if (
             card.scrollWidth > card.clientWidth + 1 ||
             card.scrollHeight > card.clientHeight + 1
@@ -230,11 +305,22 @@
         cardBounds = card.getBoundingClientRect();
         semantic = card.querySelectorAll(
             ".card-header, .value, .status, .card-identity, " +
-            ".light-control-row, .climate-values, .climate-target-row"
+            ".light-control-row, .climate-values, .climate-target-row, " +
+            ".room-header, .room-primary-values, .room-status-line, .room-alerts"
         );
 
         for (index = 0; index < semantic.length; index += 1) {
             if (!visible(semantic[index])) {
+                continue;
+            }
+
+            /* Expanded Room Cards intentionally expose their detail content
+             * through the bounded .room-content scroll area. Content below
+             * the current scroll viewport is reachable, not clipped. */
+            if (
+                type === "room" &&
+                (" " + card.className + " ").indexOf(" is-expanded ") !== -1
+            ) {
                 continue;
             }
 
@@ -249,7 +335,15 @@
                     failures,
                     fixture,
                     "clipped-content",
-                    semantic[index].className
+                    semantic[index].className + "@" +
+                        Math.round(bounds.left) + "," +
+                        Math.round(bounds.top) + "," +
+                        Math.round(bounds.right) + "," +
+                        Math.round(bounds.bottom) + "/" +
+                        Math.round(cardBounds.left) + "," +
+                        Math.round(cardBounds.top) + "," +
+                        Math.round(cardBounds.right) + "," +
+                        Math.round(cardBounds.bottom)
                 );
             }
         }
@@ -281,8 +375,13 @@
         var tiers = {};
 
         cases.forEach(function (entry) {
-            board.appendChild(renderCase(entry));
+            var fixture = renderCase(entry);
+
+            fixture._matrixEntry = entry;
+            board.appendChild(fixture);
         });
+
+        Dashboard.applyRoomAppearances(board);
 
         window.setTimeout(function () {
             var fixtures = board.getElementsByClassName("matrix-case");
@@ -302,6 +401,22 @@
             document.body.setAttribute(
                 "data-matrix-status",
                 failures.length ? "failed" : "passed"
+            );
+            document.body.setAttribute(
+                "data-matrix-cases",
+                String(cases.length)
+            );
+            document.body.setAttribute(
+                "data-matrix-failures",
+                String(failures.length)
+            );
+            document.body.setAttribute(
+                "data-matrix-diagnostics",
+                encodeURIComponent(JSON.stringify(failures.slice(0, 50)))
+            );
+            document.body.setAttribute(
+                "data-matrix-failure-summary",
+                encodeURIComponent(JSON.stringify(failureSummary(failures)))
             );
             result.textContent = JSON.stringify(
                 window.CardMatrixResult,

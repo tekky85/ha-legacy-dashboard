@@ -229,10 +229,16 @@ Code-/UI-Änderungen erneut erzeugt.
 
 - Repairs: `RQ-18-01`
 - Sprints: 25.6, 26.1, 26.2
-- Erwartete Komponenten: Card-Matrix-Dokument, Fixtures, echter Browser-CI-
-  Lauf, Room/Tall/Capabilities
-- Re-Audit: Sprint 25.6/26.1/26.2
-- Entsperrt: MT-63/69/72 und aktuelle Produktscreenshots
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Ergebnis: fünf produktive Renderer, 316 gültige Größenkombinationen und
+  1.576 Zustandsfälle; vollständige Room-/Tall-/Background-/Collapsed-/
+  Expanded-/Capability-Matrix; capabilityabhängige Control-Erwartungen
+- Browser-Gate: lokal mit Chrome for Testing 1.576/1.576, 0 Befunde; derselbe
+  Befehl ist verpflichtend in Test- und Release-CI
+- Re-Audit: Sprint 25.6/26.1/26.2 abgeschlossen
+- Entsperrt: MT-09/29/63/69/72; Resultate bleiben `NOT TESTED`
+- Public Test Release: `v1.0.0-rc.3` bleibt unverändert; Batch G ist neuer und
+  veröffentlicht in diesem Lauf keinen neuen Tag oder Release
 
 ### 27.1-H – Release Gate Traceability
 

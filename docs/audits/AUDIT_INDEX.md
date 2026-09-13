@@ -969,6 +969,42 @@ nicht, dass das Projekt RC-ready ist.
 - Ergebnis: alle vier Repairs **CODE CLOSED / MANUAL PENDING**. Batch 27.1-G
   wurde nicht begonnen.
 
+## Sprint 27.1 – Repair Batch G
+
+- Status: **COMPLETE – AUTOMATED GATE PASS / MANUAL PENDING**
+- Basiscommit: `50d481e`
+- Repair: `RQ-18-01`
+- Root Cause: Dokument und Hauptfixture kannten nur vier Renderer, Room war
+  nicht vollständig über alle Größen/Zustände/Tiers abgedeckt, Climate-
+  Control-Erwartungen waren nach Sprint 26.2 pauschal und der Browser-Harness
+  kein ausgeführtes CI-Gate.
+- Implementierung: exakte Parität mit den fünf produktiven Renderer-Typen,
+  316 gültige Größenkombinationen und 1.576 Zustandsfälle. Room umfasst 448
+  Fälle mit allen 64 Größen, sieben Zustands-/Capabilityvarianten, fünf Tiers,
+  Background und Collapsed/Expanded. Control-Erwartungen folgen den konkreten
+  Gateway-Capabilities.
+- Browserbefund: Der erste echte Gesamtlauf deckte zusätzlich einen realen
+  Room-Presentationfehler auf. Einzeilige Rooms werden nun unabhängig von der
+  Breite compact dargestellt; Standard/Wide priorisieren Inhalte ohne
+  Gridgeometrie zu übernehmen, Expanded-Details bleiben scrollbar. Finale
+  Chrome-for-Testing-Ausführung: 1.576/1.576, 0 Befunde.
+- CI: `npm run test:card-matrix-browser` ist verpflichtend in Test- und
+  Release-Workflow. Der Runner benötigt nur ein vorhandenes Chrome/Chromium
+  und keine neue Paketabhängigkeit.
+- Re-Audit: Sprint 25.6, 26.1 und 26.2; die verknüpften Inventory-, Size-,
+  Tier-, Harness-, Dokumentations- und Capabilityanforderungen wechseln auf
+  `PASS`. Gesamtbewertungen bleiben wegen realer Abnahmen `PARTIAL`.
+- Testevidenz: 34/34 fokussiert, 378/378 vollständig und Browser 1.576/1.576.
+  JavaScript-Syntax, Legacy-, Assetparitäts- und Securityregressionen grün.
+  Ausschließlich lokale/synthetische Daten und Localhost-Mocks.
+- Manuell: MT-09/29/63/69/72 sind ausführbar und bleiben `NOT TESTED`; kein
+  physischer oder produktiver Lauf wurde durchgeführt.
+- Public Test Release: `v1.0.0-rc.3` bleibt unverändert auf
+  `771683b804f0b7c684eb3d457b58fb579a3ccdb6`; Batch G ist neuer und
+  veröffentlicht weder Tag noch Release.
+- Ergebnis: `RQ-18-01` **CODE CLOSED / MANUAL PENDING**. Batch 27.1-H wurde
+  nicht begonnen.
+
 ## Verifikation der Audit-Baseline
 
 - Vollständige Testsuite: 329 von 329 Tests bestanden, 0 fehlgeschlagen.

@@ -25,11 +25,12 @@ und nach der früheren CSP-Divergenz über eine dedizierte Ebene plus CSSOM
 gesetzt. Der kontrollierte Browser-Harness meldet vier repräsentative Größen
 ohne Fehler.
 
-`PARTIAL` bleibt korrekt, weil die zentrale aktuelle Card Matrix Room/Tall/
-Capability-Fälle nicht vollständig als ausführbares Gate enthält
-(`RQ-18-01`) und reale iPad-/HAOS-Prüfungen fehlen. Der wiederverwendete PNG-
-Uploadpfad ist in Sprint 27.1-A gehärtet; JPEG, Persistenz, Runtime-URL und
-Rendererpfad bleiben intakt.
+Sprint 27.1-G hat die frühere Matrixlücke geschlossen: Room läuft nun in allen
+64 gültigen Größen mit sieben Collapsed-/Expanded-/Background-/Capability-
+Varianten und allen fünf Tiers im verpflichtenden Browser-Gate. `PARTIAL`
+bleibt nur wegen der realen iPad-/HAOS-Prüfungen korrekt. Der
+wiederverwendete PNG-Uploadpfad ist in Sprint 27.1-A gehärtet; JPEG,
+Persistenz, Runtime-URL und Rendererpfad bleiben intakt.
 
 ## Requirement-Matrix
 
@@ -80,7 +81,7 @@ Rendererpfad bleiben intakt.
 | 26.1-I2 | Standard bewusste Darstellung | PASS | Ergänzt Humidity/Presence/Openings; Browser-Harness grün. |
 | 26.1-I3 | Wide bewusste Darstellung | PASS | Mehr Alerts/Details/Controls; Browser-Harness grün. |
 | 26.1-I4 | Large bewusste Darstellung | PASS | Vollständige Raumzusammenfassung; Browser-Harness grün. |
-| 26.1-I5 | Aktuelle vollständige Room-Größen-/State-Matrix inklusive Tall | PARTIAL | Separater Harness deckt vier Tiers ab, nicht die vollständige aktuelle Room×Size×State-Matrix/Tall. Bestehendes `RQ-18-01`. |
+| 26.1-I5 | Aktuelle vollständige Room-Größen-/State-Matrix inklusive Tall | PASS | Zentraler Harness: 64 gültige Room-Größen × sieben Zustands-/Capabilityvarianten = 448 Fälle einschließlich Tall, Background und Collapsed/Expanded. |
 | 26.1-I6 | Lange Namen/Werte ohne lokalen Overflow | PASS | `min-width:0`, Ellipsis/Wrap und Sprint-26.1-Tests; Browser-Harness ohne Fehler. Physisch: MT-69. |
 | 26.1-J1 | ES5/Safari iOS 9 | PASS | Kein fetch/Promise/Arrow/let/const/async/optional chaining; `node --check` grün. |
 | 26.1-J2 | Kein CSS Grid/Flex-gap/ResizeObserver/Container Query | PASS | Wall-CSS-/Quellscan grün. |
@@ -91,11 +92,11 @@ Rendererpfad bleiben intakt.
 | 26.1-ADMIN2 | Preview und gespeicherter Runtimepfad entsprechen einander | PASS | Test persistiert Draft, liest Public Dashboard und prüft identische Backgroundreferenz/Roomdaten. |
 | 26.1-RUNTIME1 | Früherer Collapse-Defekt | PASS | Root Cause behoben: Expanded-Flexinhalt scrollt und schrumpft nicht mehr auf 0 px; direkter DOM-/Browser-Test. |
 | 26.1-RUNTIME2 | Früherer Background-Defekt | PASS | Root Cause behoben: CSP blockierte Inline-Style; dedizierte Backgroundebene wird per CSSOM gesetzt. |
-| 26.1-CACHE1 | Aktuelle Room-/Collapse-/Backgroundassets auf allen Routen | PASS | Dashboard, System, Admin und Manifest verwenden v52; `test/asset-version.test.js` prüft shared Presentation-/Icon-/Theme-/Navigationsassets. | RQ-04-01 code-seitig geschlossen; reale iPad-Abnahme bleibt `NOT TESTED`. |
+| 26.1-CACHE1 | Aktuelle Room-/Collapse-/Backgroundassets auf allen Routen | PASS | Dashboard, System, Admin und Manifest verwenden nach der sichtbaren Sprint-27.1-G-Korrektur konsistent v54; `test/asset-version.test.js` prüft die Entry-Point-Parität. |
 | 26.1-M1 | Room Card auf realem iPad mini | NOT TESTED | MT-69. |
 | 26.1-M2 | Room Background und `/data` auf HAOS | NOT TESTED | MT-70. |
 | 26.1-DOD1 | Alle automatisierbaren Kernfälle | PASS | Fokus 95/95, Ergänzung 72/72, Gesamtsuite 329/329; Room-Harness 4/4. |
-| 26.1-DOD2 | Vollständige Release-/Realgeräteabnahme | PARTIAL | RQ-04-01 und RQ-16-01 sind code-seitig geschlossen; RQ-18-01 und MT-69/70 bleiben offen beziehungsweise `NOT TESTED`. |
+| 26.1-DOD2 | Vollständige Release-/Realgeräteabnahme | PARTIAL | RQ-04-01, RQ-16-01 und RQ-18-01 sind code-seitig geschlossen; MT-69/70 bleiben `NOT TESTED`. |
 
 ## Bekannte Defekte: Root Cause und aktueller Fix
 
@@ -131,7 +132,18 @@ automatisiert geschlossen.
 - `RQ-04-01`: Cacheversionen für Room-/Shared-Assets in Sprint 27.1-B
   code-seitig vereinheitlicht.
 - `RQ-16-01`: automatisiert geschlossen; kein Room-Sonderpfad eingeführt.
-- `RQ-18-01`: vollständige aktuelle Room-Matrix inklusive Tall und
-  capabilityabhängigen Controls in das echte Browser-Gate integrieren.
+- `RQ-18-01`: in Sprint 27.1-G code-seitig geschlossen; vollständige aktuelle
+  Room-Matrix und capabilityabhängige Controls sind im echten Browser-Gate.
 - MT-69: Room Card, Collapse, Background, Größen, Alerts und Controls auf iPad.
 - MT-70: Room-Persistenz/Background/Restart auf HAOS.
+
+## Sprint-27.1-G-Re-Audit
+
+`26.1-I5` wechselt von `PARTIAL` zu `PASS`. Die zentrale Matrix verwendet den
+produktiven `RoomWidget`, alle 64 serverseitig gültigen Room-Größen, sieben
+repräsentative Zustands-/Capabilityvarianten und erreicht Compact, Standard,
+Wide, Tall und Large. Background sowie Initialzustand werden im Browser
+geprüft; Expanded-Inhalt wird als bewusst begrenzter innerer Scrollbereich
+behandelt. Der Browser-Gate bestand 1.576 Gesamtfälle ohne Befund. MT-69 und
+MT-70 bleiben unverändert `NOT TESTED`; daraus wird kein iPad-/HAOS-PASS
+abgeleitet.

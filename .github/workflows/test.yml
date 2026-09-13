@@ -27,6 +27,9 @@ jobs:
       - name: Run release test gate
         run: ./release/test-gate.sh
 
+      - name: Run real-browser card matrix gate
+        run: npm run test:card-matrix-browser
+
       - name: Check production dependency audit
         run: npm audit --omit=dev --audit-level=moderate
 

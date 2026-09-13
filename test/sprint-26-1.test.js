@@ -429,7 +429,9 @@ test("Room Card unterstützt Background, fehlenden Background und alle Präsenta
 
     assert.equal(presentation.LegacyPresentation.getMode(config, 2, 1, 180, 130, {}), "compact");
     assert.equal(presentation.LegacyPresentation.getMode(config, 3, 2, 310, 230, {}), "standard");
-    assert.equal(presentation.LegacyPresentation.getMode(config, 6, 1, 430, 140, {}), "wide");
+    assert.equal(presentation.LegacyPresentation.getMode(config, 6, 1, 430, 140, {}), "compact");
+    assert.equal(presentation.LegacyPresentation.getMode(config, 3, 2, 370, 230, {}), "wide");
+    assert.equal(presentation.LegacyPresentation.getMode(config, 3, 3, 330, 320, {}), "tall");
     assert.equal(presentation.LegacyPresentation.getMode(config, 6, 2, 500, 260, {}), "large");
 });
 

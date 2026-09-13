@@ -124,6 +124,11 @@ Sprint 27.1-F schließt weitere vier Traceability-Repairs. Auch diese waren
 keine Produktrepair-Abhängigkeiten und verändern deshalb weder Execution State
 noch Ergebnis eines manuellen Tests.
 
+Sprint 27.1-G schließt `RQ-18-01` code-seitig. Damit sind MT-09, MT-29,
+MT-63, MT-69 und MT-72 ausführbar. Ihre Ergebnisse bleiben ausdrücklich
+`NOT TESTED`; der grüne Chromium-Gate ersetzt keine physische iPad-/HAOS-
+Abnahme.
+
 | Manual Test | Execution State | Blocked By Repairs |
 |---|---|---|
 | MT-01 | CAN RUN NOW | – |
@@ -134,7 +139,7 @@ noch Ergebnis eines manuellen Tests.
 | MT-06 | CAN RUN NOW | – |
 | MT-07 | CAN RUN NOW | – |
 | MT-08 | CAN RUN NOW | – |
-| MT-09 | BLOCKED | RQ-18-01 |
+| MT-09 | CAN RUN NOW | – |
 | MT-10 | CAN RUN NOW | – |
 | MT-11 | CAN RUN NOW | – |
 | MT-12 | CAN RUN NOW | – |
@@ -154,7 +159,7 @@ noch Ergebnis eines manuellen Tests.
 | MT-26 | CAN RUN NOW | – |
 | MT-27 | CAN RUN NOW | – |
 | MT-28 | CAN RUN NOW | – |
-| MT-29 | RUN AFTER ALL VISIBLE REPAIRS | RQ-18-01 |
+| MT-29 | CAN RUN NOW | – |
 | MT-30 | CAN RUN NOW | – |
 | MT-31 | CAN RUN NOW | – |
 | MT-32 | CAN RUN NOW | – |
@@ -188,16 +193,16 @@ noch Ergebnis eines manuellen Tests.
 | MT-60 | CAN RUN NOW | – |
 | MT-61 | BLOCKED | RQ-13-01 |
 | MT-62 | BLOCKED | RQ-13-01 |
-| MT-63 | BLOCKED | RQ-18-01 |
+| MT-63 | CAN RUN NOW | – |
 | MT-64 | BLOCKED | RQ-13-01 |
 | MT-65 | BLOCKED | RQ-13-01 |
 | MT-66 | BLOCKED | RQ-13-01 |
 | MT-67 | CAN RUN NOW | – |
 | MT-68 | CAN RUN NOW | – |
-| MT-69 | BLOCKED | RQ-18-01 |
+| MT-69 | CAN RUN NOW | – |
 | MT-70 | BLOCKED | RQ-13-01 |
 | MT-71 | CAN RUN NOW | – |
-| MT-72 | BLOCKED | RQ-18-01 |
+| MT-72 | CAN RUN NOW | – |
 
 ## Detaillierte Anleitungen aus Audit Part 19
 

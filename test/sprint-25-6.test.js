@@ -61,7 +61,8 @@ function widgetContext() {
         "src/public/js/widgets/sensor.js",
         "src/public/js/widgets/binary.js",
         "src/public/js/widgets/light.js",
-        "src/public/js/widgets/climate.js"
+        "src/public/js/widgets/climate.js",
+        "src/public/js/widgets/room.js"
     ].forEach(function (fileName) {
         vm.runInContext(read(fileName), context);
     });
@@ -76,13 +77,16 @@ function configFor(entry) {
         type: entry.type,
         entity: entry.type === "binary"
             ? "binary_sensor.matrix"
-            : entry.type + ".matrix",
+            : entry.type === "room"
+                ? ""
+                : entry.type + ".matrix",
         title: entry.state.title,
         subtitle: entry.state.subtitle,
         icon: entry.type,
         iconClass: "",
         unit: entry.state.unit || "",
-        size: "normal"
+        size: "normal",
+        room: entry.type === "room" ? entry.state.room : undefined
     };
 }
 
@@ -98,6 +102,9 @@ function createWidget(context, entry) {
     }
     if (entry.type === "light") {
         return new context.LightWidget(config);
+    }
+    if (entry.type === "room") {
+        return new context.RoomWidget(config);
     }
     return new context.ClimateWidget(config);
 }
@@ -135,18 +142,19 @@ function layoutDashboard(type, profileName, item) {
 }
 
 
-test("Card Inventory enthält die vier Sprint-25.6-Renderer und die native Room Card", function () {
+test("Card Inventory entspricht vollständig der produktiven Widget-Registry", function () {
     const dashboard = read("src/public/js/core/dashboard.js");
 
     assert.deepEqual(
         DashboardConfig.SUPPORTED_WIDGET_TYPES,
-        Matrix.TYPES.concat(["room"])
+        Matrix.TYPES
     );
     assert.deepEqual(Matrix.TYPES, [
         "sensor",
         "binary",
         "light",
-        "climate"
+        "climate",
+        "room"
     ]);
     assert.match(dashboard, /config\.type === "room"/);
 
@@ -180,7 +188,8 @@ test("Size Matrix enthält jede serverseitig gültige Profilgröße", function (
         sensor: {portrait: 20, landscape: 44},
         binary: {portrait: 20, landscape: 44},
         light: {portrait: 20, landscape: 44},
-        climate: {portrait: 20, landscape: 40}
+        climate: {portrait: 20, landscape: 40},
+        room: {portrait: 20, landscape: 44}
     };
 
     Matrix.TYPES.forEach(function (type) {
@@ -211,7 +220,7 @@ test("Size Matrix enthält jede serverseitig gültige Profilgröße", function (
         });
     });
 
-    assert.equal(Matrix.cases().length, 1128);
+    assert.equal(Matrix.cases().length, 1576);
 });
 
 
@@ -269,11 +278,14 @@ test("Representative States rendern genau die erwarteten Inhalte und Controls", 
 
     Matrix.cases().forEach(function (entry) {
         const widget = createWidget(context, entry);
-        const html = widget.render(entry.state.data);
-        const identityCount =
-            (html.match(/class="title card-identity"/g) || []).length;
+        const html = entry.type === "room"
+            ? widget.render(entry.state.data, entry.state.alerts || [])
+            : widget.render(entry.state.data);
+        const identityCount = entry.type === "room"
+            ? (html.match(/class="room-title"/g) || []).length
+            : (html.match(/class="title card-identity"/g) || []).length;
         const stepCount =
-            (html.match(/class="dashboard-control dashboard-control-step climate-control"/g) || []).length;
+            (html.match(/<button[^>]*\bclimate-control\b[^>]*>/g) || []).length;
         const powerCount =
             (html.match(/<button[^>]*\bdashboard-control-power\b/g) || []).length;
 
@@ -294,7 +306,7 @@ test("Representative States rendern genau die erwarteten Inhalte und Controls", 
             assert.match(html, /class="light-state /);
             assert.equal(stepCount, 0);
             assert.equal(powerCount, 1);
-        } else {
+        } else if (entry.type === "climate") {
             const capabilities =
                 entry.state.data.gateway_capabilities || {};
 
@@ -305,6 +317,19 @@ test("Representative States rendern genau die erwarteten Inhalte und Controls", 
             assert.equal(
                 powerCount,
                 capabilities.supports_power === true ? 1 : 0
+            );
+        } else {
+            assert.match(html, /class="room-title"/);
+            assert.match(html, /class="room-primary-values"/);
+            assert.equal(
+                stepCount + powerCount,
+                Matrix.expectedControlCount(entry),
+                entry.id
+            );
+            assert.equal(
+                html.indexOf(" is-expanded") !== -1,
+                entry.state.room.defaultExpanded === true,
+                entry.id
             );
         }
     });
@@ -337,7 +362,53 @@ test("Climate Large besitzt eine eigene vollständige Grid-Presentation", functi
 });
 
 
-test("Matrix-Harness prüft Overflow, Clipping, Controls und Tier-Klassen", function () {
+test("Room-Tiers priorisieren Inhalt ohne Grid-Geometrie zu übernehmen", function () {
+    const context = widgetContext();
+    const roomState = Matrix.STATES.room[0];
+    const widget = createWidget(context, {
+        type: "room",
+        state: roomState
+    });
+    const portrait = context.LegacyPresentation.calculateGridGeometry(768, 6);
+    const landscape = context.LegacyPresentation.calculateGridGeometry(1024, 12);
+    const hints = context.LegacyPresentation.getHints(widget, roomState.data);
+    const css = read("src/public/css/style.css");
+
+    assert.equal(
+        context.LegacyPresentation.getMode(
+            widget, 12, 1,
+            12 * landscape.columnWidth - landscape.gutter,
+            landscape.rowHeight - landscape.gutter,
+            hints
+        ),
+        "compact",
+        "eine einzeilige Room Card bleibt auch bei voller Breite compact"
+    );
+    assert.equal(
+        context.LegacyPresentation.getMode(
+            widget, 3, 2,
+            3 * portrait.columnWidth - portrait.gutter,
+            2 * portrait.rowHeight - portrait.gutter,
+            hints
+        ),
+        "wide"
+    );
+    assert.match(
+        css,
+        /card-room\.card-presentation-compact \.room-primary-values\s*\{[^}]*position:\s*absolute;[^}]*bottom:\s*0;/
+    );
+    assert.match(
+        css,
+        /card-room\.card-presentation-standard \.room-target\s*\{[^}]*display:\s*none;/
+    );
+    assert.match(
+        css,
+        /card-room\.card-presentation-wide\s*\{[^}]*-webkit-flex-direction:\s*column;/
+    );
+});
+
+
+test("Matrix-Harness prüft aktuelle Renderer, Capabilities und Browser-Gate", function () {
     const harness = read(
         "test/fixtures/card-matrix-harness.js"
     );
@@ -349,9 +420,28 @@ test("Matrix-Harness prüft Overflow, Clipping, Controls und Tier-Klassen", func
     assert.match(harness, /missing-control/);
     assert.match(harness, /invalid-tier/);
     assert.match(harness, /touch-target/);
+    assert.match(harness, /expectedControlCount/);
+    assert.match(harness, /runtime-background-missing/);
+    assert.match(harness, /room-state/);
     assert.match(
         harness,
         /matrix-case grid grid-layout-active/
+    );
+    assert.match(
+        read("test/card-matrix-harness.html"),
+        /widgets\/room\.js/
+    );
+    assert.match(
+        read("package.json"),
+        /test:card-matrix-browser/
+    );
+    assert.match(
+        read(".github\/workflows\/test.yml"),
+        /npm run test:card-matrix-browser/
+    );
+    assert.match(
+        read(".github\/workflows\/release.yml"),
+        /npm run test:card-matrix-browser/
     );
 });
 

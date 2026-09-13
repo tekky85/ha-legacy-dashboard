@@ -348,11 +348,91 @@ html {
 }
 
 .card-room.card-presentation-compact .room-primary-values {
-    margin-top: 8px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 0;
 }
 
 .card-room.card-presentation-compact .room-primary strong {
     font-size: 23px;
+}
+
+.card-room.card-presentation-compact .room-primary {
+    min-width: 0;
+    max-width: 35%;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-room.card-presentation-compact .room-primary span {
+    display: none;
+}
+
+.card-room.card-presentation-compact .room-status-line,
+.card-room.card-presentation-compact .room-alerts {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    max-width: 62%;
+    margin: 0;
+}
+
+.card-room.card-presentation-compact.has-room-alerts .room-status-line {
+    display: none;
+}
+
+.card-room.card-presentation-compact .room-status,
+.card-room.card-presentation-compact .room-alert {
+    display: block;
+    max-width: 100%;
+    margin: 0;
+    padding: 4px 7px;
+    overflow: hidden;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-room.card-presentation-compact.is-expanded .room-primary-values,
+.card-room.card-presentation-compact.is-expanded .room-status-line,
+.card-room.card-presentation-compact.is-expanded .room-alerts {
+    display: none;
+}
+
+.grid.grid-layout-active .card-room.card-presentation-wide {
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+}
+
+.card-room.card-presentation-wide .room-content {
+    width: 100%;
+}
+
+.card-room.card-presentation-wide .room-primary-values {
+    margin-top: 8px;
+}
+
+.card-room.card-presentation-wide .room-primary strong {
+    font-size: 26px;
+}
+
+.card-room.card-presentation-wide .room-status-line,
+.card-room.card-presentation-wide .room-alerts {
+    margin: 0 -2px;
+}
+
+.card-room.card-presentation-wide .room-status,
+.card-room.card-presentation-wide .room-alert {
+    margin: 2px;
+    padding: 4px 7px;
 }
 
 .card-room.card-presentation-compact .room-alerts .room-alert:nth-child(n+2) {
@@ -366,6 +446,10 @@ html {
 .card-room.card-presentation-standard .room-detail-locks,
 .card-room.card-presentation-standard .room-detail-batteries,
 .card-room.card-presentation-standard .room-detail-secondary {
+    display: none;
+}
+
+.card-room.card-presentation-standard .room-target {
     display: none;
 }
 

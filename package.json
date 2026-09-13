@@ -5,6 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "test": "node --test --test-concurrency=1 test/*.test.js",
+    "test:card-matrix-browser": "node test/run-card-matrix-browser.js",
     "start": "node src/server.js"
   },
   "keywords": [],

@@ -52,6 +52,9 @@ jobs:
       - name: Run complete release test gate
         run: ./release/test-gate.sh "$GITHUB_REF_NAME"
 
+      - name: Run real-browser card matrix gate
+        run: npm run test:card-matrix-browser
+
       - name: Check production dependency audit
         run: npm audit --omit=dev --audit-level=moderate
 

@@ -271,6 +271,7 @@ RoomWidget.prototype.render = function (states, alerts, controlsDisabled) {
 
     return '<section class="card card-room ' + this.getSizeClass() +
         (expanded ? ' is-expanded' : ' is-collapsed') +
+        (roomAlerts.length ? ' has-room-alerts' : '') +
         (backgroundMarkup ? ' has-room-background' : '') + '"' +
         this.getLayoutAttribute() +
         ' data-card-density="' + (this.title.length > 24 ? "dense" : "normal") +

@@ -1,8 +1,8 @@
 # Card Type × Valid Size × Representative State Matrix
 
-Stand: 29. August 2026, Sprint 25.6
+Stand: 13. September 2026, Sprint 27.1-G
 
-Diese Matrix wird aus der tatsächlichen Dashboard-Konfiguration, den vier
+Diese Matrix wird aus der tatsächlichen Dashboard-Konfiguration, den fünf
 Wall-Display-Renderern und den serverseitigen Layoutgrenzen abgeleitet. Sie
 führt keine nur geplanten Home-Assistant-Domains als unterstützt auf.
 
@@ -12,12 +12,15 @@ führt keine nur geplanten Home-Assistant-Domains als unterstützt auf.
 | --- | --- | --- | --- | --- |
 | `sensor` | `sensor` | `SensorWidget` | Wert, Unit, Identität, Sekundärtext | keine |
 | `binary` | `binary_sensor` | `BinaryWidget` | Offen/Geschlossen/Nicht verfügbar, Identität | keine |
-| `light` | `light` | `LightWidget` | An/Aus/Nicht verfügbar, Identität | genau ein Power-Control |
-| `climate` | `climate` | `ClimateWidget` | Identität, Current, Target, HVAC/Action, Sekundärtext | Minus, Plus, Power |
+| `light` | `light` | `LightWidget` | An/Aus/Nicht verfügbar, Identität | ein Power-Control; Freigabe capabilityabhängig |
+| `climate` | `climate` | `ClimateWidget` | Identität, Current, Target, HVAC/Action, Sekundärtext | Minus/Plus bei Target-Capability, Power nur bei Power-Capability |
+| `room` | aggregierte konfigurierte Rollen | `RoomWidget` | Raumidentität, Primärwerte, Status, Alerts und Details | ausschließlich vorhandene sichere Light-/Climate-Controls |
 
 `switch`, `cover`, `fan`, `lock`, `media_player` und `vacuum` besitzen im
-aktuellen Wall-Display weder einen Renderer noch einen erlaubten
-Konfigurationstyp. Sie gehören deshalb nicht zur Abnahmematrix.
+aktuellen Wall-Display weder einen eigenständigen Renderer noch einen
+eigenständigen erlaubten Konfigurationstyp. Einige können in einer Room Card
+read-only erscheinen; sie gehören deshalb nicht als zusätzliche Card-Typen zur
+Abnahmematrix.
 
 ## Gültige Größen
 
@@ -40,8 +43,9 @@ Für alle Typen gelten:
 | `binary` | `w = 2…6` | 20 | `w = 2…12` | 44 |
 | `light` | `w = 2…6` | 20 | `w = 2…12` | 44 |
 | `climate` | `w = 2…6` | 20 | `w = 3…12` | 40 |
+| `room` | `w = 2…6` | 20 | `w = 2…12` | 44 |
 
-Damit werden 252 profilabhängige Typ-/Größenkombinationen geprüft.
+Damit werden 316 profilabhängige Typ-/Größenkombinationen geprüft.
 
 ## Repräsentative Zustände
 
@@ -53,8 +57,9 @@ Jede gültige Größe wird mit jedem Zustand ihres Typs kombiniert:
 | `binary` | `on`; `off` mit langem Namen/Sekundärtext; `unknown`; `unavailable` | 256 |
 | `light` | `on` steuerbar; `off` steuerbar und langer Name; `on` read-only; `unavailable` | 256 |
 | `climate` | Heating; Cooling mit langem Namen und Viertelgrad; negativer Dezimalwert; Off mit Power-on und °F; `unknown`; `unavailable` | 360 |
+| `room` | Collapsed/Expanded mit Background und Controls; Expanded read-only; Target ohne Power; `unavailable`/`unknown`; fehlende optionale Rollen; lange/dichte Inhalte mit Alerts | 448 |
 
-Gesamtumfang des automatisierten Matrix-Harness: 1.128 Renderfälle.
+Gesamtumfang des automatisierten Matrix-Harness: 1.576 Renderfälle.
 
 ## Presentation-Tiers
 
@@ -76,11 +81,21 @@ Zone verwendet nicht mehr `width: 100%` neben einem zweiten Flex-Kind. Minus,
 Plus und Power bleiben je mindestens ungefähr 44 × 44 Pixel; im Large-Tier
 sind sie 52 × 52 Pixel.
 
+Room verwendet dieselbe Gridgeometrie, aber eine eigene Präsentation. Eine
+einzeilige Room Card bleibt unabhängig von ihrer Breite `compact` und zeigt
+Raumidentität plus den priorisierten Primär-/Alertstatus. `standard` priorisiert
+Temperatur, Luftfeuchte und Presence/Opening statt eines umbrechenden dritten
+Zielwerts. `wide`, `tall` und `large` bleiben bewusste mehrzeilige
+Darstellungen; Expanded-Details sind innerhalb der Card scrollbar. Background,
+Collapsed/Expanded, read-only, Target-ohne-Power sowie lange Inhalte werden in
+jeder gültigen Größe gerendert.
+
 ## Automatisierte Prüfungen
 
 `test/sprint-25-6.test.js` prüft Inventory, jede gültige Servergröße, alle
-1.128 Zustandsfälle, Tier-Vollständigkeit, Identität, Primärinhalt, genaue
-Control-Anzahl, ES5, CSS-Grid-Freiheit und unveränderte Write-Grenzen.
+1.576 Zustandsfälle, Tier-Vollständigkeit je Renderer, Identität,
+Primärinhalt, capabilityabhängig genaue Control-Anzahl, ES5,
+CSS-Grid-Freiheit und unveränderte Write-Grenzen.
 
 `test/card-matrix-harness.html` rendert dieselben Fälle mit dem echten CSS und
 den echten Wall-Renderern. Der Browser-Harness misst:
@@ -92,12 +107,20 @@ den echten Wall-Renderern. Der Browser-Harness misst:
 - ungültige oder mehrere Tier-Klassen,
 - sichtbare Control-Touchziele unter ungefähr 44 × 44 Pixel.
 
+`npm run test:card-matrix-browser` startet einen lokalen statischen Testserver,
+führt den vollständigen Harness in einem installierten Chromium/Chrome aus und
+schlägt fehl, wenn nicht exakt 1.576 Fälle mit null Befunden enden. Dieser Lauf
+ist verpflichtender Bestandteil von `.github/workflows/test.yml` und
+`.github/workflows/release.yml`; das Node-Test-Gate prüft zusätzlich die
+Verkabelung beider Workflows.
+
 Optionale Filter für gezielte visuelle Prüfung:
 
 ```text
 ?type=climate
 ?type=climate&profile=portrait
 ?type=climate&profile=landscape&state=heating
+?type=room&profile=portrait&state=expanded-long-dense
 ```
 
 ## Verbindliche Realgerät-Abnahme
@@ -113,5 +136,7 @@ mini/iOS 9 bleiben mindestens zu prüfen:
 - Light Power in Compact/Wide/Large,
 - lange Sensorwerte/Units sowie Binary-Namen,
 - Rotation ohne alte Tier-Klasse,
-- Focus für alle vier Typen,
+- Room in allen fünf Tiers, Collapsed/Expanded, Background, langen Inhalten
+  und capabilityabhängigen Controls,
+- Focus für die vier Focus-fähigen Entity-Typen,
 - Light/Dark, Background-Lesbarkeit, HomeScreen und Footer.

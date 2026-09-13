@@ -15,7 +15,8 @@
         "sensor",
         "binary",
         "light",
-        "climate"
+        "climate",
+        "room"
     ];
 
     var PROFILES = {
@@ -33,8 +34,150 @@
         sensor: {portrait: 2, landscape: 2},
         binary: {portrait: 2, landscape: 2},
         light: {portrait: 2, landscape: 2},
-        climate: {portrait: 2, landscape: 3}
+        climate: {portrait: 2, landscape: 3},
+        room: {portrait: 2, landscape: 2}
     };
+
+
+    function entityState(entityId, state, attributes, capabilities) {
+        return {
+            entity_id: entityId,
+            state: state,
+            attributes: attributes || {},
+            gateway_capabilities: capabilities || {}
+        };
+    }
+
+
+    function roomScenario(options) {
+        var entities = {
+            temperature: "sensor.room_temperature",
+            humidity: "sensor.room_humidity",
+            climate: options.withClimate === false
+                ? ""
+                : "climate.room",
+            presence: options.minimal
+                ? ""
+                : "binary_sensor.room_presence",
+            windows: options.minimal
+                ? []
+                : ["binary_sensor.room_window"],
+            lights: options.withLight === false
+                ? []
+                : ["light.room"],
+            switches: options.minimal ? [] : ["switch.room"],
+            covers: options.minimal ? [] : ["cover.room"],
+            fans: options.minimal ? [] : ["fan.room"],
+            mediaPlayers: options.minimal ? [] : ["media_player.room"],
+            locks: options.minimal ? [] : ["lock.room"],
+            batteries: options.minimal ? [] : ["sensor.room_battery"],
+            alerts: options.minimal ? [] : ["binary_sensor.room_smoke"],
+            secondary: options.minimal ? [] : ["sensor.room_secondary"]
+        };
+        var data = {};
+        var climateCapabilities = options.climateCapabilities || {};
+        var lightCapabilities = options.lightCapabilities || {};
+        var background = options.background
+            ? {
+                image_url: "/assets/backgrounds/bg-0123456789abcdef0123456789abcdef.jpg",
+                position: "center center",
+                size: "cover",
+                overlay: 20
+            }
+            : null;
+
+        data[entities.temperature] = entityState(
+            entities.temperature,
+            options.temperatureState || "21.5",
+            {unit_of_measurement: options.longValues ? "Grad Celsius" : "°C"}
+        );
+        data[entities.humidity] = entityState(
+            entities.humidity,
+            options.humidityState || "48",
+            {unit_of_measurement: "%"}
+        );
+
+        if (entities.climate) {
+            data[entities.climate] = entityState(
+                entities.climate,
+                options.climateState || "heat",
+                options.climateAttributes || {
+                    current_temperature: 21.5,
+                    temperature: 22.5,
+                    min_temp: 5,
+                    max_temp: 35,
+                    target_temp_step: 0.5,
+                    hvac_action: "heating"
+                },
+                climateCapabilities
+            );
+        }
+
+        if (entities.presence) {
+            data[entities.presence] = entityState(
+                entities.presence,
+                options.presenceState || "on"
+            );
+        }
+        if (entities.windows.length) {
+            data[entities.windows[0]] = entityState(
+                entities.windows[0],
+                options.windowState || "on",
+                {friendly_name: "Terrassenfenster mit langem Namen"}
+            );
+        }
+        if (entities.lights.length) {
+            data[entities.lights[0]] = entityState(
+                entities.lights[0],
+                options.lightState || "on",
+                {friendly_name: "Deckenlicht"},
+                lightCapabilities
+            );
+        }
+
+        if (!options.minimal) {
+            data[entities.switches[0]] = entityState(
+                entities.switches[0], "on", {friendly_name: "Leselampe Schalter"}
+            );
+            data[entities.covers[0]] = entityState(entities.covers[0], "open");
+            data[entities.fans[0]] = entityState(entities.fans[0], "on");
+            data[entities.mediaPlayers[0]] = entityState(
+                entities.mediaPlayers[0], "playing"
+            );
+            data[entities.locks[0]] = entityState(entities.locks[0], "unlocked");
+            data[entities.batteries[0]] = entityState(
+                entities.batteries[0], "12", {unit_of_measurement: "%"}
+            );
+            data[entities.alerts[0]] = entityState(entities.alerts[0], "off");
+            data[entities.secondary[0]] = entityState(
+                entities.secondary[0],
+                options.longValues ? "-1234.567" : "ok",
+                {
+                    friendly_name: options.longValues
+                        ? "Sekundärer Sensor mit besonders langem Namen"
+                        : "Sekundärer Sensor",
+                    unit_of_measurement: options.longValues
+                        ? "Kilowattstunden"
+                        : ""
+                }
+            );
+        }
+
+        return {
+            id: options.id,
+            title: options.title || "Wohnzimmer",
+            subtitle: "",
+            data: data,
+            alerts: options.alerts || [],
+            room: {
+                areaId: options.areaId === false ? null : "living",
+                collapsible: true,
+                defaultExpanded: options.expanded === true,
+                background: background,
+                entities: entities
+            }
+        };
+    }
 
     var STATES = {
         sensor: [
@@ -257,8 +400,114 @@
                     gateway_capabilities: {}
                 }
             }
+        ],
+        room: [
+            roomScenario({
+                id: "collapsed-controlled-background",
+                background: true,
+                climateCapabilities: {
+                    can_set_temperature: true,
+                    supports_power: true,
+                    can_power_off: true
+                },
+                lightCapabilities: {can_light_power_off: true},
+                alerts: [{title: "Fenster offen", severity: "warning"}]
+            }),
+            roomScenario({
+                id: "expanded-controlled-background",
+                expanded: true,
+                background: true,
+                climateState: "off",
+                climateCapabilities: {
+                    can_set_temperature: true,
+                    supports_power: true,
+                    can_power_on: true
+                },
+                lightState: "off",
+                lightCapabilities: {can_light_power_on: true},
+                alerts: [{title: "Rauchwarnung", severity: "critical"}]
+            }),
+            roomScenario({
+                id: "expanded-read-only",
+                expanded: true,
+                climateCapabilities: {},
+                lightCapabilities: {}
+            }),
+            roomScenario({
+                id: "target-without-power",
+                expanded: true,
+                withLight: false,
+                climateCapabilities: {can_set_temperature: true}
+            }),
+            roomScenario({
+                id: "unavailable",
+                expanded: true,
+                temperatureState: "unavailable",
+                humidityState: "unknown",
+                climateState: "unavailable",
+                climateAttributes: {},
+                climateCapabilities: {},
+                lightState: "unavailable",
+                lightCapabilities: {}
+            }),
+            roomScenario({
+                id: "minimal-missing-optional",
+                title: "Abstellraum",
+                minimal: true,
+                withClimate: false,
+                withLight: false,
+                areaId: false
+            }),
+            roomScenario({
+                id: "expanded-long-dense",
+                title: "Wohn- und Esszimmer mit besonders langem Raumnamen",
+                expanded: true,
+                background: true,
+                longValues: true,
+                climateCapabilities: {
+                    can_set_temperature: true,
+                    supports_power: true,
+                    can_power_off: true
+                },
+                lightCapabilities: {can_light_power_off: true},
+                alerts: [
+                    {title: "Sehr langer Sicherheitshinweis", severity: "critical"},
+                    {title: "Batterie niedrig", severity: "warning"}
+                ]
+            })
         ]
     };
+
+
+    function expectedControlCount(entry) {
+        var state = entry.state;
+        var capabilities;
+        var entities;
+        var count;
+
+        if (entry.type === "light") {
+            return 1;
+        }
+        if (entry.type === "climate") {
+            capabilities = state.data.gateway_capabilities || {};
+            return 2 + (capabilities.supports_power === true ? 1 : 0);
+        }
+        if (entry.type !== "room") {
+            return 0;
+        }
+
+        entities = state.room.entities || {};
+        count = (entities.lights || []).length;
+        if (entities.climate) {
+            capabilities = state.data[entities.climate] &&
+                state.data[entities.climate].gateway_capabilities || {};
+            count += 2;
+            if (capabilities.supports_power === true) {
+                count += 1;
+            }
+        }
+        return count;
+    }
 
 
     function sizes(type, profileName) {
@@ -313,6 +562,7 @@
         MINIMUM_WIDTHS: MINIMUM_WIDTHS,
         STATES: STATES,
         sizes: sizes,
-        cases: cases
+        cases: cases,
+        expectedControlCount: expectedControlCount
     };
 }));
