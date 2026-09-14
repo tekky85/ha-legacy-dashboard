@@ -8,6 +8,45 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.4 – 2026-09-14
+
+This release candidate brings the completed Sprint 27.1 repair and audit
+hardening after RC.3 into one immutable candidate for real-device testing.
+
+### Fixed
+
+- Corrected compact Room Card content priority and clipping found by the real
+  browser card matrix.
+- Required the same immutable frontend asset generation across Dashboard,
+  System, Admin, and HomeScreen entry points.
+- Repaired backend WebSocket error-only recovery, rule-source explanations,
+  dynamic automation uncertainty, and fresh automation impact state.
+
+### Changed
+
+- Added complete requirement traceability for Summary, Errors, Registry,
+  Rules, Automation, HomeScreen, backgrounds, and release validation.
+- Expanded the executable card matrix to all five production renderers, 316
+  valid sizes, and 1,576 representative state/capability cases.
+- Rebuilt the product screenshot gallery from a controlled local instance of
+  the real application with privacy-scanned demo data.
+
+### Release hardening
+
+- Added a protected Stable approval gate tied to manual results, open P0/P1
+  repairs, source commit, image digest, and standalone checksum.
+- Added Git-based source/tag identity and immutable GitHub Release/GHCR target
+  checks so an older release version cannot silently represent newer code.
+- Added generated RC evidence binding one commit, tag, image manifest,
+  standalone checksum, and workflow run while leaving real-device results
+  explicitly `NOT TESTED`.
+
+### Security
+
+- No Home Assistant write capability or App permission was added.
+- Home Assistant, Supervisor, and Admin credentials remain backend-only;
+  release tests and artifacts contain no production secrets.
+
 ## 1.0.0-rc.3 – 2026-09-10
 
 This release candidate supersedes `1.0.0-rc.2` as the reproducible public test

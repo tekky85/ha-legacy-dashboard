@@ -5,6 +5,26 @@
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.4 – 2026-09-14
+
+This release candidate combines all completed Sprint 27.1 repair hardening
+after RC.3 for Home Assistant App and legacy wall-display validation.
+
+### Fixed
+
+- Corrected compact Room Card presentation uncovered by the real browser
+  matrix and retained shared Grid/Focus/Room capability handling.
+- Hardened backend WebSocket recovery and sanitized rule/automation diagnostic
+  freshness without changing Home Assistant write boundaries.
+
+### Release hardening
+
+- Added full multi-renderer browser coverage, source/tag identity checks,
+  immutable release targets, candidate-bound evidence, and the protected
+  Stable approval gate.
+- Preserved the minimal `homeassistant_api: true` App permission and direct LAN
+  access; no token, default Admin secret, or production data is packaged.
+
 ## 1.0.0-rc.3 – 2026-09-10
 
 This release candidate supersedes `1.0.0-rc.2` as the reproducible public test

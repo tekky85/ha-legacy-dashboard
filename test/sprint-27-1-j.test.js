@@ -91,20 +91,21 @@ test("Source-Gate erkennt release-relevante Änderungen und exakte Tag-Identitä
 });
 
 
-test("Aktueller Entwicklungsstand kann den veröffentlichten RC-Tag nicht wiederverwenden", function () {
-    const state = ReleaseSource.inspect(ROOT, CURRENT_VERSION, null);
+test("Veröffentlichter RC-Tag kann für neueren Source nicht wiederverwendet werden", function () {
+    const state = ReleaseSource.inspect(ROOT, "1.0.0-rc.3", null);
 
     assert.equal(state.expectedTag, "v1.0.0-rc.3");
     assert.notEqual(state.expectedTagCommit, state.head);
     assert.equal(state.sourceDrift, true);
     assert.ok(state.changedPaths.length > 0);
     assert.throws(function () {
-        VersionCheck.validate(
-            ROOT,
-            "v" + CURRENT_VERSION,
-            {checkSource: true}
-        );
-    }, /tag .* resolves to .* but HEAD is/);
+        ReleaseSource.assertReleaseSource(ROOT, "1.0.0-rc.3", null);
+    }, /Assign a new version before publishing/);
+
+    const current = VersionCheck.validate(ROOT, null, {checkSource: true});
+    assert.equal(current.version, CURRENT_VERSION);
+    assert.equal(current.source.expectedTagCommit, null);
+    assert.equal(current.source.previousTag, "v1.0.0-rc.3");
 });
 
 
@@ -145,7 +146,7 @@ test("RC-Nachweis bindet genau einen Commit, Tag, Digest und Bundle-Hash", funct
             path.join(output, "rc-result.json"),
             path.join(output, "rc-result.md")
         );
-    }, /tag .* resolves to .* but HEAD is/);
+    }, /tag .* (?:does not resolve|resolves to .* but HEAD is)/);
     assert.equal(fs.readdirSync(output).length, 0);
     assert.throws(function () {
         RcResult.createResult(ROOT, {
