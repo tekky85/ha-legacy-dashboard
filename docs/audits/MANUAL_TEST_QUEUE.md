@@ -136,6 +136,12 @@ nicht mehr durch `RQ-14-04` blockiert, bleiben jedoch wegen `RQ-13-01` und
 `RQ-17-01` gesperrt. Alle Ergebnisse bleiben `NOT TESTED`; MT-57 prüft später
 zusätzlich den real geschützten Environment-/Promotionslauf.
 
+Sprint 27.1-I schließt `RQ-08-02` und `RQ-08-03` automatisiert. MT-29 ist
+nicht mehr durch einen Repair blockiert und die reproduzierbare Galerie wurde
+technisch aufgenommen, format-/link-/privacy-geprüft und dokumentiert. Die in
+Schritt 10 verlangte ausdrückliche Nutzer- oder zweite Sichtprüfung wurde in
+diesem Lauf nicht vorweggenommen; das Ergebnis bleibt deshalb `NOT TESTED`.
+
 | Manual Test | Execution State | Blocked By Repairs |
 |---|---|---|
 | MT-01 | CAN RUN NOW | – |
@@ -4157,6 +4163,10 @@ Summary- und Error-Demodaten inklusive Device Group und Automation Impact.
   Mockfixture, Datenschutzprüfung und Freigabe.
 - Kontaktbogen oder PR-/Reviewansicht aller finalen Bilder; keine Secrets in
   Logs oder Anhängen.
+- Automatisierter Teilstand Sprint 27.1-I: 17 aktuelle PNG-Dateien aus dem
+  kontrollierten localhost-Real-App-Harness; Herkunft, Route und Viewport in
+  `docs/screenshots/README.md`; Format-, README-Link- und Privacy-Regression in
+  `test/sprint-27-1-i.test.js`. Ausdrückliche Nutzer-/Zweitsicht noch offen.
 
 ### Result
 

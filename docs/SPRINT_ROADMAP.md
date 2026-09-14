@@ -31,9 +31,10 @@ identischem Tar-Inhalt als Reproduzierbarkeitskandidat durch `rc.3` ersetzt.
 Er friert die
 abgeschlossenen Reparaturbatches
 27.1-A bis 27.1-D für HAOS-, Standalone-/LXC- und Legacy-iPad-Tests ein.
-Nach dieser Veröffentlichung werden die geplanten Batches 27.1-E bis 27.1-J
-fortgesetzt; der Test-Tag bleibt dabei unverändert als reproduzierbare
-Referenz erhalten. Details stehen in
+Nach dieser Veröffentlichung wurden die Batches 27.1-E bis 27.1-I
+automatisiert abgeschlossen; ihre Änderungen sind bewusst nicht in den
+unveränderten Test-Tag zurückgeschrieben worden. Als nächster Reparaturbatch
+folgt ausschließlich 27.1-J. Details zum veröffentlichten Referenzstand stehen in
 [`PUBLIC_TEST_RELEASE.md`](PUBLIC_TEST_RELEASE.md).
 
 ---
@@ -223,7 +224,7 @@ Bedeutung von „fest“:
 | 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
-| 25 | Release & Distribution | umgesetzt, RC.1 veröffentlicht |
+| 25 | Release & Distribution | umgesetzt; Public Test Release RC.3 veröffentlicht |
 | 25.1 | Pre-Release UI State & Filter Correctness | umgesetzt und auf LXC ausgerollt, reale iPad-Abnahme offen |
 | 25.2 | HomeScreen Standalone Navigation Correctness | umgesetzt und auf LXC ausgerollt, reale Geräteabnahme offen |
 | 25.3 | Dashboard Backgrounds & Full-Height Layout | umgesetzt und auf LXC ausgerollt, reale Geräteabnahme offen |
@@ -2057,12 +2058,13 @@ den letzten bestätigten Wert wieder her.
 
 # Nächster Schritt
 
-Als nächster Produktschritt bleibt eine reale iPad-/HAOS-Abnahme mit
-mindestens zwei unterschiedlichen Lights und zwei unterschiedlichen
-Thermostaten sowie der Room-Card-Größen, Hintergründe, internem Scrollen und
-Touch-Controls offen.
-Danach können weitere
-Room-Card-Komfortfunktionen auf demselben nativen Modell ergänzt werden, ohne
-Lovelace-, Custom-Card- oder generische Service-Abhängigkeiten einzuführen.
-Parallel bleiben die physischen Sprint-25.6-/25.7-/26-Abnahmen und der
-aktualisierte HAOS-RC-Lauf offen.
+Der nächste kanonische Reparaturbatch ist Sprint 27.1-J mit `RQ-13-01` und
+`RQ-17-01`: Er muss Versions-/Artefaktkohärenz und die lebende RC-Checkliste
+für exakt einen Kandidatenstand herstellen. Sprint 27.1-I hat zuvor die
+aktuelle Galerie und technische Statusquelle korrigiert; die ausdrückliche
+Nutzersichtprüfung der Bilder bleibt MT-29 `NOT TESTED`.
+
+Danach bleiben die vollständigen realen iPad-/HAOS-/LXC-Abnahmen offen,
+einschließlich mindestens zweier Lights und Thermostate sowie Room-Card-
+Größen, Hintergründe, internem Scrollen und Touch-Controls. Erst diese
+commitbezogenen Ergebnisse können das finale RC-/Stable-Gate erfüllen.

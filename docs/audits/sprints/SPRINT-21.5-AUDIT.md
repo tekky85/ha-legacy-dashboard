@@ -26,8 +26,8 @@ Der server- und clientseitig validierte `returnTo` akzeptiert nur `/` oder eine
 tatsächlich vorhandene `/d/<id>`-Route. Die durch Sprint 25.2 gehärtete aktuelle
 Navigation verwendet ausschließlich same-window/same-origin und erhält damit
 den ursprünglichen Sprint-21.5-Endzustand. Die Code-/Traceability-Befunde
-`RQ-04-01` und `RQ-11-01` sind geschlossen. `PARTIAL` beruht auf
-`RQ-08-02` und den ausstehenden realen Browser-/iPad-
+`RQ-04-01`, `RQ-11-01` und seit Sprint 27.1-I auch `RQ-08-02` sind
+geschlossen. `PARTIAL` beruht auf den ausstehenden realen Browser-/iPad-
 Abnahmen; kein neuer funktionaler oder Security-Defekt wurde gefunden.
 
 ## Requirement Matrix
@@ -87,7 +87,7 @@ Abnahmen; kein neuer funktionaler oder Security-Defekt wurde gefunden.
 | 21.5-MAN1 | iPad mini/iOS 9 HomeScreen: Health/Navi/Return in Portrait und Landscape | NOT TESTED | MT-40 | Kein physischer Test in Part 11. |
 | 21.5-MAN2 | iPad Air 2: Same-Window-Navigation und Return | NOT TESTED | MT-41 | Kein physischer Test in Part 11. |
 | 21.5-MAN3 | macOS Safari: Healthzustände, API-Ausfall und Filterunabhängigkeit | NOT TESTED | MT-42 | Kein realer Safari-Lauf in Part 11. |
-| 21.5-SHOT1 | Aktuelle echte Dashboard-/Summary-/Error-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Bilder belegen Navigation/Health des heutigen Builds nicht vollständig. |
+| 21.5-SHOT1 | Aktuelle echte Dashboard-/Summary-/Error-Screenshots | PASS | Sprint 27.1-I: Dashboard Light/Dark und Systembilder; Capture-Manifest/Test | Summary-Navigation und Health-Indikator sind im aktuellen kontrollierten Build erfasst. |
 | 21.5-DOC1 | README DE/EN, Roadmap und Projektstatus dokumentieren Navigation/Health/Return | PASS | `README.de.md`; `README.en.md`; Roadmap; Projektstatus | Fachbeschreibung ist in beiden Sprachen vorhanden. |
 | 21.5-CACHE1 | Navigation/Health und gemeinsame Styles besitzen routeübergreifend konsistente Cacheversion | PASS | Dashboard und Systemseite laden `system-navigation.js`/`style.css` mit v53; Admin/Manifest sind ebenfalls v53; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen. |
 
@@ -149,7 +149,7 @@ Systemseitenpayload und können die globale Statuspipeline nicht beeinflussen.
 
 - `RQ-04-01` – Navigation/Health-Cachepfad in Sprint 27.1-B code-seitig
   geschlossen;
-- `RQ-08-02` – veraltete Produktbilder;
+- `RQ-08-02` – in Sprint 27.1-I code-seitig geschlossen; Nutzerreview MT-29;
 - `RQ-11-01` – in Sprint 27.1-F code-seitig geschlossen; reale Abnahmen
   bleiben `NOT TESTED`.
 
@@ -162,8 +162,9 @@ Browser-WebSocket oder HA-Write wurde hinzugefügt.
 
 ## Remaining Sprint 21.5 Gaps
 
-Keine bestätigte fachliche Laufzeitlücke. Vor RC sind `RQ-08-02` sowie die
-realen MT-40 bis MT-42 abzuschließen; `RQ-11-01` ist code-seitig geschlossen.
+Keine bestätigte fachliche Laufzeitlücke. Vor RC sind MT-29 und die realen
+MT-40 bis MT-42 abzuschließen; `RQ-08-02` und `RQ-11-01` sind code-seitig
+geschlossen.
 
 ## Sprint-27.1-F-Re-Audit
 

@@ -72,8 +72,8 @@ wurde gefunden.
 | 21-MAN1 | Reale Registry-/Diagnose-/Partial-Failure-Abnahme im modernen Safari/LXC | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-30 | Kein reales HA kontaktiert. |
 | 21-MAN2 | Reale Zielgeräteabnahme mit Enrichment und Metadatenfehlern | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-32 | Kein physischer iPad-Lauf in Part 09. |
 | 21-CACHE2 | Geänderte System-/Shared-Assets haben konsistente Cacheversion | PASS | Dashboard, Systemseite, Admin und Manifest referenzieren v53; `test/asset-version.test.js`; immutable Auslieferung bleibt unverändert. | RQ-04-01 bleibt code-seitig geschlossen. |
-| 21-SHOT1 | Error/Summary/Admin-Diagnose-Screenshots geprüft/aktualisiert | PARTIAL | D1-Audit und `RQ-08-02` | Vorhandene System-/Adminbilder sind nach späteren sichtbaren Sprints nicht belastbar aktuell. |
-| 21-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Architektur | PASS | README DE/EN Registry-/Diagnoseabschnitte; Roadmap; Projektstatus Sprint-21-Abschnitt | README-Sprachen sind inhaltlich parallel; der globale Statuskopf ist separat in `RQ-08-03` veraltet. |
+| 21-SHOT1 | Error/Summary/Admin-Diagnose-Screenshots geprüft/aktualisiert | PASS | Sprint 27.1-I: `system/{summary,errors}.png`, `admin/system-diagnostics.png`; Capture-Manifest/Test | Aktuelle Real-App-Mock-Aufnahmen zeigen die heutigen normalisierten Ansichten; Nutzerfreigabe bleibt separat MT-29. |
+| 21-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Architektur | PASS | README DE/EN Registry-/Diagnoseabschnitte; Roadmap; Projektstatus Sprint-21-Abschnitt | README-Sprachen sind inhaltlich parallel; globaler Statuskopf seit Sprint 27.1-I aktuell. |
 
 ## WebSocket Error-only Reproduction
 
@@ -150,8 +150,8 @@ vollständig; dies war kein Produktfehler.
 
 ## Findings
 
-- `PARTIAL`: `RQ-08-02`; `RQ-09-02`, `RQ-04-01` und `RQ-09-01` sind
-  code-seitig geschlossen.
+- `PARTIAL`: ausschließlich reale Safari-/HA-/iPad-Abnahmen; `RQ-08-02`,
+  `RQ-09-02`, `RQ-04-01` und `RQ-09-01` sind code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: keine bestätigte fachliche oder sicherheitsrelevante Funktion.
 - `NOT TESTED`: MT-30 und MT-32; echte HAOS-Laufzeit bleibt dem Sprint-24-Audit
@@ -160,8 +160,8 @@ vollständig; dies war kein Produktfehler.
 ## Final Assessment
 
 Sprint 21 ist als read-only Registry-/Diagnoseanreicherung fachlich und
-sicherheitsseitig implementiert. Für `COMPLETE` fehlen aktuelle Produktbilder
-sowie reale Safari-/HA-/iPad-Abnahmen.
+sicherheitsseitig implementiert. Für `COMPLETE` fehlen nur reale
+Safari-/HA-/iPad-Abnahmen.
 
 ## Sprint-27.1-C-Re-Audit
 

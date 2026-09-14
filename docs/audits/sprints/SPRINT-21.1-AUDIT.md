@@ -24,9 +24,9 @@ eingeklappte Childdetails mit ES5-`onclick` und ARIA-Zustand.
 Spätere Sprints haben die einfache Kategorienavigation bewusst in getrennte
 Severity-/State-Filter und das Zwei-Spalten-Ziel in persistente 1/2/3-Spalten-
 Ansichten weiterentwickelt. Der ursprüngliche Endzustand bleibt erfüllt. Der
-Sprint bleibt dennoch `PARTIAL`, weil reale Safari-/iPad-Abnahmen, die
-vollständig explizite 77-Punkte-Testmatrix, konsistente immutable
-Cacheversionen und ein aktueller Error-Screenshot fehlen. Kein fehlerhaftes
+Sprint bleibt dennoch `PARTIAL`, weil reale Safari-/iPad-Abnahmen ausstehen.
+Testmatrix, immutable Cacheversionen und aktueller Error-Screenshot sind durch
+Sprint 27.1-E/B/I geschlossen. Kein fehlerhaftes
 Cross-Device-Grouping und keine Write-Erweiterung wurde gefunden.
 
 ## Requirement Matrix
@@ -68,7 +68,7 @@ Cross-Device-Grouping und keine Write-Erweiterung wurde gefunden.
 | 21.1-MAN1 | Moderne Safari-Abnahme von Gruppen, Filtern, Details und Layout | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-31 | Kein realer Safari-Lauf in Part 09. |
 | 21.1-MAN2 | iPad mini/iOS 9 Portrait/Landscape/HomeScreen | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-32 | Kein physischer Zielgerätetest. |
 | 21.1-CACHE2 | Systemassets besitzen konsistente Cacheversion | PASS | Systemseite, Dashboard, Admin und Manifest verwenden v53; `test/asset-version.test.js`. | RQ-04-01 code-seitig geschlossen. |
-| 21.1-SHOT1 | Stark geändertes Error Dashboard besitzt aktuellen echten Screenshot | PARTIAL | D1-Audit; `RQ-08-02`; MT-29 | Vorhandene Error-Aufnahme ist formatseitig falsch benannt und nach späteren Änderungen nicht belastbar. |
+| 21.1-SHOT1 | Stark geändertes Error Dashboard besitzt aktuellen echten Screenshot | PASS | Sprint 27.1-I: `system/errors.png`; PNG-/Capture-Regression | Aktuelle Device Groups und Filter sind im kontrollierten Real-App-Mock erfasst; MT-29 bleibt nur für Nutzerfreigabe. |
 | 21.1-DOC1 | Device Groups, Filter, Spalten, Standalone und Details dokumentiert | PASS | README DE/EN, Projektstatus, Roadmap | Spätere Filter-/Spaltensemantik ist als aktuelle Wahrheit dokumentiert. |
 
 ## Grouping and Missing-Metadata Audit
@@ -144,7 +144,8 @@ noch den globalen Health-Status oder Write Grants.
 
 ## Findings
 
-- `PARTIAL`: `RQ-08-02`; `RQ-09-02` und `RQ-04-01` sind code-seitig geschlossen.
+- `PARTIAL`: ausschließlich reale Browser-/iPad-Abnahmen; `RQ-08-02`,
+  `RQ-09-02` und `RQ-04-01` sind code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: keine fachliche Gruppierungs-/Navigationsfunktion bestätigt.
 - `NOT TESTED`: MT-31 und MT-32.
@@ -152,8 +153,8 @@ noch den globalen Health-Status oder Write Grants.
 ## Final Assessment
 
 Sprint 21.1 ist fachlich, architektonisch und sicherheitsseitig vorhanden.
-Für `COMPLETE` fehlen aktuelle echte Screenshots sowie dokumentierte moderne
-Safari- und reale iPad-mini-/iOS-9-Abnahmen.
+Für `COMPLETE` fehlen dokumentierte moderne Safari- und reale
+iPad-mini-/iOS-9-Abnahmen.
 
 ## Sprint-27.1-E-Re-Audit
 

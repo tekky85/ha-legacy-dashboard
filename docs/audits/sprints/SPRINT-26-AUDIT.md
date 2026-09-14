@@ -99,3 +99,12 @@ Control-Berechtigung.
   Legacy-Routen konsistent als v52 versioniert.
 - MT-67: physische Section-Darstellung, Rotation und Reload auf iPad mini.
 - MT-68: vollständiges Section-CRUD samt Persistenz auf Admin/Standalone.
+
+## Sprint-27.1-I-Re-Audit
+
+Die sichtbare Wartungsanforderung ist nun erfüllt: Die kontrollierte aktuelle
+Galerie enthält `dashboards/sections-room-card.png` und
+`admin/sections.png`. Beide stammen aus den unveränderten produktiven
+Frontenddateien; Capture-Manifest und PNG-/Link-/Privacy-Test dokumentieren
+Herkunft und Integrität. MT-67/68 bleiben für die physische iPad-/LXC-Abnahme
+`NOT TESTED`; die Sprintgesamtbewertung bleibt deshalb `PARTIAL`.

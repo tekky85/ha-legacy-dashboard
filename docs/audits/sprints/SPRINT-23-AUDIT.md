@@ -27,8 +27,9 @@ Referenzen erscheinen nun als begrenzter, sanitizierter und ausdrücklich
 kausalitätsfreier globaler `unknown`-Kontext (`RQ-12-02`). Außerdem werden die
 Reference-Indizes bei jedem Snapshot aus frischem Inventory und gecachten
 Referenzen neu aufgebaut, sodass State, Disabled-Kontext, Name und
-`lastTriggered` nicht mehr bis zum 60-s-TTL veralten (`RQ-12-03`). Der Sprint
-bleibt wegen Testmatrix-, Screenshot- und manuellen Abnahmelücken `PARTIAL`.
+`lastTriggered` nicht mehr bis zum 60-s-TTL veralten (`RQ-12-03`). Testmatrix
+und Screenshotlücke sind seit Sprint 27.1-F/I geschlossen. Der Sprint bleibt
+wegen manueller Abnahmelücken `PARTIAL`.
 
 ## Requirement Matrix
 
@@ -100,7 +101,7 @@ bleibt wegen Testmatrix-, Screenshot- und manuellen Abnahmelücken `PARTIAL`.
 | 23-MAN2 | Advanced Diagnostics/Impact im aktuellen macOS Safari | NOT TESTED | MT-47 | Kein realer Safari-Lauf. |
 | 23-MAN3 | Impact/Diagnostics auf iPad mini/iOS 9 | NOT TESTED | MT-48 | Keine physische Geräteprüfung. |
 | 23-MAN4 | Nichtregression auf iPad Air 2/iPadOS 15.8.5 | NOT TESTED | MT-49 | Keine physische Geräteprüfung. |
-| 23-SHOT1 | Aktuelle echte Errors-Impact-/Admin-Diagnostics-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vier Systembilder haben falsches Dateiformat; UI-Stand ist nicht belastbar aktuell. |
+| 23-SHOT1 | Aktuelle echte Errors-Impact-/Admin-Diagnostics-Screenshots | PASS | Sprint 27.1-I: `errors-automation-impact.png`, `admin/system-diagnostics.png`; PNG-/Capture-Test | Automation Impact, Details und Advanced Diagnostics sind im aktuellen Real-App-Mock als echte PNGs erfasst. |
 | 23-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Read-only-Impact/Traces | PASS | README DE/EN; Projektstatus; Roadmap | Keine Automation-Write-Funktion versprochen. |
 | 23-CACHE4 | Gemeinsame Wall-Assets besitzen routeübergreifend gleiche Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v53; `test/asset-version.test.js`. | RQ-04-01 bleibt code-seitig geschlossen. |
 
@@ -165,8 +166,8 @@ Nachweis einem konkreten Issue als Ursache oder Impact zugeordnet.
 - `RQ-12-03` – in Sprint 27.1-C code-seitig geschlossen;
 - `RQ-12-04` – in Sprint 27.1-F code-seitig geschlossen;
 - `RQ-09-01` – in Sprint 27.1-C code-seitig geschlossen;
-- `RQ-08-02` und `RQ-08-03` bleiben anwendbar; `RQ-04-01` ist code-seitig
-  geschlossen.
+- `RQ-08-02`, `RQ-08-03` und `RQ-04-01` sind code-seitig geschlossen;
+  Nutzerreview MT-29 bleibt `NOT TESTED`.
 
 ## Security and Deployment Review
 
@@ -179,7 +180,7 @@ Part 13 bzw. MT-46.
 
 ## Remaining Sprint 23 Gaps
 
-Vor `COMPLETE` sind `RQ-08-02` sowie MT-46 bis MT-49 zu schließen;
+Vor `COMPLETE` sind MT-29 sowie MT-46 bis MT-49 abzuschließen;
 `RQ-04-01`, `RQ-09-01` und `RQ-12-02` bis `RQ-12-04` sind code-seitig
 geschlossen.
 

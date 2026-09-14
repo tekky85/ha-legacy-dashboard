@@ -25,8 +25,8 @@ zeigen die dominante Gesamtzahl nur einmal.
 
 Der fachliche Endzustand ist vorhanden. Sprint 27.1-F schließt die
 75-Punkte-Testtraceability aus `RQ-11-01`; auch `RQ-04-01` ist code-seitig
-geschlossen. `PARTIAL` bleibt wegen veralteter Screenshots (`RQ-08-02`) und
-noch ausstehender realer Safari-/Tablet-/iPad-Abnahmen. Kein neuer fachlicher
+geschlossen. Sprint 27.1-I schließt die Screenshotlücke (`RQ-08-02`).
+`PARTIAL` bleibt wegen noch ausstehender realer Safari-/Tablet-/iPad-Abnahmen. Kein neuer fachlicher
 Laufzeit- oder Sicherheitsdefekt wurde gefunden.
 
 ## Requirement Matrix
@@ -83,7 +83,7 @@ Laufzeit- oder Sicherheitsdefekt wurde gefunden.
 | 21.4-MAN1 | Entity Rule Manager im aktuellen Desktop-Safari | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-37 | Kein realer Safari-Lauf in Part 11. |
 | 21.4-MAN2 | Entity Rule Manager auf modernem Touch-Tablet | NOT TESTED | MT-38 | Kein physischer Tablet-Test in Part 11. |
 | 21.4-MAN3 | Summary-/Error-Header auf iPad mini/iOS 9 | NOT TESTED | MT-39 | Kein physischer Legacy-Gerätetest. |
-| 21.4-SHOT1 | Aktuelle echte Admin-/Summary-/Error-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Aufnahmen belegen den heutigen Entity-Rule-/Headerstand nicht zuverlässig. |
+| 21.4-SHOT1 | Aktuelle echte Admin-/Summary-/Error-Screenshots | PASS | Sprint 27.1-I: `admin/entity-rules.png`, `system/{summary,errors}.png`; Capture-Manifest/Test | Entity Rule Manager und vereinfachte Header sind aktuell erfasst. |
 | 21.4-DOC1 | README DE/EN, Roadmap und Projektstatus dokumentieren die Funktion | PASS | `README.de.md`; `README.en.md`; `docs/SPRINT_ROADMAP.md`; `docs/PROJECT_STATUS.md` | Die Sprint-21.4-Fachbeschreibung ist semantisch vorhanden. |
 | 21.4-CACHE1 | Geänderte gemeinsam genutzte Assets besitzen eine konsistente Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v53; `test/asset-version.test.js`; immutable Static Cache unverändert. | RQ-04-01 code-seitig geschlossen. |
 
@@ -133,7 +133,7 @@ Autorisierung und löst beim Suchen oder Umschalten keinen HA-Aufruf aus.
 ## Repair Mapping
 
 - `RQ-04-01` – in Sprint 27.1-B code-seitig geschlossen;
-- `RQ-08-02` – veraltete bzw. formatinkonsistente Produktbilder;
+- `RQ-08-02` – in Sprint 27.1-I code-seitig geschlossen; Nutzerreview MT-29;
 - `RQ-11-01` – in Sprint 27.1-F code-seitig geschlossen; reale Abnahmen
   bleiben `NOT TESTED`.
 
@@ -148,8 +148,8 @@ Lauf ist nicht Teil dieses Parts.
 ## Remaining Sprint 21.4 Gaps
 
 Keine bestätigte fachliche Laufzeitlücke. Vor einer finalen RC-Freigabe sind
-`RQ-08-02` sowie MT-37 bis MT-39 abzuarbeiten; `RQ-11-01` und `RQ-04-01` sind
-code-seitig geschlossen.
+MT-29 und MT-37 bis MT-39 auszuführen; `RQ-08-02`, `RQ-11-01` und
+`RQ-04-01` sind code-seitig geschlossen.
 
 ## Sprint-27.1-F-Re-Audit
 

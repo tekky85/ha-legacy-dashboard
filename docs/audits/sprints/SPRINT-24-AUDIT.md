@@ -97,7 +97,7 @@ deshalb ausdrücklich `NOT TESTED`.
 | 24-VERSION-02 | Immutable Version bezeichnet genau den aktuellen App-Inhalt | BROKEN | Der reine Stringcheck erkennt keine laufzeitrelevanten Änderungen nach dem Tag. Aktuelle Quellen und veröffentlichtes RC.1-Image divergieren; `RQ-13-01`. |
 | 24-DOC-01 | App- und Standalone-Installation dokumentiert | PASS | `README.de.md`, `README.en.md`, `docs/DEPLOYMENT.md`, App-`DOCS.md` und App-`README.md`; beide Betriebsarten klar getrennt. |
 | 24-DOC-02 | Lokale App-Installation baut tatsächlich den aktuellen lokalen Kontext | PASS | `docs/DEPLOYMENT.md` trennt lokalen Quellbuild ohne `image:` vom unveränderten Produktionspaket mit GHCR-Image; Tar-/Metadatenregression in `test/sprint-24.test.js`. |
-| 24-DOC-03 | Technische Statusdokumentation entspricht der aktuellen Struktur | PARTIAL | `PROJECT_STATUS.md` nennt noch `build.yaml`, obwohl Sprint 25 es entfernte; bestehender Befund `RQ-08-03` erhält Part-13-Evidenz. |
+| 24-DOC-03 | Technische Statusdokumentation entspricht der aktuellen Struktur | PASS | Sprint 27.1-I: aktueller App-Inhalt und Dockerfile-/BuildKit-Pfad sind dokumentiert; die historische Sprint-24-`build.yaml` ist eindeutig als später entfernt gekennzeichnet. |
 | 24-LEGACY-01 | Wall-Display bleibt ES5/iOS-9-kompatibel | PASS | App verwendet denselben Wall-Build; Legacy-Suite und statischer Scan grün, kein CSS Grid/Flex-gap oder verbotene moderne Syntax. |
 | 24-LEGACY-02 | Reale iPad-mini-Abnahme über App-Direktport | NOT TESTED | Historisch waren Default/Custom sowie Light/Climate-Grundsteuerung erreichbar; vollständige aktuelle Route-/HomeScreen-Abnahme siehe `MT-54`. |
 | 24-REG-01 | Sprint-21-/21.x-Funktionen bleiben erhalten | PASS | Part-09 bis Part-11 sowie Part-13-Fokuslauf grün; keine App-spezifische Browserabweichung. |
@@ -203,8 +203,8 @@ Repositoryinhalt hochgerechnet. Neu beziehungsweise weiterhin offen sind:
 - **RQ-04-01 (CODE CLOSED / MANUAL PENDING, P1):** App und Standalone
   referenzieren aktuell denselben v53-Assetstand; reale HAOS-/Clientabnahme
   bleibt offen.
-- **RQ-08-03 (BROKEN, P2):** `PROJECT_STATUS.md` beschreibt noch die entfernte
-  `build.yaml`-Struktur.
+- **RQ-08-03:** in Sprint 27.1-I geschlossen; der aktuelle Paketstand ohne
+  `build.yaml` und der historische Sprint-24-Zwischenstand sind klar getrennt.
 - **RQ-12-01 bis RQ-12-03:** in Sprint 27.1-C code-seitig geschlossen;
   **RQ-12-04** bleibt für die vollständige Testmatrix offen.
 

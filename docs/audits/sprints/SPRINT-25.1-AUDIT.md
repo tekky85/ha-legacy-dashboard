@@ -90,8 +90,8 @@ Abnahme steht aus.
 | 25.1-MAN-02 | Exakte Filter und Device Groups auf iPad mini vollständig abgenommen | NOT TESTED | MT-34; vollständige Schritte und Expected/Fail-Kriterien vorhanden. |
 | 25.1-MAN-03 | HomeScreen-Health-/Return-Nichtregression auf iPad mini | NOT TESTED | MT-40. |
 | 25.1-MAN-04 | Aktuelles macOS Safari: Theme, Filter und Failure-Fallback | NOT TESTED | MT-42. |
-| 25.1-DOC-01 | README DE/EN und technische Statusdokumentation beschreiben den Endzustand | PASS | Synchronisierte Theme-/Filterbeschreibung in README DE/EN; Sprintabschnitt in Roadmap/Projektstatus vorhanden. Allgemeiner Status-Drift bleibt separat `RQ-08-03`. |
-| 25.1-SHOT-01 | Sichtbarer Endzustand mit aktuellen echten Produktbildern belegt | PARTIAL | D1-Galerie existiert, ist laut Part-08-Audit jedoch teilweise veraltet; `RQ-08-02`/MT-29. |
+| 25.1-DOC-01 | README DE/EN und technische Statusdokumentation beschreiben den Endzustand | PASS | Synchronisierte Theme-/Filterbeschreibung in README DE/EN; aktueller Roadmap-/Projektstatus seit Sprint 27.1-I. |
+| 25.1-SHOT-01 | Sichtbarer Endzustand mit aktuellen echten Produktbildern belegt | PASS | Sprint 27.1-I: Light/Dark, Summary und exakte Error-Ansichten; Capture-Manifest/Test | Aktueller Theme-/Systemzustand ist reproduzierbar erfasst; physische iPad-Abnahme bleibt separat. |
 
 ## Theme- und Filterarchitektur
 
@@ -139,7 +139,7 @@ ungefiltertes Error-Payload
 - MT-40: Theme/Health/Return im HomeScreen;
 - MT-42: Desktop-Safari, Failure-Fallback und Langzeitlauf;
 - `RQ-04-01`: in Sprint 27.1-B code-seitig geschlossen;
-- `RQ-08-02`: veraltete Produktbilder;
+- `RQ-08-02`: in Sprint 27.1-I code-seitig geschlossen; Nutzerreview MT-29;
 - `RQ-15-01`: in Sprint 27.1-F code-seitig geschlossen; reale Gates bleiben
   `NOT TESTED`.
 

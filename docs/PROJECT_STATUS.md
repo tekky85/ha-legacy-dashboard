@@ -1,6 +1,6 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 13. September 2026. Sprint 27.2 hat den Stand nach Batch 27.1-D als
+Stand: 14. September 2026. Sprint 27.2 hat den Stand nach Batch 27.1-D als
 `1.0.0-rc.3` Public Test Release veröffentlicht. `1.0.0-rc.2` wurde zuvor mit
 erfolgreichem GitHub-Workflow, Multi-Arch-Image und Standalone-Artefakt
 veröffentlicht. Eine
@@ -30,6 +30,10 @@ aktuelle Card-/Room-/Capability-Matrix `RQ-18-01` und band den real
 ausgeführten Browser-Harness als Test-/Release-Gate ein. Sprint 27.1-H schloss
 auf Basis `a70cc96` das commitbezogene Stable-Approval-/Blocker-Gate
 `RQ-14-04` und die vollständige 60-Punkte-Release-Traceability `RQ-14-03`.
+Sprint 27.1-I hat auf Basis `f406bf7` die aktuelle Produktgalerie
+reproduzierbar aus der unveränderten Anwendung und ausschließlich lokalen
+Demo-Payloads neu aufgenommen (`RQ-08-02`) und diesen technischen Status gegen
+Schema, App-Paket und Auditindex berichtigt (`RQ-08-03`).
 Reale iPad-/HomeScreen-/
 Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate
 bleiben offen.
@@ -63,15 +67,18 @@ Status:
   **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-G / RQ-18-01: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-H / RQ-14-04, RQ-14-03: **COMPLETE – MANUAL PENDING**
+- Sprint-27.1-I / RQ-08-02, RQ-08-03: **COMPLETE – SCREENSHOT REVIEW PENDING**
 - Sprint 27.2 / Public Test Release 1.0.0-rc.3:
   **COMPLETE – PUBLIC TESTS PENDING**
 - Manuelle Abnahme: **PENDING**
 - Finales RC-Gate: **PENDING**
 
-Diese kompakte Aktualisierung schließt nicht den separaten Befund
-`RQ-08-03`: Der umfangreiche historische Technikbericht muss nach den
-Reparaturen noch vollständig gegen Schema, Verpackung und finalen RC-Stand
-abgeglichen werden.
+Aktuelle Konfigurationsschema-Version: `12`. Das Home-Assistant-App-Paket
+besteht aktuell aus `config.yaml`, `Dockerfile`, `run.sh`, Dokumentation,
+Übersetzungen und Bildressourcen; die frühere `build.yaml` wurde in Sprint 25
+zugunsten des Dockerfile-/BuildKit-Pfads entfernt. Der veröffentlichte
+Public-Test-Stand bleibt unverändert `v1.0.0-rc.3`; die späteren Batches
+27.1-E bis 27.1-I sind noch nicht Bestandteil dieses Tags.
 
 ### Sprint 27.1-A – Upload Integrity
 
@@ -194,6 +201,34 @@ Syntax-, Versions-, Secret- und Produktionsdependency-Gates sind grün.
 Public Test Release `v1.0.0-rc.3` wurde nicht verändert. Nächster kanonischer
 Batch ist 27.1-I (`RQ-08-02`, `RQ-08-03`).
 
+### Sprint 27.1-I – Screenshot- und Statusabgleich
+
+Die 17 README-Produktbilder stammen nun aus einem reproduzierbaren lokalen
+Browserlauf der unveränderten produktiven Frontenddateien. Ein kontrollierter
+localhost-Mock liefert ausschließlich normalisierte Demo-Payloads und Fake-
+Credentials; weder Produktions-`.env` noch ein reales Home Assistant werden
+verwendet. Dashboard, Dark/Light, Background, Compact, Focus, Sections, Room
+Card, Admin-Editoren, Entity Rules, Diagnostic Sources, Summary, Errors und
+Automation Diagnostics sind abgedeckt. Dateiendung und Inhalt sind überall
+PNG. Herkunft, Route, Viewport und Datenschutzprüfung stehen in
+`docs/screenshots/README.md`; `npm run docs:screenshots` wiederholt die
+Aufnahme. Die ausdrückliche Nutzer-/Zweitsichtprüfung bleibt MT-29
+`NOT TESTED`, daher ist `RQ-08-02` **CODE CLOSED / MANUAL PENDING**.
+
+Dieser Bericht nennt jetzt den vollständigen Audit Parts 01–19, Schema 12,
+die aktuelle Dockerfile-/BuildKit-Verpackung ohne `build.yaml`, das
+unveränderte Public Test Release `v1.0.0-rc.3` und die Reparaturbatches A bis
+I. Historische Sprintabschnitte bleiben als zeitgebundene Nachweise erhalten;
+abweichende frühere Testzahlen und Paketentscheidungen sind nicht als aktueller
+Stand zu lesen. `RQ-08-03` ist **CLOSED**. Sprint 27.1-J und das finale
+commit-/artefaktbezogene RC-Gate wurden nicht begonnen.
+
+Der 27.1-I-Fokuslauf bestand 4/4, die vollständige Suite 389/389 und das
+unveränderte Card-/Room-Browser-Gate 1.576/1.576 Fälle. Beide geänderten
+JavaScript-Test-/Capturedateien bestanden `node --check`. Es wurden keine
+Produktionsdienste, Tokens, Tags, Images oder Releaseartefakte verwendet oder
+verändert.
+
 ### Sprint 27.2 – Public Test Release 1.0.0-rc.3
 
 Der veröffentlichte Kandidat bündelt die automatisiert abgeschlossenen
@@ -249,6 +284,9 @@ Container-Smoke-Test erfolgreich ausgeführt.
 ## 1. Branch, Ausgangscommit und Arbeitsbaum
 
 - Branch: `main`
+- Sprint-27.1-I-Ausgangscommit: `f406bf7`
+- Public-Test-Tag: `v1.0.0-rc.3` auf
+  `771683b804f0b7c684eb3d457b58fb579a3ccdb6` (von Batch I unverändert)
 - Sprint-26.1-Re-Audit-Ausgangscommit: `2097af2`
 - Sprint-26.2-Ausgangscommit: `7bc0abc`
 - Sprint-26.1-Implementierungscommit: `8789ee3`
@@ -366,7 +404,7 @@ die Spezifikation geprüft, korrigiert und vervollständigt.
 | 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
-| 25 | Release & Distribution | umgesetzt, RC.1 veröffentlicht |
+| 25 | Release & Distribution | umgesetzt; Public Test Release RC.3 veröffentlicht |
 | 25.1 | Pre-Release UI State & Filter Correctness | implementiert, gepusht und auf LXC ausgerollt; iPad-Abnahme offen |
 | 25.2 | HomeScreen Standalone Navigation Correctness | implementiert, gepusht und auf LXC ausgerollt; Geräteabnahme offen |
 | 25.3 | Dashboard Backgrounds & Full-Height Layout | implementiert, gepusht und auf LXC ausgerollt; Geräteabnahme offen |
@@ -510,7 +548,7 @@ Nach Recovery ersetzt ein frischer Snapshot die veralteten Daten.
 
 ## 6. Persistente Konfiguration
 
-Die Konfiguration verwendet Schema 11. Zusätzlich zu
+Die Konfiguration verwendet Schema 12. Zusätzlich zu
 `defaultDashboardId` und `dashboards` enthält sie:
 
 ```json
@@ -538,10 +576,12 @@ Die Konfiguration verwendet Schema 11. Zusätzlich zu
 ```
 
 Jeder Eintrag unter `dashboards` ergänzt `showTitle`, `background` und
-`sections`; Widgets besitzen optional `sectionId`. Native Room Cards ergänzen
-Schema 11 mit einer eigenen `room`-Konfiguration. Details zu Abschnitten und
-Room Cards stehen in den Abschnitten 27 und 28. Schema 1 bis 10 werden
-automatisch und atomar auf Schema 11 migriert. Bei Schema
+`sections`; Widgets besitzen optional `sectionId`. Native Room Cards ergänzten
+Schema 11 mit einer eigenen `room`-Konfiguration. Schema 12 trennt sichtbare
+Control-Hinweise von den serverseitigen Grants und leitet die aktuellen
+Light-/Climate-Capabilities zentral ab. Details zu Abschnitten, Room Cards und
+Controls stehen in den Abschnitten 27 bis 29. Schema 1 bis 11 werden
+automatisch und atomar auf Schema 12 migriert. Bei Schema
 4 bleiben die 6/12-Spalten-Layouts unverändert. Bei Schema 5 bleiben Summary
 und Layouts unverändert und die leeren Error-Standardwerte werden ergänzt.
 Vollständige Validierung, atomarer
@@ -1517,12 +1557,15 @@ App-Option und wird dort nicht benötigt. REST und WebSocket nutzen dieselbe
 Auflösung, während sämtliche Browser-Routen und Payloads unverändert bleiben.
 Der Admin-Token wird nun auch gegen den `SUPERVISOR_TOKEN` abgegrenzt.
 
-Das Paket liegt direkt unter `ha_legacy_dashboard/` und enthält
-`config.yaml`, `build.yaml`, `Dockerfile`, `run.sh`, README, DOCS, Changelog,
-Übersetzungen und echte bestehende Projekt-Icons. `repository.yaml` liegt am
-Repository-Root. Der Quellcode wird nicht dupliziert; für lokale HA-OS-Tests
-erzeugt `deploy/prepare-home-assistant-app.sh` einen selbständigen, nicht
-versionierten Build-Kontext.
+Das Paket lag im damaligen Sprint-24-Zwischenstand direkt unter
+`ha_legacy_dashboard/` und enthielt zunächst auch eine `build.yaml`. Sprint 25
+hat diesen historischen Builderpfad anschließend bewusst entfernt. Der
+aktuelle Paketquellstand enthält `config.yaml`, `Dockerfile`, `run.sh`, README,
+DOCS, Changelog, Übersetzungen und echte bestehende Projekt-Icons;
+`repository.yaml` liegt am Repository-Root. Der Quellcode wird nicht
+dupliziert; für lokale HAOS-Tests erzeugt
+`deploy/prepare-home-assistant-app.sh` einen selbständigen, nicht versionierten
+Build-Kontext.
 
 `config.yaml` deklariert `amd64` und `aarch64`, einen konfigurierbaren
 `3000/tcp`-Host-Port, direkte `webui`, Prozess-Watchdog, Cold Backup,

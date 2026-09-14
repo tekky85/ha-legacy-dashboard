@@ -1046,6 +1046,41 @@ nicht, dass das Projekt RC-ready ist.
   kanonischer Batch ist 27.1-I (`RQ-08-02`, `RQ-08-03`); er wurde nicht
   begonnen.
 
+## Sprint 27.1 – Repair Batch I
+
+- Status: **COMPLETE – AUTOMATED GATE PASS / SCREENSHOT REVIEW PENDING**
+- Basiscommit: `f406bf7`
+- Repairs: `RQ-08-02`, `RQ-08-03`
+- Root Cause RQ-08-02: Nach sichtbaren Sprints wurde die D1-Galerie nicht
+  durchgängig neu aufgenommen; mehrere Bilder zeigten alte UI und vier als
+  `.png` benannte Dateien enthielten JPEG-Daten. Sections und Room Card
+  fehlten vollständig.
+- Implementierung RQ-08-02: `npm run docs:screenshots` rendert 17 aktuelle
+  Ansichten aus den unveränderten produktiven Frontenddateien gegen einen
+  kontrollierten localhost-Mock mit Demo-Payloads und Fake-Credentials.
+  `docs/screenshots/README.md` dokumentiert Basis, Routen, Viewports und
+  Privacy-Prüfung; DE/EN referenzieren dieselbe vollständige PNG-Galerie.
+- Root Cause RQ-08-03: Der aktuelle Kopf/Überblick von `PROJECT_STATUS.md`
+  war nach den Baseline- und Reparaturbatches nicht vollständig fortgeführt;
+  Schema 11 und die historische `build.yaml` wurden als aktueller Stand
+  dargestellt.
+- Implementierung RQ-08-03: Der aktuelle Überblick nennt Schema 12, Audit
+  Parts 01–19, Reparaturbatches A–I, Dockerfile/BuildKit ohne `build.yaml` und
+  trennt HEAD vom unveränderten Public Test Release `v1.0.0-rc.3`.
+  Historische Sprintabschnitte bleiben ausdrücklich als Zeitstand erhalten.
+- Re-Audit: D1, die Screenshotanforderungen aus Sprint 21–23, 25.1, 26 und
+  26.1 sowie die Status-/Verpackungsanforderungen aus Sprint 24/25.
+- Testevidenz: 4/4 I-spezifisch, 389/389 vollständig und
+  Card-Matrix-Browser 1.576/1.576; geänderte JavaScriptdateien bestanden
+  `node --check`.
+- Manuell: MT-29 bleibt für die ausdrückliche Nutzer-/Zweitsichtprüfung
+  `NOT TESTED`; keine physische iPad-/HAOS-/LXC-Abnahme wurde umbewertet.
+- Public Test Release: Tag `v1.0.0-rc.3` bleibt unverändert auf
+  `771683b804f0b7c684eb3d457b58fb579a3ccdb6`; Batch I veröffentlicht nichts.
+- Ergebnis: `RQ-08-02` **CODE CLOSED / MANUAL PENDING**, `RQ-08-03`
+  **CLOSED**. Nächster kanonischer Batch ist ausschließlich 27.1-J mit
+  `RQ-13-01` und `RQ-17-01`; er wurde nicht begonnen.
+
 ## Verifikation der Audit-Baseline
 
 - Vollständige Testsuite: 329 von 329 Tests bestanden, 0 fehlgeschlagen.

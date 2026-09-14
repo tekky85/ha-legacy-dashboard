@@ -147,3 +147,14 @@ geprüft; Expanded-Inhalt wird als bewusst begrenzter innerer Scrollbereich
 behandelt. Der Browser-Gate bestand 1.576 Gesamtfälle ohne Befund. MT-69 und
 MT-70 bleiben unverändert `NOT TESTED`; daraus wird kein iPad-/HAOS-PASS
 abgeleitet.
+
+## Sprint-27.1-I-Re-Audit
+
+Room Card und Section-Integration sind nun auch in der aktuellen
+Produktgalerie belegt: `dashboards/sections-room-card.png` zeigt die
+ausgeklappte Runtime-Card mit Hintergrund, und `admin/room-card-editor.png`
+den nativen Editor. Der reproduzierbare localhost-Real-App-Harness verwendet
+die unveränderten produktiven Frontenddateien, Demo-Payloads und Fake-
+Credentials; PNG-Signatur, Links und Privacy-Marker werden automatisiert
+geprüft. MT-69/70 bleiben für iPad/HAOS `NOT TESTED`; der Sprint bleibt daher
+insgesamt `PARTIAL`.

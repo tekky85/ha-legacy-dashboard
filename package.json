@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "test:card-matrix-browser": "node test/run-card-matrix-browser.js",
+    "docs:screenshots": "node test/capture-doc-screenshots.js",
     "start": "node src/server.js"
   },
   "keywords": [],

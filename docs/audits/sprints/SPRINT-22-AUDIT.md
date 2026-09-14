@@ -26,9 +26,9 @@ Poll und keine neue Write-Fähigkeit.
 Sprint 27.1-C schließt den zuvor reproduzierten Erklärbarkeitsdefekt
 `RQ-12-01`: Die Auflösung führt nun Herkunft pro wirksamem Regelfeld und wählt
 für Expected Offline, Grace, Flapping und Recovery die tatsächlich verwendete
-Quelle. Die fachliche Wertpriorität blieb unverändert. `PARTIAL` bleiben die
-in Sprint 27.1-F geschlossene 80-Punkte-Testtraceability, veraltete Screenshots
-und ausstehende reale HA-/LXC-/iPad-Abnahmen.
+Quelle. Die fachliche Wertpriorität blieb unverändert. Testtraceability und
+Screenshots sind seit Sprint 27.1-F/I geschlossen. `PARTIAL` bleibt wegen
+ausstehender realer HA-/LXC-/iPad-Abnahmen.
 
 ## Requirement Matrix
 
@@ -98,8 +98,8 @@ und ausstehende reale HA-/LXC-/iPad-Abnahmen.
 | 22-MAN1 | Timing-, Rule-, Expected-Offline- und Health-Abnahme gegen kontrolliertes reales HA | NOT TESTED | MT-43 | Kein reales HA in Part 12 kontaktiert. |
 | 22-MAN2 | Prozessneustart, Historyverlust und Persistenz auf Standalone-LXC | NOT TESTED | MT-44 | Kein produktiver Runtime-Test in diesem Audit. |
 | 22-MAN3 | Error-/Health-/Device-Group-Darstellung auf iPad mini/iOS 9 | NOT TESTED | MT-45 | Keine physische Geräteprüfung. |
-| 22-SHOT1 | Aktuelle echte Errors-/Entity-Rules-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Bilder belegen den heutigen Stand nicht vollständig. |
-| 22-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Regeln | PASS | README DE/EN; `PROJECT_STATUS.md`; Roadmap | Semantik ist dokumentiert; allgemeine Statusdatei bleibt separat `RQ-08-03`. |
+| 22-SHOT1 | Aktuelle echte Errors-/Entity-Rules-Screenshots | PASS | Sprint 27.1-I: `system/errors.png`, `admin/entity-rules.png`; Capture-Manifest/Test | Regeln und aktueller Issue-Stand sind reproduzierbar erfasst. |
+| 22-DOC1 | README DE/EN, Projektstatus und Roadmap dokumentieren Regeln | PASS | README DE/EN; `PROJECT_STATUS.md`; Roadmap | Semantik und globaler Status sind seit Sprint 27.1-I aktuell. |
 | 22-CACHE1 | Geänderte gemeinsame Assets besitzen routeübergreifend gleiche Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v53; `test/asset-version.test.js`; immutable Header bleiben erhalten. | RQ-04-01 bleibt code-seitig geschlossen. |
 
 ## Current Rule Pipeline
@@ -159,8 +159,8 @@ weiterhin aus zuverlässigem `last_changed` rekonstruiert.
 - `RQ-12-01` – in Sprint 27.1-C code-seitig geschlossen;
 - `RQ-12-04` – in Sprint 27.1-F code-seitig geschlossen;
 - `RQ-04-01` – in Sprint 27.1-B code-seitig geschlossen;
-- `RQ-08-02` – veraltete Produktbilder;
-- `RQ-08-03` – veralteter globaler Projektstatus.
+- `RQ-08-02` – in Sprint 27.1-I code-seitig geschlossen; Nutzerreview MT-29;
+- `RQ-08-03` – in Sprint 27.1-I geschlossen.
 
 ## Security and Deployment Review
 
@@ -172,7 +172,7 @@ Tests bzw. Audit Part 13 vorbehalten.
 
 ## Remaining Sprint 22 Gaps
 
-Vor `COMPLETE` sind `RQ-08-02` und die realen MT-43 bis MT-45 zu schließen.
+Vor `COMPLETE` sind MT-29 und die realen MT-43 bis MT-45 abzuschließen.
 `RQ-12-04` ist code-seitig geschlossen. Der zentrale Regel-, Grace-, Flapping-,
 Recovery- und Autorisierungsendzustand ist ansonsten vorhanden.
 

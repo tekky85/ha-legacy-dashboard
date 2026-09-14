@@ -111,7 +111,7 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 25-DOC-01 | README DE/EN semantisch synchron | PASS | Release-/Installationsabschnitte haben dieselbe Betriebsarten-, Image-, RC- und Securityaussage. |
 | 25-DOC-02 | Standalone-Distribution aus dem Artefakt heraus korrekt dokumentiert | PASS | Bundle-spezifische deutsche/englische README-/Installationsdateien sind direkt enthalten und benötigen weder Repositorydateien noch Git-Skripte; automatisierte Link-/Inhaltsprüfung. |
 | 25-DOC-03 | Releaseanleitung entspricht dem aktuellen Lebenszyklus | PARTIAL | Sie nennt RC.1 noch als „ersten geplanten Release“ und zeigt denselben bereits existierenden Tag als nächsten Erzeugungsschritt. Zusatzbeleg zu `RQ-13-01`. |
-| 25-DOC-04 | Technischer Projektstatus/Roadmap aktuell | PARTIAL | `PROJECT_STATUS.md` ist bereits über `RQ-08-03` als veraltet erfasst; Release-/Auditstand ist nicht vollständig nachgeführt. |
+| 25-DOC-04 | Technischer Projektstatus/Roadmap aktuell | PASS | Sprint 27.1-I: Schema 12, Parts 01–19, Dockerfile/BuildKit ohne `build.yaml`, RC.3 und Batches A–I sind als aktueller Stand dokumentiert. |
 | 25-DOC-05 | Keine echten Secrets oder privaten lokalen Pfade in Beispielen | PASS | Nur generische Platzhalter/Testwerte; Bundle-/Dokumentationsscan ohne Credential oder privaten SSH-/Mac-Pfad. |
 | 25-MATRIX-01 | Alle 60 Releasefälle gezielt rückverfolgbar | PASS | `release/sprint-25-test-matrix.json` ordnet alle 60 Nummern exakt einmal direkter Automatisierung, commitgebundenem Workflow oder vollständigem versions-/artefaktbezogenem MT zu; `test/sprint-27-1-h.test.js` prüft Nummern und Evidenzmarker. Reale Resultate bleiben ehrlich separat. |
 
@@ -304,8 +304,8 @@ Zusätzliche Evidenz erhielten:
 - `RQ-04-01`: inkonsistente immutable Assetversionen sind bei einem
   distributionsorientierten RC ein P1-Blocker, weil die Releasepipeline den
   routeabhängigen Altcache nicht erkennt.
-- `RQ-08-03`: Statusdokumentation bildet den tatsächlichen Release-/Auditstand
-  nicht vollständig ab.
+- `RQ-08-03`: in Sprint 27.1-I geschlossen; Statusdokumentation trennt
+  aktuellen HEAD, Auditstand und unverändertes Public Test Release.
 
 ## Sprint-27.1-D-Re-Audit
 

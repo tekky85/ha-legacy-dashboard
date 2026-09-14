@@ -26,7 +26,7 @@ ausgewertet, nicht aus Areas. Last-known Labeldaten bleiben bei stale erhalten;
 unverfügbare/unsupported oder gelöschte Labels erzeugen einen sichtbaren
 Fehler und keinen stillen Device-Class-Fallback.
 
-Der Sprint bleibt `PARTIAL` wegen `RQ-08-02` und
+Sprint 27.1-I schließt `RQ-08-02`. Der Sprint bleibt `PARTIAL` wegen
 ausstehender realer Admin-/HA-/iPad-Abnahmen. Der Error-only-
 WebSocket-Reconnectbefund `RQ-09-01` wurde in Sprint 27.1-C code-seitig
 geschlossen; reale Label-Recovery bleibt `NOT TESTED`.
@@ -80,7 +80,7 @@ geschlossen; reale Label-Recovery bleibt `NOT TESTED`.
 | 21.3-MAN1 | Error-Filter/Risk auf iPad mini | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-34 | Kein physischer Zielgerätetest. |
 | 21.3-MAN2 | Device-Class-/Label-Modi gegen reales Test-HA | NOT TESTED | MT-35 | Keine reale HA-/Admin-Abnahme in Part 10. |
 | 21.3-MAN3 | Label-Rename/Ausfall/stale/delete/recovery | NOT TESTED | MT-36 | Keine echte Labelquellenstörung durchgeführt. |
-| 21.3-SHOT1 | Aktuelle echte Filter-/Label-Admin-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Systembilder sind nach späteren UI-Änderungen veraltet. |
+| 21.3-SHOT1 | Aktuelle echte Filter-/Label-Admin-Screenshots | PASS | Sprint 27.1-I: `system/errors.png`, `admin/dashboard-management.png`; Capture-Manifest/Test | Aktuelle Filter und Label-Konfiguration sind im kontrollierten Real-App-Mock erfasst. |
 | 21.3-DOC1 | Modi, Policy, Filter, Fail-Safe und Grenzen dokumentiert | PASS | README DE/EN, Projektstatus, Roadmap | Keine Label-Writes versprochen. |
 | 21.3-ASSET1 | Geänderte geteilte Assets besitzen konsistente Cacheversion | PASS | System, Dashboard, Admin und Manifest verwenden v53; `test/asset-version.test.js`. | RQ-04-01 bleibt code-seitig geschlossen; Realgerät bleibt manuell. |
 
@@ -153,17 +153,16 @@ keine transitive Kritikalitätsquelle.
 
 ## Findings
 
-- `PARTIAL`: `RQ-08-02`; `RQ-10-01`, `RQ-04-01` und `RQ-09-01` sind
-  code-seitig geschlossen.
+- `PARTIAL`: ausschließlich reale Label-/Admin-/iPad-Abnahme; `RQ-08-02`,
+  `RQ-10-01`, `RQ-04-01` und `RQ-09-01` sind code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: kein aktueller fachlicher Filter-/Detection-Defekt bestätigt.
 - `NOT TESTED`: MT-34 bis MT-36.
 
 ## Final Assessment
 
-Sprint 21.3 ist fachlich und sicherheitsseitig vorhanden. Vor `COMPLETE` sind
-Screenshots zu schließen und die reale Label-/Admin-/iPad-Abnahme zu
-dokumentieren.
+Sprint 21.3 ist fachlich und sicherheitsseitig vorhanden. Vor `COMPLETE` ist
+die reale Label-/Admin-/iPad-Abnahme zu dokumentieren.
 
 ## Sprint-27.1-C-Re-Audit
 

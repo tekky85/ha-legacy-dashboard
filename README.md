@@ -25,4 +25,4 @@ Choose an installation:
 
 ![HA Legacy Dashboard – Light Mode](docs/screenshots/dashboards/main-light.png)
 
-The repository uses real screenshots of the running application. See the language-specific README files for the complete gallery and its maintenance rules.
+The repository uses real screenshots of the running application. See the language-specific README files for the complete gallery and its maintenance rules. The [reproducible capture manifest](docs/screenshots/README.md) records routes, viewports, provenance, and privacy checks.

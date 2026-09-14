@@ -25,8 +25,8 @@ normale bzw. diagnostische Entities auf milderen Stufen.
 
 Der fachliche Endzustand ist vorhanden. Assetversion und 92-Punkte-
 Traceability sind inzwischen code-seitig geschlossen (`RQ-04-01`,
-`RQ-10-01`). `PARTIAL` entsteht weiterhin durch nicht aktuelle System-
-Screenshots (`RQ-08-02`) und ausstehende reale Safari-/iPad-Abnahmen. Kein
+`RQ-10-01`). Sprint 27.1-I schließt die System-Screenshots (`RQ-08-02`).
+`PARTIAL` entsteht weiterhin durch ausstehende reale Safari-/iPad-Abnahmen. Kein
 neuer aktueller Laufzeitdefekt wurde gefunden.
 
 ## Requirement Matrix
@@ -78,7 +78,7 @@ neuer aktueller Laufzeitdefekt wurde gefunden.
 | 21.2-T1 | Vollständige nummerierte 92-Punkte-Testmatrix ist rückverfolgbar | PASS | Sprint-21.2-/Systemtests plus maschinengeprüfte Traceability | Jede Nummer ist direkt, äquivalent oder für reale Viewportwirkung MT-33/MT-34 zugeordnet. |
 | 21.2-MAN1 | Summary-Abnahme Portrait/Landscape auf iPad mini | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-33 | Kein physischer Test in Part 10. |
 | 21.2-MAN2 | Error-/Spalten-/Risk-Abnahme auf iPad mini | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-34 | Kein physischer Test in Part 10. |
-| 21.2-SHOT1 | Aktuelle echte Summary-/Error-Screenshots | PARTIAL | D1-Audit, `RQ-08-02`, MT-29 | Vorhandene Systembilder belegen den heutigen Stand nicht vollständig. |
+| 21.2-SHOT1 | Aktuelle echte Summary-/Error-Screenshots | PASS | Sprint 27.1-I: `system/summary.png`, `system/errors.png`; Capture-Manifest/Test | Aktuelle Filter-, Count- und Spaltenansichten stammen aus dem kontrollierten Real-App-Mock. |
 | 21.2-DOC1 | Filter, Spalten und Risk Severity dokumentiert | PASS | README DE/EN, Roadmap, Projektstatus | Spätere Rule-/Filtersemantik als aktuelle Wahrheit dokumentiert. |
 | 21.2-CACHE1 | Geänderte geteilte Assets besitzen konsistente Cacheversion | PASS | Dashboard, System, Admin und Manifest verwenden v53; `test/asset-version.test.js`; immutable Header unverändert. | RQ-04-01 code-seitig geschlossen. |
 
@@ -125,7 +125,8 @@ sandboxbedingte `listen EPERM`-Fehler. Der unveränderte Lauf mit erlaubtem
 
 ## Findings
 
-- `PARTIAL`: `RQ-08-02`; `RQ-10-01` und `RQ-04-01` sind code-seitig geschlossen.
+- `PARTIAL`: ausschließlich reale iPad-/Safari-Abnahme; `RQ-08-02`,
+  `RQ-10-01` und `RQ-04-01` sind code-seitig geschlossen.
 - `MISSING`: keine.
 - `BROKEN`: kein aktueller fachlicher Filter-/Risk-/Spaltendefekt bestätigt.
 - `NOT TESTED`: MT-33 und MT-34.
@@ -133,8 +134,7 @@ sandboxbedingte `listen EPERM`-Fehler. Der unveränderte Lauf mit erlaubtem
 ## Final Assessment
 
 Sprint 21.2 ist fachlich, architektonisch und sicherheitsseitig implementiert.
-Für `COMPLETE` fehlen aktuelle echte Screenshots und die dokumentierte reale
-iPad-/Safari-Abnahme.
+Für `COMPLETE` fehlt die dokumentierte reale iPad-/Safari-Abnahme.
 
 ## Sprint-27.1-E-Re-Audit
 

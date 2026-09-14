@@ -427,6 +427,14 @@ Focus view.
 
 ![Compact cards in landscape layout](docs/screenshots/dashboards/compact-cards.png)
 
+#### Sections and Room Card
+
+Each section uses the existing grid and keeps unassigned cards visible. The
+native Room Card combines normalized room values, alerts, and only controls
+that are already safely authorized.
+
+![Sections with an expanded Room Card](docs/screenshots/dashboards/sections-room-card.png)
+
 #### Focus Card
 
 The Focus view is a separate interaction view: it is rebuilt from the widget
@@ -457,6 +465,10 @@ independent Focus geometry remains unchanged.
 
 ![Background upload and display settings in the Admin area](docs/screenshots/admin/dashboard-background.png)
 
+#### Sections
+
+![Section management and card assignment](docs/screenshots/admin/sections.png)
+
 #### Layout Editor
 
 ![Grid-based layout editor](docs/screenshots/admin/layout-editor.png)
@@ -464,6 +476,10 @@ independent Focus geometry remains unchanged.
 #### Live Preview
 
 ![Live preview in landscape and dark mode](docs/screenshots/admin/live-preview.png)
+
+#### Room Card Editor
+
+![Native Room Card editor with entity selection](docs/screenshots/admin/room-card-editor.png)
 
 #### Diagnostic Sources
 
@@ -481,7 +497,7 @@ independent Focus geometry remains unchanged.
 
 #### System Status
 
-![Error Dashboard with a warning state](docs/screenshots/system/errors.png)
+![Error Dashboard with critical and warning states](docs/screenshots/system/errors.png)
 
 #### Automation Impact and Advanced Diagnostics
 
@@ -507,6 +523,11 @@ Before committing screenshots, verify:
 
 Prefer demo entities or deliberately approved names.
 
+The [screenshot manifest](docs/screenshots/README.md) records the reproducible
+capture, every route and viewport, and the privacy check. The gallery can be
+recaptured with a local Chromium using `npm run docs:screenshots`; the harness
+uses localhost, demo payloads, and fake credentials only.
+
 ## Recommended Screenshot Structure
 
 ```text
@@ -518,11 +539,15 @@ docs/
       background-image.png
       compact-cards.png
       focus-card.png
+      sections-room-card.png
     admin/
       dashboard-management.png
       dashboard-background.png
+      sections.png
       layout-editor.png
       live-preview.png
+      room-card-editor.png
+      entity-rules.png
       system-diagnostics.png
     system/
       summary.png

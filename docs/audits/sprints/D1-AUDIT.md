@@ -12,26 +12,18 @@
 
 ## Overall Result
 
-PARTIAL
+PARTIAL – AUTOMATED REQUIREMENTS PASS / USER REVIEW NOT TESTED
 
-Das dreiteilige README-Modell, die semantisch parallelen vollständigen
-Sprachfassungen, die Screenshot-Verzeichnisstruktur, alle vorgesehenen
-Baseline-Dateien, die Sicherheits-/Legacy-Erklärung und die dauerhafte
-Wartungsregel sind vorhanden. Alle 29 geprüften README-Bildreferenzen lösen
-auf existierende Dateien auf; die Sprachfassungen verwenden dieselben 14
-Produktbilder und dieselben fachlichen Kapitel.
-
-Die Baseline ist aktuell jedoch nicht releasefertig gepflegt. Mehrere Bilder
-zeigen sichtbar einen älteren Produktstand, obwohl spätere Sprints Sections,
-Room Cards, Entity Rule Manager, neue Navigation und Footer geändert haben.
-Insbesondere `compact-cards.png` zeigt noch den später entfernten
-Versionsfooter, und mehrere Adminbilder zeigen die alten großen Summary-/Error-
-Auswahllisten statt des aktuellen Editors. Ein aktueller Sections-/Room-Card-
-Nachweis fehlt. Vier Dateien tragen außerdem `.png`, enthalten aber JPEG-
-Daten. Schließlich beschreibt `docs/PROJECT_STATUS.md` noch Schema 11 und
-Auditfortschritt bis Part 02, obwohl der Code Schema 12 und der Auditindex
-Parts 01–08 ausweist. Diese Befunde stehen als `RQ-08-02` und `RQ-08-03` in
-der Reparaturwarteschlange.
+Sprint 27.1-I hat die beiden Baselinebefunde behoben. Die semantisch parallelen
+Sprachfassungen referenzieren dieselben 17 aktuellen PNGs; Sections, Room Card,
+aktuelle Admin-/Systemansichten und Automation Diagnostics sind enthalten.
+`test/capture-doc-screenshots.js` rendert die unveränderten produktiven
+Frontenddateien reproduzierbar über localhost mit Demo-Payloads und Fake-
+Credentials. Herkunft, Route, Viewport und Datenschutzprüfung sind in
+`docs/screenshots/README.md` dokumentiert. `PROJECT_STATUS.md` bildet nun
+Schema 12, Parts 01–19 und die aktuelle Dockerfile-/BuildKit-Verpackung ohne
+`build.yaml` ab. Die ausdrücklich verlangte Nutzer-/Zweitsicht bleibt MT-29
+`NOT TESTED`; deshalb bleibt die Gesamtbewertung formal `PARTIAL`.
 
 ## Requirement Matrix
 
@@ -47,22 +39,22 @@ der Reparaturwarteschlange.
 | D1-A3 | User Dashboard, Admin, Summary und Errors dokumentiert | PASS | README DE/EN Hauptfunktionen | Spätere Funktionen sind semantisch synchron ergänzt. |
 | D1-A4 | Sicherheitsmodell entspricht aktueller Architektur | PASS | README Security-Kapitel; Gateway-/Securitytests | Keine generische HA-Service-API, Browser-HA-Verbindung oder implizite Write-Autorisierung behauptet. |
 | D1-S1 | Verzeichnisstruktur `dashboards/`, `admin/`, `system/` existiert | PASS | `docs/screenshots/*` | Alle drei Verzeichnisse enthalten Bilder. |
-| D1-S2 | Die neun geplanten Baseline-Dateien existieren | PASS | Dateiinventar und README-Linkcheck | Zusätzlich existieren fünf spätere Produktbilder. |
+| D1-S2 | Die neun geplanten Baseline-Dateien existieren | PASS | Dateiinventar und README-Linkcheck | Zusätzlich existieren acht spätere Produktbilder. |
 | D1-S3 | Screenshot-Dateinamen sind klein und bindestrichbasiert | PASS | `find docs/screenshots`; Namensscan | Keine Zeitstempel-/Leerzeichen-Namen. |
-| D1-S4 | Bildreferenzen sind konsistent und nicht kaputt | PASS | automatisierter Existenzcheck: Root 1, DE 14, EN 14 | Alle referenzierten Pfade existieren. |
-| D1-S5 | Produktbilder stammen aus echter Anwendung oder kontrolliertem Real-App-Mock | PARTIAL | Git-Historie der Bildcommits; README-/Projektstatus-Provenienz; visueller Abgleich | Dateien allein beweisen keine Laufzeitprovenienz; aktuelle kontrollierte Neuaufnahme wird als MT-29 dokumentiert. |
-| D1-S6 | Keine generierten Mockups als Produkt-Screenshots | PARTIAL | dokumentierte Capture-Regel und Historie; visueller Abgleich mit realem UI | Keine Gegenevidenz, aber ohne reproduzierbaren Capture-Nachweis nicht vollständig unabhängig verifizierbar. Kontrollierte Neuaufnahme samt Provenienz ist Teil von `RQ-08-02` und MT-29. |
-| D1-S7 | Screenshots enthalten keine Tokens, IPs, privaten Namen, sensitiven Entities, Medien- oder Standortdaten | PASS | visuelle Prüfung aller 14 Bilder; String-/Metadatenscan | Sichtbar sind generische Demo-/Raumnamen; keine Secrets oder Adressen. |
-| D1-S8 | Screenshot-Dateiendung entspricht dem tatsächlichen Bildformat | PARTIAL | `file`/`sips` | `entity-rules.png`, `system-diagnostics.png`, `errors.png`, `errors-automation-impact.png` sind tatsächlich JPEG. Teil von `RQ-08-02`. |
-| D1-M1 | Sichtbare UI-Sprints prüfen/aktualisieren veraltete Bilder | BROKEN | Bild-Commit-Historie und visuelle Prüfung | Mehrere Bilder stammen von vor Sprint 21.4/21.5/25.3/26/26.1 und zeigen nachweislich entfernte/ersetzte UI. `RQ-08-02`. |
-| D1-M2 | Sections und native Room Cards als spätere sichtbare Hauptfunktion auf Screenshot-Bedarf prüfen | BROKEN | README dokumentiert beide; Galerie enthält keinen Sections-/Room-Card-Screenshot | Dauerhafte Regel wurde bei Sprint 26/26.1 nicht vollständig umgesetzt. `RQ-08-02`. |
-| D1-M3 | README-Bildtexte und empfohlene Struktur entsprechen der realen Galerie | PARTIAL | README Screenshot-/Strukturkapitel | Links funktionieren, aber die Galerie wird als „aktuell“ bezeichnet, obwohl einige Aufnahmen veraltet sind und vier Formate falsch benannt sind. `RQ-08-02`. |
+| D1-S4 | Bildreferenzen sind konsistent und nicht kaputt | PASS | `test/sprint-27-1-i.test.js`: Root 1, DE 17, EN 17 | Alle referenzierten Pfade existieren; DE/EN-Mengen sind identisch. |
+| D1-S5 | Produktbilder stammen aus echter Anwendung oder kontrolliertem Real-App-Mock | PASS | `test/capture-doc-screenshots.js`; `docs/screenshots/README.md` | Reproduzierbarer localhost-Harness verwendet unveränderte produktive Frontenddateien und normalisierte Demo-Payloads. |
+| D1-S6 | Keine generierten Mockups als Produkt-Screenshots | PASS | Capture-Quellpfade und Manifest; visueller Abgleich | Die Anwendung wird im echten Browser gerendert; es werden keine Bildmockups erzeugt. |
+| D1-S7 | Screenshots enthalten keine Tokens, IPs, privaten Namen, sensitiven Entities, Medien- oder Standortdaten | PASS | visuelle Prüfung aller 17 Bilder; String-/Privacy-Regression | Sichtbar sind ausschließlich generische Demo-Namen; keine Secrets oder Adressen. |
+| D1-S8 | Screenshot-Dateiendung entspricht dem tatsächlichen Bildformat | PASS | PNG-Signatur-/Abmessungstest für 17 Dateien | Auch die vier früheren JPEG-in-PNG-Dateien sind echte PNGs. |
+| D1-M1 | Sichtbare UI-Sprints prüfen/aktualisieren veraltete Bilder | PASS | 17 aktuelle Neuaufnahmen; Manifest | Footer, Navigation, aktuelle Admin-/Systemansichten und spätere UI sind enthalten. |
+| D1-M2 | Sections und native Room Cards als spätere sichtbare Hauptfunktion auf Screenshot-Bedarf prüfen | PASS | `sections-room-card.png`, `sections.png`, `room-card-editor.png` | Runtime und Admin besitzen eigene aktuelle Nachweise. |
+| D1-M3 | README-Bildtexte und empfohlene Struktur entsprechen der realen Galerie | PASS | README DE/EN plus Link-/Mengenprüfung | Bildtexte, Struktur und Dateien sind synchron. |
 | D1-D1 | Datenschutz- und Screenshot-Pflegeregeln sind dokumentiert | PASS | README DE/EN „Screenshot-Pflege/Maintenance“ | Enthält alle verlangten Datenschutzpunkte. |
 | D1-D2 | Dauerhafte Codex-Regel lebt in `AGENTS.md` oder Handoff | PASS | `AGENTS.md:463-474` | Sichtbare UI → Screenshotprüfung; DE/EN synchron; keine generierten Mockups. |
-| D1-D3 | `docs/PROJECT_STATUS.md` wurde als technische Statusquelle gepflegt | BROKEN | `PROJECT_STATUS.md:13-16,287-319`; `AUDIT_INDEX.md`; `src/config/dashboard.js:24` | Status nennt Audit nur bis Part 02 und Schema 11; aktuell sind Parts 01–08 abgeschlossen und Schema 12. `RQ-08-03`. |
+| D1-D3 | `docs/PROJECT_STATUS.md` wurde als technische Statusquelle gepflegt | PASS | aktueller Kopf/Schema-/Packagingabschnitt; `src/config/dashboard.js:24`; Auditindex | Schema 12, Parts 01–19, Batches A–I, Dockerfile/BuildKit und RC.3 stimmen mit dem aktuellen Stand überein. |
 | D1-N1 | D1 verändert keine Produktfunktion, API, Regeln, Layout oder Writefläche | PASS | historischer D1-Commit `0881705`; aktueller Part-08-Diff | D1 legte Dokumentation/Verzeichnisse an; Part 08 ändert ebenfalls nur Auditdokumente. |
-| D1-T1 | Sprach-, Link-, Screenshot-, Secret-, Security- und Legacy-Prüfungen | PARTIAL | automatisierte Link-/Pfad-/Format-/Textscans plus visuelle Bildprüfung | Technische Checks bestanden; aktuelle Real-App-Neuaufnahme/Provenienz bleibt MT-29. |
-| D1-MAN1 | Aktuelle reale/Mock-App-Galerie kontrolliert neu aufnehmen und freigeben | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-29 | Keine Screenshots wurden in diesem Baseline-Audit erfunden oder ersetzt. |
+| D1-T1 | Sprach-, Link-, Screenshot-, Secret-, Security- und Legacy-Prüfungen | PASS | `test/sprint-27-1-i.test.js`, D1-/Security-/Legacytests, visuelle Erstprüfung | Technische Anforderungen und kontrollierte Neuaufnahme bestanden. |
+| D1-MAN1 | Aktuelle reale/Mock-App-Galerie kontrolliert neu aufnehmen und freigeben | NOT TESTED | [`MANUAL_TEST_QUEUE.md`](../MANUAL_TEST_QUEUE.md), MT-29 | Aufnahme und technische Erstprüfung sind erfolgt; ausdrückliche Nutzer-/Zweitsichtfreigabe steht aus. |
 
 ## README Parity Review
 
@@ -74,14 +66,14 @@ Beide vollständigen Fassungen besitzen dieselbe fachliche Reihenfolge:
    Backgrounds, Theme, Navigation und iPad-Kiosk;
 4. Admin, Summary, Errors, Regeln und Diagnostik;
 5. Sicherheits- und Legacy-Grenzen;
-6. identische 14-Bild-Galerie und Wartungsregeln;
+6. identische 17-Bild-Galerie und Wartungsregeln;
 7. Entwicklung, Tests, Deployment, Releases, Status und Gegenlink.
 
 Die Linkmengen sind bis auf den absichtlich entgegengesetzten Sprachlink
 identisch. Es wurden keine schnelllebigen Testzahlen oder Commit-IDs in den
 READMEs gefunden.
 
-## Screenshot Audit
+## Screenshot Audit – Ausgangsbefund Part 08
 
 ### Vorhandene und weiterhin brauchbare Nachweise
 
@@ -119,7 +111,7 @@ Content-Type-Prüfung, Download, Bildwerkzeuge und dauerhafte Wartung
 irreführend. Die Reparatur soll entweder echte PNGs erzeugen oder Dateien und
 README-Links konsistent auf `.jpg` umstellen.
 
-## Documentation Accuracy Finding
+## Documentation Accuracy Finding – Ausgangsbefund Part 08
 
 `docs/PROJECT_STATUS.md` ist historisch ausführlich, aber sein aktueller Kopf
 ist nicht mehr verlässlich:
@@ -134,31 +126,45 @@ ist nicht mehr verlässlich:
 Das wird als `RQ-08-03` dokumentiert und in diesem Baseline-Audit nicht
 repariert.
 
+## Sprint-27.1-I-Re-Audit
+
+- Reproduzierbarer Browserlauf: 17/17 PNG-Dateien erzeugt.
+- Runtime: Light/Dark, Background, Compact, Focus, Sections und Room Card.
+- Admin: Management, Background, Sections, Layout, Live Preview, Room Editor,
+  Entity Rules und Diagnostic Sources.
+- System: Summary, Errors sowie Automation Impact/Advanced Diagnostics.
+- DE/EN: identische 17 Bildpfade; Root-README und Manifestlinks gültig.
+- Datenschutz: keine Produktions-`.env`, kein reales HA, keine sichtbaren oder
+  eingebetteten Token-/IP-/Privatmarker.
+- `RQ-08-02`: **CODE CLOSED / MANUAL PENDING**.
+- `RQ-08-03`: **CLOSED**.
+- MT-29: ausdrückliche Nutzer-/Zweitsicht bleibt `NOT TESTED`.
+- Tests: 4/4 I-spezifisch, 389/389 Gesamtsuite und 1.576/1.576
+  Card-Matrix-Browserfälle PASS.
+
 ## Automated and Manual Evidence
 
 - Root-README: 1/1 Bildpfad vorhanden;
-- deutsche README: 14/14 Bildpfade vorhanden;
-- englische README: 14/14 Bildpfade vorhanden;
+- deutsche README: 17/17 Bildpfade vorhanden;
+- englische README: 17/17 Bildpfade vorhanden;
 - DE/EN: je 20 Links, identisch bis auf Gegenlink;
 - alle 14 Bilder visuell auf sichtbare sensible Daten geprüft;
 - String-/Metadatenscan ohne Token, interne URL oder Standortmetadaten;
-- vier Format-/Endungsabweichungen gefunden;
+- alle 17 Dateien besitzen echte PNG-Signatur und lesbare Abmessungen;
 - Git-Historie ordnet jedes Bild einem dokumentierten UI-Commit zu;
-- aktuelle Real-App-Neuaufnahme bleibt MT-29 `NOT TESTED`.
+- Aufnahme/automatische Prüfung abgeschlossen; Nutzer-/Zweitsicht bleibt
+  MT-29 `NOT TESTED`.
 
 ## Findings
 
-- `BROKEN`: Screenshotpflege nach späteren sichtbaren Sprints und aktueller
-  Projektstatus (`RQ-08-02`, `RQ-08-03`).
-- `PARTIAL`: nachweisbare aktuelle Screenshot-Provenienz, vier falsche
-  Dateiendungen und die Aussage „aktuelle Galerie“.
-- `MISSING`: kein Pflichtpfad aus der ursprünglichen Neun-Bild-Baseline; ein
-  aktueller Sections-/Room-Card-Nachweis fehlt als spätere Wartungsanforderung.
+- `BROKEN`: keine verbleibende automatisierbare D1-Anforderung.
+- `PARTIAL`: nur die noch ausstehende ausdrückliche Nutzer-/Zweitsicht.
+- `MISSING`: keine.
 - `NOT TESTED`: MT-29.
 
 ## Final Assessment
 
-Sprint D1 hat ein brauchbares zweisprachiges Dokumentationsfundament, erfüllt
-aber seine eigene dauerhafte Pflegepflicht im heutigen Repository nicht
-vollständig. Nach aktueller Neuaufnahme/Formatkorrektur und Aktualisierung der
-technischen Statusquelle kann D1 erneut auf `PASS` geprüft werden.
+Sprint D1 erfüllt nach 27.1-I sämtliche automatisierbaren Dokumentations-,
+Galerie-, Format-, Herkunfts- und Statusanforderungen. Die Gesamtbewertung
+bleibt ausschließlich wegen MT-29 `PARTIAL`; nach ausdrücklicher Nutzer- oder
+zweiter Sichtprüfung kann sie ohne weiteren Code-Repair auf `PASS` wechseln.
