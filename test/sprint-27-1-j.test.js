@@ -104,8 +104,12 @@ test("Veröffentlichter RC-Tag kann für neueren Source nicht wiederverwendet we
 
     const current = VersionCheck.validate(ROOT, null, {checkSource: true});
     assert.equal(current.version, CURRENT_VERSION);
-    assert.equal(current.source.expectedTagCommit, null);
-    assert.equal(current.source.previousTag, "v1.0.0-rc.3");
+    if (current.source.expectedTagCommit === null) {
+        assert.equal(current.source.previousTag, "v1.0.0-rc.4");
+    } else {
+        assert.equal(current.source.expectedTagCommit, current.source.head);
+        assert.equal(current.source.sourceDrift, false);
+    }
 });
 
 
@@ -146,7 +150,7 @@ test("RC-Nachweis bindet genau einen Commit, Tag, Digest und Bundle-Hash", funct
             path.join(output, "rc-result.json"),
             path.join(output, "rc-result.md")
         );
-    }, /tag .* (?:does not resolve|resolves to .* but HEAD is)/);
+    }, /(?:source commit .* differs from checked-out HEAD|tag .* (?:does not resolve|resolves to .* but HEAD is))/);
     assert.equal(fs.readdirSync(output).length, 0);
     assert.throws(function () {
         RcResult.createResult(ROOT, {

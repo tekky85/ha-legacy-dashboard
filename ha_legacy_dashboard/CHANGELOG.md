@@ -5,6 +5,12 @@
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.5 – 2026-09-14
+
+This candidate replaces the unpublished RC.4 build without moving its public
+tag. Runtime behavior is unchanged; the release source-identity test now
+supports both the pre-tag and post-tag states used by the protected workflow.
+
 ## 1.0.0-rc.4 – 2026-09-14
 
 This release candidate combines all completed Sprint 27.1 repair hardening

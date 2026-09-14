@@ -8,6 +8,18 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.5 – 2026-09-14
+
+This candidate replaces the unpublished RC.4 build without moving or reusing
+its public tag. Application behavior is identical to RC.4.
+
+### Release hardening
+
+- Made the source-identity regression tests valid both immediately before and
+  immediately after creation of the immutable release tag.
+- Preserved the failed RC.4 workflow as public evidence instead of rewriting
+  its tag or source commit.
+
 ## 1.0.0-rc.4 – 2026-09-14
 
 This release candidate brings the completed Sprint 27.1 repair and audit
