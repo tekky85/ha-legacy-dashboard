@@ -108,8 +108,8 @@ test("Veröffentlichter RC-Tag kann für neueren Source nicht wiederverwendet we
         assert.match(current.source.previousTag, /^v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
         assert.notEqual(current.source.previousTag, current.source.expectedTag);
     } else {
-        assert.equal(current.source.expectedTagCommit, current.source.head);
         assert.equal(current.source.sourceDrift, false);
+        assert.deepEqual(current.source.changedPaths, []);
     }
 });
 
