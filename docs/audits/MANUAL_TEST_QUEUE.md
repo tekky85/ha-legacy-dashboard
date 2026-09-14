@@ -142,6 +142,13 @@ technisch aufgenommen, format-/link-/privacy-geprüft und dokumentiert. Die in
 Schritt 10 verlangte ausdrückliche Nutzer- oder zweite Sichtprüfung wurde in
 diesem Lauf nicht vorweggenommen; das Ergebnis bleibt deshalb `NOT TESTED`.
 
+Sprint 27.1-J schließt die Code-/Dokumentationsursachen von `RQ-13-01` und
+`RQ-17-01`, veröffentlicht nach ausdrücklicher Batchgrenze jedoch weder eine
+neue Version noch ein Image oder Release. Deshalb bleiben die unten genannten
+Repair-Abhängigkeiten bis zum separaten RC.4-Workflow und seinem generierten
+commit-/artefaktgebundenen Nachweis bestehen. Kein physischer Test wurde
+ausgeführt und kein Resultat wurde von `NOT TESTED` auf `PASS` geändert.
+
 | Manual Test | Execution State | Blocked By Repairs |
 |---|---|---|
 | MT-01 | CAN RUN NOW | – |

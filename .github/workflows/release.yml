@@ -47,7 +47,33 @@ jobs:
         run: >-
           node release/check-version.js
           --tag "$GITHUB_REF_NAME"
+          --check-source
           --github-output "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx for immutable-target check
+        uses: docker/setup-buildx-action@v3
+
+      - name: Reject reuse of published release targets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_IMAGE: ${{ steps.release.outputs.image }}:${{ steps.release.outputs.version }}
+        run: |
+          if release_lookup=$(gh release view "$GITHUB_REF_NAME" 2>&1); then
+            echo "GitHub Release $GITHUB_REF_NAME already exists; immutable releases cannot be overwritten." >&2
+            exit 1
+          elif ! printf '%s' "$release_lookup" | grep -Eqi 'release not found|not found'; then
+            echo "Could not safely determine whether GitHub Release $GITHUB_REF_NAME exists." >&2
+            printf '%s\n' "$release_lookup" >&2
+            exit 1
+          fi
+          if image_lookup=$(docker buildx imagetools inspect "$RELEASE_IMAGE" 2>&1); then
+            echo "Container manifest $RELEASE_IMAGE already exists; choose a new version." >&2
+            exit 1
+          elif ! printf '%s' "$image_lookup" | grep -Eqi 'not found|manifest unknown'; then
+            echo "Could not safely determine whether container manifest $RELEASE_IMAGE exists." >&2
+            printf '%s\n' "$image_lookup" >&2
+            exit 1
+          fi
 
       - name: Run complete release test gate
         run: ./release/test-gate.sh "$GITHUB_REF_NAME"
@@ -232,10 +258,27 @@ jobs:
             "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}-aarch64"
 
       - name: Validate manifest platforms
-        run: >-
-          docker buildx imagetools inspect
-          "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}"
-          --raw | node release/validate-manifest.js
+        run: |
+          docker buildx imagetools inspect \
+            "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}" \
+            --raw > release-manifest.json
+          node release/validate-manifest.js < release-manifest.json
+          docker buildx imagetools inspect \
+            "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}" \
+            > release-manifest-inspect.txt
+          manifest_digest=$(sed -n 's/^Digest:[[:space:]]*//p' release-manifest-inspect.txt | head -n 1)
+          printf '%s\n' "$manifest_digest" > release-manifest-digest.txt
+          grep -Eq '^sha256:[0-9a-f]{64}$' release-manifest-digest.txt
+
+      - name: Upload immutable manifest evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-manifest-evidence
+          path: |
+            release-manifest.json
+            release-manifest-digest.txt
+          if-no-files-found: error
+          retention-days: 90
 
   smoke-test:
     needs:
@@ -269,10 +312,78 @@ jobs:
           ./release/smoke-container.sh
           "${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}"
 
+  candidate-evidence:
+    needs:
+      - validate
+      - publish-manifest
+      - smoke-test
+    runs-on: ubuntu-latest
+    if: needs.validate.outputs.stable != 'true'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out exact release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Download standalone artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: standalone-release
+          path: dist
+
+      - name: Download manifest evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: release-manifest-evidence
+          path: dist
+
+      - name: Create commit- and artifact-bound RC result
+        env:
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+          RELEASE_IMAGE: ${{ needs.validate.outputs.image }}:${{ needs.validate.outputs.version }}
+          RELEASE_ARTIFACT: ${{ needs.validate.outputs.standalone_artifact }}
+        run: |
+          standalone_sha=$(cut -d ' ' -f1 dist/SHA256SUMS)
+          manifest_digest=$(tr -d '\r\n' < dist/release-manifest-digest.txt)
+          generated_at=$(node -e 'process.stdout.write(new Date(Number(process.argv[1]) * 1000).toISOString())' "$(git show -s --format=%ct "$GITHUB_SHA")")
+          node release/create-rc-result.js \
+            --version "$RELEASE_VERSION" \
+            --tag "$GITHUB_REF_NAME" \
+            --commit "$GITHUB_SHA" \
+            --image "$RELEASE_IMAGE" \
+            --manifest-digest "$manifest_digest" \
+            --standalone-artifact "$RELEASE_ARTIFACT" \
+            --standalone-sha256 "$standalone_sha" \
+            --workflow-url "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --generated-at "$generated_at" \
+            --output-json dist/rc-result.json \
+            --output-markdown dist/rc-result.md
+
+      - name: Upload candidate-bound RC evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc-result
+          path: |
+            dist/rc-result.json
+            dist/rc-result.md
+          if-no-files-found: error
+          retention-days: 90
+
   publish-release:
     needs:
       - validate
       - smoke-test
+      - candidate-evidence
+    if: >-
+      always() &&
+      needs.validate.result == 'success' &&
+      needs.smoke-test.result == 'success' &&
+      (needs.validate.outputs.stable == 'true' ||
+      needs.candidate-evidence.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -319,6 +430,13 @@ jobs:
           name: stable-gate-result
           path: dist
 
+      - name: Download candidate-bound RC evidence
+        if: needs.validate.outputs.stable != 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: rc-result
+          path: dist
+
       - name: Create GitHub Release and attach checksums
         env:
           GH_TOKEN: ${{ github.token }}
@@ -342,3 +460,12 @@ jobs:
             gh release upload "$GITHUB_REF_NAME" \
               dist/stable-gate-result.json
           fi
+
+      - name: Attach candidate-bound RC evidence
+        if: needs.validate.outputs.stable != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release upload "$GITHUB_REF_NAME"
+          dist/rc-result.json
+          dist/rc-result.md

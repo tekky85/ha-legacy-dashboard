@@ -34,6 +34,11 @@ Sprint 27.1-I hat auf Basis `f406bf7` die aktuelle Produktgalerie
 reproduzierbar aus der unveränderten Anwendung und ausschließlich lokalen
 Demo-Payloads neu aufgenommen (`RQ-08-02`) und diesen technischen Status gegen
 Schema, App-Paket und Auditindex berichtigt (`RQ-08-03`).
+Sprint 27.1-J schloss auf Basis `a5d433c` die automatisierbaren Ursachen von
+`RQ-13-01` und `RQ-17-01`: ein Git-basiertes Source-/Tag-/Immutable-Target-
+Gate und ein commit-/artefaktgebundener RC-Nachweis ersetzen Stringprüfung
+und gemischte Checkliste. Der separat zu veröffentlichende RC.4 sowie alle
+kandidatenbezogenen Realtests bleiben ausstehend.
 Reale iPad-/HomeScreen-/
 Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate
 bleiben offen.
@@ -68,6 +73,8 @@ Status:
 - Sprint-27.1-G / RQ-18-01: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-H / RQ-14-04, RQ-14-03: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-I / RQ-08-02, RQ-08-03: **COMPLETE – SCREENSHOT REVIEW PENDING**
+- Sprint-27.1-J / RQ-13-01, RQ-17-01:
+  **CODE CLOSED – RELEASE AND MANUAL EVIDENCE PENDING**
 - Sprint 27.2 / Public Test Release 1.0.0-rc.3:
   **COMPLETE – PUBLIC TESTS PENDING**
 - Manuelle Abnahme: **PENDING**
@@ -78,7 +85,7 @@ besteht aktuell aus `config.yaml`, `Dockerfile`, `run.sh`, Dokumentation,
 Übersetzungen und Bildressourcen; die frühere `build.yaml` wurde in Sprint 25
 zugunsten des Dockerfile-/BuildKit-Pfads entfernt. Der veröffentlichte
 Public-Test-Stand bleibt unverändert `v1.0.0-rc.3`; die späteren Batches
-27.1-E bis 27.1-I sind noch nicht Bestandteil dieses Tags.
+27.1-E bis 27.1-J sind noch nicht Bestandteil dieses Tags.
 
 ### Sprint 27.1-A – Upload Integrity
 
@@ -228,6 +235,31 @@ unveränderte Card-/Room-Browser-Gate 1.576/1.576 Fälle. Beide geänderten
 JavaScript-Test-/Capturedateien bestanden `node --check`. Es wurden keine
 Produktionsdienste, Tokens, Tags, Images oder Releaseartefakte verwendet oder
 verändert.
+
+### Sprint 27.1-J – Versionierter Kandidat und RC-Evidenz
+
+Die frühere Stringprüfung konnte nicht erkennen, dass RC.3 unveränderlich auf
+`771683b` zeigt, während neuere release-relevante Reparaturen auf HEAD liegen.
+Das neue Source-Gate weist Tag-/HEAD-Abweichung, Wiederverwendung einer
+gebundenen Version und nicht monotone Folgeversionen ab. Der Releaseworkflow
+stoppt fail-closed bei einem bereits vorhandenen GitHub Release oder
+GHCR-Manifest, bevor ein Image gepusht wird.
+
+`docs/RC_CHECKLIST.md` begrenzt RC.1 auf seine historische Commit-/Artefakt-
+Evidenz und bewertet den heutigen Entwicklungsstand ohne erfundene
+Kandidatenwerte als `BLOCKED`. Für den nächsten Kandidaten erzeugt der
+Workflow nach Test, Manifest, Smoke und Checksum ein `rc-result`-Paar mit
+genau einem Commit, Tag, Image-Digest, Bundlehash und Workflowlauf. LXC,
+HAOS amd64/aarch64 und iPad beginnen immer `NOT TESTED`.
+
+Dieser Batch veröffentlicht entsprechend seiner Scope-Grenze keine neue
+Version. RC.3 bleibt installierbar und unverändert; RC.4 muss in einem eigenen
+Releasecommit aktiviert, getaggt und durch den Workflow veröffentlicht werden.
+Bis dahin bleiben beide P1-Einträge als Releaseevidenz-Blocker sichtbar. Es
+wurde kein Runtime-, Frontend-, HA-, Credential- oder Permissionpfad geändert.
+Der Fokuslauf bestand 35/35, die Gesamtsuite 394/394; Syntax-, Secret- und
+Produktionsdependency-Gates sind grün. Der unveränderte Card-Matrix-Harness
+war lokal mangels Chromium `NOT TESTED` und bleibt im CI verpflichtend.
 
 ### Sprint 27.2 – Public Test Release 1.0.0-rc.3
 

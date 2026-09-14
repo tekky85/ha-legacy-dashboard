@@ -57,10 +57,10 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 25-SOURCE-02 | Dockerfile/BuildKit statt historischem HA-Builder | PASS | `.github/workflows/test.yml` und `release.yml` verwenden buildx/BuildKit; `build.yaml` und `home-assistant/builder` fehlen. |
 | 25-SOURCE-03 | Eindeutiger Repository-Root-Kontext und kontrollierte Kopien | PASS | Workflow: `context: .`, `file: ha_legacy_dashboard/Dockerfile`; Dockerfile kopiert Lockfile, `src`, Lizenz und `run.sh` gezielt, niemals `COPY . .`. |
 | 25-SOURCE-04 | Kein widersprüchlicher zweiter Releasepfad | PASS | Eine Releaseworkflowdatei, ein Bundle-Generator und ein Manifestvalidator; das Sprint-24-Dev-Vorbereitungsskript ist kein Veröffentlichungsworkflow. |
-| 25-VERSION-01 | SemVer über Paket, Lockfile, App, Metadaten und Changelogs konsistent | PASS | `release/check-version.js`; lokaler Check für `v1.0.0-rc.1` grün. |
-| 25-VERSION-02 | Falscher Tag oder Versionsabweichung bricht ab | PASS | `test/sprint-25.test.js`: falscher Git-Tag und abweichende App-Version werfen kontrollierte Fehler. |
-| 25-VERSION-03 | Immutable Version bezeichnet den aktuellen Source-Stand | BROKEN | Tag `v1.0.0-rc.1` zeigt auf `741bba4`, HEAD auf `593ba5a`; Stringgleichheit erkennt 19 nachfolgende Commits nicht. `RQ-13-01`. |
-| 25-VERSION-04 | Buildargumente, Image- und Archivnamen verwenden dieselbe Version | PASS | `release/metadata.json`, `release.yml`, `config.yaml`, Bundle-Generator und OCI-Buildargumente verwenden `1.0.0-rc.1`. |
+| 25-VERSION-01 | SemVer über Paket, Lockfile, App, Metadaten und Changelogs konsistent | PASS | `release/check-version.js`; aktive veröffentlichte Quellen nennen konsistent `1.0.0-rc.3`. |
+| 25-VERSION-02 | Falscher Tag oder Versionsabweichung bricht ab | PASS | Sprint-25- und Sprint-27.1-J-Tests: falsche Strings, nicht monotone Version, Tag ≠ HEAD und Wiederverwendung eines gebundenen Tags werden abgewiesen. |
+| 25-VERSION-03 | Immutable Version bezeichnet den aktuellen Source-Stand | PARTIAL | Das neue Git-Source-Gate erzwingt dies für jede künftige Veröffentlichung. Der heutige HEAD ist bewusst noch kein neuer Kandidat; RC.3 bleibt unverändert, RC.4-Releaseevidenz steht aus. `RQ-13-01`. |
+| 25-VERSION-04 | Buildargumente, Image- und Archivnamen verwenden dieselbe Version | PASS | `release/metadata.json`, `release.yml`, `config.yaml`, Bundle-Generator und OCI-Buildargumente verwenden dieselbe aktive Version; der künftige Evidenzgenerator validiert dieselben Werte erneut. |
 | 25-TYPE-01 | Development, RC und Stable sind getrennt definiert | PASS | `docs/RELEASING.md`, `check-version.js` und `metadata.channel`; RC nur `-rc.N`, Stable ohne Suffix. |
 | 25-TYPE-02 | RC ist Prerelease und aktualisiert niemals `latest` | PASS | Releaseworkflow setzt `--prerelease`; `latest`-Schritt besitzt `stable == 'true'`. Öffentlicher RC.1-Run ließ alle `latest`-Schritte aus. |
 | 25-TYPE-03 | Stable veröffentlicht erst nach explizitem Promotionsschritt | PASS | Sprint 27.1-H: Stable läuft vor jedem Image-Push durch das geschützte `stable-release`-Environment, die versionierte RC-Freigabe, alle Pflicht-Manuellresultate und den P0/P1-Queue-Check. RC verwendet einen getrennten Gatepfad. |
@@ -110,7 +110,7 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 25-GATE-05 | HA-App-Gate einschließlich realem Update | PARTIAL | Historischer RC.1-Fresh-Install/REST/LAN PASS; WS, Update, `/data`, Backup, Reboot und aarch64 in `MT-50` bis `MT-53`/`MT-57`. |
 | 25-DOC-01 | README DE/EN semantisch synchron | PASS | Release-/Installationsabschnitte haben dieselbe Betriebsarten-, Image-, RC- und Securityaussage. |
 | 25-DOC-02 | Standalone-Distribution aus dem Artefakt heraus korrekt dokumentiert | PASS | Bundle-spezifische deutsche/englische README-/Installationsdateien sind direkt enthalten und benötigen weder Repositorydateien noch Git-Skripte; automatisierte Link-/Inhaltsprüfung. |
-| 25-DOC-03 | Releaseanleitung entspricht dem aktuellen Lebenszyklus | PARTIAL | Sie nennt RC.1 noch als „ersten geplanten Release“ und zeigt denselben bereits existierenden Tag als nächsten Erzeugungsschritt. Zusatzbeleg zu `RQ-13-01`. |
+| 25-DOC-03 | Releaseanleitung entspricht dem aktuellen Lebenszyklus | PASS | Sprint 27.1-J beschreibt RC.3 als unveränderliche Historie, verlangt eine neue Version für neueren Source und dokumentiert Immutable-Target- sowie Kandidatennachweis-Gates ohne vorhandene Tags wiederzuverwenden. |
 | 25-DOC-04 | Technischer Projektstatus/Roadmap aktuell | PASS | Sprint 27.1-I: Schema 12, Parts 01–19, Dockerfile/BuildKit ohne `build.yaml`, RC.3 und Batches A–I sind als aktueller Stand dokumentiert. |
 | 25-DOC-05 | Keine echten Secrets oder privaten lokalen Pfade in Beispielen | PASS | Nur generische Platzhalter/Testwerte; Bundle-/Dokumentationsscan ohne Credential oder privaten SSH-/Mac-Pfad. |
 | 25-MATRIX-01 | Alle 60 Releasefälle gezielt rückverfolgbar | PASS | `release/sprint-25-test-matrix.json` ordnet alle 60 Nummern exakt einmal direkter Automatisierung, commitgebundenem Workflow oder vollständigem versions-/artefaktbezogenem MT zu; `test/sprint-27-1-h.test.js` prüft Nummern und Evidenzmarker. Reale Resultate bleiben ehrlich separat. |
@@ -166,7 +166,7 @@ Der heutige Repositoryinhalt ist dennoch nicht releasebereit:
 | 45 | Release Notes | PASS | öffentliche RC.1-Notes |
 | 46 | Changelog | PASS | Root und App |
 | 47 | Supportlinks | PASS | GitHub-Issues/Repository |
-| 48 | Keine veralteten Releaseaussagen | BROKEN | RC.1 wird noch als geplant beschrieben; `RQ-13-01` |
+| 48 | Keine veralteten Releaseaussagen | PASS | `docs/RELEASING.md` und `docs/RC_CHECKLIST.md` trennen RC.1–RC.3-Historie, aktuellen Entwicklungsstand und nächsten Kandidaten. |
 | 49 | Default Dashboard | PARTIAL | automatisiert PASS; Releasegerät in manuellen UI-Queues offen |
 | 50 | Custom Dashboards | PARTIAL | automatisiert PASS; Releasegerät in manuellen UI-Queues offen |
 | 51 | Focus | PARTIAL | automatisiert PASS; reales Gerät MT-18/19/20 offen |
@@ -366,3 +366,25 @@ H-spezifisch bestanden 7/7, im fokussierten Release-/App-/Standalone-Lauf
 44/44 und in der Gesamtsuite 385/385 Tests. Der verpflichtende Browser-Harness
 bestand 1.576/1.576 Fälle; Syntax-, Versions-, Secret- und
 Produktionsdependency-Gates waren grün.
+
+## Sprint-27.1-J-Re-Audit
+
+`RQ-13-01` besitzt nun ein Git-basiertes Source-Gate zusätzlich zur formalen
+Versionskonsistenz. Negative Fixtures belegen release-relevante Änderungen
+nach einem gebundenen Tag, Tag/HEAD-Abweichung und nicht monotone
+Folgeversionen. Der Releaseworkflow stoppt außerdem vor Image-Push, wenn
+GitHub Release oder GHCR-Manifest derselben Version schon existieren. Die
+Anleitung beschreibt den tatsächlichen RC.1–RC.3-Lebenszyklus und keine
+Wiederverwendung historischer Tags mehr.
+
+Der Workflow erzeugt nach Manifest-, Checksum- und Smoke-Gate einen
+commit-/artefaktgebundenen RC-Nachweis. Das ist zugleich die technische
+Grundlage für `RQ-17-01`; konkrete RC.4-Digests entstehen erst im separat
+autorisierten Releaseworkflow. Die aktive Version wurde nicht vorzeitig auf
+ein fehlendes Image angehoben. Sprint 25 bleibt bis Kandidatenpublish und
+MT-55/56/57 insgesamt `PARTIAL`, die lokale/automatisierbare 27.1-J-
+Reparatur ist abgeschlossen. Fokussiert bestanden 35/35 und vollständig
+394/394 Tests; JavaScript-/Shellsyntax, Secret-Scan und der Produktionsaudit
+mit Moderate-Schwelle waren grün. Der lokale Card-Matrix-Browserlauf blieb
+mangels installiertem Chromium `NOT TESTED`; der unveränderte Harness bleibt
+Pflicht im GitHub-Test- und Releaseworkflow.

@@ -66,16 +66,16 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-A3-01 | amd64 und aarch64 deklariert | PASS | `arch` enthält beide; aktuelles öffentliches OCI-Manifest enthält `linux/amd64` und `linux/arm64`. |
 | 25.4-A4-01 | Generische Image-Referenz | PASS | `image: ghcr.io/tekky85/ha-legacy-dashboard`; entspricht aktueller HA-Publishing-Empfehlung. |
 | 25.4-DOCKER-01 | Eine Dockerfile-Buildquelle | PASS | Release-/Testworkflow verwenden ausschließlich `ha_legacy_dashboard/Dockerfile` mit Root-Buildkontext. |
-| 25.4-DOCKER-02 | RC-Checkliste beschreibt den tatsächlichen Dockerfile-Pfad | BROKEN | Checkliste behauptet „Root-Dockerfile“; im Repository existiert kein Root-`Dockerfile`. Teil von `RQ-17-01`. |
-| 25.4-VERSION-01 | Paket, Lockfile, App, Releasemetadaten und Changelogs stimmen als String überein | PASS | `release/check-version.js --tag v1.0.0-rc.1` besteht. |
-| 25.4-VERSION-02 | Version/Image repräsentieren den aktuell auditierten Quellstand | BROKEN | Tag/Image RC.1 = `741bba4`, HEAD = `593ba5a`; 36 Laufzeit-/Packagingdateien abweichend. `RQ-13-01`. |
+| 25.4-DOCKER-02 | RC-Checkliste beschreibt den tatsächlichen Dockerfile-Pfad | PASS | Sprint 27.1-J nennt ausschließlich `ha_legacy_dashboard/Dockerfile` mit Root-Buildkontext. |
+| 25.4-VERSION-01 | Paket, Lockfile, App, Releasemetadaten und Changelogs stimmen als String überein | PASS | Aktive Quellen nennen konsistent `1.0.0-rc.3`; `release/check-version.js` prüft diese Werte. Das neue Source-Gate verhindert ihre Wiederverwendung für den neueren HEAD. |
+| 25.4-VERSION-02 | Version/Image repräsentieren den aktuell auditierten Quellstand | PARTIAL | Source-/Tag-Gate und Immutable-Target-Prüfung sind seit Sprint 27.1-J implementiert; ein neues RC.4-Image aus dem finalen Kandidatencommit wurde in diesem Batch ausdrücklich noch nicht veröffentlicht. |
 | 25.4-VERSION-03 | Bestehenden RC-Tag nicht blind wiederverwenden | PASS | Audit empfiehlt einen neuen separaten Kandidaten erst nach Reparaturen; kein Tag/Publish erfolgt. |
-| 25.4-IMAGE-01 | Versionierter öffentlicher Image-Tag verfügbar | PASS | Anonymer GHCR-Abruf für `1.0.0-rc.1` am 8. September 2026: HTTP 200, OCI Index. Gilt nur für `741bba4`. |
-| 25.4-IMAGE-02 | Multi-Arch-Manifest enthält amd64/arm64 | PASS | Digest `sha256:1c5d4e…98e7c`; Plattformen `linux/amd64`, `linux/arm64` plus Attestierungsartefakte. |
-| 25.4-IMAGE-03 | Image für aktuellen HEAD verfügbar | BROKEN | Kein neuer Release nach RC.1; App installiert weiterhin den alten Tag. `RQ-13-01`. |
+| 25.4-IMAGE-01 | Versionierter öffentlicher Image-Tag verfügbar | PASS | Aktueller veröffentlichter Public Test Release ist unveränderlich `1.0.0-rc.3` auf Commit `771683b`; ein neuerer Kandidat wurde in Sprint 27.1-J nicht veröffentlicht. |
+| 25.4-IMAGE-02 | Multi-Arch-Manifest enthält amd64/arm64 | PASS | Für RC.3 dokumentiert `docs/PUBLIC_TEST_RELEASE.md` das Manifest `sha256:7aa35767909de4b12119386112887845705f9e29214069d5ab4c1350a6432550` für amd64/arm64; die nächste Version muss einen eigenen Digest erhalten. |
+| 25.4-IMAGE-03 | Image für aktuellen HEAD verfügbar | NOT TESTED | RC.3 bleibt korrekt historisch; der heutige Entwicklungsstand ist noch kein getaggter Kandidat. Das neue RC.4-Manifest muss im separaten Releaseworkflow entstehen und über MT-55 geprüft werden. |
 | 25.4-IMAGE-04 | Aktuelles Image lokal gebaut und inspiziert | NOT TESTED | Docker ist auf dem Audit-Mac nicht installiert; kein Artefakt wurde gebaut oder veröffentlicht. |
-| 25.4-RELEASE-01 | GitHub-Prerelease und Workflow existieren | PASS | Öffentliche API: Release `v1.0.0-rc.1`, prerelease=true; Runs 33203376391/33203376334 beide success auf `741bba4`. |
-| 25.4-RELEASE-02 | Bundle und SHA256SUMS verfügbar | PASS | Öffentliche Release-API listet Tarball und Checksum; veröffentlichter Digest dokumentiert/verifiziert. |
+| 25.4-RELEASE-01 | GitHub-Prerelease und Workflow existieren | PASS | RC.3 ist als unveränderlicher Public Test Release auf `771683b` dokumentiert; Releaseworkflow `34471183386`. RC.1 und RC.2 bleiben getrennte Historie. |
+| 25.4-RELEASE-02 | Bundle und SHA256SUMS verfügbar | PASS | RC.3 dokumentiert `ha-legacy-dashboard-1.0.0-rc.3.tar.gz`, `SHA256SUMS` und Standalone-SHA256 `4d6ca325365d041b21b2fc06512dfd9e029a53cbbf6db2a9577ec6e682437295`. |
 | 25.4-RELEASE-03 | Standalone-Bundle ist aus sich heraus installier-/upgrade-/rollbackfähig | PASS | Sprint 27.1-D enthält bundle-spezifische DE/EN-Anleitungen, versionierte Runtime-/State-Pfade, Backup und Rollback ohne Git-Checkout; Tar-Link-/Pfadtest grün. Reale LXC-Abnahme MT-56. |
 | 25.4-RELEASE-04 | Upgradeprüfung verwendet zwei getrennte Releasezustände und Rollback | PASS | Eingefrorener Release-0.9-/Schema-4-Prozess und entpackter aktueller Tarballprozess teilen isolierten Standalone-/App-Datenpfad; Migration, Backup, Regeln, Background und Rückprüfung durch die alte Laufzeit sind automatisiert. Reale MT-52/56 bleiben NOT TESTED. |
 | 25.4-PERM-01 | Nur benötigtes `homeassistant_api: true` | PASS | Config enthält genau diese HA-Berechtigung; kein `hassio_api`. |
@@ -129,20 +129,23 @@ Entscheid lautet daher weiterhin **BLOCKED**.
 | 25.4-DOC-02 | Standalone-Artefakt enthält alle versprochenen Anleitungen | PASS | Archivlokale README-/INSTALL-Dateien in Deutsch/Englisch; alle relativen Links werden gegen den Tar-Inhalt geprüft, keine Git-Deployskriptreferenz. |
 | 25.4-DOC-03 | Projektstatus/Roadmap bilden aktuellen Stand korrekt ab | PARTIAL | Historischer Sprintabschnitt vorhanden; globaler Status nennt weiter Schema 11 und veralteten Auditstand. `RQ-08-03`. |
 | 25.4-TELEM-01 | Keine Telemetrie/Analytics/Crash-Uploads | PASS | Source-/Dependency-/Networkscan ohne entsprechende Integration. |
-| 25.4-MATRIX-01 | RC Result Matrix vorhanden und verwendet nur PASS/FAIL/BLOCKED/NOT TESTED | PASS | `docs/RC_CHECKLIST.md`; 145 Statuszeilen, keine fremden Statuswerte. |
-| 25.4-MATRIX-02 | Matrix ist ein commitbezogener, aktueller Kandidatennachweis | BROKEN | Kopf RC.1/741bba4, LXC 42d88f3, Tests 275/283/290, später angehängte Sprints; aktueller HEAD 329 Tests. `RQ-17-01`. |
-| 25.4-MATRIX-03 | PASS-Aussagen entsprechen dem aktuellen Repositoryzustand | BROKEN | Der Moderate-Dependency-Befund ist seit Sprint 27.1-D geschlossen; die historische RC-Checkliste mischt weiterhin Commit-/Artefaktstände und einen falschen Dockerfile-Pfad. `RQ-17-01`. |
-| 25.4-BLOCK-01 | Expliziter Abschnitt `RC BLOCKERS` vorhanden | PASS | Fünf Punkte plus Abschlussreihenfolge; RC-Empfehlung ausdrücklich BLOCKED. |
-| 25.4-BLOCK-02 | Blockerliste enthält alle aktuell offenen P1-Befunde | BROKEN | RQ-13-01 und RQ-14-04 sind nicht vollständig commitbezogen als heutige Gatebedingungen abgeleitet. `RQ-17-01`; RQ-04-01, RQ-14-01/-02 und RQ-16-01 sind code-seitig geschlossen. |
-| 25.4-MANUAL-01 | Reale HAOS-, LXC-, Netzwerk- und iPad-Punkte nicht künstlich PASS | PARTIAL | Alte Evidenz ist überwiegend korrekt begrenzt; einige Matrix-PASS-Zeilen werden aber ohne klare Buildgrenze neben späteren Ständen wiederverwendet. MT-Zuordnung und RQ-17-01. |
+| 25.4-MATRIX-01 | RC Result Matrix vorhanden und verwendet nur PASS/FAIL/BLOCKED/NOT TESTED | PASS | Die aktuelle Matrix in `docs/RC_CHECKLIST.md` und das generierte `rc-result.md` beschränken Ergebniswerte auf PASS/FAIL/BLOCKED/NOT TESTED; `test/sprint-27-1-j.test.js` prüft die erzeugte Struktur. |
+| 25.4-MATRIX-02 | Matrix ist ein commitbezogener, aktueller Kandidatennachweis | PARTIAL | Die lebende Checkliste mischt keine Kandidaten mehr. Der neue Workflowgenerator bindet exakt einen Commit, Tag, Manifestdigest, Bundlehash und Workflowlauf; konkrete Werte entstehen erst beim separaten RC.4-Workflow. |
+| 25.4-MATRIX-03 | PASS-Aussagen entsprechen dem aktuellen Repositoryzustand | PASS | Historische RC.1-Evidenz ist auf `741bba4` begrenzt, RC.2 und RC.3 sind separat ausgewiesen; der heutige Nicht-Kandidat ist ehrlich `BLOCKED`/`NOT TESTED`. Falscher Dockerfile-Pfad und zeitlich vermischter Dependency-PASS wurden entfernt. |
+| 25.4-BLOCK-01 | Expliziter Abschnitt `RC BLOCKERS` vorhanden | PASS | Sechs konkrete Punkte plus Abschlussablauf; RC-Empfehlung ausdrücklich BLOCKED. |
+| 25.4-BLOCK-02 | Blockerliste enthält alle aktuell offenen P1-Befunde | PASS | Checkliste führt fehlenden neuen Kandidaten/Releaseevidenz sowie alle kandidatenbezogenen LXC-/HAOS-/iPad- und Stable-Gates explizit. Die kanonische Queue bleibt Quelle für P0/P1. |
+| 25.4-MANUAL-01 | Reale HAOS-, LXC-, Netzwerk- und iPad-Punkte nicht künstlich PASS | PASS | Generierter Nachweis initialisiert LXC, HAOS amd64/aarch64 und iPad immer als `NOT TESTED`; die heutige Matrix übernimmt keine alten Realresultate auf einen neuen Kandidaten. |
 | 25.4-MANUAL-02 | Vollständige ausführbare Manuelltests vorhanden | PASS | MT-13/34/40/42 und MT-50 bis MT-56/58 bis MT-60 besitzen Voraussetzungen, Routen, Schritte, Expected, Fail, Evidence und Result. |
 | 25.4-RC-01 | RC nur bei vollständigen Pflicht-PASS freigeben | PASS | Dokument empfiehlt ausdrücklich `BLOCKED`; kein Stable-/Tag-/Publish in Part 17. |
-| 25.4-RC-02 | Aktueller HEAD ist RC-freigabefähig | BROKEN | Aktuelles Image fehlt, P1-Befunde und reale Pflichtgates sind offen; `RQ-17-01` mit verbleibenden Abhängigkeiten RQ-13-01/RQ-14-04. RQ-04-01 und RQ-14-01/-02 sind code-seitig geschlossen. |
+| 25.4-RC-02 | Aktueller HEAD ist RC-freigabefähig | NOT TESTED | Der Entwicklungs-HEAD ist absichtlich noch kein neuer Kandidat. RC.4-Workflow, Kandidatennachweis und alle zugeordneten Realtests stehen aus; Empfehlung bleibt `BLOCKED`. |
 
-## Aktuelle RC Result Matrix
+## Historische Baseline-RC-Result-Matrix (Audit Part 17)
 
-Diese Matrix bewertet den auditierten HEAD. Historische RC.1-Evidenz bleibt
-ausdrücklich auf `741bba4` begrenzt.
+Diese Matrix bewertet ausschließlich den oben genannten Audit-Part-17-Commit
+`593ba5a` und wird nicht als heutiger Kandidatennachweis fortgeschrieben.
+Historische RC.1-Evidenz bleibt ausdrücklich auf `741bba4` begrenzt. Der
+aktuelle, bereinigte Stand steht im Sprint-27.1-J-Re-Audit am Dateiende und in
+`docs/RC_CHECKLIST.md`.
 
 | Bereich | Status | Blocker/Nachweis |
 |---|---|---|
@@ -317,3 +320,24 @@ H-spezifisch bestanden 7/7, fokussiert 44/44 und vollständig 385/385 Tests.
 Das Release-Gate bestand Syntax, Version und Secret-Scan, der
 Produktionsaudit meldete 0 Schwachstellen. Diese lokale Evidenz ersetzt weder
 die Environment-Administration noch MT-57.
+
+## Sprint-27.1-J-Re-Audit
+
+`RQ-17-01` ist code-seitig geschlossen. `docs/RC_CHECKLIST.md` ist kein
+fortgeschriebenes Mischprotokoll mehr: RC.1 ist ausschließlich auf
+`741bba4` begrenzt, RC.2/RC.3 bleiben getrennte unveränderliche Historie und
+der heutige Entwicklungsstand wird ohne erfundene Kandidatenwerte als
+`BLOCKED` bewertet. Der tatsächliche Buildpfad lautet
+`ha_legacy_dashboard/Dockerfile`; Dependencyaussagen werden nicht mehr aus
+anderen Commits übernommen.
+
+`release/create-rc-result.js` und der Releaseworkflow erzeugen für den nächsten
+Kandidaten erst nach allen automatischen Gates genau eine Commit-/Tag-/Image-/
+Manifest-/Bundle-/Workflowidentität. LXC, HAOS amd64/aarch64 und iPad beginnen
+explizit `NOT TESTED`. Da Sprint 27.1-J weder Tag noch Image noch Release
+veröffentlicht, bleiben `25.4-MATRIX-02` und die Distribution unter
+Kandidatenevidenz-Vorbehalt; RC-Empfehlung und Sprint-Gesamtstatus bleiben
+`BLOCKED`. Kein manueller Test wurde als bestanden markiert. Der 27.1-J-
+Fokuslauf bestand 35/35 und die Gesamtsuite 394/394; Source-/Secret-/
+Dependency-Gates bestanden beziehungsweise wiesen den absichtlich noch auf
+RC.3 stehenden Entwicklungsstand korrekt als nicht erneut veröffentlichbar ab.

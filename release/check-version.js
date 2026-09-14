@@ -2,6 +2,7 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
+const ReleaseSource = require("./check-release-source");
 
 const ROOT = path.join(__dirname, "..");
 const SEMVER_PATTERN =
@@ -37,7 +38,7 @@ function headingContainsVersion(content, version) {
 }
 
 
-function validate(root, requestedTag) {
+function validate(root, requestedTag, options) {
     const packageConfiguration = readJson(root, "package.json");
     const lock = readJson(root, "package-lock.json");
     const metadata = readJson(root, "release/metadata.json");
@@ -122,7 +123,7 @@ function validate(root, requestedTag) {
         fail("Git tag " + requestedTag + " must be " + expectedTag);
     }
 
-    return {
+    const result = {
         version: version,
         tag: expectedTag,
         channel: expectedChannel,
@@ -131,6 +132,15 @@ function validate(root, requestedTag) {
         standaloneArtifact: metadata.standaloneArtifact,
         releaseNotes: metadata.releaseNotes
     };
+
+    if (options && options.checkSource) {
+        result.source = ReleaseSource.assertReleaseSource(
+            root,
+            version,
+            requestedTag
+        );
+    }
+    return result;
 }
 
 
@@ -158,7 +168,10 @@ if (require.main === module) {
     try {
         const result = validate(
             ROOT,
-            argumentValue("--tag") || process.env.RELEASE_TAG || null
+            argumentValue("--tag") || process.env.RELEASE_TAG || null,
+            {
+                checkSource: process.argv.indexOf("--check-source") !== -1
+            }
         );
         const outputFile = argumentValue("--github-output");
 

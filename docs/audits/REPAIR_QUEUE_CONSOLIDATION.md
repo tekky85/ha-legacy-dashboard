@@ -276,12 +276,18 @@ Code-/UI-Änderungen erneut erzeugt.
 
 - Repairs: `RQ-13-01`, `RQ-17-01`
 - Sprints: 24, 25, 25.4
-- Erwartete Komponenten: konsistente Version/Tag/Image/Release und neue, exakt
-  commit-/artefaktbezogene RC-Matrix
-- Re-Audit: Sprint 24/25/25.4
-- Entsperrt: aktuelle HAOS-/Release-/Kiosk-Abnahme und finales RC-Gate
+- Status: **CODE CLOSED – RELEASE AND MANUAL EVIDENCE PENDING**
+- Ergebnis: Git-basiertes Source-/Tag-/Monotonie-Gate, Fail-closed-Schutz
+  gegen vorhandene Releaseziele, historisch begrenzte RC.1-Evidenz und ein
+  automatisch erzeugter commit-/artefaktgebundener `rc-result`.
+- Re-Audit: Sprint 24/25/25.4 abgeschlossen; Gesamtstatus bleibt
+  `PARTIAL`/`BLOCKED`, bis ein neuer Kandidat veröffentlicht ist.
+- Noch nicht entsperrt: aktuelle HAOS-/Release-/Kiosk-Abnahme und finales
+  RC-Gate benötigen den separat autorisierten RC.4-Workflow. RC.3 bleibt
+  unverändert.
 
-Die Batches sind Vorschläge. Kein Batch wurde in diesem Pass gestartet.
+Die ursprüngliche Batchplanung bleibt historische Konsolidierungsevidenz;
+der jeweilige aktuelle Ausführungsstand steht nun direkt bei den Batches.
 
 ## 10. Manuelle Testabhängigkeiten
 

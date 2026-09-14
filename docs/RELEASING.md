@@ -16,10 +16,14 @@ Die Versionsquelle ist die gemeinsam geprüfte SemVer-Version in:
 - `ha_legacy_dashboard/CHANGELOG.md`
 - Git-Tag `v<version>`
 
-`release/check-version.js` bricht bei jeder Abweichung ab. Der aktuelle Public
-Test Release ist `1.0.0-rc.3`; `1.0.0-rc.1` und `1.0.0-rc.2` bleiben als
-unveränderliche historische Kandidaten erhalten. Rc.3 neutralisiert zusätzlich
-das plattformabhängige gzip-OS-Feld des Standalone-Artefakts.
+`release/check-version.js` bricht bei jeder Abweichung ab. Mit
+`--check-source` prüft es zusätzlich den Git-Stand: Ein bereits vorhandener
+Versionstag muss exakt auf den Release-Commit zeigen; release-relevante
+Änderungen nach einem bereits gebundenen Tag verlangen eine neue Version. Der
+aktuelle Public Test Release ist `1.0.0-rc.3`; `1.0.0-rc.1` und
+`1.0.0-rc.2` bleiben als unveränderliche historische Kandidaten erhalten.
+Rc.3 neutralisiert zusätzlich das plattformabhängige gzip-OS-Feld des
+Standalone-Artefakts.
 
 Release Candidate:
 
@@ -45,6 +49,8 @@ Ein Release erzeugt:
 - bei Stable zusätzlich `ghcr.io/tekky85/ha-legacy-dashboard:latest`
 - `ha-legacy-dashboard-<version>.tar.gz`
 - `SHA256SUMS`
+- bei Release Candidates `rc-result.json` und `rc-result.md` mit exakt einer
+  Commit-/Tag-/Image-/Bundle-/Workflowidentität
 - automatisch erzeugte GitHub-Quellarchive
 - BuildKit-Provenance und SBOM für die Architektur-Images
 
@@ -85,19 +91,23 @@ Produktionsaudit bleiben Teil jedes Release Gates.
 ausgelöst:
 
 1. exakten Tag auschecken und Zugehörigkeit zu `main` prüfen
-2. vollständiges Test Gate ausführen
-3. Standalone-Artefakte erzeugen
-4. den Release-Kanal prüfen: RCs passieren das Prerelease-Gate; Stable muss
+2. Tag-/HEAD-Identität prüfen und bereits existierenden GitHub Release oder
+   GHCR-Versionstag vor jedem Push ablehnen
+3. vollständiges Test Gate ausführen
+4. Standalone-Artefakte erzeugen
+5. den Release-Kanal prüfen: RCs passieren das Prerelease-Gate; Stable muss
    vor jedem Image-Push das geschützte `stable-release`-Environment und das
    versionierte Stable-Gate bestehen
-5. amd64 und aarch64 getrennt mit BuildKit bauen und pushen
-6. erst nach beiden Erfolgen das versionierte Multi-Arch-Manifest erzeugen
-7. Manifest auf amd64 und arm64 prüfen
-8. Image gegen einen lokalen Supervisor-/HA-Mock starten
-9. `/health`, `/api/status` und statische Assets prüfen
-10. bei Stable erst jetzt `latest` erzeugen
-11. GitHub Release erstellen und Standalone-Artefakte sowie bei Stable den
-    commitbezogenen Gate-Nachweis anhängen
+6. amd64 und aarch64 getrennt mit BuildKit bauen und pushen
+7. erst nach beiden Erfolgen das versionierte Multi-Arch-Manifest erzeugen
+8. Manifest auf amd64 und arm64 prüfen und seinen Registry-Digest erfassen
+9. Image gegen einen lokalen Supervisor-/HA-Mock starten
+10. `/health`, `/api/status` und statische Assets prüfen
+11. bei RCs den commit- und artefaktgebundenen RC-Nachweis erzeugen; Stable
+    verwendet stattdessen seinen strengeren `stable-gate-result.json`
+12. bei Stable erst jetzt `latest` erzeugen
+13. GitHub Release erstellen und Standalone-Artefakte, `rc-result.*` sowie bei
+    Stable den commitbezogenen Stable-Gate-Nachweis anhängen
 
 Die Pipeline verwendet `github.token`; ein Registry-PAT ist nicht erforderlich.
 Nur Image-Jobs erhalten `packages: write`, erst der letzte Release-Job erhält
@@ -130,11 +140,14 @@ Version, Revision, Erstellzeit, Source, Titel, Beschreibung und Lizenz.
 4. Nutzerorientierte Changelogs und `release/notes/<version>.md` ergänzen.
 5. `release/metadata.json` auf Version, Kanal, Notiz und Artefaktnamen setzen.
 6. beide README-Sprachen semantisch synchron halten.
-7. vollständige lokale Prüfung ausführen:
+7. vollständige lokale Prüfung ausführen. Solange die noch aktive Version
+   bereits auf einem älteren Tag gebunden ist, muss der Source-Check bewusst
+   fehlschlagen; erst der neue Versionscommit darf ihn bestehen:
 
 ```bash
 npm ci
-./release/test-gate.sh v1.0.0-rc.3
+node release/check-version.js --check-source
+./release/test-gate.sh v<neue-version>
 node release/create-standalone-bundle.js dist
 ```
 
@@ -146,14 +159,22 @@ Die CI-Buildprüfung bleibt unabhängig davon verbindlich.
 Nach Review und erfolgreicher CI:
 
 ```bash
-git tag -a v1.0.0-rc.3 -m "HA Legacy Dashboard 1.0.0-rc.3 public test release"
-git push origin v1.0.0-rc.3
+git tag -a v<neue-version> -m "HA Legacy Dashboard <neue-version> public test release"
+git push origin v<neue-version>
 ```
 
 Der Tag startet den Workflow. Erst dessen letzter Job erzeugt das GitHub
-Prerelease. Einen fehlgeschlagenen oder teilweise veröffentlichten Tag nicht
-verschieben. Fehler korrigieren und einen neuen RC, beispielsweise `rc.2`,
-vorbereiten.
+Prerelease. Der Workflow lehnt einen bereits existierenden GitHub Release oder
+GHCR-Manifesttag ab, statt ihn zu überschreiben. Einen fehlgeschlagenen oder
+teilweise veröffentlichten Tag nicht verschieben. Fehler korrigieren und einen
+neuen RC vorbereiten.
+
+`rc-result.json` und `rc-result.md` werden nach dem Container-Smoke-Test
+erzeugt. Sie enthalten den exakten Source-Commit, Tag, Manifestdigest,
+Standalone-SHA256 und Workflowlauf. Reale LXC-, HAOS- und iPad-Ergebnisse
+beginnen darin immer als `NOT TESTED`; sie dürfen nur für denselben Kandidaten
+ergänzt werden. `docs/RC_CHECKLIST.md` beschreibt diese Trennung und bewahrt
+historische RC.1-Evidenz ohne spätere Ergebnisse hineinzumischen.
 
 RC-Abnahme:
 
@@ -271,6 +292,10 @@ Rückweg durchgeführt werden.
 Ein Release wird abgebrochen bei:
 
 - inkonsistenter Version oder falschem Tag
+- Tag, der nicht exakt auf den ausgecheckten Release-Commit zeigt
+- release-relevanten Änderungen nach einem bereits gebundenen Versionstag ohne
+  neue Version
+- bereits vorhandenem GitHub Release oder GHCR-Manifest für dieselbe Version
 - nicht auf `main` enthaltenem Release-Commit
 - fehlgeschlagenem Test, Audit, Build, Manifest oder Smoke Test
 - verfolgter `.env`, privatem Schlüssel oder bekannten Tokenmustern

@@ -91,10 +91,10 @@ deshalb ausdrücklich `NOT TESTED`.
 | 24-WS-01 | Temporäre HA-Unverfügbarkeit scheitert sicher und erholt sich | PASS | REST-Snapshots besitzen stale/offline; der gemeinsame Backend-WebSocket verarbeitet Error/Close seit Sprint 27.1-C idempotent und reconnectet mit begrenztem Backoff. | Automatisierter Transportpfad für Standalone und App PASS; reale HAOS-Recovery bleibt MT-50. |
 | 24-IMAGE-01 | Definierte Node-Version, Produktionsdependencies und gezielte Kopien | PASS – superseded by Sprint 25 | Multi-stage `ha_legacy_dashboard/Dockerfile`, Default `node:22-alpine`, `npm ci --omit=dev`, gezielte Runtime-Kopien. |
 | 24-IMAGE-02 | `.dockerignore` schließt Secrets, Daten und Entwicklungsartefakte aus | PASS | Root- und App-`.dockerignore`; Release-Secret-Scan grün; weder `.env` noch Daten/Keys werden kopiert. |
-| 24-IMAGE-03 | Aktuelle App-Version/Image entspricht dem auditierten Repositorycode | BROKEN | `1.0.0-rc.1` referenziert ein Image/Tag vom Commit `741bba4`; aktueller Commit ist `593ba5a` mit späteren Runtimeänderungen. Siehe `RQ-13-01`. |
+| 24-IMAGE-03 | Aktuelle App-Version/Image entspricht dem auditierten Repositorycode | PARTIAL | Der veröffentlichte RC.3 bleibt korrekt an `771683b` gebunden; HEAD ist neuer. Sprint 27.1-J verhindert nun eine Wiederverwendung von RC.3 und verlangt vor Veröffentlichung eine höhere Version. Ein neues Image wurde in diesem Batch ausdrücklich nicht veröffentlicht; `RQ-13-01` ist code-seitig geschlossen, Releaseevidenz bleibt ausstehend. |
 | 24-IMAGE-04 | Aktuelles Image lokal reproduzierbar gebaut | NOT TESTED | Docker ist auf dem Audit-Mac nicht installiert. Historische Workflow-/Manifesttests PASS; aktueller Build folgt erst nach `RQ-13-01`. |
-| 24-VERSION-01 | Versionen in Package/App/Changelogs sind formal konsistent | PASS – superseded by Sprint 25 | `release/check-version.js --tag v1.0.0-rc.1` ist grün; alle formalen Felder nennen `1.0.0-rc.1`. |
-| 24-VERSION-02 | Immutable Version bezeichnet genau den aktuellen App-Inhalt | BROKEN | Der reine Stringcheck erkennt keine laufzeitrelevanten Änderungen nach dem Tag. Aktuelle Quellen und veröffentlichtes RC.1-Image divergieren; `RQ-13-01`. |
+| 24-VERSION-01 | Versionen in Package/App/Changelogs sind formal konsistent | PASS – superseded by Sprint 25 | `release/check-version.js` bestätigt die aktiven RC.3-Quellen; neue Git-Fixtures prüfen zusätzlich Tag-/Source-Identität. |
+| 24-VERSION-02 | Immutable Version bezeichnet genau den aktuellen App-Inhalt | PARTIAL | Sprint 27.1-J ergänzt das fehlende Git-Source-Gate und weist den aktuellen RC.3-Drift sowie Tagwiederverwendung kontrolliert ab. Die nächste immutable Version/Image entsteht erst im separaten RC.4-Releaseworkflow. |
 | 24-DOC-01 | App- und Standalone-Installation dokumentiert | PASS | `README.de.md`, `README.en.md`, `docs/DEPLOYMENT.md`, App-`DOCS.md` und App-`README.md`; beide Betriebsarten klar getrennt. |
 | 24-DOC-02 | Lokale App-Installation baut tatsächlich den aktuellen lokalen Kontext | PASS | `docs/DEPLOYMENT.md` trennt lokalen Quellbuild ohne `image:` vom unveränderten Produktionspaket mit GHCR-Image; Tar-/Metadatenregression in `test/sprint-24.test.js`. |
 | 24-DOC-03 | Technische Statusdokumentation entspricht der aktuellen Struktur | PASS | Sprint 27.1-I: aktueller App-Inhalt und Dockerfile-/BuildKit-Pfad sind dokumentiert; die historische Sprint-24-`build.yaml` ist eindeutig als später entfernt gekennzeichnet. |
@@ -254,3 +254,20 @@ App-Transport und ändern keine App-Berechtigung. `RQ-09-01` sowie
 `RQ-12-01/-02/-03` sind code-seitig geschlossen; die Gesamtsuite bestand
 336/336. Reale HAOS-Prüfung MT-50 und die Packaging-/Releasebefunde bleiben
 offen.
+
+## Sprint-27.1-J-Re-Audit
+
+`RQ-13-01` ist code-seitig geschlossen, die geforderte neue Distribution aber
+bewusst noch nicht veröffentlicht. Das neue Source-Gate erkennt den aktuellen
+RC.3→HEAD-Drift, verlangt eine höhere monotone Version, bindet im Taglauf den
+Tag exakt an HEAD und verhindert zusammen mit dem Workflow die Wiederverwendung
+eines vorhandenen GitHub-Releases oder GHCR-Manifests. Damit kann eine künftige
+App-Version nicht mehr allein durch passende Versionsstrings einen fremden
+Source-Stand vortäuschen.
+
+Die aktive App bleibt bis zum separaten RC.4-Release installierbar auf dem
+unveränderten RC.3-Image. Kein Token-, Permission-, `/data`-, REST-/WebSocket-
+oder LAN-Pfad wurde geändert. Die Releaseevidenz und MT-50 bis MT-54 bleiben
+`NOT TESTED`; Sprint 24 bleibt deshalb insgesamt `PARTIAL`. Der 27.1-J-
+Fokuslauf bestand 35/35, die Gesamtsuite 394/394; Secret- und
+Produktionsdependency-Gate meldeten keinen Befund.

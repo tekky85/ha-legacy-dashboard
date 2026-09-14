@@ -1255,3 +1255,30 @@ nicht, dass das Projekt RC-ready ist.
   das öffentliche Archiv ist mit SHA256
   `4d6ca325365d041b21b2fc06512dfd9e029a53cbbf6db2a9577ec6e682437295`
   byteidentisch zum unabhängigen macOS-Nachbau. `latest` wurde nicht angelegt.
+
+## Sprint 27.1 – Repair Batch J
+
+- Scope: ausschließlich `RQ-13-01` und `RQ-17-01`.
+- Basiscommit: `a5d433c8cea06218b7530ceb66cdf5edc5baa0e5`.
+- `RQ-13-01`: Git-basiertes Source-/Tag-/Monotonie-Gate sowie Fail-closed-
+  Prüfung auf bereits vorhandenen GitHub Release/GHCR-Manifesttag
+  implementiert. Aktiver RC.3 bleibt installierbar und unverändert; der
+  getrennte RC.4-Releaseworkflow bleibt ausstehend.
+- `RQ-17-01`: gemischte lebende RC-Matrix durch historisch begrenzte Evidenz,
+  ehrlichen Nicht-Kandidatenstatus und einen automatisch erzeugten
+  commit-/artefaktgebundenen `rc-result` ersetzt. Reale Umgebungen beginnen
+  stets `NOT TESTED`.
+- Re-Audit: Sprint 24 und 25 bleiben `PARTIAL`; Sprint 25.4 und aktuelle
+  RC-Empfehlung bleiben `BLOCKED`, bis ein neuer Kandidat veröffentlicht und
+  manuell abgenommen wurde.
+- Sicherheit: kein Runtime-/Frontend-/HA-Pfad geändert; keine Credentials,
+  kein Produktiv-HA, kein LXC/HAOS und kein physisches Gerät verwendet.
+- Automatisierung: 35/35 fokussiert und 394/394 vollständig; Syntax-, Secret-
+  und Moderate-Dependency-Gate grün. Card-Matrix lokal mangels Chromium
+  `NOT TESTED`, im GitHub-Workflow weiterhin verbindlich.
+- Public Test Release: `v1.0.0-rc.3`, GitHub Release und GHCR-Historie blieben
+  unverändert; kein Tag, Image oder Release wurde in Batch J publiziert.
+- Status: **CODE CLOSED / RELEASE AND MANUAL EVIDENCE PENDING**.
+- Nächster Schritt: separater reviewter RC.4-Versionscommit und Releaseworkflow,
+  danach die kandidatengebundenen MT-50 bis MT-57 sowie weiteren HAOS-/iPad-
+  Prüfungen. Kein Sprint 27.1-K wurde begonnen.
