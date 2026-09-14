@@ -215,6 +215,10 @@ test("Release Workflow gate Stable vor Image-Push und lässt RCs getrennt", func
     assert.match(workflow, /stable-gate:[\s\S]*environment:[\s\S]*name: stable-release/);
     assert.match(workflow, /stable-gate:[\s\S]*check-stable-gate\.js/);
     assert.match(workflow, /build-images:[\s\S]*- release-gate/);
+    assert.match(
+        workflow,
+        /build-images:[\s\S]*if: >-[\s\S]*always\(\)[\s\S]*needs\.validate\.result == 'success'[\s\S]*needs\.release-gate\.result == 'success'/
+    );
     assert.match(workflow, /release-candidate-gate:[\s\S]*stable != 'true'/);
     assert.match(workflow, /stable-gate-result\.json/);
     assert.match(workflow, /Publish latest only after stable validation[\s\S]*stable == 'true'/);

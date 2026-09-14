@@ -173,6 +173,10 @@ jobs:
     needs:
       - validate
       - release-gate
+    if: >-
+      always() &&
+      needs.validate.result == 'success' &&
+      needs.release-gate.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read

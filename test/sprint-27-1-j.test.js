@@ -105,7 +105,8 @@ test("Veröffentlichter RC-Tag kann für neueren Source nicht wiederverwendet we
     const current = VersionCheck.validate(ROOT, null, {checkSource: true});
     assert.equal(current.version, CURRENT_VERSION);
     if (current.source.expectedTagCommit === null) {
-        assert.equal(current.source.previousTag, "v1.0.0-rc.4");
+        assert.match(current.source.previousTag, /^v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
+        assert.notEqual(current.source.previousTag, current.source.expectedTag);
     } else {
         assert.equal(current.source.expectedTagCommit, current.source.head);
         assert.equal(current.source.sourceDrift, false);

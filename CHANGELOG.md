@@ -8,6 +8,19 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.6 – 2026-09-14
+
+This candidate replaces the unpublished RC.5 build without moving or reusing
+its public tag. Application behavior is identical to RC.5.
+
+### Release hardening
+
+- Made the architecture-image jobs explicitly depend on successful validation
+  and channel gates even when the non-matching Stable gate is intentionally
+  skipped for a release candidate.
+- Added a regression assertion for the exact RC workflow state that prevented
+  RC.5 from publishing images and release artifacts.
+
 ## 1.0.0-rc.5 – 2026-09-14
 
 This candidate replaces the unpublished RC.4 build without moving or reusing

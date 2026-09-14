@@ -5,6 +5,12 @@
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.6 – 2026-09-14
+
+This candidate replaces the unpublished RC.5 build without moving its public
+tag. Runtime behavior is unchanged; RC architecture images now proceed after
+the successful candidate gate while the unrelated Stable gate remains skipped.
+
 ## 1.0.0-rc.5 – 2026-09-14
 
 This candidate replaces the unpublished RC.4 build without moving its public
