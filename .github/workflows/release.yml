@@ -233,6 +233,10 @@ jobs:
     needs:
       - validate
       - build-images
+    if: >-
+      always() &&
+      needs.validate.result == 'success' &&
+      needs.build-images.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -288,6 +292,10 @@ jobs:
     needs:
       - validate
       - publish-manifest
+    if: >-
+      always() &&
+      needs.validate.result == 'success' &&
+      needs.publish-manifest.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -322,7 +330,12 @@ jobs:
       - publish-manifest
       - smoke-test
     runs-on: ubuntu-latest
-    if: needs.validate.outputs.stable != 'true'
+    if: >-
+      always() &&
+      needs.validate.result == 'success' &&
+      needs.publish-manifest.result == 'success' &&
+      needs.smoke-test.result == 'success' &&
+      needs.validate.outputs.stable != 'true'
     permissions:
       contents: read
 

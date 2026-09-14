@@ -1,6 +1,6 @@
 {
   "name": "ha-legacy-dashboard",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "description": "Lightweight Home Assistant dashboard for legacy browsers and wall displays",
   "main": "src/server.js",
   "scripts": {

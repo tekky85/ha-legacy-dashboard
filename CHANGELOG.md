@@ -8,6 +8,18 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.7 – 2026-09-14
+
+This candidate replaces the unpublished RC.6 build without moving or reusing
+its public tag. Application behavior is identical to RC.6.
+
+### Release hardening
+
+- Made manifest publication, container smoke testing, and candidate evidence
+  explicitly continue after successful predecessor jobs even when the
+  non-matching Stable channel gate is intentionally skipped.
+- Extended workflow regressions across every post-gate release boundary.
+
 ## 1.0.0-rc.6 – 2026-09-14
 
 This candidate replaces the unpublished RC.5 build without moving or reusing
