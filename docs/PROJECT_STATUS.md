@@ -1,14 +1,11 @@
 # Projektstatus – HA Legacy Dashboard
 
-Stand: 14. September 2026. Sprint 27.2 hat den Stand nach Batch 27.1-D als
-`1.0.0-rc.3` Public Test Release veröffentlicht. `1.0.0-rc.2` wurde zuvor mit
-erfolgreichem GitHub-Workflow, Multi-Arch-Image und Standalone-Artefakt
-veröffentlicht. Eine
-anschließende unabhängige macOS-/Linux-Reproduktion zeigte jedoch einen
-unterschiedlichen rein informativen gzip-Host-OS-Headerbyte bei identischem
-entpacktem Tar-Inhalt. `rc.3` normalisiert dieses Byte und ersetzt `rc.2` als
-Reproduzierbarkeitskandidat. `rc.3` ist kein Stable Release;
-reale HAOS-/LXC-/iPad-Abnahmen bleiben `NOT TESTED`.
+Stand: 14. September 2026. Der aktuelle öffentliche Teststand ist
+`1.0.0-rc.7` auf Commit `2507f6955b17740da8edbd36925b3338ca080383`.
+Workflow `34838365619` veröffentlichte das geprüfte amd64-/aarch64-Manifest,
+den Container-Smoke-Test, das Standalone-Artefakt samt SHA256 und den
+commit-/artefaktgebundenen RC-Nachweis. RC.7 ist kein Stable Release; reale
+HAOS-/LXC-/iPad-Abnahmen bleiben `NOT TESTED`.
 
 Das Sprint-27-Baseline-Audit der Parts 01 bis 19 und
 der anschließende Repair-Queue-Consolidation-Pass wurden auf Repository-Commit
@@ -37,8 +34,9 @@ Schema, App-Paket und Auditindex berichtigt (`RQ-08-03`).
 Sprint 27.1-J schloss auf Basis `a5d433c` die automatisierbaren Ursachen von
 `RQ-13-01` und `RQ-17-01`: ein Git-basiertes Source-/Tag-/Immutable-Target-
 Gate und ein commit-/artefaktgebundener RC-Nachweis ersetzen Stringprüfung
-und gemischte Checkliste. Der separat zu veröffentlichende RC.4 sowie alle
-kandidatenbezogenen Realtests bleiben ausstehend.
+und gemischte Checkliste. Der separate Releasepfad wurde anschließend mit
+RC.7 vollständig ausgeführt; die dabei real gefundenen Workflowgrenzen sind
+regressiert. Alle kandidatenbezogenen Realtests bleiben ausstehend.
 Reale iPad-/HomeScreen-/
 Safari-, LXC-, Home-Assistant- und HAOS-Abnahmen sowie das finale RC-Gate
 bleiben offen.
@@ -74,7 +72,9 @@ Status:
 - Sprint-27.1-H / RQ-14-04, RQ-14-03: **COMPLETE – MANUAL PENDING**
 - Sprint-27.1-I / RQ-08-02, RQ-08-03: **COMPLETE – SCREENSHOT REVIEW PENDING**
 - Sprint-27.1-J / RQ-13-01, RQ-17-01:
-  **CODE CLOSED – RELEASE AND MANUAL EVIDENCE PENDING**
+  **CODE AND RELEASE EVIDENCE CLOSED – MANUAL PENDING**
+- Public Test Release 1.0.0-rc.7:
+  **COMPLETE – PUBLIC TESTS PENDING**
 - Sprint 27.2 / Public Test Release 1.0.0-rc.3:
   **COMPLETE – PUBLIC TESTS PENDING**
 - Manuelle Abnahme: **PENDING**

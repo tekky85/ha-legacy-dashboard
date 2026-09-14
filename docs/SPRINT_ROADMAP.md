@@ -24,17 +24,12 @@ Codex muss vor jedem Sprint den tatsächlichen Repository-Stand prüfen.
 
 ## Aktueller Test-Release
 
-Sprint 27.2 hat `1.0.0-rc.3` als öffentlichen, ausdrücklich nicht
-stabilen Test-Release veröffentlicht. `rc.2` wurde zuvor veröffentlicht, aber
-wegen eines plattformabhängigen rein informativen gzip-Host-OS-Bytes bei
-identischem Tar-Inhalt als Reproduzierbarkeitskandidat durch `rc.3` ersetzt.
-Er friert die
-abgeschlossenen Reparaturbatches
-27.1-A bis 27.1-D für HAOS-, Standalone-/LXC- und Legacy-iPad-Tests ein.
-Nach dieser Veröffentlichung wurden die Batches 27.1-E bis 27.1-I
-automatisiert abgeschlossen; ihre Änderungen sind bewusst nicht in den
-unveränderten Test-Tag zurückgeschrieben worden. Als nächster Reparaturbatch
-folgt ausschließlich 27.1-J. Details zum veröffentlichten Referenzstand stehen in
+Der aktuelle öffentliche, ausdrücklich nicht stabile Test-Release ist
+`1.0.0-rc.7`. Er friert die abgeschlossenen Reparaturbatches 27.1-A bis
+27.1-J einschließlich Release- und Evidenzhärtung für HAOS-, Standalone-/LXC-
+und Legacy-iPad-Tests ein. Die öffentlichen Tags RC.4 bis RC.6 bleiben als
+unveränderliche, nicht vollständig veröffentlichte Pipelinehistorie erhalten.
+Details zum aktuellen Teststand stehen in
 [`PUBLIC_TEST_RELEASE.md`](PUBLIC_TEST_RELEASE.md).
 
 ---
@@ -224,7 +219,7 @@ Bedeutung von „fest“:
 | 22 | Rules, Grace Periods & Device Aggregation | umgesetzt |
 | 23 | Automation Impact & Advanced Diagnostics | umgesetzt |
 | 24 | Home Assistant App Packaging | umgesetzt |
-| 25 | Release & Distribution | umgesetzt; Public Test Release RC.3 veröffentlicht |
+| 25 | Release & Distribution | umgesetzt; Public Test Release RC.7 veröffentlicht |
 | 25.1 | Pre-Release UI State & Filter Correctness | umgesetzt und auf LXC ausgerollt, reale iPad-Abnahme offen |
 | 25.2 | HomeScreen Standalone Navigation Correctness | umgesetzt und auf LXC ausgerollt, reale Geräteabnahme offen |
 | 25.3 | Dashboard Backgrounds & Full-Height Layout | umgesetzt und auf LXC ausgerollt, reale Geräteabnahme offen |

@@ -24,7 +24,11 @@ Lokale Mocks ersetzen weder LXC-/HAOS-Laufzeit noch das physische iPad.
 |---|---|---|---|
 | `1.0.0-rc.1` | `v1.0.0-rc.1` | `741bba41d8ffc34cba4c7643f2e2b777f2e6501e` | Historischer erster Public Test Release |
 | `1.0.0-rc.2` | `v1.0.0-rc.2` | `dd592da` | Historischer Public Test Release; plattformabhängiges gzip-Informationsbyte |
-| `1.0.0-rc.3` | `v1.0.0-rc.3` | `771683b804f0b7c684eb3d457b58fb579a3ccdb6` | Aktueller veröffentlichter Public Test Release |
+| `1.0.0-rc.3` | `v1.0.0-rc.3` | `771683b804f0b7c684eb3d457b58fb579a3ccdb6` | Historischer vollständiger Public Test Release |
+| `1.0.0-rc.4` | `v1.0.0-rc.4` | `fe99fd6f046a8db87835b03757c9b4d292b768ea` | Taghistorie; Validierung fehlgeschlagen, kein Release/Image |
+| `1.0.0-rc.5` | `v1.0.0-rc.5` | `188db0def88cdd5b315e3036b82fc53463a508e6` | Taghistorie; Publish-Jobs übersprungen, kein Release/Image |
+| `1.0.0-rc.6` | `v1.0.0-rc.6` | `5ab15ae774c0d5b2a6d3b01607c4290f79222a41` | Taghistorie; Architekturimages ohne Manifest/Release |
+| `1.0.0-rc.7` | `v1.0.0-rc.7` | `2507f6955b17740da8edbd36925b3338ca080383` | Aktueller vollständiger Public Test Release |
 
 Kein bestehender Tag, Release oder GHCR-Versionstag darf verschoben,
 überschrieben oder für einen neueren Quellstand wiederverwendet werden.
@@ -54,9 +58,10 @@ werden nur aus dem Gate des jeweiligen neuen Kandidaten übernommen.
 
 ## Aktueller Entwicklungsstand
 
-Der aktive öffentliche Release bleibt `1.0.0-rc.3`. Der Repository-HEAD enthält
-neuere Reparaturen. Er ist deshalb noch kein neuer veröffentlichter Kandidat
-und darf nicht als RC.3 ausgegeben werden.
+Der aktive öffentliche Release ist `1.0.0-rc.7`. Der Tag zeigt exakt auf den
+aktuellen Releasecommit. GitHub-Prerelease, Multi-Arch-Manifest,
+Standalone-Artefakt und der generierte Kandidatennachweis wurden im Workflow
+`34838365619` gemeinsam erzeugt.
 
 `release/check-version.js --check-source` erkennt diesen Zustand: Sobald
 release-relevante Dateien nach dem bereits gebundenen Versionstag geändert
@@ -65,11 +70,8 @@ Beim Tagworkflow muss der erwartete Tag exakt auf `HEAD` zeigen. Zusätzlich
 bricht der Workflow ab, wenn GitHub Release oder GHCR-Manifest für die Version
 bereits existieren.
 
-Die nächste freie Versionsnummer nach RC.3 ist `1.0.0-rc.4`. Sie ist erst dann
-ein Kandidat, wenn alle aktiven Versionsquellen in einem eigenen Releasecommit
-konsistent aktualisiert und dieser Commit unveränderlich als
-`v1.0.0-rc.4` getaggt wurde. Diese Checkliste behauptet weder einen noch nicht
-existierenden Commit noch ein noch nicht veröffentlichtes Image.
+RC.4 bis RC.6 bleiben unverändert als Nachweis der beim realen Publish
+gefundenen Pipelinefehler. Kein Tag wurde verschoben oder wiederverwendet.
 
 ## Commit- und artefaktgebundener Nachweis
 
@@ -98,33 +100,29 @@ als Release-Asset unverändert.
 
 | Bereich | Status | Nachweis/Blocker |
 |---|---|---|
-| Veröffentlichte RC.3-Identität | PASS | Tag `v1.0.0-rc.3`, Commit `771683b`, publizierter Release bleibt unverändert. |
-| Formale aktive Versionsstrings | PASS | Paket, Lockfile, App, Release-Metadaten und Anzeigen nennen weiterhin den veröffentlichten RC.3. |
-| Aktueller Source-Stand entspricht RC.3 | FAIL | Release-relevante Reparaturen liegen nach dem unveränderlichen RC.3-Tag; Source-Gate weist Wiederverwendung ab. |
-| Neuer Kandidatencommit und Tag | NOT TESTED | Für diesen Reparaturlauf wird kein neuer Releasecommit/Tag erzeugt. |
-| Neues GHCR-Multi-Arch-Manifest | NOT TESTED | Keine Veröffentlichung in Sprint 27.1-J. |
-| Neues Standalone-Artefakt/Checksumme | NOT TESTED | Keine Veröffentlichung in Sprint 27.1-J. |
-| Kandidatenbezogener Workflowlauf | NOT TESTED | Wird erst durch einen neuen Tag gestartet. |
+| Veröffentlichte RC.7-Identität | PASS | Tag `v1.0.0-rc.7`, Commit `2507f6955b17740da8edbd36925b3338ca080383`. |
+| Formale aktive Versionsstrings | PASS | Paket, Lockfile, App, Release-Metadaten und Anzeigen nennen RC.7. |
+| Aktueller Source-Stand entspricht RC.7 | PASS | Source-/Tag-Gate bestätigt die exakte Bindung. |
+| Neuer Kandidatencommit und Tag | PASS | Unveränderlicher Tag RC.7 auf dem geprüften Commit. |
+| Neues GHCR-Multi-Arch-Manifest | PASS | Digest `sha256:050044307676e5263652e609379bd8eb331bc76a41a8341fb06f88320380037e`; amd64 und arm64 validiert. |
+| Neues Standalone-Artefakt/Checksumme | PASS | SHA256 `eac0df3c709d4663819167fe0eb1eff23164b40e92f103f691d7550f7eccfa10`; heruntergeladen und erneut geprüft. |
+| Kandidatenbezogener Workflowlauf | PASS | GitHub Actions `34838365619`, alle Releasejobs erfolgreich. |
 | Automatisches RC-Evidenzformat | PASS | Generator und Workflow binden Commit, Tag, Manifestdigest, Bundlechecksum und Workflow-ID; Negativtests vorhanden. |
 | Standalone/LXC des nächsten Kandidaten | NOT TESTED | MT-55/56. |
 | Home Assistant App amd64 | NOT TESTED | MT-50–52/55. |
 | Home Assistant App aarch64 | NOT TESTED | MT-53/55. |
 | iPad mini / iOS 9 | NOT TESTED | MT-54 sowie die zugeordneten UI-/Kiosktests. |
 | Stable-Promotion | BLOCKED | Reale Pflichtresultate und geschütztes Stable-Gate müssen für denselben Kandidaten PASS sein. |
-| Aktuelle RC-Empfehlung | BLOCKED | Noch kein neuer unveränderlicher Kandidat und keine kandidatenbezogene Realabnahme. |
+| Aktuelle RC-Empfehlung | BLOCKED | Der Kandidat ist vollständig veröffentlicht; reale LXC-/HAOS-/iPad-Abnahmen fehlen noch. |
 
 ## RC BLOCKERS
 
-1. Die nächste freie Version in allen aktiven Versionsquellen konsistent setzen,
-   als eigenen Commit reviewen und diesen exakten Commit einmalig taggen.
-2. Den Releaseworkflow vollständig ausführen; `rc-result.json` und
-   `rc-result.md` müssen dieselbe Commit-/Tag-/Image-/Bundleidentität tragen.
-3. MT-55 gegen Workflow, GHCR-Manifest, GitHub-Prerelease und Checksummen
+1. MT-55 gegen Workflow, GHCR-Manifest, GitHub-Prerelease und Checksummen
    durchführen.
-4. MT-56 mit dem veröffentlichten Standalone-Artefakt durchführen.
-5. MT-50 bis MT-54 und weitere betroffene HAOS-/iPad-Prüfungen mit exakt
+2. MT-56 mit dem veröffentlichten Standalone-Artefakt durchführen.
+3. MT-50 bis MT-54 und weitere betroffene HAOS-/iPad-Prüfungen mit exakt
    demselben Kandidaten durchführen.
-6. Vor Stable müssen alle in `release/stable-gate-policy.json` geforderten
+4. Vor Stable müssen alle in `release/stable-gate-policy.json` geforderten
    Manuelltests `PASS` sein und die kanonische Repair Queue darf keine offenen
    P0/P1-Reparaturen enthalten.
 

@@ -20,15 +20,14 @@ Die Versionsquelle ist die gemeinsam geprüfte SemVer-Version in:
 `--check-source` prüft es zusätzlich den Git-Stand: Ein bereits vorhandener
 Versionstag muss exakt auf den Release-Commit zeigen; release-relevante
 Änderungen nach einem bereits gebundenen Tag verlangen eine neue Version. Der
-aktuelle Public Test Release ist `1.0.0-rc.3`; `1.0.0-rc.1` und
-`1.0.0-rc.2` bleiben als unveränderliche historische Kandidaten erhalten.
-Rc.3 neutralisiert zusätzlich das plattformabhängige gzip-OS-Feld des
-Standalone-Artefakts.
+aktuelle Public Test Release ist `1.0.0-rc.7`; alle früheren Tags bleiben als
+unveränderliche Historie erhalten. RC.7 enthält die abgeschlossenen
+Sprint-27.1-Reparaturbatches und den commit-/artefaktgebundenen RC-Nachweis.
 
 Release Candidate:
 
 ```text
-1.0.0-rc.3 -> v1.0.0-rc.3 -> GitHub Prerelease / Public Test Release
+1.0.0-rc.7 -> v1.0.0-rc.7 -> GitHub Prerelease / Public Test Release
 ```
 
 Stable:
@@ -125,7 +124,7 @@ docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --file ha_legacy_dashboard/Dockerfile \
   --build-arg APP_SOURCE_PATH=ha_legacy_dashboard \
-  --build-arg BUILD_VERSION=1.0.0-rc.3 \
+  --build-arg BUILD_VERSION=1.0.0-rc.7 \
   .
 ```
 
@@ -227,10 +226,10 @@ Promotionslauf selbst und ist deshalb kein zirkuläres Vorabkriterium.
 
 ```bash
 docker buildx imagetools inspect \
-  ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.3
+  ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.7
 
 docker pull --platform linux/amd64 \
-  ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.3
+  ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.7
 ```
 
 Das Manifest muss `linux/amd64` und `linux/arm64` enthalten. Das GHCR-Paket

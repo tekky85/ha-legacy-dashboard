@@ -627,7 +627,7 @@ Complete instructions: `docs/DEPLOYMENT.md` and `docs/RELEASING.md`.
 
 ## Releases, Support, and License
 
-The current installable intermediate build is the **1.0.0-rc.3 Public Test
+The current installable intermediate build is the **1.0.0-rc.7 Public Test
 Release**. It is intended for community, HAOS, LXC, and legacy-iPad testing,
 is not stable, and does not update `latest`. Testing focus, safe App/LXC
 updates, rollback, and defect reporting are documented in

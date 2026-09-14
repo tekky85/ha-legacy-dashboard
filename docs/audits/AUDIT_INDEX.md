@@ -1283,3 +1283,19 @@ nicht, dass das Projekt RC-ready ist.
 - Nächster Schritt: separater reviewter RC.4-Versionscommit und Releaseworkflow,
   danach die kandidatengebundenen MT-50 bis MT-57 sowie weiteren HAOS-/iPad-
   Prüfungen. Kein Sprint 27.1-K wurde begonnen.
+
+## Public Test Release RC.7 – Kandidatennachweis
+
+- Tag/Commit: `v1.0.0-rc.7` / `2507f6955b17740da8edbd36925b3338ca080383`
+- GitHub Actions: Workflow `34838365619`, vollständig erfolgreich.
+- Multi-Arch-Manifest: amd64 + arm64, Digest
+  `sha256:050044307676e5263652e609379bd8eb331bc76a41a8341fb06f88320380037e`.
+- Standalone: `ha-legacy-dashboard-1.0.0-rc.7.tar.gz`, SHA256
+  `eac0df3c709d4663819167fe0eb1eff23164b40e92f103f691d7550f7eccfa10`.
+- Release Assets: Standalone-Tarball, `SHA256SUMS`, `rc-result.json` und
+  `rc-result.md`; Prerelease, kein `latest`.
+- Ergebnis: `RQ-13-01` und `RQ-17-01` besitzen vollständige Releaseevidenz.
+  Reale HAOS-, Standalone-/LXC- und iPad-Ergebnisse bleiben `NOT TESTED`.
+- Nächster Schritt: den manuellen Testkatalog gegen exakt RC.7 ausführen und
+  Ergebnisse in `MANUAL_TEST_QUEUE.md` erfassen. Sprint 27.1-K beginnt erst
+  danach und nur für tatsächlich gefundene Reparaturen.

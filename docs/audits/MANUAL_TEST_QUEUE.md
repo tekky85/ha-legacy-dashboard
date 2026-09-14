@@ -2,16 +2,22 @@
 
 ## Sprint-27.2-Testkandidat
 
-Der öffentliche Teststand ist `1.0.0-rc.3` / `v1.0.0-rc.3` mit
-dem Image `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.3` und dem Archiv
-`ha-legacy-dashboard-1.0.0-rc.3.tar.gz`. Das bereits veröffentlichte `rc.2`
-wurde wegen eines plattformabhängigen, rein informativen gzip-Headerbytes bei
-identischem Tar-Inhalt als Reproduzierbarkeitskandidat ersetzt. `rc.3` ist
-veröffentlicht und kann als feste Referenz für die bereits beschriebenen
-HAOS-, Standalone-/LXC- und iPad-Prüfungen verwendet werden. Dieser Hinweis
-ändert kein Resultat:
+Der öffentliche Teststand ist `1.0.0-rc.7` / `v1.0.0-rc.7` auf Commit
+`2507f6955b17740da8edbd36925b3338ca080383`, mit dem Image
+`ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.7`, Manifestdigest
+`sha256:050044307676e5263652e609379bd8eb331bc76a41a8341fb06f88320380037e`
+und dem Archiv `ha-legacy-dashboard-1.0.0-rc.7.tar.gz` mit SHA256
+`eac0df3c709d4663819167fe0eb1eff23164b40e92f103f691d7550f7eccfa10`.
+Workflow `34838365619` und die angehängten `rc-result.*`-Dateien belegen die
+automatischen Gates. Dieser Hinweis ändert kein manuelles Resultat:
 Alle nicht real ausgeführten Tests bleiben `NOT TESTED`, und vorhandene
 Repair-Abhängigkeiten bleiben bestehen.
+
+Ergebnisse werden direkt im jeweiligen ausführlichen `MT-…`-Abschnitt unter
+`### Result` eingetragen. Jeder Eintrag nennt mindestens Datum, RC-Version,
+Source-Commit, Deploymentmodus, Gerät/OS/Browser, `PASS` oder `FAIL`, die
+beobachtete Abweichung und vorhandene Screenshots/Fotos. Geheimnisse, interne
+Tokens und unbereinigte Logs gehören niemals in diesen Katalog.
 
 Automatisierte Tests ersetzen keine reale iPad-, HomeScreen- oder
 Home-Assistant-Abnahme. Ein Eintrag bleibt `NOT TESTED`, bis die beschriebene
@@ -142,12 +148,12 @@ technisch aufgenommen, format-/link-/privacy-geprüft und dokumentiert. Die in
 Schritt 10 verlangte ausdrückliche Nutzer- oder zweite Sichtprüfung wurde in
 diesem Lauf nicht vorweggenommen; das Ergebnis bleibt deshalb `NOT TESTED`.
 
-Sprint 27.1-J schließt die Code-/Dokumentationsursachen von `RQ-13-01` und
-`RQ-17-01`, veröffentlicht nach ausdrücklicher Batchgrenze jedoch weder eine
-neue Version noch ein Image oder Release. Deshalb bleiben die unten genannten
-Repair-Abhängigkeiten bis zum separaten RC.4-Workflow und seinem generierten
-commit-/artefaktgebundenen Nachweis bestehen. Kein physischer Test wurde
-ausgeführt und kein Resultat wurde von `NOT TESTED` auf `PASS` geändert.
+Der separate RC-Releasepfad schließt die Distributions-/Evidenzabhängigkeiten
+von `RQ-13-01` und `RQ-17-01` mit RC.7: Tag, Commit, Multi-Arch-Manifest,
+Standalone-Checksumme, Smoke-Test und `rc-result.*` sind kohärent. Die zuvor
+blockierten Kandidatentests sind damit `CAN RUN NOW`; kein physischer Test
+wurde vorweggenommen und kein Resultat wurde von `NOT TESTED` auf `PASS`
+geändert.
 
 | Manual Test | Execution State | Blocked By Repairs |
 |---|---|---|
@@ -200,27 +206,27 @@ ausgeführt und kein Resultat wurde von `NOT TESTED` auf `PASS` geändert.
 | MT-47 | CAN RUN NOW | – |
 | MT-48 | CAN RUN NOW | – |
 | MT-49 | CAN RUN NOW | – |
-| MT-50 | BLOCKED | RQ-13-01 |
-| MT-51 | BLOCKED | RQ-13-01 |
-| MT-52 | BLOCKED | RQ-13-01 |
-| MT-53 | BLOCKED | RQ-13-01 |
-| MT-54 | BLOCKED | RQ-13-01 |
-| MT-55 | BLOCKED | RQ-13-01, RQ-17-01 |
+| MT-50 | CAN RUN NOW | – |
+| MT-51 | CAN RUN NOW | – |
+| MT-52 | CAN RUN NOW | – |
+| MT-53 | CAN RUN NOW | – |
+| MT-54 | CAN RUN NOW | – |
+| MT-55 | CAN RUN NOW | – |
 | MT-56 | CAN RUN NOW | – |
-| MT-57 | RUN AFTER ALL REPAIRS | RQ-13-01, RQ-17-01 |
+| MT-57 | RUN AFTER ALL MANUAL GATES | – |
 | MT-58 | CAN RUN NOW | – |
 | MT-59 | CAN RUN NOW | – |
 | MT-60 | CAN RUN NOW | – |
-| MT-61 | BLOCKED | RQ-13-01 |
-| MT-62 | BLOCKED | RQ-13-01 |
+| MT-61 | CAN RUN NOW | – |
+| MT-62 | CAN RUN NOW | – |
 | MT-63 | CAN RUN NOW | – |
-| MT-64 | BLOCKED | RQ-13-01 |
-| MT-65 | BLOCKED | RQ-13-01 |
-| MT-66 | BLOCKED | RQ-13-01 |
+| MT-64 | CAN RUN NOW | – |
+| MT-65 | CAN RUN NOW | – |
+| MT-66 | CAN RUN NOW | – |
 | MT-67 | CAN RUN NOW | – |
 | MT-68 | CAN RUN NOW | – |
 | MT-69 | CAN RUN NOW | – |
-| MT-70 | BLOCKED | RQ-13-01 |
+| MT-70 | CAN RUN NOW | – |
 | MT-71 | CAN RUN NOW | – |
 | MT-72 | CAN RUN NOW | – |
 

@@ -286,6 +286,17 @@ Code-/UI-Änderungen erneut erzeugt.
   RC-Gate benötigen den separat autorisierten RC.4-Workflow. RC.3 bleibt
   unverändert.
 
+### Public Test Release RC.7
+
+- Status: **RELEASE EVIDENCE PASS / MANUAL PENDING**
+- Tag/Commit: `v1.0.0-rc.7` / `2507f6955b17740da8edbd36925b3338ca080383`
+- Workflow `34838365619` bestand Source-, Test-, Browser-, Dependency-,
+  amd64-/aarch64-, Manifest-, Smoke-, Evidence- und Prerelease-Gates.
+- `RQ-13-01` und `RQ-17-01` sind damit auch auf Distributions-/Evidenzseite
+  geschlossen. Alle realen HAOS-/LXC-/iPad-Ergebnisse bleiben `NOT TESTED`.
+- RC.4–RC.6 bleiben unveränderliche, nicht vollständige Pipelinehistorie;
+  kein Tag wurde verschoben oder wiederverwendet.
+
 Die ursprüngliche Batchplanung bleibt historische Konsolidierungsevidenz;
 der jeweilige aktuelle Ausführungsstand steht nun direkt bei den Batches.
 

@@ -1,20 +1,25 @@
-# Public Test Release 1.0.0-rc.3
+# Public Test Release 1.0.0-rc.7
 
-`1.0.0-rc.3` is an installable public test release. It is not stable, does
-not update the container tag `latest`, and does not replace the outstanding
-Sprint 27 repair and manual acceptance work.
+`1.0.0-rc.7` is the current installable public test release. It is not stable,
+does not update the container tag `latest`, and still requires the documented
+real HAOS, Standalone/LXC, and iPad acceptance tests.
 
-It supersedes `1.0.0-rc.2`, whose standalone archives differed between macOS
-and Linux only in gzip's informational host-OS byte. Rc.3 normalizes that byte
-without changing application behavior or security boundaries.
+It contains the completed Sprint 27.1 repair batches through J. Public tags
+RC.4 through RC.6 remain immutable evidence of release-pipeline runs that did
+not create a GitHub Release; RC.7 is the first complete candidate after those
+pipeline corrections.
 
 ## Immutable release targets
 
-- Git tag: `v1.0.0-rc.3`
-- Source commit: `771683b804f0b7c684eb3d457b58fb579a3ccdb6`
+- Git tag: `v1.0.0-rc.7`
+- Source commit: `2507f6955b17740da8edbd36925b3338ca080383`
 - Home Assistant App image:
-  `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.3`
-- Standalone archive: `ha-legacy-dashboard-1.0.0-rc.3.tar.gz`
+  `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.7`
+- GHCR manifest digest:
+  `sha256:050044307676e5263652e609379bd8eb331bc76a41a8341fb06f88320380037e`
+- Standalone archive: `ha-legacy-dashboard-1.0.0-rc.7.tar.gz`
+- Standalone SHA256:
+  `eac0df3c709d4663819167fe0eb1eff23164b40e92f103f691d7550f7eccfa10`
 - Integrity file: `SHA256SUMS`
 
 The release workflow builds both `linux/amd64` and `linux/arm64` from
@@ -25,13 +30,14 @@ only after all gates pass.
 Published verification:
 
 - GitHub prerelease:
-  `https://github.com/tekky85/ha-legacy-dashboard/releases/tag/v1.0.0-rc.3`
-- Release workflow: `34471183386`
+  `https://github.com/tekky85/ha-legacy-dashboard/releases/tag/v1.0.0-rc.7`
+- Release workflow: `34838365619`
 - GHCR manifest digest:
-  `sha256:7aa35767909de4b12119386112887845705f9e29214069d5ab4c1350a6432550`
+  `sha256:050044307676e5263652e609379bd8eb331bc76a41a8341fb06f88320380037e`
 - Standalone SHA256:
-  `4d6ca325365d041b21b2fc06512dfd9e029a53cbbf6db2a9577ec6e682437295`
-- Archive size: 217208 bytes; 117 archive entries
+  `eac0df3c709d4663819167fe0eb1eff23164b40e92f103f691d7550f7eccfa10`
+- Archive size: 218627 bytes
+- Candidate evidence: `rc-result.json` and `rc-result.md` attached
 - Stable `latest`: not published
 
 ## Home Assistant App smoke test
@@ -39,7 +45,7 @@ Published verification:
 Before an install or update, create a Home Assistant backup that contains the
 App data. Then:
 
-1. Refresh the custom App repository and verify that version `1.0.0-rc.3` is
+1. Refresh the custom App repository and verify that version `1.0.0-rc.7` is
    offered.
 2. Install or update the App and verify that it starts without startup errors.
 3. Inspect sanitized logs; they must contain no token or secret.
@@ -59,7 +65,7 @@ Long-Lived Access Token, or browser-to-Home-Assistant WebSocket.
 
 The project does not claim that the Home Assistant App UI supports arbitrary
 downgrades. Keep the previous tag and image
-`ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.2` available and create a backup
+`ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.3` available and create a backup
 before updating. If rollback is required, restore the matching Home Assistant
 backup and deploy a repository package whose `config.yaml` references the
 compatible earlier version. Confirm the exact procedure on a test HAOS system
@@ -76,7 +82,7 @@ complete `data` directory before switching versions. On the LXC as
 cd /home/dashboard/ha-legacy-dashboard
 git status
 git fetch --tags origin
-./deploy/rollback.sh v1.0.0-rc.3
+./deploy/rollback.sh v1.0.0-rc.7
 ./deploy/health-check.sh
 ```
 
@@ -98,12 +104,12 @@ Git checkout; the standalone release archive instead contains its own
 
 ### Git-based LXC rollback
 
-The immediately preceding public test source is `v1.0.0-rc.2`. Keep the
+The preceding complete public test source is `v1.0.0-rc.3`. Keep the
 matching pre-update configuration backup. To return to it:
 
 ```bash
 cd /home/dashboard/ha-legacy-dashboard
-./deploy/rollback.sh v1.0.0-rc.2
+./deploy/rollback.sh v1.0.0-rc.3
 ./deploy/health-check.sh
 ```
 
@@ -118,7 +124,7 @@ extracting:
 
 ```bash
 sha256sum --check SHA256SUMS
-tar -xzf ha-legacy-dashboard-1.0.0-rc.3.tar.gz
+tar -xzf ha-legacy-dashboard-1.0.0-rc.7.tar.gz
 ```
 
 Follow only the bundled installation guide. Confirm service startup,

@@ -651,7 +651,7 @@ Vollständige Anleitungen: `docs/DEPLOYMENT.md` und `docs/RELEASING.md`.
 
 ## Releases, Support und Lizenz
 
-Der aktuelle installierbare Zwischenstand ist **1.0.0-rc.3 Public Test
+Der aktuelle installierbare Zwischenstand ist **1.0.0-rc.7 Public Test
 Release**. Er dient Community-, HAOS-, LXC- und Legacy-iPad-Tests, ist kein
 Stable Release und verändert `latest` nicht. Testschwerpunkte, sichere
 LXC-/App-Updates, Rollback und Fehlerberichte stehen in
