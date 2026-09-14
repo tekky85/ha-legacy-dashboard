@@ -1274,7 +1274,8 @@ nicht, dass das Projekt RC-ready ist.
 - Sicherheit: kein Runtime-/Frontend-/HA-Pfad geändert; keine Credentials,
   kein Produktiv-HA, kein LXC/HAOS und kein physisches Gerät verwendet.
 - Automatisierung: 35/35 fokussiert und 394/394 vollständig; Syntax-, Secret-
-  und Moderate-Dependency-Gate grün. Card-Matrix lokal mangels Chromium
+  und Moderate-Dependency-Gate grün. Test- und Releaseworkflow laden die für
+  das Source-Gate benötigte vollständige Git-/Tag-Historie. Card-Matrix lokal mangels Chromium
   `NOT TESTED`, im GitHub-Workflow weiterhin verbindlich.
 - Public Test Release: `v1.0.0-rc.3`, GitHub Release und GHCR-Historie blieben
   unverändert; kein Tag, Image oder Release wurde in Batch J publiziert.

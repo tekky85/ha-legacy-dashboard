@@ -165,6 +165,7 @@ test("RC-Nachweis bindet genau einen Commit, Tag, Digest und Bundle-Hash", funct
 
 test("Releaseworkflow verhindert Wiederverwendung und veröffentlicht Kandidatenevidenz", function () {
     const workflow = read(".github/workflows/release.yml");
+    const testWorkflow = read(".github/workflows/test.yml");
 
     assert.match(workflow, /--check-source/);
     assert.match(workflow, /Reject reuse of published release targets/);
@@ -174,6 +175,10 @@ test("Releaseworkflow verhindert Wiederverwendung und veröffentlicht Kandidaten
     assert.match(workflow, /release\/create-rc-result\.js/);
     assert.match(workflow, /release-manifest-digest\.txt/);
     assert.match(workflow, /dist\/rc-result\.json/);
+    assert.match(
+        testWorkflow,
+        /Check out repository[\s\S]*?fetch-depth:\s*0/
+    );
     assert.match(workflow, /dist\/rc-result\.md/);
     assert.match(workflow, /file: ha_legacy_dashboard\/Dockerfile/);
     assert.match(workflow, /npm audit --omit=dev --audit-level=moderate/);
