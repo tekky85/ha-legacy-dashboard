@@ -1,6 +1,9 @@
 # Sprint 27.3 – implementation and handoff
 
 Date: 2026-10-18. Start: `main`, `028b718` (also origin/main at preflight).
+Implementation commit: `2558af1fb0e773369804f6ab69860ac496ff63f1`, successfully
+pushed to origin/main as `tky <mbp@tky.cloud>`. A subsequent evidence-only
+documentation commit records the observed CI/publication results below.
 Scope: independent Community Test-Center only. No 27.1-K repair, physical
 acceptance, new App release, tag, image, LXC rollout or final RC gate.
 
@@ -119,3 +122,35 @@ validation remain manual; exact nine-step instructions are in
 Commit message: `feat(testing): add community test center and JSON report workflow`.
 Final commit/push result can be resolved via `git log -- testing/index.html`;
 pre-existing owner documents and Sprint 27.1-K specification stay unstaged.
+
+## Observed GitHub results after push
+
+- [Community Test-Center workflow 39154225107](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/39154225107):
+  catalog drift, 15 unit tests, allowlisted site build, real-browser test and
+  Pages artifact upload **PASS**. Deploy **BLOCKED** at Configure Pages:
+  `Get Pages site failed` / `Not Found`. GitHub's annotation explicitly asks
+  to enable Pages and configure GitHub Actions. The deploy step was skipped;
+  the portal is not live. A maintainer must enable the setting and manually
+  rerun the workflow on main. The workflow does not silently change settings.
+- [Normal CI 39154225108](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/39154225108):
+  release test gate and production card browser matrix **PASS**. The existing
+  production dependency audit **FAIL**; container-build is consequently skipped.
+- A fresh local `npm audit --omit=dev --audit-level=moderate --json` confirms
+  the existing lockfile now has **1 high (`axios`) and 1 critical (`proxy-addr`)
+  package finding**. This sprint changed neither dependency nor lockfile.
+  Axios advisory ranges include the locked 1.18.1; fixed range starts at
+  1.20.0. The proxy-addr advisory affects versions below 2.0.8
+  ([GHSA-jqcg-44mw-7w3h](https://github.com/advisories/GHSA-jqcg-44mw-7w3h)).
+  This is register evidence, not a demonstrated exploit of this application.
+  Triage/update with security regressions is a separate required follow-up
+  before the next product release. No dependency gate was disabled and no
+  27.1 repair batch was started.
+- Existing RC.7 tag/image/bundle were not altered. The static portal has no
+  production runtime dependencies and remains locally validated; public
+  availability and the separate product security gate must not be reported PASS.
+
+Final Sprint 27.3 result: **PARTIAL**. Before external testing, activate Pages,
+observe a successful deploy/HTTP check, and explicitly resolve the product
+dependency-audit blocker when selecting the runtime candidate to distribute.
+Working tree retains the six pre-existing manual-result documentation edits
+and untracked 27.1-K specification; no Sprint 27.3 implementation is left unstaged.

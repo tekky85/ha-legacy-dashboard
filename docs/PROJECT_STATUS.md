@@ -2670,3 +2670,14 @@ und Owner-Abnahme wurden nicht ausgeführt. Produkt-Frontend/-Backend,
 Standalone-/App-Verpackung und unveränderliche RC.7-Artefakte bleiben
 unverändert. Vollständige Übergabe und verbleibende Schritte:
 [`testing/IMPLEMENTATION_STATUS.md`](testing/IMPLEMENTATION_STATUS.md).
+
+GitHub-Nachweis nach Push von `2558af1`: Workflow `39154225107` bestand
+Katalog-/Unit-/Build-/Browserprüfungen und Artifact-Upload. Pages-Deploy ist
+wegen fehlender Repository-Einrichtung (`Get Pages site failed`, `Not Found`)
+**BLOCKED**. Normale CI `39154225108` bestand Release-Testgate und Card-Matrix,
+scheitert aber am aktuellen Audit der unveränderten Produktionsabhängigkeiten:
+ein High-Paketbefund (`axios`) und ein Critical-Paketbefund (`proxy-addr`).
+Die lokale npm-Abfrage bestätigt dies; eine separate Security-Reparatur und
+Risiko-/Regressionprüfung bleibt erforderlich. Sprint 27.3 ist deshalb
+**PARTIAL**; kein neuer Produktrelease, keine automatische Abnahme und keine
+27.1-K-Reparatur wurden daraus abgeleitet.
