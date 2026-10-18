@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Canonical manual test catalog 1.0",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "catalogVersion", "catalogHash", "sourceFile", "sourceHash", "sourceCommit", "testCount", "testIds", "diagnostics", "tests"],
+  "properties": {
+    "schemaVersion": {"const": "1.0"}, "catalogVersion": {"type": "string", "pattern": "^27\\.3-[a-f0-9]{12}$"},
+    "catalogHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "sourceHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "sourceFile": {"const": "docs/audits/MANUAL_TEST_QUEUE.md"}, "testCount": {"type": "integer", "minimum": 1, "maximum": 1000},
+    "sourceCommit": {"type": ["string", "null"], "pattern": "^[a-f0-9]{40}$"},
+    "testIds": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^MT-[0-9]+$"}},
+    "diagnostics": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["testId", "line", "message"], "properties": {"testId": {"type": "string"}, "line": {"type": "integer"}, "message": {"type": "string"}}}},
+    "tests": {"type": "array", "items": {"$ref": "#/$defs/test"}}
+  },
+  "$defs": {
+    "strings": {"type": "array", "items": {"type": "string"}},
+    "test": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "sourceTestId", "title", "sprints", "requirement", "category", "device", "deployments", "prerequisites", "metadata", "sections", "steps", "expected", "failureCriteria", "evidence", "repairs", "readiness", "executionState", "blockedBy", "source"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^MT-[0-9]+$"}, "sourceTestId": {"type": "string"}, "title": {"type": "string"},
+        "sprints": {"$ref": "#/$defs/strings"}, "requirement": {"type": "string"}, "category": {"type": "string"}, "device": {"type": "string"},
+        "deployments": {"type": "array", "items": {"enum": ["ha-app", "standalone", "coordinator"]}}, "prerequisites": {"type": "string"}, "metadata": {"type": "string"},
+        "sections": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["title", "text"], "properties": {"title": {"type": "string"}, "text": {"type": "string"}}}},
+        "steps": {"$ref": "#/$defs/strings"}, "expected": {"type": "string"}, "failureCriteria": {"type": "string"}, "evidence": {"type": "string"},
+        "repairs": {"$ref": "#/$defs/strings"}, "readiness": {"enum": ["READY", "NOT READY"]}, "executionState": {"enum": ["CAN RUN NOW", "BLOCKED"]}, "blockedBy": {"$ref": "#/$defs/strings"},
+        "source": {"type": "object", "additionalProperties": false, "required": ["file", "heading", "line", "endLine"], "properties": {"file": {"type": "string"}, "heading": {"type": "string"}, "line": {"type": "integer", "minimum": 1}, "endLine": {"type": "integer", "minimum": 1}}}
+      }
+    }
+  }
+}

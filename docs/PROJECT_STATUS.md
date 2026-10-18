@@ -2634,3 +2634,39 @@ unter `src` und `test` bestanden `node --check`, alle Deployment-Shellskripte
 bestanden `sh -n`, und `git diff --check` blieb fehlerfrei. Der test-only
 Browser-Harness bestand zusätzlich bei 768 × 1024 und 1024 × 768 Pixeln mit
 jeweils vier Room-Card-Tiers und null Befunden.
+
+## Sprint 27.3 – Community Test-Center
+
+Stand: 18. Oktober 2026. Startbranch `main`, Startcommit `028b718`.
+Das unabhängige statische Portal unter `testing/` verwendet ausschließlich den
+aus `docs/audits/MANUAL_TEST_QUEUE.md` generierten Katalog. Für die
+Veröffentlichung wird die bereits versionierte Quelle verwendet; die lokalen
+uncommitteten MT-01-Beobachtungen werden nicht in diesen Sprint übernommen.
+72 eindeutige Definitionen sind vollständig; keine Dubletten, keine fehlenden
+Pflichtabschnitte, keine blockierten Definitionen in diesem Quellsnapshot.
+
+Implementiert sind deutsche Oberfläche, HA-App-/Sprint-/Geräte-/Statusfilter,
+getrennte lokale Läufe, sichere Speicherfehlerbehandlung, expliziter JSON-
+Import/-Export mit Konfliktvorschau, versioniertes Berichtsformat, bestehendes
+Bug-Formular plus neues Testlauf-Formular und lokale JSON-/CSV-/Markdown-
+Auswertung. Weder Portal noch Auswertung verbinden sich mit Home Assistant
+oder übertragen Ergebnisse automatisch. Ein Community-PASS ersetzt keine
+physische Pflichtabnahme und schließt keine Repairs automatisch.
+
+Die Testeranleitungen DE/EN, Koordinatoranleitung, Datenformat und Datenschutz
+stehen unter `docs/testing/`. Der Pages-Workflow veröffentlicht ausschließlich
+eine explizite Dateiliste aus `dist/`, nur von `main`; PRs dürfen nur bauen und
+prüfen. Die öffentliche Repository-API meldete vor Sprintbeginn
+`has_pages: false`. Ein Maintainer muss Pages mit Quelle GitHub Actions
+aktivieren. Die erwartete Adresse ist
+`https://tekky85.github.io/ha-legacy-dashboard/testing/`; ein öffentlicher
+Deploy wird erst nach tatsächlich erfolgreichem Workflow als PASS gewertet.
+
+Lokale Evidenz: 15/15 fokussierte Node-Tests und 14/14 reale Chromium-
+Prüfgruppen (Browser 134.0.6998.35), inklusive Projekt-Unterpfad und Root-Pfad,
+Speicher/Reload, Importkonflikt, Katalogabweichung, fünf Statuswerten,
+schädlichen Strings sowie Layout bei 390/768/1280 px. Physische iPad-, HAOS-
+und Owner-Abnahme wurden nicht ausgeführt. Produkt-Frontend/-Backend,
+Standalone-/App-Verpackung und unveränderliche RC.7-Artefakte bleiben
+unverändert. Vollständige Übergabe und verbleibende Schritte:
+[`testing/IMPLEMENTATION_STATUS.md`](testing/IMPLEMENTATION_STATUS.md).

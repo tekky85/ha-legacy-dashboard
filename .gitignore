@@ -8,3 +8,6 @@ data/.dashboards.json.*.tmp
 data/backgrounds/
 .app-build/
 dist/
+test-results/
+testing/local-results/
+testing/local-cache/

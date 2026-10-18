@@ -669,6 +669,18 @@ Backend. Das Projekt enthält keine Telemetrie oder Analytics.
 
 ## Projektstatus und Roadmap
 
+Das unabhängige [Community Test-Center](https://tekky85.github.io/ha-legacy-dashboard/testing/)
+führt durch die manuellen Tests auf der eigenen HA-App-/Standalone-Installation.
+Die Adresse ist erst nach erfolgreicher Pages-Bereitstellung verfügbar; den
+Nachweis nennt [Projektstatus](docs/PROJECT_STATUS.md). Entwürfe bleiben nur im
+eigenen Browser; JSON ausdrücklich exportieren und nach Datenschutzprüfung als
+GitHub-Testlauf oder über den Koordinator weitergeben. Kein HA-Zugriff und kein
+GitHub-Login zum Lesen erforderlich. Die echte installierte Version angeben.
+
+- [Anleitung für Tester](docs/testing/TESTER_GUIDE.de.md)
+- [Koordination und lokale Berichtsauswertung](docs/testing/TEST_COORDINATOR.md)
+- [Datenformat](docs/testing/DATA_FORMAT.md) und [Datenschutz](docs/testing/PRIVACY_AND_SECURITY.md)
+
 - Technischer Stand: `docs/PROJECT_STATUS.md`
 - Roadmap: `docs/SPRINT_ROADMAP.md`
 

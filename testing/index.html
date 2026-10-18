@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <title>HA Legacy Dashboard · Community Test-Center</title>
+  <link rel="stylesheet" href="css/testing.css">
+  <script defer src="js/report.js"></script>
+  <script defer src="js/portal.js"></script>
+</head>
+<body>
+<header><span class="eyebrow">HA LEGACY DASHBOARD / COMMUNITY</span><h1>Gemeinsam testen.</h1>
+  <p>Teste die installierte App auf deinem eigenen System. Dieses unabhängige Portal bleibt auch erreichbar, wenn die App nicht startet.</p>
+  <nav aria-label="Anleitungen"><a href="guides/TESTER_GUIDE.de.md">Anleitung Deutsch</a><a href="guides/TESTER_GUIDE.en.md" lang="en">English guide</a><a href="guides/PRIVACY_AND_SECURITY.md">Datenschutz</a></nav>
+</header>
+<main>
+  <section class="notice" aria-label="Vorbereitung"><h2>Vor dem Start</h2>
+    <p>Verwende einen aktuellen Browser für dieses Portal und das geforderte Testgerät für die eigentliche Prüfung. Sichere deine App-Daten. Trage die <strong>tatsächlich installierte Version</strong> ein, keine vermutete Version. Architektur und HA-Version dürfen unbekannt bleiben.</p>
+    <p>Entwürfe liegen ausschließlich in diesem Browser. Das ist <strong>kein zentrales Backup</strong>. Exportiere regelmäßig JSON. Ohne deine ausdrückliche Aktion werden keine Ergebnisse hochgeladen. Kein Zugriff auf dein Home Assistant, keine Telemetrie.</p>
+  </section>
+  <p id="message" role="status" aria-live="polite">Katalog wird geladen …</p>
+  <p id="storage-message" class="notice" role="status"></p>
+  <section class="panel"><h2>Testlauf</h2>
+    <div class="actions"><label>Gespeicherte Läufe<select id="runs" aria-label="Gespeicherte Läufe"></select></label><button id="resume" type="button">Lauf fortsetzen</button><button id="new-run" type="button">Neuen Lauf vorbereiten</button></div>
+    <p id="active-run">Noch kein aktiver Lauf.</p>
+    <form id="run-form">
+      <div class="fields">
+        <label>Tester-Alias *<input name="testerId" required maxlength="80" placeholder="Tester-A"></label>
+        <label>Installierte Dashboard-Version *<input name="dashboardVersion" required maxlength="160" placeholder="1.0.0-rc.7"></label>
+        <label>Installation<select name="deployment"><option value="ha-app">Home Assistant App</option><option value="standalone">Standalone / LXC</option></select></label>
+        <label>Home Assistant Core-Version<input name="homeAssistantVersion" maxlength="160" placeholder="Unbekannt: leer lassen"></label>
+        <label>Architektur<input name="architecture" maxlength="160" placeholder="amd64 / aarch64 / unbekannt"></label>
+        <label>Testgerät *<input name="device" required maxlength="160" placeholder="z. B. iPad mini 1"></label>
+        <label>Betriebssystem *<input name="os" required maxlength="160" placeholder="z. B. iOS 9.3.5"></label>
+        <label>Testbrowser *<input name="browser" required maxlength="160" placeholder="z. B. Safari auf iOS 9"></label>
+        <label class="full">Optionale Laufnotizen<textarea name="notes" maxlength="4000" rows="2"></textarea></label>
+        <label>Lauf-Issue (optional)<input name="issueUrl" maxlength="150" placeholder="#123 oder GitHub-Issue-URL"></label>
+      </div>
+      <button id="save-run" type="submit">Lauf starten / Angaben speichern</button>
+    </form>
+    <div class="actions"><label>JSON importieren (max. 2 MiB)<input id="import-file" type="file" accept=".json,application/json"></label><button id="export" type="button">JSON exportieren</button><button id="clear" class="danger" type="button">Alle lokalen Läufe löschen</button></div>
+    <section id="import-preview" hidden class="notice"><h3>Import prüfen</h3><pre id="import-summary"></pre><label><input id="accept-mismatch" type="checkbox">Abweichungen verstanden; bei Katalogabweichung nur lesend übernehmen.</label><button id="confirm-import" type="button">Import bestätigen</button><button id="cancel-import" type="button">Abbrechen</button></section>
+  </section>
+  <section class="panel"><h2>Prüfkatalog <span id="catalog-info"></span></h2><p id="counts"></p>
+    <p>Filter sind eine Auswahlhilfe. Voraussetzungen und Zielgerät im Test bleiben verbindlich. Release-/Stable-Veröffentlichungen sind Aufgaben des Koordinators.</p>
+    <div class="fields filters">
+      <label>Suche nach ID oder Titel<input id="search" type="search"></label>
+      <label>Kategorie<select id="category"><option value="">Alle</option></select></label>
+      <label>Sprint<select id="sprint"><option value="">Alle</option></select></label>
+      <label>Plattform<select id="deployment"><option value="">Alle</option><option value="ha-app" selected>HA App relevant</option><option value="standalone">Standalone / LXC</option><option value="coordinator">Koordinator / Release</option></select></label>
+      <label>Gefordertes Gerät/System<select id="device"><option value="">Alle</option></select></label>
+      <label>Dein Ergebnis<select id="filter-status"><option value="">Alle</option><option>PASS</option><option>FAIL</option><option>BLOCKED</option><option>NOT_TESTED</option><option>N/A</option></select></label>
+      <label>Katalogbereitschaft<select id="readiness"><option value="">Alle</option><option value="READY">READY</option><option value="NOT READY">NOT READY</option><option value="BLOCKED">BLOCKED durch Produktrepair</option></select></label>
+    </div>
+    <p id="visible-count"></p><ul id="test-list" class="test-list"></ul>
+  </section>
+  <section id="detail" class="panel" hidden aria-labelledby="test-title"><h2 id="test-title" tabindex="-1"></h2><p id="test-state" class="notice"></p><div id="test-content"></div>
+    <form id="result-form"><h3>Deine manuelle Beobachtung</h3><p>Unbeobachtetes bleibt NOT_TESTED. N/A ist kein PASS. Produktblockade und fehlende eigene Voraussetzungen bitte als BLOCKED begründen.</p>
+      <div class="fields"><label>Ergebnis<select name="status"><option>NOT_TESTED</option><option>PASS</option><option>FAIL</option><option>BLOCKED</option><option>N/A</option></select></label>
+        <label>Test-Issue (optional)<input name="issueUrl" maxlength="150" placeholder="#123 oder GitHub-Issue-URL"></label>
+        <label>Erwartet (bei FAIL erforderlich)<textarea name="expected" maxlength="4000" rows="3"></textarea></label>
+        <label>Tatsächlich beobachtet (bei FAIL erforderlich)<textarea name="actual" maxlength="4000" rows="3"></textarea></label>
+        <label>Reproduktion (bei FAIL erforderlich)<textarea name="reproductionSteps" maxlength="4000" rows="3"></textarea></label>
+        <label>Begründung / Notizen (bei BLOCKED oder N/A erforderlich)<textarea name="notes" maxlength="4000" rows="3"></textarea></label>
+        <label class="full">Evidenzreferenz (Dateiname oder Hinweis; keine eingebetteten Dateien)<textarea name="evidence" maxlength="4000" rows="2"></textarea></label>
+      </div><button id="save-result" type="submit">Ergebnis speichern</button>
+    </form>
+  </section>
+  <section class="panel"><h2>Bericht weitergeben</h2><p>GitHub Issues sind öffentlich. Entferne vor dem Teilen Tokens, Passwörter, Entity-/Personennamen, interne Adressen, private Fotos und sensible Logs. Prüfe auch Screenshots. Vollständige vertrauliche Evidenz nur über einen vereinbarten privaten Kanal.</p>
+    <label><input id="redaction" type="checkbox">Ich habe Bericht und Evidenz auf private Daten geprüft.</label>
+    <div class="actions"><button id="make-summary" type="button">Zusammenfassung erstellen</button><button id="copy-summary" type="button">Zusammenfassung kopieren</button><a id="issue-link" href="https://github.com/tekky85/ha-legacy-dashboard/issues/new?template=manual_test_run.yml" rel="noreferrer">Testlauf auf GitHub melden</a><a id="bug-link" href="https://github.com/tekky85/ha-legacy-dashboard/issues/new?template=bug_report.yml" rel="noreferrer">Einzelnen Fehler melden</a></div>
+    <label>Kopierbare Zusammenfassung<textarea id="issue-summary" rows="8" readonly></textarea></label>
+    <p>JSON zuerst exportieren. Mit GitHub-Konto das Formular öffnen und den geprüften Bericht anhängen. Falls .json abgelehnt wird: als .zip oder .txt anhängen, alternativ redigiertes JSON als Codeblock einfügen. Ohne Konto die Datei an deinen Koordinator geben. Danach die Issue-Nummer oben beim Lauf oder Ergebnis hinterlegen. Das Portal erstellt keine Issues automatisch.</p>
+  </section>
+</main><footer>Community Test-Center · lokale Entwürfe · <a href="guides/DATA_FORMAT.md">Datenformat</a> · <a href="guides/TEST_COORDINATOR.md">Koordinator</a></footer>
+</body></html>

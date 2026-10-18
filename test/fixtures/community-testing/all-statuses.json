@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0",
+  "testRunId": "RUN-synthetic-demo-0001",
+  "testerId": "Demo-A",
+  "createdAt": "2026-10-18T10:00:00.000Z",
+  "updatedAt": "2026-10-18T11:00:00.000Z",
+  "catalogVersion": "synthetic-example",
+  "catalogHash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "environment": {
+    "deployment": "ha-app",
+    "dashboardVersion": "1.0.0-rc.7",
+    "homeAssistantVersion": "2026.10.0",
+    "architecture": "aarch64",
+    "browser": "Demo Browser",
+    "device": "Demo Tablet",
+    "os": "Demo OS"
+  },
+  "notes": "SYNTHETIC FIXTURE: no real installation or manual acceptance. Deliberately different catalog, incomplete coverage.",
+  "issueUrl": "",
+  "results": [
+    {"testId":"MT-01","status":"PASS","testedAt":"2026-10-18T10:01:00.000Z","expected":"","actual":"","reproductionSteps":"","notes":"Synthetic observation only","issueUrl":"","evidence":""},
+    {"testId":"MT-02","status":"FAIL","testedAt":"2026-10-18T10:02:00.000Z","expected":"Navigation remains fullscreen","actual":"Synthetic unexpected browser chrome","reproductionSteps":"Open demo route, then return","notes":"","issueUrl":"#1","evidence":"demo-only.png"},
+    {"testId":"MT-03","status":"BLOCKED","testedAt":"2026-10-18T10:03:00.000Z","expected":"","actual":"","reproductionSteps":"","notes":"Required test device is not available","issueUrl":"","evidence":""},
+    {"testId":"MT-04","status":"N/A","testedAt":"2026-10-18T10:04:00.000Z","expected":"","actual":"","reproductionSteps":"","notes":"Synthetic run scope excludes admin checks","issueUrl":"","evidence":""},
+    {"testId":"MT-05","status":"NOT_TESTED","testedAt":null,"expected":"","actual":"","reproductionSteps":"","notes":"","issueUrl":"","evidence":""}
+  ]
+}

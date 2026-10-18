@@ -20,6 +20,7 @@ Choose an installation:
 - [Release and distribution process](./docs/RELEASING.md)
 - [Public Test Release 1.0.0-rc.7](./docs/PUBLIC_TEST_RELEASE.md)
 - [GitHub Releases](https://github.com/tekky85/ha-legacy-dashboard/releases)
+- [Community testing guide](./docs/testing/TESTER_GUIDE.en.md) / [Testanleitung](./docs/testing/TESTER_GUIDE.de.md)
 
 ## Screenshots
 

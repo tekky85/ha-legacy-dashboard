@@ -1,0 +1,75 @@
+name: Community Test-Center
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'testing/**'
+      - 'scripts/testing/**'
+      - 'schemas/test-*.json'
+      - 'docs/testing/**'
+      - 'docs/audits/MANUAL_TEST_QUEUE.md'
+      - 'test/community-testing*'
+      - 'test/fixtures/community-testing/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/workflows/testing-pages.yml'
+  pull_request:
+    paths:
+      - 'testing/**'
+      - 'scripts/testing/**'
+      - 'schemas/test-*.json'
+      - 'docs/testing/**'
+      - 'docs/audits/MANUAL_TEST_QUEUE.md'
+      - 'test/community-testing*'
+      - 'test/fixtures/community-testing/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/workflows/testing-pages.yml'
+permissions:
+  contents: read
+concurrency:
+  group: community-pages-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check canonical catalog drift and community tests
+        run: |
+          node scripts/testing/build-test-catalog.js --check
+          node --test test/community-testing.test.js
+      - name: Build allowlisted static site
+        run: node scripts/testing/build-site.js dist/community-site
+      - name: Test actual portal in local browser
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/community-browsers
+        run: |
+          npm install --prefix "$RUNNER_TEMP/community-tools" --no-save --ignore-scripts --package-lock=false playwright@1.51.1
+          node "$RUNNER_TEMP/community-tools/node_modules/playwright/cli.js" install --with-deps chromium
+          NODE_PATH="$RUNNER_TEMP/community-tools/node_modules" node test/community-testing-browser.js
+      - name: Upload only public static files
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/community-site
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Deploy independent test portal
+        id: deployment
+        uses: actions/deploy-pages@v4

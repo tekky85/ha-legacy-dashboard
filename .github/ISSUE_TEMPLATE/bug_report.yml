@@ -1,4 +1,4 @@
-name: Public test release bug
+name: Bug Report
 description: Report a reproducible HA Legacy Dashboard defect
 title: "[Bug]: "
 labels:
@@ -10,6 +10,16 @@ body:
         Thanks for testing HA Legacy Dashboard. Never include Home Assistant,
         Supervisor, or Admin tokens, passwords, `.env` files, private keys,
         personal data, or unredacted sensitive logs.
+  - type: input
+    id: test-id
+    attributes:
+      label: Manual Test ID (if applicable)
+      placeholder: MT-01
+  - type: input
+    id: test-run
+    attributes:
+      label: Test Run ID or related run Issue
+      description: Link the exported community test run when available. No full report in URLs.
   - type: input
     id: dashboard-version
     attributes:
