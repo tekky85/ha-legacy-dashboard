@@ -1,9 +1,8 @@
 # Community Test-Center – Anleitung
 
-Das Portal soll unter
-https://tekky85.github.io/ha-legacy-dashboard/testing/ erreichbar sein.
-Der Veröffentlichungsnachweis steht im Projektstatus; bis zum erfolgreichen
-Pages-Lauf ist dies die erwartete Adresse. Ein GitHub-Login und Zugriff auf
+Das Portal ist unter
+https://tekky85.github.io/ha-legacy-dashboard/testing/ öffentlich erreichbar.
+Der erfolgreiche Pages-Lauf ist im Projektstatus dokumentiert. Ein GitHub-Login und Zugriff auf
 das Home Assistant des Projektbetreibers sind zum Lesen/Testen nicht nötig.
 Das Portal läuft unabhängig von deiner installierten App. Verwende dafür
 einen aktuellen Browser; die iOS-9-Prüfung erfolgt auf dem echten iPad.

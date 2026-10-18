@@ -647,8 +647,8 @@ The project contains no telemetry or analytics.
 
 The independent [Community Test-Center](https://tekky85.github.io/ha-legacy-dashboard/testing/)
 guides manual tests on your own HA App/Standalone installation. The address is
-available only after successful Pages deployment; [project status](docs/PROJECT_STATUS.md)
-records the evidence. Drafts remain in your browser; explicitly export JSON
+publicly accessible; [project status](docs/PROJECT_STATUS.md) records the
+deployment evidence. Drafts remain in your browser; explicitly export JSON
 and review privacy before submitting a GitHub test run or handing it to a
 coordinator. Reading needs no HA access or GitHub login. Enter the actual
 installed version.

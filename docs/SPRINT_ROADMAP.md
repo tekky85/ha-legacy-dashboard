@@ -230,7 +230,7 @@ Bedeutung von „fest“:
 | 26 | Persistent Dashboard Sections | umgesetzt und automatisiert validiert; iPad-mini-Abnahme offen |
 | 26.1 | Native Room Card MVP | vollständig re-auditiert; Runtime-Hintergrund und Collapse korrigiert; iPad-mini-Abnahme offen |
 | 26.2 | Controllable Entity Authorization & Climate Capability Hardening | umgesetzt und automatisiert validiert; Mehrgeräte-iPad-Abnahme offen |
-| 27.3 | Community Test-Center & Test Result Management | PARTIAL: Portal/Katalog/Auswertung implementiert und CI-Build grün; Pages-Deploy durch Repository-Einrichtung blockiert; bestehender Produktionsdependency-Audit rot |
+| 27.3 | Community Test-Center & Test Result Management | PARTIAL – PORTAL LIVE: Build/Deploy 39155337796 grün, Portal/Katalog HTTP 200; bestehender Produktionsdependency-Audit weiterhin rot |
 
 ---
 

@@ -671,8 +671,8 @@ Backend. Das Projekt enthält keine Telemetrie oder Analytics.
 
 Das unabhängige [Community Test-Center](https://tekky85.github.io/ha-legacy-dashboard/testing/)
 führt durch die manuellen Tests auf der eigenen HA-App-/Standalone-Installation.
-Die Adresse ist erst nach erfolgreicher Pages-Bereitstellung verfügbar; den
-Nachweis nennt [Projektstatus](docs/PROJECT_STATUS.md). Entwürfe bleiben nur im
+Das Portal ist öffentlich erreichbar; den Bereitstellungsnachweis nennt
+[Projektstatus](docs/PROJECT_STATUS.md). Entwürfe bleiben nur im
 eigenen Browser; JSON ausdrücklich exportieren und nach Datenschutzprüfung als
 GitHub-Testlauf oder über den Koordinator weitergeben. Kein HA-Zugriff und kein
 GitHub-Login zum Lesen erforderlich. Die echte installierte Version angeben.

@@ -2657,10 +2657,10 @@ Die Testeranleitungen DE/EN, Koordinatoranleitung, Datenformat und Datenschutz
 stehen unter `docs/testing/`. Der Pages-Workflow veröffentlicht ausschließlich
 eine explizite Dateiliste aus `dist/`, nur von `main`; PRs dürfen nur bauen und
 prüfen. Die öffentliche Repository-API meldete vor Sprintbeginn
-`has_pages: false`. Ein Maintainer muss Pages mit Quelle GitHub Actions
-aktivieren. Die erwartete Adresse ist
-`https://tekky85.github.io/ha-legacy-dashboard/testing/`; ein öffentlicher
-Deploy wird erst nach tatsächlich erfolgreichem Workflow als PASS gewertet.
+`has_pages: false`. Der Betreiber hat Pages inzwischen aktiviert. Workflow
+`39155337796` auf Commit `306ea3e` bestand Build und Deploy. Die öffentliche
+Adresse `https://tekky85.github.io/ha-legacy-dashboard/testing/` und der
+72 Tests umfassende Katalog liefern HTTP 200; Version/Hash stimmen überein.
 
 Lokale Evidenz: 15/15 fokussierte Node-Tests und 14/14 reale Chromium-
 Prüfgruppen (Browser 134.0.6998.35), inklusive Projekt-Unterpfad und Root-Pfad,
@@ -2672,12 +2672,13 @@ unverändert. Vollständige Übergabe und verbleibende Schritte:
 [`testing/IMPLEMENTATION_STATUS.md`](testing/IMPLEMENTATION_STATUS.md).
 
 GitHub-Nachweis nach Push von `2558af1`: Workflow `39154225107` bestand
-Katalog-/Unit-/Build-/Browserprüfungen und Artifact-Upload. Pages-Deploy ist
+Katalog-/Unit-/Build-/Browserprüfungen und Artifact-Upload. Pages-Deploy war
 wegen fehlender Repository-Einrichtung (`Get Pages site failed`, `Not Found`)
-**BLOCKED**. Normale CI `39154225108` bestand Release-Testgate und Card-Matrix,
+zunächst **BLOCKED**; dieser Blocker ist mit Workflow `39155337796` geschlossen.
+Normale CI `39154225108` bestand Release-Testgate und Card-Matrix,
 scheitert aber am aktuellen Audit der unveränderten Produktionsabhängigkeiten:
 ein High-Paketbefund (`axios`) und ein Critical-Paketbefund (`proxy-addr`).
 Die lokale npm-Abfrage bestätigt dies; eine separate Security-Reparatur und
 Risiko-/Regressionprüfung bleibt erforderlich. Sprint 27.3 ist deshalb
-**PARTIAL**; kein neuer Produktrelease, keine automatische Abnahme und keine
+**PARTIAL – PORTAL LIVE**; kein neuer Produktrelease, keine automatische Abnahme und keine
 27.1-K-Reparatur wurden daraus abgeleitet.

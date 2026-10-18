@@ -1,9 +1,9 @@
 # Community Test-Center – tester guide
 
-The intended portal address is
+The public portal address is
 https://tekky85.github.io/ha-legacy-dashboard/testing/.
-Project status records deployment evidence; until Pages succeeds this is an
-expected address. Reading/testing needs neither a GitHub login nor access to
+Project status records the successful deployment evidence. Reading/testing
+needs neither a GitHub login nor access to
 the project owner's Home Assistant. The portal runs independently of your
 installed App. Use a modern browser for the portal; test iOS 9 on the real iPad.
 

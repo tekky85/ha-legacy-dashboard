@@ -106,15 +106,17 @@ links Issues and RQ candidates, and never mutates the Repair Queue.
 ## Publication / remaining gate
 
 Preflight public API: repository public, default branch main, `has_pages: false`.
-No existing site/workflow was overwritten. Build/deploy workflow is prepared;
-public deployment is **BLOCKED by repository Pages configuration** until a
-maintainer selects Settings → Pages → Source: GitHub Actions and runs the
-Community Test-Center workflow on main. Do not announce the URL as live before
-an actual successful deploy and HTTP check. No HA App release is required.
+No existing site/workflow was overwritten. The initial configuration blocker
+has been resolved by the owner. Workflow `39155337796` on commit
+`306ea3e316589a8ce9088a13459edbe934ac1e2f` completed both build and deploy
+successfully. The public portal and catalog both returned HTTP 200; catalog
+version/hash and all 72 tests match the local generated artifact. The portal
+is **LIVE**. No HA App release is required.
 
-Implementation is locally complete. Sprint result is **PARTIAL** while public
-publication is unverified. External testers need the Pages setting and a
-successful deploy, plus the coordinator's explicit version/device scope.
+Implementation and public publication are verified. Sprint result remains
+**PARTIAL** because the separate existing product dependency audit is red;
+the Pages blocker is closed. Test coordination still requires an explicit
+runtime version/device scope and the product security follow-up below.
 Current macOS Safari, another modern browser and physical phone/tablet
 validation remain manual; exact nine-step instructions are in
 `TEST_COORDINATOR.md`. No dummy public Issue was submitted.
@@ -130,8 +132,9 @@ pre-existing owner documents and Sprint 27.1-K specification stay unstaged.
   Pages artifact upload **PASS**. Deploy **BLOCKED** at Configure Pages:
   `Get Pages site failed` / `Not Found`. GitHub's annotation explicitly asks
   to enable Pages and configure GitHub Actions. The deploy step was skipped;
-  the portal is not live. A maintainer must enable the setting and manually
-  rerun the workflow on main. The workflow does not silently change settings.
+  the portal was not live at that point. This historical failure was resolved
+  by the later successful run documented below; the workflow did not silently
+  change settings.
 - [Normal CI 39154225108](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/39154225108):
   release test gate and production card browser matrix **PASS**. The existing
   production dependency audit **FAIL**; container-build is consequently skipped.
@@ -146,11 +149,22 @@ pre-existing owner documents and Sprint 27.1-K specification stay unstaged.
   before the next product release. No dependency gate was disabled and no
   27.1 repair batch was started.
 - Existing RC.7 tag/image/bundle were not altered. The static portal has no
-  production runtime dependencies and remains locally validated; public
-  availability and the separate product security gate must not be reported PASS.
+  production runtime dependencies. The separate product security gate remains
+  FAIL even though portal publication now passes.
 
-Final Sprint 27.3 result: **PARTIAL**. Before external testing, activate Pages,
-observe a successful deploy/HTTP check, and explicitly resolve the product
-dependency-audit blocker when selecting the runtime candidate to distribute.
+Final Sprint 27.3 result: **PARTIAL – PORTAL LIVE**. The Pages requirement is
+satisfied; explicitly resolve the product dependency-audit blocker when
+selecting the runtime candidate to distribute.
 Working tree retains the six pre-existing manual-result documentation edits
 and untracked 27.1-K specification; no Sprint 27.3 implementation is left unstaged.
+
+## Verified public deployment
+
+- [Workflow 39155337796](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/39155337796):
+  build PASS, deploy PASS, commit `306ea3e316589a8ce9088a13459edbe934ac1e2f`.
+- [Public portal](https://tekky85.github.io/ha-legacy-dashboard/testing/): HTTP 200.
+- Public `testing/data/test-catalog.json`: HTTP 200, 72 tests,
+  `27.3-1c6d7088096c`, hash matches the source inventory above.
+- Verified on 2026-10-18 after the owner's successful manual workflow start.
+- This closes public Pages availability only. No physical product tests,
+  dependency repairs, new runtime release or final RC acceptance were performed.
