@@ -7,6 +7,9 @@
   "required": ["schemaVersion", "testRunId", "testerId", "createdAt", "updatedAt", "catalogVersion", "catalogHash", "environment", "notes", "issueUrl", "results"],
   "properties": {
     "schemaVersion": {"const": "1.0"},
+    "testCenterVersion": {"type": "string", "minLength": 1, "maxLength": 80},
+    "dataKind": {"enum": ["manual", "synthetic"]},
+    "exportedAt": {"type": "string", "format": "date-time"},
     "testRunId": {"type": "string", "pattern": "^RUN-[A-Za-z0-9-]{8,80}$"},
     "testerId": {"type": "string", "minLength": 1, "maxLength": 80},
     "createdAt": {"type": "string", "format": "date-time"},

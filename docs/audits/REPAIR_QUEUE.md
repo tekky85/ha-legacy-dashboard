@@ -280,3 +280,13 @@ betroffener Fläche – gezielt zu regressieren.
 - Release-/Kandidatenevidenz: **PENDING** bis zum separat autorisierten
   RC.4-Workflow; beide P1-Einträge bleiben deshalb als RC-Blocker sichtbar.
 - Reale LXC-/HAOS-/iPad-Ergebnisse: weiterhin `NOT TESTED`.
+
+## Zusätzlicher Tooling-Befund – Sprint 27.4 (18. Oktober 2026)
+
+Diese Ergänzung liegt nach dem oben datierten Baseline-/Repairbatch-Snapshot:
+ein zusätzlicher kanonischer P2-Tooling-Repair, code-seitig geschlossen. Keine
+27.1-Reparatur und keine Änderung einer manuellen Produktabnahme.
+
+| ID | Sprint | Requirement | Ausgangsstatus | Priorität | Evidence | Vorgeschlagene Reparatur | RC-Relevanz | Re-Audit |
+|---|---|---|---|---|---|---|---|---|
+| RQ-21-01 | 27.3, 27.4 | Varianten derselben Run-ID wurden trotz Konflikt mehrfach gezählt; reine Re-Exports konnten als Konflikt gelten und synthetische Reports waren nicht standardmäßig aus der Ergebniszählung ausgeschlossen. | BROKEN | P2 | Kontrollierte Vorprobe auf f027eeb: distinctRuns=1, reportVariants=2, runConflicts=1, PASS=2. `test/community-testing-pilot.test.js` reproduziert gleiche Beobachtung mit neuer Exportzeit/Schlüsselreihenfolge, inhaltlich abweichende Run-Varianten und mehrere ausdrücklich synthetische Tester. | **UMGESETZT.** Kanonische Beobachtungsidentität ignoriert nur Exportzeit und JSON-Schlüsselreihenfolge. Konfliktvarianten bleiben vollständig erhalten, zählen aber nicht. Synthetische Berichte zählen nur mit explizitem Übungsflag; Versions-/Katalog-/Provenienzgruppen, per-Test-Detailreferenzen und Ausschlussgründe bleiben sichtbar. | Reporting-Tooling geprüft; keine Produkt-, iPad-, HAOS- oder Stable-Abnahme. Menschliche Pilotberichte und deren Datenschutzreview bleiben PENDING, siehe `docs/testing/PILOT_STATUS.md`. | CODE CLOSED – Sprint 27.4; HUMAN PILOT PENDING |

@@ -9,6 +9,14 @@ einen aktuellen Browser; die iOS-9-Prüfung erfolgt auf dem echten iPad.
 
 ## Vorbereiten und starten
 
+Für Sprint 27.4 zuerst den [Pilotplan](PILOT_PLAN.de.md) lesen: elf bestehende
+Test-IDs, sichere Voraussetzungen und Dauerklassen. Der Koordinator bestätigt
+den Kandidaten; eine Veröffentlichung beweist nicht deine installierte Version.
+Im Portal „Pilot 27.4: 11 ausgewählte bestehende Tests“ aktivieren; die Originalschritte
+bleiben maßgeblich. Für echte Tests „Echte manuelle Beobachtungen“ wählen.
+Eine reine Berichtsübung als „Synthetischer Übungslauf“ kennzeichnen, insbesondere
+einen absichtlich erzeugten FAIL. Übungsberichte sind keine echte Abnahme.
+
 1. Erstelle eine Sicherung deiner App-Daten und bereite ein separates
    Testdashboard sowie sichere Testgeräte vor. Keine gefährlichen Geräte oder
    produktiven Sicherheitsabläufe für Fehler-/Ausfalltests verwenden.
@@ -88,3 +96,19 @@ nach; erst jeden benötigten Lauf exportieren.
 Fotos/Screenshots stammen nur vom echten Produkt oder einer kontrollierten
 Demo. Vor Weitergabe private Details prüfen; keine generierten Produktmockups.
 Ein leerer/unvollständiger Lauf ist keine Freigabe und keine „100 % bestanden“.
+
+## Wenn etwas nicht erreichbar ist
+
+Bei App-Ausfall keine Folgetests erfinden: beobachteten Startfehler als FAIL
+mit Reproduktion dokumentieren, abhängige Tests begründet BLOCKED lassen.
+Bei Pages-Ausfall vorhandenen JSON-Export sichern, Zeitpunkt/Fehlermeldung
+notieren und den Koordinator über den vereinbarten Kanal kontaktieren. Ohne
+geladenes Portal gibt es keine garantierte Offline-App. Bei GitHub-Ausfall
+bleibt der lokale Export möglich: JSON privat sichern und später übergeben.
+Kein zusätzlicher Account, Passwort oder Token wird hierfür benötigt.
+
+Neue Exporte enthalten Test-Center-Version, Katalogidentität und Exportzeit.
+Ältere 1.0-Berichte ohne diese Zusatzmetadaten bleiben importierbar; Hinweise
+prüfen und Originaldatei behalten. Lokaler Entwurf und Datei sind kein gemeinsames
+Serverbackup. Empfang und echte Ergebnisse stehen im [Pilotstatus](PILOT_STATUS.md);
+alle realen Slots starten mit NOT TESTED.

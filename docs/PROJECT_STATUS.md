@@ -2682,3 +2682,36 @@ Die lokale npm-Abfrage bestätigt dies; eine separate Security-Reparatur und
 Risiko-/Regressionprüfung bleibt erforderlich. Sprint 27.3 ist deshalb
 **PARTIAL – PORTAL LIVE**; kein neuer Produktrelease, keine automatische Abnahme und keine
 27.1-K-Reparatur wurden daraus abgeleitet.
+
+## Sprint 27.4 – Pilotvorbereitung und Reporting-Validierung
+
+Stand: 18. Oktober 2026. Startbranch `main`, Startcommit
+`f027eebefce4a8aedb1f69424310b24cdac31852`.
+**IMPLEMENTATION READY FOR HUMAN PILOT** bezeichnet ausschließlich das geprüfte
+Test-Center-Tooling und Onboarding, keine real bestandene Produktabnahme.
+Sprint 27.3 ist implementiert und öffentlich erreichbar; sein separat bekannter
+Produktdependency-Audit bleibt offen. Echte unabhängige HA-App-Pilotberichte,
+volle manuelle Abnahme und RC-/Stable-Gate sind weiterhin PENDING.
+
+Der Pilotfilter wählt elf vorhandene MT-IDs aus dem unveränderten kanonischen
+72-Test-Katalog. Keine zweite Testfall-Datenbank, keine erfundenen Tests,
+keine Übernahme lokaler Owner-Beobachtungen in den öffentlichen Katalog.
+Neue Bericht-1.0-Exporte enthalten additive Tool-Version, Datenart und UTC-
+Exportzeit. Legacy-1.0-Dateien bleiben mit Hinweisen gültig. Synthetische
+Berichte sind standardmäßig von der Zählung ausgeschlossen. Der nachgewiesene
+Doppelzählfehler `RQ-21-01` ist gezielt repariert: Inhaltskonflikte derselben
+Run-ID werden erhalten und quarantiniert; Re-Exporte derselben Beobachtung
+werden dedupliziert. App-/Katalog-/Provenienzgruppen bleiben getrennt.
+
+Koordinatoren erhalten per-Test-Zähler, Hash-/Indexreferenzen, Konflikte,
+fehlende Abdeckung und begrenzte BLOCKED/N/A-Gründe in Aggregate-JSON 1.1,
+Markdown und CSV. Keine automatische RQ-Schließung, Issue-Erzeugung oder
+Übertragung von Rohdaten. Der Offline-Pilot verwendet ausschließlich markierte
+Fixtures und keinen Home-Assistant-Zugriff. README DE/EN und Anleitungen bleiben
+inhaltlich synchron; neue Produktbilder sind mangels Produkt-UI-Änderung nicht
+erforderlich. Legacy-Runtime, Controls, App-Rechte und unveränderliche RC.7-
+Artefakte bleiben unangetastet; Sprint 27.1-K wird nicht gestartet.
+
+Pilotplan, Ergebnis-/Empfangsslots, konkrete Testbefehle, finale Testzahlen,
+Pages-Nachweis und offene manuelle Übergaben:
+[`testing/PILOT_STATUS.md`](testing/PILOT_STATUS.md).

@@ -8,6 +8,7 @@
   <title>HA Legacy Dashboard · Community Test-Center</title>
   <link rel="stylesheet" href="css/testing.css">
   <script defer src="js/report.js"></script>
+  <script defer src="js/pilot.js"></script>
   <script defer src="js/portal.js"></script>
 </head>
 <body>
@@ -30,6 +31,7 @@
         <label>Tester-Alias *<input name="testerId" required maxlength="80" placeholder="Tester-A"></label>
         <label>Installierte Dashboard-Version *<input name="dashboardVersion" required maxlength="160" placeholder="1.0.0-rc.7"></label>
         <label>Installation<select name="deployment"><option value="ha-app">Home Assistant App</option><option value="standalone">Standalone / LXC</option></select></label>
+        <label>Berichtsart<select name="dataKind"><option value="manual">Echte manuelle Beobachtungen</option><option value="synthetic">Synthetischer Übungslauf – kein HA-Test</option></select></label>
         <label>Home Assistant Core-Version<input name="homeAssistantVersion" maxlength="160" placeholder="Unbekannt: leer lassen"></label>
         <label>Architektur<input name="architecture" maxlength="160" placeholder="amd64 / aarch64 / unbekannt"></label>
         <label>Testgerät *<input name="device" required maxlength="160" placeholder="z. B. iPad mini 1"></label>
@@ -44,6 +46,8 @@
     <section id="import-preview" hidden class="notice"><h3>Import prüfen</h3><pre id="import-summary"></pre><label><input id="accept-mismatch" type="checkbox">Abweichungen verstanden; bei Katalogabweichung nur lesend übernehmen.</label><button id="confirm-import" type="button">Import bestätigen</button><button id="cancel-import" type="button">Abbrechen</button></section>
   </section>
   <section class="panel"><h2>Prüfkatalog <span id="catalog-info"></span></h2><p id="counts"></p>
+    <label><input id="pilot-only" type="checkbox">Pilot 27.4: 11 ausgewählte bestehende Tests</label>
+    <p><a href="guides/PILOT_PLAN.de.md">Pilotplan und sichere Voraussetzungen</a> · <a href="guides/PILOT_STATUS.md">Werkzeugprüfung und ausstehender menschlicher Pilot</a></p>
     <p>Filter sind eine Auswahlhilfe. Voraussetzungen und Zielgerät im Test bleiben verbindlich. Release-/Stable-Veröffentlichungen sind Aufgaben des Koordinators.</p>
     <div class="fields filters">
       <label>Suche nach ID oder Titel<input id="search" type="search"></label>

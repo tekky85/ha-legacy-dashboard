@@ -9,6 +9,14 @@ installed App. Use a modern browser for the portal; test iOS 9 on the real iPad.
 
 ## Prepare and start
 
+For Sprint 27.4, read the [pilot plan](PILOT_PLAN.de.md): eleven existing Test IDs,
+safe prerequisites and duration categories. The coordinator confirms the
+candidate; publication does not prove your installed version. Enable “Pilot
+27.4: 11 ausgewählte bestehende Tests”; full canonical instructions remain authoritative.
+Choose “Echte manuelle Beobachtungen” for real tests. Mark reporting-only
+exercises “Synthetischer Übungslauf”, especially an intentional FAIL.
+Practice reports are not real acceptance evidence.
+
 1. Back up App data and prepare a separate test dashboard and safe test devices.
    Do not use dangerous devices or production safety/security processes for
    deliberate error/outage tests.
@@ -76,3 +84,19 @@ Clearing all local runs requires confirmation; first export every needed run.
 Use screenshots/photos from the real product or controlled demo only. Inspect
 private details before sharing; generated product mockups are not evidence.
 An empty/incomplete run is neither acceptance nor “100% passed”.
+
+## If a service is unavailable
+
+If the App fails, do not invent downstream observations: record a reproduced
+startup failure as FAIL and leave dependent tests BLOCKED with reasons. If
+Pages is unavailable, retain existing JSON backups, note the time/error and
+contact the coordinator through the agreed channel. Without a loaded portal
+there is no guaranteed offline app. If GitHub fails, local export remains
+available: save JSON privately and hand it over later. No additional account,
+password or token is required for this fallback.
+
+New exports contain Test-Center version, catalog identity and export time.
+Older 1.0 reports without the additive metadata remain importable: review
+warnings and retain the original file. Neither a local draft nor a file is a
+shared server backup. Receipt and real outcomes go in [pilot status](PILOT_STATUS.md);
+all real slots start NOT TESTED.

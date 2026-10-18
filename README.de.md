@@ -678,6 +678,9 @@ GitHub-Testlauf oder über den Koordinator weitergeben. Kein HA-Zugriff und kein
 GitHub-Login zum Lesen erforderlich. Die echte installierte Version angeben.
 
 - [Anleitung für Tester](docs/testing/TESTER_GUIDE.de.md)
+- [Pilot 27.4: elf bestehende Tests](docs/testing/PILOT_PLAN.de.md) und
+  [Eingänge/Status](docs/testing/PILOT_STATUS.md): Werkzeugprüfung vorbereitet;
+  echte unabhängige HA-App-Piloten und vollständige manuelle Abnahme stehen aus.
 - [Koordination und lokale Berichtsauswertung](docs/testing/TEST_COORDINATOR.md)
 - [Datenformat](docs/testing/DATA_FORMAT.md) und [Datenschutz](docs/testing/PRIVACY_AND_SECURITY.md)
 

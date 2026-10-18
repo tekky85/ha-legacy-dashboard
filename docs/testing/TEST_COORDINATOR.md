@@ -29,14 +29,20 @@ Review `summary.json`, `summary.md` and `matrix.csv`. JSON contains input
 validity/hashes, version/catalog groups, precise status totals, category/system
 coverage, repeated failures, conflicts, per-test Sprint/requirement/RQ mapping
 and Issue linkage. CSV is Test ID × run/version/catalog; conflicting variants
-remain visible. Summary omits raw notes. Do not publish raw submissions or
+remain visible. General notes are omitted; bounded/redacted BLOCKED/N/A
+explanations remain as capability limitations. Do not publish raw submissions or
 aggregate exports without manual privacy review. Published examples use only
 synthetic or explicitly reviewed/redacted data.
 
 Invalid files or same-ID/different-content conflicts cause a nonzero exit
 while producing actionable diagnostics. Identical files with the same run ID
 are deduplicated; neither software-version differences nor disagreeing testers
-are collapsed. Count aliases and run IDs separately; aliases alone do not
+are collapsed. Conflicting variants of one run are quarantined from totals;
+all variants and source hashes remain available. Re-exports changing only
+export time or JSON key order are duplicates. Explicitly synthetic reports
+are excluded by default; `--include-synthetic` is for labeled training only.
+Legacy reports without provenance are `unspecified`, not verified humans.
+Count aliases and run IDs separately; aliases alone do not
 prove independent people. Inspect catalog mismatch/unknown IDs and incomplete
 coverage before comparing. No result is inferred for a missing test, and N/A
 is never PASS. Compare HA Core/environment groups as well as App version.
@@ -53,7 +59,7 @@ RC/Stable approval still requires all repository gates and explicit evidence.
 
 ```sh
 node scripts/testing/build-test-catalog.js --check
-node --test test/community-testing.test.js
+node --test test/community-testing*.test.js
 node scripts/testing/build-site.js dist/community-site
 node test/community-testing-browser.js
 ```
@@ -98,3 +104,41 @@ On current macOS Safari, a second modern browser, tablet and phone:
 
 These are portal checks, not physical iPad/HAOS/product acceptance. Product
 screenshots remain governed by Sprint D1; this sprint changes no product UI.
+
+## Pilot koordinieren (Deutsch)
+
+1. Zwei unabhängige HA-App-Nutzer einladen, möglichst einen dritten mit anderer
+   Architektur. [Pilotplan](PILOT_PLAN.de.md) und deutsche Anleitung verlinken.
+   Keine Einladung oder Teilnahme wird durch diese Dokumentation behauptet.
+2. Kandidat, reale Installationsversion, elf Test-IDs und sichere Voraussetzungen
+   pro Slot im [Pilotstatus](PILOT_STATUS.md) festlegen. Tatsächliche HA-Schaltungen
+   erfordern die Zustimmung des Testers; Ausfall-/Updateprüfungen nur mit Backup
+   und sicherem Zeitfenster. MT-53 ist auf reinem amd64 N/A.
+3. Unabhängige Berichte verlangen, nicht gemeinsam vorbefüllen. Bei Empfang
+   Datum, Alias, reale Version, Run-ID, Kataloghash und Issue vermerken.
+   Rohberichte privat unter `test-results/incoming/` ablegen, nicht committen.
+4. Mit obigen Befehlen validieren und in ein neues Ausgabeverzeichnis auswerten.
+   Fehlercodes bei beschädigten Reports oder Run-Konflikten nicht ignorieren.
+   Hashreferenzen behalten; unbekannte IDs und alte Kataloge prüfen.
+5. `summary.json` für Analyse nutzen: pro Test Zähler und Detailreferenzen,
+   getrennte App-/Katalog-/Datenart-Gruppen, FAIL-Konflikte, fehlende Abdeckung und
+   BLOCKED/N/A-Gründe. Keine Prozent-Freigabe aus unvollständigen Läufen ableiten.
+6. Einen Testlauf mit dem bestehenden Manual-Test-Run-Formular verknüpfen;
+   unabhängig reproduzierbare Bugs über das bestehende Bug-Formular. Duplikate
+   nach Version, Test-ID und Reproduktion sichten. RQ-Kandidaten manuell prüfen;
+   keine automatische Reparaturschließung oder Umdeutung von N/A als PASS.
+7. Erst nach zwei echten gültigen Berichten die Exitkriterien im Pilotstatus
+   bewerten. Offene reale Prüfungen bleiben NOT TESTED; volle Abnahme und
+   Stable-Freigabe benötigen eine gesonderte Entscheidung.
+
+Reproduzierbare reine Tooling-Übung (kein HA, keine öffentlichen Issues):
+
+```sh
+node scripts/testing/run-pilot-validation.js test-results/pilot-27-4-001
+```
+
+Ein neues Verzeichnis wählen. Der Wrapper erwartet die absichtlichen Fehlercodes
+für eine beschädigte Fixture, prüft die Ergebnisse und endet selbst mit 0 bei
+korrekter Behandlung. `synthetic-summary/` enthält ausdrücklich nur Übungsdaten;
+`default-summary/` beweist deren Ausschluss aus realer Zählung. Das ist kein
+Nachweis unabhängiger Menschen und kein Produkt-PASS.

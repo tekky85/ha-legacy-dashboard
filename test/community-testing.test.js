@@ -119,9 +119,10 @@ test("Aggregator retains versions/testers, dedupes exact reports, surfaces run a
     assert.equal(summary.distinctRuns, 3); assert.equal(summary.distinctTesters, 3); assert.equal(summary.reportVariants, 4);
     assert.equal(summary.inventory.filter(item => item.duplicate).length, 1);
     assert.equal(summary.runConflicts.length, 1); assert.equal(summary.versions.length, 2);
-    assert.equal(summary.repeatedFailures.length, 1); assert.equal(summary.repeatedFailures[0].runCount, 2);
-    assert.equal(summary.failureGroups.length, 1); assert.equal(summary.failureGroups[0].runIds.length, 2);
-    assert.equal(summary.conflictingResults.length, 1);
+    assert.equal(summary.repeatedFailures.length, 0); // conflicting first run is quarantined
+    assert.equal(summary.failureGroups.length, 1); assert.equal(summary.failureGroups[0].runIds.length, 1);
+    assert.equal(summary.conflictingResults.length, 0);
+    assert.equal(summary.countedRuns, 2); assert.equal(summary.totals.FAIL, 1); assert.equal(summary.totals.PASS, 1);
     assert.equal(summary.versions.find(item => item.version === "1.0.0-rc.8").totals.FAIL, 0);
     assert.match(Aggregator.matrix(summary), /MT-01/); assert.match(Aggregator.markdown(summary), /No pass percentage/);
 });

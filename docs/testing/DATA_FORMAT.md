@@ -63,6 +63,13 @@ and the execution table; historical mentions are not automatically OPEN.
 
 ## Reports
 
+Schema `1.0` remains backward-compatible. Sprint 27.4 adds optional
+`testCenterVersion` (new runs: `27.4`), `dataKind` (`manual` or `synthetic`)
+and `exportedAt` (canonical UTC, at/after `updatedAt`). New downloads stamp
+export time without mutating draft observations. Older 1.0 files still load
+with metadata warnings; absent provenance is `unspecified`, never proof of a
+real tester. Other schema versions remain explicitly rejected, not migrated.
+
 See `test/fixtures/community-testing/all-statuses.json` for a synthetic
 example. Required run fields: schema version, random `RUN-…` identifier,
 tester alias, creation/update UTC timestamps, catalog version/hash,
@@ -101,7 +108,9 @@ files), rejects symlinks and bounds size before reading. Outputs are private
 by default under ignored `test-results/`. Existing outputs are never
 overwritten. Aggregation retains different software versions, catalog hashes,
 tester observations and all conflicting run variants. Only identical run ID
-and report content are deduplicated. Conflicts return a nonzero exit status
+and report content are deduplicated (ignoring JSON key order and the transport
+field `exportedAt`, not observations or version changes). Conflicting variants
+are retained but quarantined from all counted totals. Conflicts return a nonzero exit status
 while still producing a review summary. Distinct aliases are not proof of
 distinct physical people. Repeated failures require distinct run IDs;
 conflicting variants of one ID are not independent confirmations.
@@ -109,7 +118,18 @@ conflicting variants of one ID are not independent confirmations.
 JSON output includes input hashes, validity, unknown IDs/catalog warnings,
 version groups, category/device coverage, status totals, observations, Issue
 links and candidate RQ mappings. Markdown and CSV are escaped for their output
-contexts; CSV formula prefixes are neutralized. Raw freeform evidence/notes
-are not repeated in aggregate outputs. These safeguards cannot prove a
+contexts; CSV formula prefixes are neutralized. General freeform evidence/notes
+are not repeated; BLOCKED/N/A explanations are redacted and bounded to 200
+characters as capability limitations. These safeguards cannot prove a
 submission contains no secrets: manually review before any public sharing.
 No aggregation updates Repair Queue or approves a final RC gate.
+
+Aggregate output is versioned `1.1` (not a new report schema). It records input
+and counted runs/aliases separately, exclusions, per-test counts/detail hashes
+and result indexes, no executed coverage, environment limitations and RQ/Issue
+candidates. App version, catalog version/hash and provenance are independent
+group keys. `manual` is a declaration, not authentication. Explicit `synthetic`
+reports are excluded from totals by default; `--include-synthetic` produces a
+labeled exercise summary, not real acceptance. All original observations stay
+visible, with a `counted` flag. Unknown IDs and old catalogs are retained with
+warnings, never silently equated to current test coverage.

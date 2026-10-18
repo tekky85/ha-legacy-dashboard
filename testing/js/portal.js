@@ -63,6 +63,7 @@
         const form = $("run-form"); form.reset();
         if (!active) return;
         ["testerId", "notes", "issueUrl"].forEach(key => { form.elements[key].value = active[key]; });
+        form.elements.dataKind.value = active.dataKind || "manual";
         Object.keys(active.environment).forEach(key => { form.elements[key].value = active.environment[key]; });
     }
     function options(id, values) {
@@ -73,6 +74,7 @@
     function renderList() {
         const filters = Object.fromEntries(["search", "category", "sprint", "deployment", "device", "readiness"].map(id => [id, $(id).value]));
         filters.status = $("filter-status").value;
+        filters.testIds = $("pilot-only").checked ? window.TestPilot.testIds : null;
         const tests = Model.select(catalog, active, filters);
         $("test-list").replaceChildren();
         tests.forEach(test => {
@@ -84,7 +86,7 @@
             badge.textContent = (result?.status || "NOT_TESTED") + " · " + test.readiness + (test.executionState === "BLOCKED" ? " · BLOCKED: " + test.blockedBy.join(", ") : "");
             button.append(badge); button.addEventListener("click", () => showTest(test.id)); li.append(button); $("test-list").append(li);
         });
-        $("visible-count").textContent = tests.length + " von " + catalog.testCount + " Tests im Filter";
+        $("visible-count").textContent = tests.length + " von " + catalog.testCount + " Tests im Filter" + ($("pilot-only").checked ? " · Pilot 27.4 (Voraussetzungen gelten unverändert)" : "");
         const empty = {results: []};
         const totals = Model.counts(active || empty, catalog);
         $("counts").textContent = "Gesamter Lauf (unabhängig vom Filter): " + Object.entries(totals).map(([status, number]) => status + " " + number).join(" · ") + ". N/A zählt nicht als bestanden.";
@@ -110,7 +112,7 @@
     }
     function setup() {
         options("category", catalog.tests.map(test => test.category)); options("sprint", catalog.tests.flatMap(test => test.sprints)); options("device", catalog.tests.map(test => test.device));
-        ["search", "category", "sprint", "deployment", "device", "filter-status", "readiness"].forEach(id => $(id).addEventListener("input", renderList));
+        ["search", "category", "sprint", "deployment", "device", "filter-status", "readiness", "pilot-only"].forEach(id => $(id).addEventListener("input", renderList));
         $("new-run").addEventListener("click", () => {
             if (active && !confirm("Neuen Lauf vorbereiten? Der bisher gespeicherte Lauf bleibt erhalten. Ungespeicherte Eingaben im Formular gehen verloren.")) return;
             active = null; newDraft = true; selected = null; resetSharing(); $("detail").hidden = true; fillForm(); renderRuns(); renderList(); message("Neuer Lauf: Angaben ausfüllen und starten.");
@@ -128,6 +130,9 @@
             const candidate = newDraft ? Model.create(catalog, form.elements.testerId.value.trim(), environment, "RUN-" + crypto.randomUUID(), now) : clone(active);
             if (newDraft && runs.some(run => run.testRunId === candidate.testRunId)) return message("Run-ID-Kollision: bitte erneut starten. Bestehende Ergebnisse bleiben erhalten.");
             if (!newDraft && candidate.environment.dashboardVersion !== environment.dashboardVersion && candidate.results.some(result => result.status !== "NOT_TESTED")) return message("Eine andere Softwareversion benötigt einen neuen Lauf. Der bisherige Lauf bleibt erhalten.");
+            if (!newDraft && (candidate.dataKind || "manual") !== form.elements.dataKind.value && candidate.results.some(result => result.status !== "NOT_TESTED")) return message("Eine andere Berichtsart benötigt einen neuen Lauf. Synthetische Ergebnisse dürfen nicht als manuelle Beobachtungen umdeklariert werden.");
+            candidate.dataKind = form.elements.dataKind.value;
+            delete candidate.exportedAt;
             candidate.environment = environment; candidate.testerId = form.elements.testerId.value.trim(); candidate.notes = form.elements.notes.value.trim(); candidate.issueUrl = form.elements.issueUrl.value.trim(); candidate.updatedAt = now;
             const check = Model.validate(candidate, catalog);
             if (!check.valid) return message(check.errors.join("\n"));
@@ -139,6 +144,7 @@
             const result = Model.blank(selected.id);
             ["status", "expected", "actual", "reproductionSteps", "notes", "issueUrl", "evidence"].forEach(key => { result[key] = form.elements[key].value.trim(); });
             candidate.updatedAt = new Date().toISOString(); result.testedAt = result.status === "NOT_TESTED" ? null : candidate.updatedAt;
+            delete candidate.exportedAt;
             const index = candidate.results.findIndex(item => item.testId === selected.id);
             if (index < 0) candidate.results.push(result); else candidate.results[index] = result;
             const check = Model.validate(candidate, catalog); if (!check.valid) return message(check.errors.join("\n"));
@@ -147,8 +153,9 @@
         });
         $("export").addEventListener("click", () => {
             if (!active) return;
-            const check = Model.validate(active, catalog); if (!check.valid) return message(check.errors.join("\n"));
-            const blob = new Blob([JSON.stringify(active, null, 2) + "\n"], {type: "application/json;charset=utf-8"});
+            const exported = Model.prepareExport(active, new Date().toISOString());
+            const check = Model.validate(exported, catalog); if (!check.valid) return message(check.errors.join("\n"));
+            const blob = new Blob([JSON.stringify(exported, null, 2) + "\n"], {type: "application/json;charset=utf-8"});
             const link = document.createElement("a"), url = URL.createObjectURL(blob); link.href = url;
             link.download = "test-" + active.environment.dashboardVersion.replace(/[^a-zA-Z0-9.-]/g, "-") + "-" + active.testRunId + ".json";
             link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); message("JSON exportiert. Die Datei ist dein Backup; bitte sicher aufbewahren.");
@@ -160,7 +167,7 @@
                 if (file.size > Model.MAX_BYTES || !/\.json$/i.test(file.name)) throw new Error("Nur .json bis 2 MiB importieren.");
                 pending = Model.parse(await file.text(), catalog);
                 const existing = runs.find(run => run.testRunId === pending.report.testRunId);
-                pending.conflict = Boolean(existing && JSON.stringify(existing) !== JSON.stringify(pending.report));
+                pending.conflict = Boolean(existing && Model.observationJSON(existing) !== Model.observationJSON(pending.report));
                 $("import-summary").textContent = Model.summary(pending.report, catalog) + "\n" + pending.warnings.join("\n") + (pending.conflict ? "\nKONFLIKT: gleiche Run-ID mit anderem Inhalt. Kein Überschreiben oder Mischen. Beide Dateien sichern und Koordinator zur Prüfung geben." : "\nSeparater Lauf; andere Läufe bleiben unverändert.");
                 $("accept-mismatch").checked = false; $("confirm-import").disabled = pending.conflict; $("import-preview").hidden = false;
             } catch (error) { message(error.message); }
@@ -170,7 +177,8 @@
             if (!pending || pending.conflict) return;
             if (runs.length >= 100 && !runs.some(run => run.testRunId === pending.report.testRunId)) return message("Maximal 100 lokale Läufe. Vor weiterem Import zuerst exportieren und bewusst bereinigen.");
             if (pending.warnings.length && !$("accept-mismatch").checked) return message("Importabweichungen zuerst ausdrücklich bestätigen.");
-            active = clone(pending.report); newDraft = false; saveActive(); fillForm(); selected = null; $("detail").hidden = true; $("import-preview").hidden = true; pending = null; message("Import als eigenständiger Lauf übernommen. Katalogabweichungen bleiben nur lesend.");
+            const existing = runs.find(run => run.testRunId === pending.report.testRunId);
+            active = clone(existing || pending.report); newDraft = false; saveActive(); fillForm(); selected = null; $("detail").hidden = true; $("import-preview").hidden = true; pending = null; message(existing ? "Identischer Lauf fortgesetzt; gespeicherte Ergebnisse bleiben erhalten." : "Import als eigenständiger Lauf übernommen. Katalogabweichungen bleiben nur lesend.");
         });
         $("cancel-import").addEventListener("click", () => { pending = null; $("import-preview").hidden = true; });
         $("clear").addEventListener("click", () => {
@@ -197,7 +205,7 @@
             if (request.status !== 200) throw new Error("Katalog konnte nicht geladen werden.");
             catalog = JSON.parse(request.responseText);
             if (catalog.schemaVersion !== "1.0" || !Array.isArray(catalog.tests) || catalog.testCount !== catalog.tests.length) throw new Error("Ungültiger Katalog.");
-            load(); setup(); $("catalog-info").textContent = catalog.catalogVersion + " · " + catalog.testCount + " Tests";
+            load(); setup(); $("catalog-info").textContent = "Test-Center " + Model.TEST_CENTER_VERSION + " · " + catalog.catalogVersion + " · " + catalog.testCount + " Tests";
             message("Bereit. Gespeicherten Lauf fortsetzen oder neue Laufdaten eintragen.");
         } catch (error) { message(error.message); }
     };

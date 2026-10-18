@@ -28,7 +28,9 @@ Before copying or submitting:
 - preserve a private original JSON backup; share a reviewed redacted copy.
 
 The portal summary omits freeform notes by default. CLI exports escape
-Markdown/CSV and omit raw freeform notes, with limited pattern redaction.
+Markdown/CSV and omit general freeform notes. BLOCKED/N/A reasons are retained
+as capability limitations with limited pattern redaction and a 200-character
+bound; these may still contain private information and require review.
 These are not guarantees against secret disclosure: humans must review every
 public artifact. Raw input/output directories are ignored by Git. Synthetic
 fixtures are clearly separate from real submissions. Imported data never

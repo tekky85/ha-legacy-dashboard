@@ -3,8 +3,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 const cp = require("node:child_process");
 const ROOT = path.resolve(__dirname, "../..");
-const FILES = ["index.html", "css/testing.css", "js/report.js", "js/portal.js", "data/test-catalog.json"];
-const GUIDES = ["TESTER_GUIDE.de.md", "TESTER_GUIDE.en.md", "TEST_COORDINATOR.md", "DATA_FORMAT.md", "PRIVACY_AND_SECURITY.md"];
+const FILES = ["index.html", "css/testing.css", "js/report.js", "js/pilot.js", "js/portal.js", "data/test-catalog.json"];
+const GUIDES = ["TESTER_GUIDE.de.md", "TESTER_GUIDE.en.md", "TEST_COORDINATOR.md", "DATA_FORMAT.md", "PRIVACY_AND_SECURITY.md", "PILOT_PLAN.de.md", "PILOT_STATUS.md"];
 const SCHEMAS = ["test-catalog.schema.json", "test-report.schema.json"];
 function build(output) {
     const target = path.resolve(output);

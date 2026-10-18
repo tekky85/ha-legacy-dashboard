@@ -231,6 +231,7 @@ Bedeutung von „fest“:
 | 26.1 | Native Room Card MVP | vollständig re-auditiert; Runtime-Hintergrund und Collapse korrigiert; iPad-mini-Abnahme offen |
 | 26.2 | Controllable Entity Authorization & Climate Capability Hardening | umgesetzt und automatisiert validiert; Mehrgeräte-iPad-Abnahme offen |
 | 27.3 | Community Test-Center & Test Result Management | PARTIAL – PORTAL LIVE: Build/Deploy 39155337796 grün, Portal/Katalog HTTP 200; bestehender Produktionsdependency-Audit weiterhin rot |
+| 27.4 | Community Test-Center Pilot & End-to-End Validation | IMPLEMENTATION READY FOR HUMAN PILOT – Werkzeugprüfung/Onboarding vorbereitet; echte unabhängige HA-App-Berichte, volle manuelle Abnahme und RC-/Stable-Gate weiterhin offen; siehe `docs/testing/PILOT_STATUS.md` |
 
 ---
 

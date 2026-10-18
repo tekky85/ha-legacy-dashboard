@@ -654,6 +654,9 @@ coordinator. Reading needs no HA access or GitHub login. Enter the actual
 installed version.
 
 - [Tester guide](docs/testing/TESTER_GUIDE.en.md)
+- [Pilot 27.4: eleven existing tests](docs/testing/PILOT_PLAN.de.md) and
+  [receipt/status tracking](docs/testing/PILOT_STATUS.md): tooling prepared;
+  independent real HA App pilots and full manual acceptance remain pending.
 - [Coordination and local report analysis](docs/testing/TEST_COORDINATOR.md)
 - [Data format](docs/testing/DATA_FORMAT.md) and [privacy](docs/testing/PRIVACY_AND_SECURITY.md)
 
