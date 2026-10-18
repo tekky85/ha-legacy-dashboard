@@ -154,14 +154,54 @@ im separaten Testportal, kein Produkt-Screenshotbedarf nach D1.
 
 ### Git / öffentliche Bereitstellung
 
-Automatisches/Tooling-Gate bestanden. Commit und Push erfolgen mit
-`test: prepare community Test-Center pilot and report validation` auf `main`.
-Das bestehende Pages-Verfahren deployt aus diesem Quellstand, kein zweites
-Hosting oder App-Release. Vor Push ist die neue Bereitstellung PENDING;
-der zuletzt beobachtete Sprint-27.3-Lauf `39155337796` war grün.
-Öffentliche Adresse: https://tekky85.github.io/ha-legacy-dashboard/testing/.
-Nach Push Workflow, Tool-Version 27.4, Pilot-Auswahl und Kataloghash überprüfen;
-der tatsächliche Ausgang wird separat nachgewiesen.
+Automatisches/Tooling-Gate bestanden. Implementierungscommit
+`b497ad3303ea0df9112e376eb428c0267b33c12d`, Nachricht
+`test: prepare community Test-Center pilot and report validation`, ist auf
+`origin/main` gepusht. Das bestehende Pages-Verfahren
+[39157990028](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/39157990028)
+bestand **Build und Deploy** auf genau diesem Commit. Kein zweites Hosting
+oder App-Release. Öffentliche Adresse:
+https://tekky85.github.io/ha-legacy-dashboard/testing/.
+
+Nach Deployment geprüft: HTML, `js/report.js`, `js/portal.js`, `js/pilot.js`
+und `data/test-catalog.json` liefern HTTP 200 und sind bytegenau identisch
+mit dem getesteten lokalen Stand. Tool-Version 27.4 und die elf Pilot-IDs
+sind damit öffentlich vorhanden. Das ist ein Live-HTTP-/Artefaktnachweis,
+kein realer Safari-/iPad-/HAOS-/menschlicher Verständlichkeitstest.
+
+Die getrennte normale [Produkt-CI 39157990015](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/39157990015)
+bestand Release-Testgate und reale Browser-Card-Matrix, scheiterte aber beim
+unveränderten Produktionsdependency-Audit. Bundle/Container-Folgeschritte
+wurden übersprungen. Dieser bekannte Produktblocker wird nicht verschwiegen,
+nicht durch Portal-PASS aufgehoben und nicht in Sprint 27.4 repariert.
+
+### Abschlussdaten und Quellen
+
+- Ausgangspunkt: `main` auf `f027eebefce4a8aedb1f69424310b24cdac31852`.
+- Kanonische Definitionen: `docs/audits/MANUAL_TEST_QUEUE.md` (committeter
+  Snapshot, nicht die vorbestehenden lokalen Testergebnisänderungen).
+  Generat: `testing/data/test-catalog.json`, 72 → 72, keine Ausschlüsse.
+  Source-Commit `ea293c1343cf26a7320619db9f4aafc7cc9d483b`, Source-SHA256
+  `e6ec859d2e31437f04ef347d4b8c1f0aa64bb871d22b7a4ecae92aab573d2265`;
+  der davon verschiedene Definitionshash steht oben.
+- Ausgewählte IDs: MT-02, MT-04, MT-13, MT-15, MT-16, MT-40, MT-50, MT-52,
+  MT-53, MT-58, MT-69. Gründe, Aufwand, Zustimmung und N/A/BLOCKED-Regeln
+  stehen im [Pilotplan](PILOT_PLAN.de.md), nicht in einem zweiten Katalog.
+- Exportvertrag: Bericht 1.0 mit optionalen Zusatzfeldern; Aggregate 1.1.
+  Alte 1.0-Berichte bleiben akzeptiert, andere Schemaversionen werden hilfreich
+  abgewiesen. Unbekannte IDs/alte Kataloge bleiben mit Warnung erhalten.
+- Übergabe: bestehendes Manual-Test-Run-Formular für den Lauf, Bug-Formular
+  für einen unabhängig reproduzierbaren Defekt; manueller Privatkanal als
+  Fallback ohne erfundene Kontaktadresse. Öffentliches Absenden noch NOT TESTED.
+- [Deutsche Anleitung](TESTER_GUIDE.de.md), [englische Anleitung](TESTER_GUIDE.en.md),
+  [Koordination/Befehle](TEST_COORDINATOR.md), [Datenvertrag](DATA_FORMAT.md),
+  [Datenschutz](PRIVACY_AND_SECURITY.md); echte Eingänge in Abschnitt B hier.
+- 27 Sprintdateien gezielt committed; die sechs fremden WIP-Dokumente und
+  27.1-K-Datei bleiben uncommittet. Keine Rohreports, Secrets oder Produktbilder
+  im Commit. Die Implementierungsdateien sind oben nach Bereichen aufgelistet.
+- Tooling: **IMPLEMENTATION READY FOR HUMAN PILOT**. Echte Testpersonen,
+  HA-App-/iPad-Abnahme, menschliche Verständlichkeit und vollständige
+  RC-/Stable-Freigabe: **NOT TESTED / PENDING**, nicht „Pilot bestanden“.
 
 Nächster Schritt: Kandidatenrisiko und sicheren Umfang mit dem Koordinator
 klären, mindestens zwei echte unabhängige Tester einladen, tatsächliche
