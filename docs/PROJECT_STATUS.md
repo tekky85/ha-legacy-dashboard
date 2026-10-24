@@ -2766,3 +2766,39 @@ bleiben außerhalb dieses Fix-Commits. Reale iPad-/HAOS-/LXC-Abnahme des neuen
 Kandidaten bleibt NOT TESTED; disabled Climate +/- und Rapid-Tap-Zoom aus dem
 Owner-Bericht werden hier ausdrücklich nicht als repariert behauptet.
 RC.8 bleibt Prerelease, kein Stable und keine Änderung von `latest`.
+
+### RC.8 – öffentlicher Ergebnisnachweis
+
+Veröffentlicht am 24. Oktober 2026; kein Retagging und kein Überschreiben von RC.7.
+
+| Nachweis | Ergebnis |
+|---|---|
+| Release-Fix / exaktes Tag | `5a00a7bcbd1be035a60b41031d0f30f92afe6a4f` / `v1.0.0-rc.8` |
+| Normale CI vor dem Tag | [40123473525](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/40123473525): PASS inklusive Testgate, realer Browser-Card-Matrix, Produktionsaudit, Bundle und Multi-Arch-Build |
+| Release-Workflow | [40123675614](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/40123675614): PASS inklusive beider Architekturimages, Manifest, Container-Smoke-Test, Kandidatenevidenz und Veröffentlichung |
+| GitHub Prerelease | [v1.0.0-rc.8](https://github.com/tekky85/ha-legacy-dashboard/releases/tag/v1.0.0-rc.8): öffentlich, kein Draft, Prerelease |
+| Image | `ghcr.io/tekky85/ha-legacy-dashboard:1.0.0-rc.8`, anonym pullbar; `linux/amd64` und `linux/arm64` bestätigt |
+| Manifestdigest | `sha256:4e7b2cb0c031d445769510137a1a4c5c86590630fecd0bcf3cfb8e80fd6bff0c` |
+| Standalone | `ha-legacy-dashboard-1.0.0-rc.8.tar.gz`, 220232 Byte; öffentlich heruntergeladen |
+| Standalone SHA256 | `ca1804b3651effa8028122c17da8f89367c9be16e1da49d38ee8f44ee958f5af` – identisch zu lokalem reproduzierbarem Archiv, `SHA256SUMS` und `rc-result.json` |
+| Kandidatenbindung | `rc-result.json`/`.md` öffentlich angehängt; Commit, Tag, Image-Digest und Bundle-Hash stimmen mit den separat geprüften Artefakten überein |
+| Reale Geräte / Runtime | iPad mini, HAOS amd64/aarch64, LXC-Update weiterhin NOT TESTED; Stable-Empfehlung im RCreport weiterhin BLOCKED bis zur manuellen Abnahme |
+
+Die lokale Browsermatrix mit isoliertem Chromium 134 überschritt das
+120-Sekunden-Limit und wird **nicht** als lokales PASS gewertet. Dieselbe
+verbindliche Matrix (1576 Fälle) bestand im sauberen CI- und Release-Lauf.
+Lokales vollständiges Release-Gate: 426/426 PASS. Produktionsaudit: 0 Befunde.
+Keine echte HA-Instanz kontaktiert, kein LXC-Rollout und kein automatischer
+Issue-Kommentar oder Issue-Abschluss. Issue #5 benötigt noch die Bestätigung
+eines tatsächlichen App-Updates mit dem zuvor betroffenen Dashboard.
+
+Updatehinweise stehen in [Deployment](DEPLOYMENT.md) und den
+[Releasehinweisen](../release/notes/1.0.0-rc.8.md). App: zuerst Backup inklusive
+`/data`, App-Repository/App-Store aktualisieren, RC.8 als Update installieren
+und neu starten; nicht deinstallieren und keine Cards entfernen. Bei Bedarf
+`admin_config_max_bytes: 2097152` für 2 MiB setzen und nochmals neu starten.
+Standalone: neues Release-Verzeichnis und bestehende Daten gemäß Anleitung
+verwenden; nach Konfigurationsänderung `systemctl restart ha-legacy-dashboard.service`.
+Anschließend Admin öffnen, zusätzliche Karten/Room-Entities speichern,
+neu öffnen und Neustart-Persistenz bestätigen. Physische Controls-/Safari-
+Abnahmen und der getrennte 27.1-K-Batch bleiben unverändert offen.
