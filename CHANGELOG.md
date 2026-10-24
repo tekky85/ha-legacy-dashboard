@@ -8,6 +8,28 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.8 – 2026-10-24
+
+### Fixed
+
+- Fixed Issue #5: saving the complete Admin configuration no longer hits the
+  16 KiB device-command body limit (mistaken for a 20-card/entity limit).
+  Authenticated Admin JSON defaults to 1 MiB and can be configured between
+  16 KiB and 16 MiB. Existing configurations/schema remain unchanged.
+- Added App option `admin_config_max_bytes` and Standalone environment setting
+  `ADMIN_CONFIG_MAX_BYTES`. Authentication and rate limiting run before Admin
+  JSON parsing; Light/Climate retain 16 KiB and images retain their own limit.
+- Updated compatible backend dependencies to resolve the production audit
+  findings; no security gate or write authorization was relaxed.
+
+### Validation
+
+- Added regressions for 60 cards, Room Cards with 20/21/64 entities, boundary
+  bytes/Unicode/gzip, atomic persistence, restart, last-valid protection and
+  authentication/rate-limit precedence. Physical iPad/HAOS acceptance remains open.
+- Includes the independent Sprint 27.3/27.4 Community Test-Center tooling;
+  its synthetic validation is not a real manual acceptance result.
+
 ## 1.0.0-rc.7 – 2026-09-14
 
 This candidate replaces the unpublished RC.6 build without moving or reusing

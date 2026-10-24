@@ -1,6 +1,6 @@
 {
   "name": "ha-legacy-dashboard",
-  "version": "1.0.0-rc.7",
+  "version": "1.0.0-rc.8",
   "description": "Lightweight Home Assistant dashboard for legacy browsers and wall displays",
   "main": "src/server.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "axios": "^1.18.1",
+    "axios": "^1.20.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1"
   }

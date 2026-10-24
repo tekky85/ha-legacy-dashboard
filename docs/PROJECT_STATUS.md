@@ -2715,3 +2715,54 @@ Artefakte bleiben unangetastet; Sprint 27.1-K wird nicht gestartet.
 Pilotplan, Ergebnis-/Empfangsslots, konkrete Testbefehle, finale Testzahlen,
 Pages-Nachweis und offene manuelle Übergaben:
 [`testing/PILOT_STATUS.md`](testing/PILOT_STATUS.md).
+
+## Issue #5 – größere Admin-Konfigurationen / Release Candidate RC.8
+
+Stand: 24. Oktober 2026. Ausgangscommit `d8a36a6`, Branch `main`.
+Quelle: [Issue #5 mit ergänzendem Log](https://github.com/tekky85/ha-legacy-dashboard/issues/5).
+Kein festes 20-Widget-/Entity-Limit: Der vollständige Admin-Save-Batch traf
+vor der Authentifizierung denselben globalen 16-KiB-JSON-Parser wie ein
+Light-/Climate-Befehl. Das erklärt HTTP 413 `entity.too.large` auch für nur
+eine Room Card; der scheinbare Zählgrenzwert hing vom restlichen JSON ab.
+
+Der Fehler wurde mit neuen localhost-Regressionen vor der Serveränderung
+reproduziert (60 Karten sowie Room-Konfigurationen >16 KiB: 413 statt 200).
+Gezielter Fix in `src/server.js`, `src/routes/admin.js` und
+`src/config/request-limits.js`: Admin-Authentifizierung und Rate Limit zuerst,
+danach ein eigener strikter JSON-Parser mit standardmäßig 1048576 Byte.
+`ADMIN_CONFIG_MAX_BYTES` (Standalone/LXC) bzw. `admin_config_max_bytes`
+(App-Option) erlaubt 16384–16777216 Byte; nach Änderung Neustart.
+Ungültige Werte stoppen den Backendstart kontrolliert, kein unbounded Fallback.
+Light-/Climate-Requests behalten 16 KiB, Binärbilder ihren separaten Parser.
+
+Dashboard-Schema 12, Persistenzpfad, Atomic Replace, `.bak`, Backgrounds und
+Write-Grants bleiben unverändert. Kein Dashboard-Neuaufbau und keine
+Datenmigration erforderlich. Wegen HTTP 413 nie gespeicherte Entwürfe lassen
+sich nicht nachträglich wiederherstellen. README DE/EN, Deployment und App-DOCS
+erläutern Backup, Update und Einstellung. Gemeinsame Assetversion 55 und
+Versionslabels für RC.8; kein Layout-/Control-Umbau. Screenshotpflege geprüft:
+keine neuen Produktansichten nötig, bestehende Layoutgalerie bleibt gültig.
+
+Die für einen neuen Release zwingend nötigen kompatiblen Sicherheitsupdates
+erhöhen Axios auf 1.20.0, body-parser auf 2.4.0, follow-redirects auf 1.16.1,
+proxy-addr auf 2.0.8 und qs auf 6.16.1 (einschließlich nötiger transitiver
+Updates). Express bleibt 5.2.1. Produktionsaudit: null bekannte Befunde;
+keine Ausnahme oder Abschwächung des Release-Gates.
+
+`test/admin-body-limit.test.js` umfasst neun fokussierte Fälle: 60 Karten,
+Room 20/21/64, Neustart/Backup, Unicode-/Byte-/gzip-Grenzen, hochgesetztes
+Budget, Schutz bei ungültigem Schema/JSON und Übergröße, Auth/Disabled,
+Rate-Limit-vor-Parser, bestehender Bildpfad und numerische App-Optionen samt
+Legacy-Optionsdatei. Die kombinierte Admin-/Gateway-/Persistenz-/App-Auswahl
+bestand 66/66 Tests; Release-/Issue-Fokus 19/19. Das vollständige Release-Gate
+bestand 426/426 Tests sowie sämtliche JavaScript-/Shellsyntax-, Versions- und
+Secret-Prüfungen. App-YAML parsed; reproduzierbares Standalone-Archiv zweimal
+bytegleich erzeugt und SHA256 geprüft. Kein echtes HA und keine Produktions-
+`.env`. Browsergate und öffentlicher Artefaktnachweis werden nach Abschluss
+separat festgehalten.
+
+Die lokalen vorbestehenden MT-01-/RC-/Auditänderungen und 27.1-K-Spezifikation
+bleiben außerhalb dieses Fix-Commits. Reale iPad-/HAOS-/LXC-Abnahme des neuen
+Kandidaten bleibt NOT TESTED; disabled Climate +/- und Rapid-Tap-Zoom aus dem
+Owner-Bericht werden hier ausdrücklich nicht als repariert behauptet.
+RC.8 bleibt Prerelease, kein Stable und keine Änderung von `latest`.

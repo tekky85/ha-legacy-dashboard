@@ -187,6 +187,15 @@ Wiederanlaufgrenzen und die verbindliche Realgerät-Checkliste stehen in
 
 Unter `/admin` werden Dashboards und Widgets verwaltet.
 
+Es gibt kein 20-Widget-/Entity-Limit. Die gesamte Admin-Konfiguration darf
+standardmäßig 1 MiB groß sein. Bei Bedarf `admin_config_max_bytes` in den
+Home-Assistant-App-Optionen oder `ADMIN_CONFIG_MAX_BYTES` für Standalone/LXC
+setzen (16384–16777216 Byte) und den Dienst neu starten. Authentifizierung
+und Validierung bleiben verpflichtend; Light-/Climate-Anfragen bleiben auf
+16 KiB begrenzt. Die separate Room-Liste erlaubt weiterhin bis zu 64 Entities
+pro Liste. Ein Update erhält gespeicherte Dashboards ohne Neuaufbau; zuvor
+wegen HTTP 413 nie gespeicherte Änderungen müssen erneut eingegeben werden.
+
 Dazu gehören unter anderem:
 
 - Dashboards erstellen, umbenennen, duplizieren und löschen
@@ -651,11 +660,13 @@ Vollständige Anleitungen: `docs/DEPLOYMENT.md` und `docs/RELEASING.md`.
 
 ## Releases, Support und Lizenz
 
-Der aktuelle installierbare Zwischenstand ist **1.0.0-rc.7 Public Test
+Der aktuelle Release Candidate ist **1.0.0-rc.8 Public Test
 Release**. Er dient Community-, HAOS-, LXC- und Legacy-iPad-Tests, ist kein
 Stable Release und verändert `latest` nicht. Testschwerpunkte, sichere
 LXC-/App-Updates, Rollback und Fehlerberichte stehen in
-[`docs/PUBLIC_TEST_RELEASE.md`](docs/PUBLIC_TEST_RELEASE.md).
+den [RC.8-Releasehinweisen](release/notes/1.0.0-rc.8.md). RC.8 behebt das
+Speichern größerer Admin-Konfigurationen (Issue #5), ohne Dashboard-Neuaufbau.
+Die bisherigen RC.7-Abnahmedokumente bleiben historische Evidenz.
 
 Release Candidates und stabile Releases verwenden SemVer-Tags. Jeder Release
 enthält ein versioniertes Standalone-Archiv und `SHA256SUMS`; Container stehen

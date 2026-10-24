@@ -37,6 +37,16 @@ unverified Supervisor rollback mechanism is assumed.
   is enabled, set a strong dedicated token. It must never equal any Home
   Assistant or Supervisor credential.
 - The direct LAN host port is configured in the App's Network section.
+- `admin_config_max_bytes` defaults to `1048576` (1 MiB), with an allowed
+  range of `16384` to `16777216` bytes. This bounds JSON for the authenticated
+  Admin configuration, not the number of widgets/entities. Restart the App
+  after changing it. Old options without this setting use the same default.
+  Light/Climate requests retain 16 KiB; image upload limits are separate.
+
+RC.8 fixes the former global 16 KiB batch-save limit (Issue #5). Do not remove
+cards or recreate dashboards to update: existing `/data` configuration and
+backgrounds are retained without a schema migration. Back up first. Previously
+unsaved edits from a rejected request cannot be recovered by an update.
 
 No Long-Lived Home Assistant access token is configured in App options. The
 backend uses the server-side `SUPERVISOR_TOKEN` with the Core REST and

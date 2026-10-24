@@ -5,6 +5,18 @@
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.8 – 2026-10-24
+
+- Fixed Issue #5: full Admin configuration saves use an authenticated 1 MiB
+  JSON budget rather than the 16 KiB Light/Climate request limit. There is no
+  20-widget/entity count cap. Optional `admin_config_max_bytes` adjusts the
+  budget between 16384 and 16777216 bytes; restart after changing the option.
+- Existing `/data/dashboards.json`, backgrounds and schema are retained;
+  no dashboard rebuild or migration is required. Back up before updating.
+- Compatible security updates resolve the production dependency audit.
+- HA/Supervisor credentials, explicit writes and iOS 9 compatibility remain
+  protected. Known real-device Climate/rapid-tap findings remain open.
+
 ## 1.0.0-rc.7 – 2026-09-14
 
 This candidate replaces the unpublished RC.6 build without moving its public

@@ -28,6 +28,8 @@ if (typeof value === "boolean") {
     process.stdout.write(value ? "true" : "false");
 } else if (typeof value === "string") {
     process.stdout.write(value);
+} else if (typeof value === "number") {
+    process.stdout.write(String(value));
 }
 ' "$OPTIONS_FILE" "$option_name"
 }
@@ -43,6 +45,14 @@ fi
 
 admin_api_enabled="$(read_option admin_api_enabled)"
 admin_token="$(read_option admin_token)"
+admin_config_max_bytes="$(read_option admin_config_max_bytes)"
+
+# Older installations may not yet have this optional setting in options.json.
+if [ -n "$admin_config_max_bytes" ]; then
+    export ADMIN_CONFIG_MAX_BYTES="$admin_config_max_bytes"
+else
+    unset ADMIN_CONFIG_MAX_BYTES || true
+fi
 
 if [ "$admin_api_enabled" = "true" ]; then
     if [ -z "$admin_token" ]; then

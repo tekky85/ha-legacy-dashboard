@@ -134,6 +134,26 @@ weder mit einem Home-Assistant-Token noch dem `SUPERVISOR_TOKEN`
 geschützt; die bestehende Admin-Bearer-Authentifizierung bleibt daher immer
 maßgeblich.
 
+### Admin-Konfigurationsgröße (Issue #5)
+
+Die gesamte JSON-Konfiguration wird als Batch gespeichert. Es gibt kein
+20-Widget-/Entity-Limit; HTTP 413 wurde zuvor durch die gemeinsame 16-KiB-
+Requestgrenze ausgelöst. Geschützte Admin-JSON-Anfragen verwenden jetzt
+standardmäßig 1048576 Byte (1 MiB), nach Admin-Authentifizierung und Rate Limit.
+
+- Home Assistant App: `admin_config_max_bytes` in den App-Optionen setzen.
+- Standalone/LXC: `ADMIN_CONFIG_MAX_BYTES=1048576` in der serverseitigen `.env`.
+- Gültiger Bereich: 16384 bis 16777216 Byte. Ungültige Werte stoppen den
+  Backendstart kontrolliert; die Grenze wird niemals automatisch aufgehoben.
+- Nach Änderung App bzw. `ha-legacy-dashboard.service` neu starten.
+- Light/Climate behalten 16 KiB; JPEG-/PNG-Uploads bleiben separat begrenzt.
+- Bestehende Konfiguration, `.bak`, Hintergrundassets und Schema bleiben beim
+  Update erhalten. Nicht deinstallieren oder `/data` löschen. Vorher sichern.
+- Speichern, Admin erneut öffnen und Dienst neu starten: zusätzliche Karten/
+  Room-Entities müssen erhalten bleiben. HTTP 413/400/401/429 darf die letzte
+  gültige Datei/Backup nicht verändern. Bereits nie gespeicherte Entwürfe kann
+  das Update nicht nachträglich wiederherstellen.
+
 ### App-Abnahme
 
 Eine reale Installation auf Home Assistant OS erfolgt nur kontrolliert durch

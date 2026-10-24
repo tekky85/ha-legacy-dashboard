@@ -7,11 +7,19 @@ const dashboardReturnTarget =
     require("./services/dashboard-return-target");
 const logger = require("./services/logger");
 const Runtime = require("./config/runtime");
+const RequestLimits = require("./config/request-limits");
 const dashboardBackgrounds =
     require("./services/dashboard-backgrounds");
 
 
 let runtimeMode;
+
+try {
+    RequestLimits.resolveAdminConfigMaxBytes();
+} catch (error) {
+    logger.error("request_body_limit_invalid", {error_type: error.name});
+    process.exit(1);
+}
 
 try {
     runtimeMode =
@@ -161,23 +169,15 @@ function setAdminHeaders(res) {
 app.disable("x-powered-by");
 app.use(setSecurityHeaders);
 const jsonParser = express.json({
-    limit: "16kb",
+    limit: RequestLimits.CONTROL_JSON_MAX_BYTES,
     strict: true
 });
 
 app.use(function (req, res, next) {
 
-    if (
-        req.method === "POST" &&
-        (
-            /^\/api\/admin\/dashboards\/[^/]+\/background$/.test(
-                req.path
-            ) ||
-            /^\/api\/admin\/dashboards\/[^/]+\/widgets\/[^/]+\/background$/.test(
-                req.path
-            )
-        )
-    ) {
+    // Admin JSON is parsed only after authentication/rate limiting, with its
+    // own bounded configuration budget. All other APIs retain the small cap.
+    if (/^\/api\/admin(?:\/|$)/i.test(req.path)) {
         return next();
     }
 
@@ -368,9 +368,20 @@ app.use(function (error, req, res, next) {
     }
 
 
-    return res.status(status).json({
-        error: message
-    });
+    const response = {error: message};
+    if (
+        status === 413 && req.method === "PUT" &&
+        /^\/api\/admin\/config\/?$/i.test(req.path)
+    ) {
+        response.message =
+            "Die Konfiguration überschreitet das Admin-Limit von " +
+            RequestLimits.resolveAdminConfigMaxBytes() +
+            " Byte. ADMIN_CONFIG_MAX_BYTES bzw. die App-Option " +
+            "admin_config_max_bytes anpassen und den Dienst neu starten. " +
+            "Die gespeicherte Konfiguration bleibt unverändert.";
+    }
+
+    return res.status(status).json(response);
 
 });
 

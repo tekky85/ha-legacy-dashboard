@@ -178,6 +178,14 @@ recovery limits, and mandatory real-device checklist are documented in
 
 Dashboards and widgets are managed under `/admin`.
 
+There is no 20-widget/entity limit. The complete Admin configuration defaults
+to a 1 MiB budget. Set `admin_config_max_bytes` in Home Assistant App options,
+or `ADMIN_CONFIG_MAX_BYTES` for Standalone/LXC if needed (16384–16777216 bytes),
+then restart the service. Authentication and validation remain mandatory;
+Light/Climate requests retain 16 KiB. The separate Room list validation still
+allows up to 64 entities per list. Updating preserves saved dashboards without
+rebuilding; edits never saved because of HTTP 413 must be entered again.
+
 Features include:
 
 - create, rename, duplicate and delete dashboards
@@ -627,11 +635,13 @@ Complete instructions: `docs/DEPLOYMENT.md` and `docs/RELEASING.md`.
 
 ## Releases, Support, and License
 
-The current installable intermediate build is the **1.0.0-rc.7 Public Test
+The current release candidate is the **1.0.0-rc.8 Public Test
 Release**. It is intended for community, HAOS, LXC, and legacy-iPad testing,
 is not stable, and does not update `latest`. Testing focus, safe App/LXC
 updates, rollback, and defect reporting are documented in
-[`docs/PUBLIC_TEST_RELEASE.md`](docs/PUBLIC_TEST_RELEASE.md).
+the [RC.8 release notes](release/notes/1.0.0-rc.8.md). RC.8 fixes larger Admin
+configuration saves (Issue #5), without rebuilding dashboards. Existing RC.7
+acceptance documents remain historical evidence.
 
 Release candidates and stable releases use SemVer tags. Every release contains
 a versioned standalone archive and `SHA256SUMS`; containers are available as

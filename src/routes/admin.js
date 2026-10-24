@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const express = require("express");
+const RequestLimits = require("../config/request-limits");
 
 const dashboardConfig =
     require("../config/dashboard");
@@ -515,6 +516,23 @@ function sanitizePreviewEntity(state) {
 
 router.use(requireAdmin);
 router.use(limitAdminWrites);
+
+const parseConfigurationJson = express.json({
+    limit: RequestLimits.resolveAdminConfigMaxBytes(),
+    strict: true
+});
+
+router.use(function (req, res, next) {
+    // Keep the existing JPEG/PNG binary upload path and its independent cap.
+    if (
+        req.method === "POST" &&
+        /^\/dashboards\/[^/]+(?:\/widgets\/[^/]+)?\/background\/?$/i.test(req.path)
+    ) {
+        return next();
+    }
+
+    return parseConfigurationJson(req, res, next);
+});
 
 
 const parseBackgroundImage = express.raw({

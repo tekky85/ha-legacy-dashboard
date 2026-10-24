@@ -288,7 +288,7 @@ test("Produktionsparser verwendet korrigiertes qs und bleibt begrenzt", function
         }
     );
 
-    assert.equal(qsPackage.version, "6.16.0");
+    assert.equal(qsPackage.version, "6.16.1");
     assert.equal({}.polluted, undefined);
     assert.ok(Date.now() - started < 1000);
     assert.equal(Object.keys(parsed).length <= 2, true);
