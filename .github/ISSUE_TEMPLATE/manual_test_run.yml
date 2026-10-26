@@ -1,58 +1,61 @@
-name: Manual Test Run Report
-description: Submit one sanitized community test run (not one Issue per PASS)
-title: "[Test Run]: "
+name: Testbericht abgeben
+description: Ergebnisse aus dem Test-Center weitergeben – ein Bericht darf mehrere Tests enthalten
+title: "[Testbericht]: "
 body:
   - type: markdown
     attributes:
       value: |
-        Public Issue: redact secrets, private entity/person names, addresses, photos and logs.
-        Validate and export JSON in the Community Test-Center first. Attach the file
-        in this textarea or a comment. If .json is rejected, use .zip/.txt or paste
-        redacted JSON in a fenced code block. No GitHub account? Give the JSON to
-        your coordinator instead. Never include tokens, .env or private keys.
+        Diese Meldung ist öffentlich. Prüfe Bericht und Bilder zuerst auf private
+        Namen, Adressen und Zugangsdaten. Lade im Test-Center deine Berichtsdatei
+        herunter und hänge sie unten an. Wird .json abgelehnt, nutze .zip/.txt
+        oder füge den bereinigten Dateiinhalt als Codeblock ein. Du musst ihn
+        nicht selbst bearbeiten. Ohne GitHub-Konto kannst du die Datei über den
+        vereinbarten Weg an deinen Ansprechpartner geben. Niemals Schlüssel,
+        Passwörter, .env-Dateien oder ungeprüfte Protokolle mitschicken.
   - type: input
     id: run-id
     attributes:
-      label: Test Run ID
+      label: Berichtskennung
+      description: Steht in der kopierten Zusammenfassung hinter Testbericht. Einfach übernehmen.
       placeholder: RUN-...
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: Actually installed HA Legacy Dashboard version
+      label: Tatsächlich installierte HA Legacy Dashboard-Version
     validations:
       required: true
   - type: textarea
     id: environment
     attributes:
-      label: Environment
-      description: HA App or Standalone, HA Core version, architecture if known, test device, OS and browser. Aliases only; no IPs.
+      label: Womit hast du getestet?
+      description: App in Home Assistant oder separater Server, Prüfgerät, Betriebssystem und Browser. Weitere Versionen und Rechnerart nur nennen, wenn bekannt. Keine privaten Adressen.
     validations:
       required: true
   - type: textarea
     id: summary
     attributes:
-      label: Run summary
-      description: Paste the portal summary with catalog hash, status counts and failed Test IDs. Incomplete coverage is not PASS.
+      label: Zusammenfassung aus dem Test-Center
+      description: Unter Bericht weitergeben die Zusammenfassung kopieren und hier einfügen. Nicht geprüfte Schritte zählen nicht als bestanden.
     validations:
       required: true
   - type: textarea
     id: report
     attributes:
-      label: Sanitized report file or structured JSON
-      description: Attach JSON (or ZIP/TXT fallback), or paste sanitized JSON as a fenced code block. Keep sensitive evidence private via an agreed channel.
+      label: Geprüfte Berichtsdatei anhängen
+      description: Heruntergeladene .json-Datei hier hineinziehen oder die Dateiauswahl benutzen. Falls nicht möglich, .zip/.txt verwenden. Vertrauliche Belege nur über einen vereinbarten privaten Weg senden.
     validations:
       required: true
   - type: textarea
     id: issues
     attributes:
-      label: Individual bug Issues found
-      description: Link existing Issues rather than creating duplicates. No automatic Issue per test.
+      label: Schon vorhandene Fehlermeldungen – freiwillig
+      description: Falls bereits gemeldet, Nummer oder Verweis nennen. Nicht für jeden erfolgreichen Test eine eigene Meldung erstellen.
   - type: checkboxes
     id: privacy
     attributes:
-      label: Privacy and observation check
+      label: Vor dem Absenden prüfen
       options:
-        - label: I reviewed all shared data for secrets and personal/private details; unexecuted tests remain NOT_TESTED and assumptions are not observations.
+        - label: Ich habe Bericht und Bilder auf Zugangsdaten und private Angaben geprüft. Nicht ausgeführte Tests sind nicht als bestanden markiert; ich beschreibe Beobachtungen statt Vermutungen.
           required: true

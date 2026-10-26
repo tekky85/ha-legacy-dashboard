@@ -2802,3 +2802,43 @@ verwenden; nach Konfigurationsänderung `systemctl restart ha-legacy-dashboard.s
 Anschließend Admin öffnen, zusätzliche Karten/Room-Entities speichern,
 neu öffnen und Neustart-Persistenz bestätigen. Physische Controls-/Safari-
 Abnahmen und der getrennte 27.1-K-Batch bleiben unverändert offen.
+
+## Community Test-Center – verständliche Durchführung und Rückmeldung
+
+Test-Center `27.4.1`, Überarbeitung vom 26. Oktober 2026,
+Ausgangscommit `4387ab0` (Dashboard-App weiterhin RC.8):
+
+- Deutsche Hauptoberfläche mit klaren Ergebnisfeldern statt sichtbarer
+  PASS-/FAIL-/BLOCKED-Kürzel, situationsbezogener Ausfüllhilfe und Bestätigung
+  vor einem neu gespeicherten vollständigen Erfolg. Fehler brauchen weiterhin
+  Erwartung, Beobachtung und Schritte; Hindernisse eine Begründung.
+- Zwölf bestehende Prüfungen (MT-01 plus elf Pilotprüfungen) erläutern Ziel,
+  Vorbereitung, Zuständigkeit, alle Schritte, Ergebnisse und Protokollierung.
+  Technische Ausfall-/Sicherheits-/Protokollprüfungen übernimmt die Betreuung;
+  fehlende Nachweise werden nicht zu PASS. Die anderen 60 technischen Prüfungen
+  bleiben mit Originalanforderungen und Betreuungshinweis erreichbar.
+- Neue statische Hilfe `/testing/help.html` mit konkretem Plus-Tasten-Beispiel;
+  deutsche GitHub-Formulare und semantisch abgestimmte deutsche/englische
+  Teilnehmeranleitung und README-Ergänzung. Originalanforderungen bleiben
+  aufklappbar. Begriffshilfe erklärt unvermeidbare App-Bezeichnungen.
+- Durchführungshilfen stehen im Anhang derselben kanonischen Manual Queue.
+  Generator prüft Definitionsfingerabdruck und vollständige Schrittanzahl.
+  Alle 72 IDs, Katalogidentität `27.3-1c6d7088096c`, Reportformat 1.0 und
+  Ergebniswerte bleiben unverändert. Bestehende Berichte werden nicht umgewertet
+  oder allein wegen der neuen Formulierungen schreibgeschützt.
+- Validierung: Gesamtsuite **432/432**, gezielte Portaltests **29/29**,
+  kontrollierter Chromium-Lauf **20 Prüfgruppen PASS** mit lokalen Daten,
+  Syntaxprüfung **10 JavaScript-Dateien PASS**, drei YAML-Dateien gültig,
+  Versions-/Release-Source-/Secret-Prüfung ohne Befund. Bildschirmbreiten
+  390/768/1280 geprüft; reale Portal-PNGs der lokalen Instanz visuell geprüft.
+  Keine erfundenen Produktbilder; bestehende Dashboard-Screenshots unverändert,
+  weil sich nur das separate Test-Center ändert.
+- Keine Änderungen an `src/`, Steuerfreigaben, HA-/Supervisor-Zugängen,
+  App-Version RC.8 oder LXC-Laufzeit. Veröffentlichung betrifft ausschließlich
+  die separate Pages-Seite; kein neues App-Release erforderlich.
+
+Offen: Verständlichkeit mit Community-Teilnehmern praktisch prüfen, weitere
+technische Durchführungshilfen bei Bedarf gezielt vereinfachen. Reale iPad-,
+HAOS- und bisher offene Steuerungsbefunde werden durch diesen Portaltest
+nicht als bestanden oder behoben markiert. Bereits vorhandene lokale
+Owner-Ergebnisse/Auditänderungen bleiben getrennt und unverändert.

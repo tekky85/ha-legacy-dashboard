@@ -1,94 +1,93 @@
-name: Bug Report
-description: Report a reproducible HA Legacy Dashboard defect
-title: "[Bug]: "
+name: Fehler melden
+description: Beschreibe, was du versucht hast und was stattdessen passiert ist
+title: "[Fehler]: "
 labels:
   - bug
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for testing HA Legacy Dashboard. Never include Home Assistant,
-        Supervisor, or Admin tokens, passwords, `.env` files, private keys,
-        personal data, or unredacted sensitive logs.
+        Danke fürs Ausprobieren! Die Fehlerursache musst du nicht kennen.
+        Diese Meldung ist öffentlich: keine Home-Assistant-/Verwaltungsschlüssel,
+        Passwörter, `.env`-Dateien, privaten Schlüssel, persönlichen Angaben
+        oder ungeprüften Protokolle anhängen.
   - type: input
     id: test-id
     attributes:
-      label: Manual Test ID (if applicable)
+      label: Testnummer – falls du eine Anleitung aus dem Test-Center benutzt hast
       placeholder: MT-01
   - type: input
     id: test-run
     attributes:
-      label: Test Run ID or related run Issue
-      description: Link the exported community test run when available. No full report in URLs.
+      label: Berichtskennung oder zugehöriger Testbericht – freiwillig
+      description: Kennung aus der Zusammenfassung oder Verweis auf den bereits abgegebenen Bericht. Keine ganze Berichtsdatei in eine Adresse schreiben.
   - type: input
     id: dashboard-version
     attributes:
-      label: HA Legacy Dashboard version
-      description: For example, 1.0.0-rc.7.
+      label: Installierte HA Legacy Dashboard-Version
+      description: Zum Beispiel 1.0.0-rc.8. Nicht die Home-Assistant-Version oder nur eine angebotene Aktualisierung.
     validations:
       required: true
   - type: dropdown
     id: deployment
     attributes:
-      label: Deployment type
+      label: Wie läuft dein Dashboard?
       options:
-        - Home Assistant App
-        - Standalone/LXC
+        - Als App in Home Assistant
+        - Separat auf einem Server / LXC
     validations:
       required: true
   - type: input
     id: ha-version
     attributes:
-      label: Home Assistant version
-      description: Use "not applicable" only for a standalone mock setup.
-    validations:
-      required: true
+      label: Home-Assistant-Version – wenn bekannt
+      description: Unbekannt? Leer lassen. Bei künstlicher Testumgebung bitte dazuschreiben.
   - type: input
     id: device-browser
     attributes:
-      label: Device and browser
-      description: Include the iOS and Safari version where applicable.
+      label: Prüfgerät, Betriebssystem und Browser
+      description: Zum Beispiel iPad mini 1, iOS 9.3.5, Safari. Versionsnummern nur nennen, wenn bekannt.
     validations:
       required: true
   - type: input
     id: affected-area
     attributes:
-      label: Affected dashboard, card, or route
-      placeholder: Custom dashboard / Room Card / system/errors
+      label: Wo passiert der Fehler?
+      placeholder: Zum Beispiel zusätzliche Dashboardseite, Raumkarte oder Fehlerübersicht
     validations:
       required: true
   - type: textarea
     id: reproduction
     attributes:
-      label: Reproduction steps
-      description: Provide the smallest exact sequence that reproduces the issue.
+      label: Was hast du der Reihe nach gemacht?
+      description: Nenne die Schaltflächen und Reihenfolge, damit wir es nachmachen können. Testnummer und Schrittnummer helfen.
       placeholder: |
-        1. Open ...
-        2. Tap ...
-        3. Observe ...
+        1. Heizkarte geöffnet.
+        2. Einmal auf Plus getippt.
+        3. Taste bleibt grau, Temperatur unverändert.
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Expected behavior
+      label: Was sollte passieren?
     validations:
       required: true
   - type: textarea
     id: actual
     attributes:
-      label: Actual behavior
+      label: Was ist stattdessen passiert?
     validations:
       required: true
   - type: textarea
     id: evidence
     attributes:
-      label: Screenshots and sanitized logs
-      description: Remove credentials, private entity names, addresses, and personal data first.
+      label: Bildschirmfoto oder bereinigtes Protokoll – freiwillig
+      description: Erst Schlüssel, private Gerätenamen, Adressen und persönliche Daten entfernen. Ein Foto darf auch separat über einen vereinbarten Weg gesendet werden.
   - type: checkboxes
     id: redaction
     attributes:
-      label: Sensitive-data check
+      label: Vor dem Absenden prüfen
       options:
-        - label: I confirmed that this report contains no tokens, passwords, `.env`, private keys, or unredacted sensitive logs.
+        - label: Ich habe diese Meldung und ihre Anhänge auf Zugangsdaten und private Angaben geprüft. Keine Passwörter, Schlüssel, `.env`-Dateien oder ungeprüften Protokolle enthalten.
           required: true

@@ -36,7 +36,7 @@ test("Pilot selects eleven existing canonical IDs, with no competing definitions
 test("Report 1.0 additive metadata and German export/import preserve observations and old files", () => {
     const report = reports()[0], before = clone(report);
     const exported = Model.prepareExport(report, "2026-10-18T13:00:00.000Z");
-    assert.deepEqual(report, before); assert.equal(exported.testCenterVersion, "27.4");
+    assert.deepEqual(report, before); assert.equal(exported.testCenterVersion, Model.TEST_CENTER_VERSION);
     assert.equal(exported.dataKind, "synthetic");
     assert.deepEqual(Model.parse(JSON.stringify(exported), Catalog).report, exported);
     assert.match(exported.results.find(item => item.status === "FAIL").actual, /äöü.*°C/);
@@ -131,11 +131,11 @@ test("Built portal resolves all static links under project subpath and publishes
     const html = fs.readFileSync(path.join(base, "index.html"), "utf8");
     for (const match of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
         if (/^(https?:|#)/.test(match[1])) continue;
-        assert.ok(fs.existsSync(path.join(base, match[1])), match[1]);
+        assert.ok(fs.existsSync(path.join(base, match[1].split("?")[0])), match[1]);
     }
     assert.ok(fs.existsSync(path.join(base, "js/pilot.js")));
     const publicFiles = fs.readdirSync(base, {recursive: true}).filter(file => fs.statSync(path.join(base, file)).isFile());
-    assert.equal(publicFiles.length, 15);
+    assert.equal(publicFiles.length, 18);
     assert.ok(publicFiles.every(file => !/test-results|pilot-reports|\.env|incoming/.test(file)));
     const portal = fs.readFileSync(path.join(base, "js/portal.js"), "utf8");
     assert.doesNotMatch(portal, /innerHTML|api\.github|\/api\/|SUPERVISOR_TOKEN|fetch\(/);

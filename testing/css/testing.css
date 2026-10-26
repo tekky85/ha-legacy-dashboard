@@ -36,4 +36,15 @@ button.danger { background: #fff; color: #963b33; border-color: #963b33; }
 #test-state { overflow-wrap: anywhere; }
 [hidden] { display: none !important; }
 footer { color: #4a6274; font-size: .85rem; padding-bottom: 50px; }
+.hint { display: block; font-size: .85rem; font-weight: 400; color: #4a6274; margin: 6px 0 12px; }
+details { margin: 16px 0; }
+summary { cursor: pointer; padding: 10px 0; min-height: 44px; font-weight: 600; }
+details[open] > summary { margin-bottom: 10px; }
+.journey { display: flex; flex-wrap: wrap; gap: 12px 38px; padding-left: 22px; font-size: .95rem; }
+.test-list .badge { display: block; margin: 6px 0 0; font-size: .85rem; font-weight: 400; }
+#test-content ol { padding-left: 26px; }
+#test-content pre { font: .85rem/1.6 system-ui, sans-serif; padding: 15px; background: #f1f5f8; max-width: 100%; }
+dt { font-weight: 700; margin-top: 16px; }
+dd { margin: 4px 0 0; }
+#complete-confirm { padding: 16px; background: #fff4db; border-radius: 6px; margin-bottom: 16px; }
 @media (max-width: 700px) { header, main, footer { padding: 18px; } .panel { padding: 18px; } .fields, .filters { grid-template-columns: 1fr; } .actions { align-items: stretch; flex-direction: column; } h1 { font-size: 2.5rem; } }

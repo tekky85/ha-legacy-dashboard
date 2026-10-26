@@ -42,6 +42,7 @@ jobs:
       - name: Check canonical catalog drift and community tests
         run: |
           node scripts/testing/build-test-catalog.js --check
+          node scripts/testing/build-test-guides.js --check
           node --test test/community-testing*.test.js
       - name: Build allowlisted static site
         run: node scripts/testing/build-site.js dist/community-site

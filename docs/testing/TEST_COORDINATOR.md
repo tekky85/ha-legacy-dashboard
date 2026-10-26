@@ -57,8 +57,30 @@ RC/Stable approval still requires all repository gates and explicit evidence.
 
 ## Pages build and publication
 
+German community wording lives in the appendix marked
+`TEST-CENTER-GUIDES-DE` in the canonical `MANUAL_TEST_QUEUE.md`. Generate it with
+`node scripts/testing/build-test-guides.js`; `--working-tree` explicitly selects
+local draft wording. Never publish owner results from a working-tree catalog.
+Twelve existing tests (MT-01 plus the eleven pilot IDs) have complete matching
+step explanations, preparation, responsibilities, outcomes and recording guidance.
+The remaining sixty retain their full technical requirements and are explicitly
+assisted, not presented as beginner-ready. Definition fingerprints and step counts
+reject stale translations; semantic equivalence still needs human review.
+Original requirements and evidence stay expandable and authoritative.
+Catalog identity and report schema/status codes remain unchanged: old progress
+stays editable. No partial test is promoted to PASS. Necessary log/security
+checks must actually be performed by the helper before full success is recorded.
+Arrange safe fixtures, exact routes and a contact before inviting nontechnical
+testers. Do not ask them to disable production safety devices.
+
+Review wording with community volunteers: can they identify the right page,
+perform steps, distinguish defect from missing preparation, and submit a file
+without developer help? This comprehension check remains NOT TESTED; browser
+automation cannot establish it. Do not alter historical pilot results.
+
 ```sh
 node scripts/testing/build-test-catalog.js --check
+node scripts/testing/build-test-guides.js --check
 node --test test/community-testing*.test.js
 node scripts/testing/build-site.js dist/community-site
 node test/community-testing-browser.js

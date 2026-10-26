@@ -663,6 +663,13 @@ and review privacy before submitting a GitHub test run or handing it to a
 coordinator. Reading needs no HA access or GitHub login. Enter the actual
 installed version.
 
+The German interface uses plain-language result fields and a
+[worked example](https://tekky85.github.io/ha-legacy-dashboard/testing/help.html).
+Twelve existing checks (the pilot plus MT-01) explain preparation, responsibility,
+actions and observations concretely. All 72 original tests remain available;
+other technical checks require assistance. Existing report files stay compatible.
+Partial success does not count as a fully passed test.
+
 - [Tester guide](docs/testing/TESTER_GUIDE.en.md)
 - [Pilot 27.4: eleven existing tests](docs/testing/PILOT_PLAN.de.md) and
   [receipt/status tracking](docs/testing/PILOT_STATUS.md): tooling prepared;

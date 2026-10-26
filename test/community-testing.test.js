@@ -153,7 +153,7 @@ test("Static build exposes only reviewed allowlist; portal is independent and sa
     Site.build(directory);
     assert.deepEqual(fs.readdirSync(directory).sort(), [".nojekyll", "testing"]);
     const html = fs.readFileSync(path.join(directory, "testing/index.html"), "utf8");
-    assert.match(html, /href="css\/testing.css"/); assert.match(html, /script-src 'self'/);
+    assert.match(html, /href="css\/testing.css\?v=27\.4\.1"/); assert.match(html, /script-src 'self'/);
     const portal = fs.readFileSync(path.join(directory, "testing/js/portal.js"), "utf8");
     assert.doesNotMatch(portal, /innerHTML|fetch\(|\/api\/|\.env\b|HA_TOKEN|SUPERVISOR_TOKEN|https:\/\/api\.github/);
     assert.match(portal, /textContent/); assert.match(portal, /confirm\(/);
@@ -162,7 +162,7 @@ test("Static build exposes only reviewed allowlist; portal is independent and sa
 });
 test("GitHub forms and Pages workflow preserve narrow permissions and manual submission", () => {
     const form = fs.readFileSync(path.join(root, ".github/ISSUE_TEMPLATE/manual_test_run.yml"), "utf8");
-    assert.match(form, /name: Manual Test Run Report/); assert.match(form, /\.zip\/\.txt/); assert.match(form, /required: true/);
+    assert.match(form, /name: Testbericht abgeben/); assert.match(form, /\.zip\/\.txt/); assert.match(form, /required: true/);
     const workflow = fs.readFileSync(path.join(root, ".github/workflows/testing-pages.yml"), "utf8");
     assert.match(workflow, /pages: write/); assert.match(workflow, /id-token: write/); assert.match(workflow, /github.ref == 'refs\/heads\/main'/);
     assert.doesNotMatch(workflow, /packages: write|contents: write|release create|git tag/);

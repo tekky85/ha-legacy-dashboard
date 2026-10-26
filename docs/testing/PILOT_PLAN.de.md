@@ -8,6 +8,17 @@ Die Auswahl ist keine zweite Testfall-Datenbank und verändert keine Test-ID.
 
 Portal: https://tekky85.github.io/ha-legacy-dashboard/testing/
 
+Für Teilnehmer zuerst die [einfache Anleitung](TESTER_GUIDE.de.md) und die
+[Hilfe mit Ausfüllbeispiel](https://tekky85.github.io/ha-legacy-dashboard/testing/help.html)
+verwenden. Die elf Pilotprüfungen plus MT-01 haben dort eigene deutsche
+Durchführungshilfen. Dieser Plan enthält zusätzlich technische Aufgaben für
+die Betreuung; Teilnehmer müssen sie nicht selbst entschlüsseln. Ausfälle,
+Testzustände und Protokollkontrollen gemeinsam vorbereiten. Ohne nötige
+Betreuung kein vollständiges Erfolgsergebnis. Die Kandidatenangabe im folgenden
+Abschnitt ist der historische Sprintstart, keine Aufforderung zum Rückbau;
+für einen neuen Bericht die aktuell vereinbarte und tatsächlich installierte
+Version angeben.
+
 ## Kandidat, Zustimmung und sichere Vorbereitung
 
 Der zum Sprintstart tatsächlich veröffentlichte App-Testrelease ist

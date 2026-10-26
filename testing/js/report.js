@@ -6,7 +6,7 @@
     "use strict";
     const STATUSES = ["PASS", "FAIL", "BLOCKED", "NOT_TESTED", "N/A"];
     const MAX_BYTES = 2 * 1024 * 1024;
-    const TEST_CENTER_VERSION = "27.4";
+    const TEST_CENTER_VERSION = "27.4.1";
     const RUN = /^RUN-[A-Za-z0-9-]{8,80}$/;
     const HASH = /^[a-f0-9]{64}$/;
     const ISSUE = /^(?:#[1-9][0-9]{0,9}|https:\/\/github\.com\/tekky85\/ha-legacy-dashboard\/issues\/[1-9][0-9]{0,9})?$/;

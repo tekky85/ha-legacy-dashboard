@@ -1,114 +1,98 @@
-# Community Test-Center – Anleitung
+# Gemeinsam testen – ohne Entwicklerwissen
 
-Das Portal ist unter
-https://tekky85.github.io/ha-legacy-dashboard/testing/ öffentlich erreichbar.
-Der erfolgreiche Pages-Lauf ist im Projektstatus dokumentiert. Ein GitHub-Login und Zugriff auf
-das Home Assistant des Projektbetreibers sind zum Lesen/Testen nicht nötig.
-Das Portal läuft unabhängig von deiner installierten App. Verwende dafür
-einen aktuellen Browser; die iOS-9-Prüfung erfolgt auf dem echten iPad.
+Öffne das [Test-Center](https://tekky85.github.io/ha-legacy-dashboard/testing/).
+Die [Hilfe mit Ausfüllbeispiel](https://tekky85.github.io/ha-legacy-dashboard/testing/help.html)
+erklärt den gesamten Ablauf direkt im Browser. Du brauchst zum Testen kein Git,
+Codex oder GitHub-Konto. Das Test-Center läuft in einem aktuellen Browser,
+während du dein Dashboard auf dem jeweils genannten Prüfgerät ausprobierst.
 
-## Vorbereiten und starten
+## Vor dem ersten Test
 
-Für Sprint 27.4 zuerst den [Pilotplan](PILOT_PLAN.de.md) lesen: elf bestehende
-Test-IDs, sichere Voraussetzungen und Dauerklassen. Der Koordinator bestätigt
-den Kandidaten; eine Veröffentlichung beweist nicht deine installierte Version.
-Im Portal „Pilot 27.4: 11 ausgewählte bestehende Tests“ aktivieren; die Originalschritte
-bleiben maßgeblich. Für echte Tests „Echte manuelle Beobachtungen“ wählen.
-Eine reine Berichtsübung als „Synthetischer Übungslauf“ kennzeichnen, insbesondere
-einen absichtlich erzeugten FAIL. Übungsberichte sind keine echte Abnahme.
+1. Vereinbare mit deinem Ansprechpartner, welche installierte App-Version,
+   welches Gerät und welche Tests du prüfen sollst. Die App-Version steht auf
+   der Informationsseite der installierten App in Home Assistant oder unten
+   in der Dashboard-Verwaltung. Nicht die angebotene Updateversion oder die
+   Home-Assistant-Version eintragen. Falls unklar, frage nach statt zu raten.
+2. Verwende ungefährliche Testgeräte und eine getrennte vorbereitete
+   Dashboardseite. Eine sichtbare Lampe oder Heizung ist nicht automatisch
+   zur Steuerung freigegeben: Dein Ansprechpartner richtet das ausdrücklich ein.
+   Technische Ausfälle, künstliche Zustände und Sicherungen nur mit Betreuung
+   in einer sicheren Testumgebung durchführen, nie am Alltagssystem erzwingen.
+3. Trage Kürzel, tatsächliche App-Version, Installationsart, Prüfgerät,
+   Betriebssystem und Browser ein. Kürzel frei wählen, kein echter Name nötig.
+   Weitere Versionen/Rechnerart nur nennen, wenn bekannt. „Bericht beginnen“
+   speichert diese Angaben.
+4. Standardmäßig siehst du zwölf einfach erklärte Prüfungen: die elf bestehenden
+   Pilotprüfungen und MT-01. Andere technische Prüfungen sind über „Alle Tests“
+   weiterhin erreichbar, brauchen aber Betreuung. Es gibt weiterhin insgesamt
+   72 unveränderte Testnummern, keine neue Teilprüfung.
+5. Lies „Das brauchst du – und wer hilft“, dann die nummerierten Schritte.
+   Teste im eigenen Dashboard, nicht im Test-Center. Ein Mac ersetzt keinen
+   vorgeschriebenen iPad-Test. Du musst nicht alle Prüfungen durchführen.
+   Der Pilotfilter wählt nur die elf vereinbarten Prüfungen aus.
 
-1. Erstelle eine Sicherung deiner App-Daten und bereite ein separates
-   Testdashboard sowie sichere Testgeräte vor. Keine gefährlichen Geräte oder
-   produktiven Sicherheitsabläufe für Fehler-/Ausfalltests verwenden.
-2. Lies die installierte **HA Legacy Dashboard App-Version** auf ihrer
-   Informationsseite in Home Assistant ab. Nicht mit HA Core-Version oder
-   angebotener Updateversion verwechseln. Bei Standalone die verwendete
-   Releaseversion feststellen. Wenn die App nicht startet, bleibt das Portal
-   erreichbar und der Startfehler kann dokumentiert werden.
-3. Trage im Portal einen Alias, tatsächliche Dashboard-Version,
-   Installationsart, Testgerät, OS und Browser ein. HA Core-Version und
-   Architektur nur angeben, wenn bekannt; keine automatische Erkennung wird
-   behauptet. Optional Laufnotiz hinzufügen und „Lauf starten“ wählen.
-4. Standardmäßig ist „HA App relevant“ ausgewählt. Filter nach Sprint,
-   Kategorie, Gerät, Ergebnis oder ID/Titel nutzen. Lies immer die vollständigen
-   Voraussetzungen; ein Filter macht einen iPad-Test nicht zum Desktop-Test.
-   Release-/Stable-Aktionen führt ausschließlich der Koordinator nach Freigabe
-   aus. Aus dem Portal werden keine solchen Aktionen gestartet.
-5. Test öffnen und die Originalschritte in Reihenfolge auf deinem eigenen
-   System ausführen. Die Anleitungen stammen aus der deutschen Warteschlange;
-   technische Platzhalter müssen am Testsystem bewusst ersetzt werden.
+## Was trage ich ein?
 
-## Ergebnisse und Fortsetzen
+- **Hat wie erwartet funktioniert:** Alle erforderlichen Schritte und Ergebnisse
+  tatsächlich geprüft, nötige technische Kontrollen durch die Betreuung
+  eingeschlossen. Bestätigung anhaken; bedingte entfallene Schritte begründen.
+  Ein Teilerfolg ist kein vollständig erfolgreicher Test.
+- **Etwas stimmt nicht:** Du hast einen Fehler beobachtet. Erwartung, tatsächliche
+  Beobachtung und Reihenfolge aufschreiben. Ursache musst du nicht kennen.
+  Nicht ausgeführte Folgeschritte in den Notizen nennen.
+- **Ich komme nicht weiter:** Gerät, Testkarte, Vorbereitung oder verständliche
+  Anleitung fehlt. Testnummer, Schrittnummer und Hindernis notieren.
+- **Passt nicht zu meinem System:** Nach Absprache grundsätzlich nicht für diesen
+  Lauf vorgesehen. Begründen; eine bloß fehlende Vorbereitung ist ein Hindernis.
+- **Noch nicht ausprobiert:** Noch nicht durchgeführt, zählt nicht als bestanden.
 
-- PASS: tatsächlich geprüftes erwartetes Verhalten. Notizen sind optional.
-- FAIL: Erwartung, tatsächliche Beobachtung und genaue Reproduktion ausfüllen.
-  Beispiel: „Sollwert per Plus erhöhen“ / „beide Tasten deaktiviert bei an
-  und aus“ / „Compact-Climate öffnen, einschalten, Plus tippen, ausschalten,
-  nochmals Plus tippen“. Das ist eine Beobachtung, noch keine Root Cause.
-- BLOCKED: Grund nennen, etwa fehlendes Testgerät, eine Voraussetzung oder ein
-  bekannter Produktrepair. Bereits bestandene Teilprüfungen in den Notizen
-  festhalten. Nicht ausgeführte Folgeschritte nicht als FAIL markieren.
-- N/A: begründen, warum der Test für diesen Lauf nicht anwendbar ist. N/A ist
-  kein bestandener Test.
-- NOT_TESTED: nicht ausgeführt. Es wird kein positives Ergebnis abgeleitet.
+Beispiel für MT-01, Schritt 3 (nur ein Ausfüllbeispiel):
 
-„Ergebnis speichern“ übernimmt den Eintrag. Katalogseitiges BLOCKED oder
-NOT READY ist zusätzlich sichtbar und wird nicht mit deinem Resultat vermischt.
-Kein PASS für katalogseitig blockierte Tests. Notiere optional anonymisierte
-Evidenzdateinamen und die spätere GitHub-Issue-Nummer. Keine Bilddaten werden
-im JSON eingebettet.
+- Was sollte passieren? „Einmal Plus erhöht die Zieltemperatur um einen Schritt.“
+- Was ist passiert? „Plus und Minus bleiben grau, bei an und aus.“
+- Was hast du gemacht? „Dashboard über das iPad-Symbol gestartet, Heizkarte
+  gesucht, Minus und Plus bei eingeschaltetem und ausgeschaltetem Gerät versucht.“
+- Notizen: „Schritte 4–7 danach nicht ausgeführt. Schnelles Tippen vergrößert
+  außerdem die Seite.“
 
-Entwürfe bleiben nur in diesem Browser/Profil. „Gespeicherte Läufe“ auswählen
-und „Lauf fortsetzen“ nutzen. „Neuen Lauf vorbereiten“ bewahrt alte gespeicherte
-Läufe. Für eine andere Softwareversion einen neuen Lauf beginnen. Bei vollem,
-gesperrtem oder privatem Browserspeicher erscheint eine Warnung: sofort JSON
-exportieren, bevor die Seite geschlossen wird. Ungespeicherte Formulareingaben
-sind kein gespeicherter Entwurf. „Alle lokalen Läufe löschen“ fragt vorher
-nach; erst jeden benötigten Lauf exportieren.
+Wähle dafür „Etwas stimmt nicht“, nicht „Ich komme nicht weiter“: Du hast einen
+konkreten Produktfehler gesehen. Fehlt dagegen nur die vorbereitete Testkarte,
+ist es ein Hindernis. Auf „Dieses Ergebnis speichern“ klicken; ungespeicherte
+Formulareingaben gehören noch nicht zum Bericht.
 
-## Exportieren, importieren und melden
+## Fortsetzen, sichern und weitergeben
 
-1. „JSON exportieren“ lädt den validierten UTF-8-Bericht herunter. Bewahre die
-   Datei als eigenes Backup auf; das Portal hat keine zentrale Datenbank.
-2. Zum Weiterarbeiten „JSON importieren“ wählen (max. 2 MiB), Vorschau prüfen
-   und bestätigen. Ein Katalogunterschied wird deutlich angezeigt und nur
-   lesend importiert. Gleiche Run-ID mit anderem Inhalt wird nicht überschrieben:
-   beide Dateien behalten und dem Koordinator geben.
-3. Vor jedem öffentlichen Teilen die Datenschutzliste prüfen: Tokens,
-   Passwörter, `.env`, Keys, private Entity-/Personennamen, Adressen, Fotos,
-   Medieninhalte, Standorte und Logs redigieren. Bei sensiblen Belegen nur eine
-   bereinigte Reproduktion öffentlich melden; private Übermittlung vorher mit
-   dem Koordinator vereinbaren.
-4. Datenschutzbestätigung setzen, Zusammenfassung erstellen/kopieren und
-   „Testlauf auf GitHub melden“ öffnen. Zum Erstellen des öffentlichen Issues
-   brauchst du ein GitHub-Konto. Das Portal legt kein Issue automatisch an.
-   Einen Bericht pro Lauf senden, keine Issues für jeden PASS.
-5. Zusammenfassung ins Formular einfügen, JSON anhängen. GitHub dokumentiert
-   inzwischen `.json` für Kommentare; falls das Formular den Typ ablehnt:
-   `.zip` oder `.txt` verwenden, alternativ bereinigtes JSON als Codeblock
-   einfügen. Niemals den ganzen Bericht in eine URL schreiben.
-6. Einzelne Fehler bei Bedarf im vorhandenen Bug-Formular mit Test-ID,
-   Version, Run-ID/Issue, Reproduktion, Erwartung und Beobachtung verknüpfen.
-   Danach Issue-Nummer beim Lauf oder Ergebnis speichern und erneut exportieren.
-7. Ohne GitHub-Konto: JSON über einen vorher vereinbarten Kanal an den
-   Koordinator geben. Lesen, Testen und Exportieren erfordern keinen Login.
+1. Ergebnisse bleiben nur in diesem Browser/Profil. Regelmäßig „Bericht
+   herunterladen“ wählen: Die .json-Datei ist deine Sicherung, kein Upload.
+   Du musst sie nicht öffnen oder bearbeiten.
+2. Zum Fortsetzen „Ich habe schon einen Bericht …“ öffnen, gespeicherten Bericht
+   auswählen oder Datei laden. Vorschau prüfen und bestätigen. Andere
+   Testanleitungen werden nur lesend übernommen; widersprüchliche Dateien mit
+   derselben Berichtskennung überschreiben sich nicht. Originale aufbewahren.
+3. Für eine andere App-Version einen neuen Bericht beginnen. Frühere Berichte
+   bleiben erhalten. Übungen unter den freiwilligen Angaben ausdrücklich als
+   Übung kennzeichnen; erfundene Ergebnisse zählen nicht als echte Beobachtung.
+4. Bericht und Bilder vor Weitergabe auf private Namen, Adressen, Fotos,
+   Zugangsdaten und ungeprüfte Protokolle prüfen. Keine Passwörter, Schlüssel
+   oder .env-Dateien. Vertrauliche Belege nur über vereinbarten privaten Weg.
+   Bildhinweise laden keine Bilder hoch; bereinigte Bilder separat beifügen.
+5. Datenschutz bestätigen, Zusammenfassung kopieren, „Bericht auf GitHub
+   abgeben“ öffnen. Zusammenfassung einfügen und geprüfte Datei anhängen.
+   Lehnt GitHub .json ab, .txt/.zip anhängen oder bereinigten Inhalt als Codeblock
+   einfügen. Ein Bericht kann viele Prüfungen enthalten; keine Meldung für
+   jeden Erfolg.
+6. Ohne GitHub-Konto oder bei Störung die Datei über den vereinbarten Weg an
+   deinen Ansprechpartner geben. Nichts wird automatisch übertragen.
 
-Fotos/Screenshots stammen nur vom echten Produkt oder einer kontrollierten
-Demo. Vor Weitergabe private Details prüfen; keine generierten Produktmockups.
-Ein leerer/unvollständiger Lauf ist keine Freigabe und keine „100 % bestanden“.
+Bei gesperrtem oder vollem Browserspeicher sofort herunterladen, bevor du die
+Seite schließt. Alte Berichte erst nach Sicherung bewusst löschen. Bei einem
+App-Startfehler die Beobachtung melden; abhängige Prüfungen nicht erfinden.
+Bei Test-Center-Ausfall vorhandene Dateien sichern, Zeitpunkt/Fehler notieren
+und Ansprechpartner informieren. Eine garantierte Offline-App gibt es nicht.
 
-## Wenn etwas nicht erreichbar ist
-
-Bei App-Ausfall keine Folgetests erfinden: beobachteten Startfehler als FAIL
-mit Reproduktion dokumentieren, abhängige Tests begründet BLOCKED lassen.
-Bei Pages-Ausfall vorhandenen JSON-Export sichern, Zeitpunkt/Fehlermeldung
-notieren und den Koordinator über den vereinbarten Kanal kontaktieren. Ohne
-geladenes Portal gibt es keine garantierte Offline-App. Bei GitHub-Ausfall
-bleibt der lokale Export möglich: JSON privat sichern und später übergeben.
-Kein zusätzlicher Account, Passwort oder Token wird hierfür benötigt.
-
-Neue Exporte enthalten Test-Center-Version, Katalogidentität und Exportzeit.
-Ältere 1.0-Berichte ohne diese Zusatzmetadaten bleiben importierbar; Hinweise
-prüfen und Originaldatei behalten. Lokaler Entwurf und Datei sind kein gemeinsames
-Serverbackup. Empfang und echte Ergebnisse stehen im [Pilotstatus](PILOT_STATUS.md);
-alle realen Slots starten mit NOT TESTED.
+Die technische Originalanleitung bleibt aufklappbar. Begriffe werden am Ende
+der Seite erklärt. Dateiformat, technische Kennungen und bisherige Berichte
+bleiben kompatibel; nicht geprüfte Ergebnisse werden niemals als bestanden
+gewertet. [Pilotplan](PILOT_PLAN.de.md) und [Pilotstatus](PILOT_STATUS.md)
+beschreiben Vorbereitung und tatsächliche Eingänge; die sprachliche Überarbeitung
+ist kein Nachweis für reale iPad-/HAOS-Tests oder Verständlichkeit bei der Community.

@@ -688,6 +688,14 @@ eigenen Browser; JSON ausdrücklich exportieren und nach Datenschutzprüfung als
 GitHub-Testlauf oder über den Koordinator weitergeben. Kein HA-Zugriff und kein
 GitHub-Login zum Lesen erforderlich. Die echte installierte Version angeben.
 
+Die deutsche Oberfläche führt mit verständlichen Ergebnisfeldern und einem
+[Ausfüllbeispiel](https://tekky85.github.io/ha-legacy-dashboard/testing/help.html)
+durch den Bericht. Zwölf bestehende Prüfungen (Pilot plus MT-01) erklären
+Vorbereitung, Zuständigkeiten, Schritte und Beobachtungen konkret. Alle 72
+Originalprüfungen bleiben verfügbar; weitere technische Prüfungen benötigen
+Betreuung. Alte Berichtsdateien bleiben kompatibel. Ein Teilerfolg zählt nicht
+als vollständig bestandener Test.
+
 - [Anleitung für Tester](docs/testing/TESTER_GUIDE.de.md)
 - [Pilot 27.4: elf bestehende Tests](docs/testing/PILOT_PLAN.de.md) und
   [Eingänge/Status](docs/testing/PILOT_STATUS.md): Werkzeugprüfung vorbereitet;

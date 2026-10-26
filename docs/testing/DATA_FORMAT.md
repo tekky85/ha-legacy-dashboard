@@ -8,6 +8,15 @@ alone cannot express. No dependency or account is needed.
 
 ## Canonical source and regeneration
 
+The German explanation appendix in that same canonical source is projected by
+`scripts/testing/build-test-guides.js` into `testing/data/test-guides.de.json`.
+It is presentation-only: twelve explanations refer to unchanged canonical IDs,
+pin a definition fingerprint and match the complete original step count.
+This does not change report schema 1.0, status codes, or catalog identity.
+Technical originals remain authoritative. Readable labels are not additional
+statuses. The UI requires explicit full-check confirmation for a newly saved
+PASS; old reports are not retroactively rewritten or claimed reconfirmed.
+
 The only master definition list is `docs/audits/MANUAL_TEST_QUEUE.md`.
 The bounded parser matches exact `## MT-NN` detail headings, the six-column
 summary table and three-column execution table. `Test ID:` is retained as a
@@ -64,7 +73,8 @@ and the execution table; historical mentions are not automatically OPEN.
 ## Reports
 
 Schema `1.0` remains backward-compatible. Sprint 27.4 adds optional
-`testCenterVersion` (new runs: `27.4`), `dataKind` (`manual` or `synthetic`)
+`testCenterVersion` (new runs: `27.4.1` after the German wording revision;
+existing `27.4` reports remain unchanged), `dataKind` (`manual` or `synthetic`)
 and `exportedAt` (canonical UTC, at/after `updatedAt`). New downloads stamp
 export time without mutating draft observations. Older 1.0 files still load
 with metadata warnings; absent provenance is `unspecified`, never proof of a

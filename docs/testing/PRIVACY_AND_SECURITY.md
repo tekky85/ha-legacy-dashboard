@@ -1,8 +1,8 @@
 # Privacy and security
 
 The static portal has no HA access, backend, central result store, analytics,
-telemetry or authenticated GitHub API. The only runtime request loads its
-same-origin static catalog. It does not discover addresses, collect entity
+telemetry or authenticated GitHub API. Two runtime requests load the
+same-origin static catalog and German explanation file. It does not discover addresses, collect entity
 IDs/logs, detect device details or read credentials. Enter aliases and known
 environment details manually. The hosting provider still receives ordinary
 HTTP requests when serving the site; opening GitHub is a deliberate navigation.

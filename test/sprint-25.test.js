@@ -206,12 +206,12 @@ test("Public-Test-Release ist als Prerelease gekennzeichnet und besitzt sichere 
     assert.match(notes, /GitHub Issues/);
     assert.match(notes, /sanitized logs/i);
     assert.doesNotMatch(notes, /mark(?:ed)? as stable/i);
-    assert.match(issueTemplate, /Home Assistant version/);
-    assert.match(issueTemplate, /Home Assistant App/);
-    assert.match(issueTemplate, /Standalone\/LXC/);
-    assert.match(issueTemplate, /expected/i);
-    assert.match(issueTemplate, /actual/i);
-    assert.match(issueTemplate, /no tokens, passwords/);
+    assert.match(issueTemplate, /Home-Assistant-Version/);
+    assert.match(issueTemplate, /Als App in Home Assistant/);
+    assert.match(issueTemplate, /Separat auf einem Server \/ LXC/);
+    assert.match(issueTemplate, /id: expected/);
+    assert.match(issueTemplate, /id: actual/);
+    assert.match(issueTemplate, /Keine Passwörter, Schlüssel/);
 });
 
 

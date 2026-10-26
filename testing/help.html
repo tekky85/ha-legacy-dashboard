@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <title>So testest du mit · HA Legacy Dashboard</title>
+  <link rel="stylesheet" href="css/testing.css?v=27.4.1">
+</head>
+<body>
+<header><span class="eyebrow">GEMEINSAM TESTEN</span><h1>Ausprobieren. Beobachten. Aufschreiben.</h1><p>Du musst keine Fehlerursache finden und nichts programmieren. Eine genaue Beschreibung dessen, was du siehst, hilft bereits.</p><a href="./">Zurück zum Test-Center</a></header>
+<main>
+  <section class="panel"><h2>1. Zwei Seiten, zwei Aufgaben</h2>
+    <p>Im <strong>Test-Center</strong> schreibst du Ergebnisse auf. Zum Ausprobieren öffnest du daneben <strong>dein eigenes HA Legacy Dashboard</strong> auf dem genannten Prüfgerät. Das kann ein anderes Gerät sein: etwa Test-Center am Rechner, Dashboard am alten iPad.</p>
+    <p>Ein „Testdashboard“ ist eine getrennte, vorbereitete Seite mit ungefährlichen Testkarten. Dein Ansprechpartner nennt dir die Adresse und richtet nötige Karten ein. Ändere dafür nicht ungefragt dein Alltagsdashboard.</p>
+    <p>Die ersten Angaben beschreiben das Prüfgerät und die tatsächlich installierte Dashboard-App-Version. Ein erfundenes Kürzel genügt. Rechnerart und Home-Assistant-Version darfst du leer lassen, wenn du sie nicht kennst. Eine technische Quellkennung notiert bei Bedarf dein Ansprechpartner.</p>
+  </section>
+  <section class="panel"><h2>2. Erst lesen, dann ausprobieren</h2>
+    <p>Wähle eine Prüfung und lies „Das brauchst du – und wer hilft“. Du musst nicht alle Tests machen. Ein Test für iPad mini 1 / iOS 9.3.5 wird nicht dadurch erledigt, dass er am Mac funktioniert.</p>
+    <p>Bei Licht/Heizung reicht es nicht, dass die Karte sichtbar ist: Die Steuerung muss in der Verwaltung ausdrücklich erlaubt sein. Dein Ansprechpartner bereitet eine sichere Lampe bzw. sichere Temperaturen vor. Keine echten Sicherheitsgeräte ausschalten oder absichtliche Ausfälle am Alltagssystem erzeugen.</p>
+    <p>Bei vorbereiteten Fehlern oder technischen Protokollprüfungen übernimmt dein Ansprechpartner diesen Teil. Gibt es die Vorbereitung nicht oder verstehst du den Schritt nicht, darfst du stoppen und das als Hindernis melden. Du musst nicht raten.</p>
+    <p>„Vom Home-Bildschirm“ bedeutet: Dashboard über das Symbol auf dem iPad starten. Wenn anschließend plötzlich die normale Safari-Adressleiste erscheint, hat die App ihr Vollbildfenster verlassen. Schreibe genau das auf.</p>
+  </section>
+  <section class="panel"><h2>3. Welches Ergebnis wählst du?</h2>
+    <dl>
+      <dt>Hat wie erwartet funktioniert</dt><dd>Alle erforderlichen Schritte und Ergebnisse wurden geprüft, auch notwendige technische Nachweise durch die Betreuung. Ein einzelner Teilerfolg reicht nicht. Bedingte Schritte, die nicht möglich waren, begründen.</dd>
+      <dt>Etwas stimmt nicht</dt><dd>Du hast etwas versucht und einen Fehler gesehen. Beschreibe Erwartung, Beobachtung und deine Schritte. Nachfolgende, noch nicht ausgeführte Schritte in den Notizen nennen.</dd>
+      <dt>Ich komme nicht weiter</dt><dd>Ein benötigtes Gerät, eine Karte, eine Vorbereitung oder verständliche Hilfe fehlt. Testnummer, Schrittnummer und Hindernis nennen.</dd>
+      <dt>Passt nicht zu meinem System</dt><dd>Diese Prüfung ist nach Absprache für dein System grundsätzlich nicht vorgesehen. Begründe das. Nur eine fehlende Vorbereitung ist stattdessen ein Hindernis.</dd>
+      <dt>Noch nicht ausprobiert</dt><dd>Du hast diese Prüfung noch nicht ausgeführt. Das zählt nicht als bestanden.</dd>
+    </dl>
+  </section>
+  <section class="panel"><h2>Ausfüllbeispiel: Die Plus-Taste ist grau</h2>
+    <p><strong>Nur ein Beispiel, kein neues Testergebnis.</strong> Angenommen, du prüfst MT-01, Schritt 3, und kannst die Zieltemperatur nicht ändern. Wähle „Etwas stimmt nicht“:</p>
+    <dl>
+      <dt>Was sollte passieren?</dt><dd>Einmal auf Plus tippen erhöht die Zieltemperatur um den vereinbarten Schritt.</dd>
+      <dt>Was ist stattdessen passiert?</dt><dd>Plus und Minus sind grau. Die Temperatur ändert sich nicht, sowohl bei eingeschaltetem als auch ausgeschaltetem Thermostat.</dd>
+      <dt>Was hast du der Reihe nach gemacht?</dt><dd>1. Testdashboard über das Home-Bildschirm-Symbol geöffnet. 2. Heizkarte gesucht. 3. Auf Plus und Minus getippt. 4. Bei ein- und ausgeschaltetem Thermostat wiederholt.</dd>
+      <dt>Notizen</dt><dd>MT-01, Schritt 3. Schritte 4–7 habe ich danach nicht ausgeführt. Beim schnellen Tippen vergrößert sich außerdem die ganze Seite.</dd>
+    </dl>
+    <p>Du musst nicht wissen, ob ein Steuerbefehl beim Server ankam. Solche Protokolle prüft die technische Betreuung. „Fehler bleibt optimistisch stehen“ heißt einfach: Nach einer abgelehnten Änderung darf nicht weiter der neue Wert angezeigt werden, als wäre er bestätigt.</p>
+    <p>Klicke „Dieses Ergebnis speichern“. Erst dann ist der Eintrag in deinem Bericht. Wenn du nur das Ausfüllen üben willst, beginne einen separaten Bericht und wähle unter den freiwilligen Angaben „Nur eine Übung mit erfundenen Ergebnissen“.</p>
+  </section>
+  <section class="panel"><h2>4. Sichern und abgeben</h2>
+    <ol>
+      <li>„Bericht herunterladen“ speichert eine Datei mit der Endung .json. Du musst sie nicht verstehen oder bearbeiten. Regelmäßig sichern: Das Test-Center hat keine zentrale Ablage.</li>
+      <li>Zum Fortsetzen denselben Browser benutzen oder unter „Ich habe schon einen Bericht …“ die Datei wieder laden. Für eine andere App-Version einen neuen Bericht beginnen. Alte Berichte bleiben erhalten.</li>
+      <li>Vor dem Weitergeben Bericht und Bilder prüfen: keine Passwörter, Schlüssel, privaten Namen, Adressen oder ungeprüften Protokolle. Ein Foto wird nicht automatisch mit hochgeladen; bei Bedarf separat bereinigt mitschicken.</li>
+      <li>Mit GitHub-Konto: Datenschutz bestätigen, Zusammenfassung kopieren, „Bericht auf GitHub abgeben“ öffnen, Text einfügen und Datei anhängen. Wird .json abgelehnt, als .txt oder .zip anhängen. Eine Meldung kann viele Tests enthalten.</li>
+      <li>Ohne GitHub-Konto: Datei über den mit deinem Ansprechpartner vereinbarten Weg senden. Es wird nichts automatisch übertragen. Du brauchst keine weitere Anmeldung.</li>
+    </ol>
+    <p>Wenn du weiterhin nicht weißt, was du tun sollst: Nenne deinem Ansprechpartner Testnummer und Schrittnummer und beschreibe deine Frage. Auch diese Rückmeldung hilft, die Anleitung besser zu machen.</p>
+  </section>
+</main><footer><a href="./">Zum Test-Center</a> · keine automatische Übertragung</footer>
+</body></html>
