@@ -5519,3 +5519,268 @@ NOT TESTED
 - Primäre, überschneidungsfreie Systemzuordnung: iPad mini/HomeScreen 31,
   iPad Air 2 5, macOS-/Browser-/kontrolliertes Test-HA 18, Standalone/LXC 9,
   HAOS 7, Release/GitHub 2.
+
+## Verständliche Hilfetexte für das Test-Center
+
+Diese deutschen Durchführungshilfen gehören zu den bestehenden Testnummern,
+nicht zu einem zweiten Testkatalog. Sie erläutern alle Schritte derselben Prüfung.
+Die Originalanforderungen oben bleiben maßgeblich. Technische Vorbereitung und
+Protokollkontrollen übernimmt ausdrücklich die Betreuung; ohne diese Nachweise
+entsteht kein vollständiges PASS. Weitere Prüfungen bleiben mit technischer
+Betreuung zugänglich. Testkennungen und gespeicherte Ergebnisse bleiben gleich.
+
+Der Generator prüft Definition-Fingerabdruck und Schrittanzahl. Bei Änderungen
+der Originalprüfung muss die Erklärung fachlich neu abgeglichen werden, nicht
+bloß der Fingerabdruck ersetzt. Dieser Anhang enthält keine Testergebnisse.
+
+<!-- TEST-CENTER-GUIDES-DE -->
+```json
+{
+  "schemaVersion": "1.0",
+  "guides": [
+    {
+      "testId": "MT-01",
+      "title": "Heizung und kleine Karten auf dem alten iPad bedienen",
+      "goal": "Bleiben kleine Karten lesbar und reagieren Lampe und Thermostat zuverlässig?",
+      "preparation": "iPad mini 1 mit iOS 9.3.5; eigenes Testdashboard unter / und /d/default. Dein Ansprechpartner bereitet kleine Messwert-, Fenster-, Licht- und Heizkarten mit langen Namen/Werten vor. Er erlaubt die Steuerung ausdrücklich in der Verwaltung, nennt sichere Temperaturgrenzen und Schrittweite und notiert die genaue Testversion. Für Fehlerzustände und die Protokollprüfung brauchst du seine Hilfe. Keine echten Sicherheitsgeräte abschalten.",
+      "steps": [
+        "Öffne das Testdashboard in Safari im Hochformat, danach über sein Symbol auf dem Home-Bildschirm. Dort darf keine normale Safari-Adressleiste erscheinen.",
+        "Wähle Hell, danach Dunkel. Prüfe bei jeder kleinen Karte Name, Wert und Einheit: lesbar, nichts abgeschnitten oder außerhalb der Karte.",
+        "Tippe einmal Minus, dann einmal Plus am Thermostat, danach rasch nacheinander. Die Zieltemperatur soll sich um den vereinbarten Schritt ändern. Beobachte kurze Verarbeitung und bestätigten Wert. Dein Ansprechpartner prüft im Testprotokoll zusätzlich: je angenommenem Tippen genau ein Steuerbefehl, keine Doppelaktion.",
+        "Lass den vorbereiteten Fehler beim Temperatursetzen einschalten. Versuche eine Änderung: eine Meldung muss erscheinen; ein nicht bestätigter neuer Wert darf nicht als erfolgreich stehen bleiben. Fehler danach entfernen lassen.",
+        "Lass das Thermostat künstlich als nicht erreichbar anzeigen. Seine Tasten müssen gesperrt sein.",
+        "Drehe quer und wieder hoch. Wiederhole Minus/Plus sowie Ein/Aus an der freigegebenen Testlampe. Tasten müssen mittig und gut antippbar bleiben.",
+        "Warte mindestens zwei automatische Aktualisierungen ab; die Wartezeit nennt dein Ansprechpartner. Ein bestätigter neuer Zielwert darf nicht zum alten Wert zurückspringen."
+      ],
+      "expected": "Lesbare Karten ohne Überlappung oder seitliches Scrollen, mittige Tasten mit etwa 44 Bildpunkten Größe und einheitliche Farben. Je angenommenem Tippen genau ein Befehl; Verarbeitung verhindert Doppelaktionen. Nach Fehlern gilt der bestätigte Wert. Nicht erreichbare Geräte bleiben gesperrt. Die App bleibt im Vollbildfenster.",
+      "failIf": "Inhalt ragt über die Karte, Zielwert springt zurück, ein Tippen erzeugt zwei Befehle, ein fehlgeschlagener Wert bleibt scheinbar erfolgreich stehen oder normales Safari öffnet sich.",
+      "record": "Beispiel: „Schritt 3: Plus und Minus grau, bei eingeschaltetem und ausgeschaltetem Thermostat. Schritte 4–7 nicht ausgeführt.“ Das ist ein beobachteter Fehler. Fehlt nur die vorbereitete Fehlerumgebung oder Protokollprüfung, als Hindernis nennen.",
+      "definitionHash": "69ecffebe4b512bd2208bc25d0a3a1c7e22a8b79378dd843f912f6575151979c"
+    },
+    {
+      "testId": "MT-02",
+      "title": "Zwischen zwei Dashboards wechseln",
+      "goal": "Jede Seite zeigt eigene Karten und bleibt im Vollbildfenster.",
+      "preparation": "iPad mini 1, iOS 9.3.5, Start vom Home-Bildschirm. Dein Ansprechpartner stellt /, /d/default und /d/esszimmer auf derselben Testadresse bereit: unterschiedliche Titel/Karten für Messwert, Fenster, Licht und Heizung; ungefährliche Testwertänderung möglich.",
+      "steps": [
+        "Starte / vom Home-Bildschirm. Notiere Titel und die vom Ansprechpartner genannte Dashboardkennung.",
+        "Öffne /d/default auf derselben Testadresse. Vergleiche mit /: dieselben Standardkarten und derselbe Titel.",
+        "Öffne /d/esszimmer. Nur die dort eingerichteten Karten sollen erscheinen.",
+        "Lass einen vorbereiteten Testwert ändern. Warte auf automatische Aktualisierung auf beiden Dashboards.",
+        "Wähle Hell oder Dunkel und lade jede Seite neu. Die Auswahl muss bleiben.",
+        "Drehe auf jeder Seite hoch und quer. Karten, Titel, Uhr, Datum und Verbindungsanzeige müssen lesbar, dezent und ohne seitlichen Überlauf bleiben.",
+        "Wechsle über interne Verweise zwischen den Seiten. Keine normale Safari-Adressleiste, kein neues Fenster."
+      ],
+      "expected": "/ und /d/default zeigen dasselbe; das zusätzliche Dashboard bleibt getrennt. Testwerte aktualisieren sich automatisch. Layout und Zusatzanzeigen passen in beide Ausrichtungen. Farbauswahl bleibt erhalten, Navigation bleibt im Vollbild.",
+      "failIf": "Falscher Titel, vermischte Karten, Ladefehler, fehlende Aktualisierung, verlorene Farbauswahl oder normales Safari/neues Fenster.",
+      "record": "Nenne betroffene Seite, Schritt, alten/neuen Testwert und ob eine Safari-Adressleiste erschien.",
+      "definitionHash": "5720e4b28ad8c5cdc5c1a2fafd95464bc6dbfd84051fad35d9c431ed9073010a"
+    },
+    {
+      "testId": "MT-04",
+      "title": "Dashboards bearbeiten, speichern und verwerfen",
+      "goal": "Verwaltung, Vorschau und gespeichertes Dashboard stimmen überein.",
+      "preparation": "Aktuelles Safari am Mac, getrennte Testinstallation mit /admin, zwei Dashboards, vier Kartentypen, Größen klein/normal/breit/hoch/groß, langen Namen und Karten mit/ohne Steuerfreigabe. Dein Ansprechpartner stellt separaten Verwaltungsschlüssel und Sicherung bereit. Speicherfehler nur mit seiner Hilfe auslösen. Schlüssel nie in Adresse, Bericht oder Bild schreiben.",
+      "steps": [
+        "Öffne /admin ohne Schlüssel und mit falschem Testschlüssel: keine Konfigurationsdaten dürfen zugänglich sein. Melde dich dann mit gültigem Testschlüssel an.",
+        "Erstelle ein Testdashboard, benenne und dupliziere es, lösche die Kopie. Setze das Testdashboard als Standard.",
+        "Suche und filtere die Geräteauswahl. Füge Messwert-, Fensterkontakt-, Licht- und Heizkarte hinzu.",
+        "Ändere Sichtbarkeit, Reihenfolge und jede der fünf Größen. Vergleiche jede Änderung mit der Live-Vorschau.",
+        "Verwirf Änderungen. Das tatsächliche Testdashboard muss unverändert bleiben.",
+        "Wiederhole die Änderungen und speichere. Lade Verwaltung und Dashboard neu: dieselben Einstellungen müssen erscheinen.",
+        "Lass einen vorbereiteten Speicherfehler auslösen. Prüfe Meldung, erhaltenen Entwurf und letzte gültige Konfiguration. Fehler danach entfernen lassen.",
+        "Prüfe Tabulatortaste, sichtbaren Eingabefokus, Beschriftungen und Kontrast. Melde dich ab; danach muss eine neue Anmeldung nötig sein."
+      ],
+      "expected": "Anmeldung schützt die Verwaltung. Bearbeiten, Größen, Speichern, Verwerfen und Neuladen sind konsistent. Vorschau und Dashboard passen zusammen, keine abgeschnittenen Tasten. Fehler zerstören keine gültigen Daten. Betreuung prüft zusätzlich: keine Schlüssel in Adresse oder Protokoll.",
+      "failIf": "Verwaltungsdaten ohne Anmeldung, öffentliche Schlüssel, abweichende Vorschau, Verwerfen speichert trotzdem oder Speicherfehler überschreibt gültige Konfiguration.",
+      "record": "Nenne Arbeitsschritt, Kartengröße und Unterschied zwischen Vorschau und Dashboard. Schlüssel weglassen.",
+      "definitionHash": "2ce2a8d462306f36d81c77982d9d8805cc4e9aaf61a702ef2d4937341d5a0db0"
+    },
+    {
+      "testId": "MT-13",
+      "title": "Bleibt Hell oder Dunkel beim Seitenwechsel erhalten?",
+      "goal": "Die Farbauswahl bleibt auf allen Seiten und nach erneutem Öffnen gleich.",
+      "preparation": "iPad mini 1, iOS 9.3.5, vom Home-Bildschirm gestartet. Aktuelle Testversion, ein zusätzliches Dashboard und gefüllte Übersichts-/Fehlerseiten. Ansprechpartner zeigt die Navigation. Keine Verwaltungsschlüssel auf dem iPad speichern.",
+      "steps": [
+        "Öffne /. Wähle Hell und lade die Seite neu: sie bleibt hell.",
+        "Öffne das zusätzliche Dashboard über die App-Navigation: ebenfalls hell.",
+        "Öffne die Übersicht über „Summary“, dann die Fehlerseite über „Errors“: beide hell.",
+        "Tippe auf die app-eigene Schaltfläche Zurück. Du kommst zum vorherigen Dashboard, weiterhin hell.",
+        "Schließe die App vollständig und öffne sie über das Home-Bildschirm-Symbol erneut. / bleibt hell.",
+        "Wähle Dunkel und wiederhole Schritte 1–5 mit Dunkel statt Hell.",
+        "Nur falls sicher auf diesem iPad vorbereitet: wiederhole einen Wechsel mit gesperrtem/geleertem Website-Speicher. Vorher Daten sichern. Die Seite muss trotzdem starten und bedienbar bleiben. Ist dies nicht möglich, ausdrücklich begründen."
+      ],
+      "expected": "Auswahl bleibt nach Neuladen, Wechsel, Rückkehr und erneutem Öffnen konsistent. Kein länger sichtbares falsches Aufblitzen. Übersicht/Fehlerseite verwenden dieselbe Farbe. Gesperrter Speicher verhindert Start und Umschaltung der laufenden Sitzung nicht.",
+      "failIf": "Eine Seite wechselt ungewollt die Farbe, Auswahl geht verloren, Übersicht/Fehlerseite zeigt anderen Zustand oder Speicherfehler macht die Seite unbedienbar.",
+      "record": "Nenne Seite und Farbe vorher/nachher. Nicht möglichen Schritt 7 ausdrücklich als nicht ausgeführt begründen.",
+      "definitionHash": "e743bf6ca0a2b55fb06f5b1472d6c4c318e90643e68f3ff20ce52b1bfd0bd9e5"
+    },
+    {
+      "testId": "MT-15",
+      "title": "Licht schalten, ohne versehentlich die Einzelansicht zu öffnen",
+      "goal": "Ein/Aus funktioniert gleich auf Übersicht und großer Einzelansicht.",
+      "preparation": "iPad mini 1, iOS 9.3.5, vom Home-Bildschirm. Ansprechpartner nennt Testadresse und drei Lampenkarten: erreichbar und ausdrücklich zur Steuerung freigegeben; ohne Steuerfreigabe; künstlich nicht erreichbar. Nur ungefährliche Testlampen. Protokollkontrolle übernimmt die Betreuung.",
+      "steps": [
+        "Tippe bei der freigegebenen eingeschalteten Lampe in der Übersicht einmal Ein/Aus. Beobachte die Verarbeitung und bestätigten Aus-Zustand.",
+        "Tippe erneut Ein/Aus. Danach muss die Lampe bestätigt an sein.",
+        "Tippe auf die Kartenfläche neben der Taste. In der großen Einzelansicht einmal aus und ein schalten.",
+        "Tippe dort nur Ein/Aus: die Einzelansicht bleibt offen.",
+        "Schließe die Einzelansicht. Tippe in der Übersicht nur Ein/Aus: keine Einzelansicht darf aufgehen.",
+        "Prüfe die zwei anderen Lampen: ohne Freigabe und nicht erreichbar müssen die Tasten gesperrt sein.",
+        "Nur wenn sicher vorbereitet: Betreuung löst Schaltfehler aus. Prüfe verständliche Meldung und nach Behebung normale Bedienung. Sonst Einschränkung notieren."
+      ],
+      "expected": "Tasten mittig, etwa 44 Bildpunkte groß, mit einmaligem Tippen bedienbar. Verarbeitung, Fehler und bestätigter Zustand klar, Ansichten konsistent. Tastentippen öffnet/schließt die Einzelansicht nicht. Gesperrte Lampen bleiben unbedienbar. Betreuung bestätigt nur vorgesehene abgesicherte Lichtbefehle.",
+      "failIf": "Tasten versetzt/zu klein, Mehrfachtippen nötig, widersprüchliche Zustände, versehentliches Öffnen/Schließen oder gesperrte Lampe steuerbar.",
+      "record": "Nenne Lampenrolle, Ansicht und Schritt; keine privaten Gerätenamen nötig.",
+      "definitionHash": "cecd3b8fe5a420b3a4ddcd36ab19d1f29d1e3b132744789baf04d28b1b4cfd6a"
+    },
+    {
+      "testId": "MT-16",
+      "title": "Heizung in der großen Einzelansicht bedienen",
+      "goal": "Minus, Plus und Ein/Aus liegen richtig und nutzen nur unterstützte Funktionen.",
+      "preparation": "iPad mini 1, iOS 9.3.5, vom Home-Bildschirm. Betreuung nennt Testadresse, sichere Temperaturgrenzen und Schrittweite. Drei Heizkarten: freigegeben mit echtem Aus-Modus, eines ohne Aus-Modus, eines künstlich nicht erreichbar. Klären, ob Zielwerte bei ausgeschalteter Heizung unterstützt werden. Keine kritische Alltagsheizung dafür verwenden.",
+      "steps": [
+        "Öffne die große Einzelansicht der freigegebenen Heizung. Suche Raumtemperatur, Zieltemperatur, Betriebszustand (z. B. Heizen), Minus, Plus und Ein/Aus.",
+        "Tippe einmal Minus und Plus. Prüfe Verarbeitung, erlaubten Schritt und bestätigten Zielwert innerhalb der erlaubten Grenzen.",
+        "Schalte mit Ein/Aus aus. Die Anzeige soll Aus bestätigen.",
+        "Wenn unterstützt: ändere den Zielwert bei ausgeschaltetem Gerät. Dadurch darf es nicht einschalten. Ablehnung durch die Geräteanbindung muss verständlich bleiben, ohne falsche Bestätigung; Einschränkung notieren.",
+        "Schalte ein. Betreuung bestätigt, dass nur ein vom Gerät unterstützter Betriebsmodus gewählt wird.",
+        "Prüfe die Heizung ohne Aus-Modus: keine unechte Ein-/Aus-Taste.",
+        "Prüfe das nicht erreichbare Gerät: keinerlei Steuerung möglich.",
+        "Drehe hoch und quer. Tippe nahe Tastenrändern: symmetrisch mittig, ungefähr 44 Bildpunkte groß, nicht abgeschnitten/überlappend und mit einem Tippen erreichbar.",
+        "Nur falls gefahrlos vorbereitet: Schaltfehler auslösen lassen. Verständliche Meldung und normale Bedienung nach Behebung prüfen; sonst begründen."
+      ],
+      "expected": "Temperaturgrenzen/Schrittweite gelten. Ändern bei Aus schaltet nicht ein. Nur unterstützte Betriebsmodi; ohne Aus-Modus keine Ein-/Aus-Taste. Verarbeitung, Fehler und Nichterreichbarkeit hinterlassen weder dauerhaft gesperrte Tasten noch falsche bestätigte Werte.",
+      "failIf": "Tasten versetzt/abgeschnitten/überlappend; Zielwertänderung schaltet ein; unerlaubter Modus; unechte Ein-/Aus-Taste; nach Fehler dauerhaft hängende Verarbeitung oder falscher Zielwert.",
+      "record": "Notiere Zustand an/aus, Zielwert vorher/nachher und Schritt. Immer graue Minus-/Plus-Tasten ausdrücklich als Fehler melden.",
+      "definitionHash": "ecae3fdd7ece10bc51f1d819245a5aaaaa2e704126bb0ccc0c0c6073c27d6122"
+    },
+    {
+      "testId": "MT-40",
+      "title": "Übersicht, Warnanzeige und Zurück im Vollbild prüfen",
+      "goal": "Listenfilter dürfen keine globale Entwarnung vortäuschen; Zurück führt zum richtigen Dashboard.",
+      "preparation": "iPad mini 1 mit iOS 9.3.5 im Home-Bildschirm-Vollbild, aktuelle Testversion, / und /d/health-audit. Betreuung muss künstliche Zustände vorbereiten: fehlerfrei, nur Hinweis, Warnung, Fehler, kritisch, veraltet, unbekannt und Statusausfall. Keine echten Sicherheitsgeräte abschalten. Ohne diese Vorbereitung nicht als vollständig bestanden melden.",
+      "steps": [
+        "Starte / bei aktuellen fehlerfreien Testdaten. „Summary“ ist sichtbar, Warnanzeige verborgen. Öffne Summary und Zurück.",
+        "Lass ausschließlich einen allgemeinen Hinweis anzeigen: weiterhin keine Alarmanzeige.",
+        "Lass eine Warnung vorbereiten. Sichtbares verständliches Symbol/Beschriftung antippen: „Errors“ öffnet im selben Vollbildfenster.",
+        "Filtere diese Warnung aus der Fehlerliste und ändere Spaltenzahl. Zurück: die globale Warnanzeige bleibt.",
+        "Wiederhole mit Fehler und kritisch. Höhere Schwere muss unterscheidbar sein; Antippen öffnet Errors.",
+        "Öffne /d/health-audit, dann Summary, Errors, Zurück: exakt dasselbe zusätzliche Dashboard. Wiederhole mit Neuladen von Summary/Errors vor Zurück.",
+        "Lass veraltete vormals gute, dann veraltete vormals kritische Daten und nie bekannten Zustand vorbereiten. Alle bleiben sichtbar, keine falsche Entwarnung.",
+        "Betreuung unterbricht nur die kleine Statusantwort der Testumgebung. Nach Wartezeit unbekannt/veraltet statt Entwarnung. Nach Behebung selbstständige Erholung ohne Neuladen.",
+        "Drehe zusätzliches Dashboard mit kritischer Anzeige quer und zurück. Warnanzeige und Zurück erneut bedienen; Kopfzeile und Tasten müssen passen.",
+        "Nach jedem Wechsel prüfen: keine normale Safari-Adressleiste/zusätzlicher Tab, weiterhin dasselbe Vollbildfenster."
+      ],
+      "expected": "Summary immer neutral sichtbar. Frisch fehlerfrei/nur Hinweis alarmiert nicht; Warnung/Fehler/kritisch/veraltet/unbekannt bleiben unterscheidbar sichtbar. Filter und Spalten ändern globale Lage nicht. Exaktes Rückkehrziel auch nach Neuladen, alles im Vollbild. Tasten etwa 44 × 44 Bildpunkte, kein Überlauf in beiden Ausrichtungen.",
+      "failIf": "Fehlende Übersicht, Alarm bei bloßem Hinweis, unsichtbare relevante Warnung/Ungewissheit, Entwarnung durch Filter, falsches Rückkehrziel oder Safari-Fenster, Verlust bekannter kritischer Lage bei Statusausfall.",
+      "record": "Vorbereiteten Zustand, Schritt und Ausgangsdashboard nennen. Fehlende Testzustände als Hindernis notieren.",
+      "definitionHash": "d3dc89f85cfad9f39b6734aece64f4b28d30c5a1cff472a236447d8e62a5b1e8"
+    },
+    {
+      "testId": "MT-50",
+      "title": "Verbindung nach Home-Assistant-Ausfall prüfen – mit technischer Hilfe",
+      "goal": "Die App bleibt erreichbar und verbindet sich nach einem Ausfall selbst wieder, ohne Zugangsdaten preiszugeben.",
+      "preparation": "Nur getrennte Home-Assistant-OS-Testinstallation auf x86-64 und aktuelles Safari. Betreuung richtet vereinbarte Testversion, harmlose Geräte/Räume/Markierungen/Integrationen/Automation/Reparaturmeldung (oder fehlende Unterstützung), minimale App-Rechte und separaten Verwaltungsschlüssel ein. Kein manuell eingetragener Home-Assistant-Dauerschlüssel. Keine Ausfälle am Alltagssystem erzeugen.",
+      "steps": [
+        "Starte die Test-App gemeinsam. Notiere Version, Rechnerart, Startzeit und Anschlussnummer. Betreuung prüft /health und /api/status ohne Home-Assistant-Zugangsdaten im Browser.",
+        "Öffne /admin gemeinsam. Notiere Quellenstatus für Geräte, Räume, Markierungen, Integrationen, Reparaturen und Automationen, einschließlich Eintragszuordnung.",
+        "Öffne Übersicht, Fehlerseite und erweiterte Diagnose der Testautomation. Nur aufbereitete reduzierte Anzeigen, keine internen Rohdaten.",
+        "Betreuung prüft Startprotokolle: keine Schlüssel, Anmeldeheader, ungekürzte Zuordnungsdaten, Automationskonfigurationen oder Ablaufdaten. Nichts ungeprüft weitergeben.",
+        "Betreuung stoppt nur Core, nicht die Dashboard-App. /health, /api/status, Übersicht/Fehler mehrfach öffnen: /health bleibt erreichbar, Ausfall wird verständlich behandelt.",
+        "Core wieder starten, Dashboard-App nicht neu starten. Nach vereinbarter Wartezeit müssen Messwerte und alle verfügbaren internen Datenquellen selbst wieder aktuell werden.",
+        "Nur falls gezielt möglich: Betreuung unterbricht zusätzlich die interne dauerhafte Verbindung ohne normalen Verbindungsabschluss. Nach Behebung selbstständige Erholung prüfen; sonst nicht ausgeführten Teil notieren.",
+        "Betreuung schaltet Verwaltungsschnittstelle wieder ab und prüft technisch: öffentlicher Anschluss gibt weder Schlüssel noch frei wählbare Home-Assistant-Befehle heraus."
+      ],
+      "expected": "Nur der Server verbindet sich intern über die vorgesehene Supervisor-Verbindung. Browser/Protokolle enthalten keine Schlüssel/Rohdaten. Während Core-Ausfall bleibt App erreichbar, zeigt veraltet/nicht verbunden/nicht unterstützt statt Absturz. Verfügbare Quellen erholen sich ohne App-Neustart. Technische Sicherheitsprüfung gehört zwingend dazu.",
+      "failIf": "Schlüssel/Rohdaten sichtbar, App-Absturz, /health hängt an Core, Quelle erholt sich nur durch App-Neustart oder freie Home-Assistant-Befehle möglich.",
+      "record": "Gemeinsam Quellenstatus vor/während/nach Ausfall, Wartezeit und ausgeführte technische Prüfungen notieren. Reines Anschauen ersetzt keine technische Prüfung.",
+      "definitionHash": "2bf21614ded0754a573d19314795d0bf60c1bc0d76f3c2bc610ef55cf98ab0be"
+    },
+    {
+      "testId": "MT-52",
+      "title": "Sicherung, Wiederherstellung und Versionswechsel – mit technischer Hilfe",
+      "goal": "Dashboarddaten und Bilder bleiben nach Wiederherstellung, Aktualisierung und Rechnerneustart erhalten.",
+      "preparation": "Nur getrenntes Home Assistant OS auf x86-64, technische Betreuung, zwei genaue veröffentlichte Versionen A/B, vollständige Sicherungsmöglichkeit und Wartungszeit. Datensatz aus MT-51 mit Abschnitt, Karte, Bild und eindeutigem Testtext. Betreuung bestätigt Sicherung bei gestoppter App und automatischen App-Start. Nicht am Alltagssystem löschen/wiederherstellen.",
+      "steps": [
+        "Starte A gemeinsam. Prüft /health und alle MT-51-Daten; Testtext notieren.",
+        "Erstellt eine Sicherung der gestoppten App über Home Assistant. Version und Zeitpunkt notieren.",
+        "Ändert danach den sichtbaren Testtext zur Unterscheidung. App einmal stoppen/starten.",
+        "Stellt die Sicherung wieder her. Die App startet mit exakt dem gesicherten Testtext und allen gesicherten Daten.",
+        "Aktualisiert auf B. /health, Protokoll, Daten, Bild und Verwaltung prüfen. Tatsächlich laufende Version muss B sein.",
+        "Startet nur Core neu. Verbindung erholt sich ohne Datenverlust.",
+        "Startet den ganzen Home-Assistant-OS-Testrechner neu. App muss automatisch starten. /health, Daten und interne Quellen erneut prüfen.",
+        "Setzt die Testumgebung sicher zurück und bewahrt nur bereinigte Nachweise auf."
+      ],
+      "expected": "Reproduzierbare Sicherung/Wiederherstellung mit App-Daten; Upgrade startet genau B und erhält Daten. Core- und Rechnerneustart erholen sich automatisch ohne manuellen App-Start. Bild und Verwaltung bleiben erhalten.",
+      "failIf": "Falsche/fehlende Daten, weiterhin A, manueller App-Start nötig, dauerhaft veraltet/nicht verbunden, fehlende Bilder oder Schlüssel im Protokoll.",
+      "record": "A/B-Version, Sicherungszeit, Testtext vor/nach Wiederherstellung und Neustartergebnis notieren. Normaler App-Neustart allein beweist keine Sicherung oder Rechnerneustart.",
+      "definitionHash": "a78e7881da771f01ba2a07f629c457df60d34b9363021ed2df25539f2a81ec47"
+    },
+    {
+      "testId": "MT-53",
+      "title": "App auf echtem ARM-Rechner prüfen – mit technischer Hilfe",
+      "goal": "Auf ARM-Hardware funktioniert die App genauso sicher wie auf x86-64.",
+      "preparation": "Kontrolliertes Home Assistant OS auf echter 64-Bit-ARM-Hardware, technische Betreuung und passendes veröffentlichtes Paket. Sensor, Fensterkontakt, ausdrücklich freigegebene Testlampe/Heizung, gesperrte Geräte und harmloses Bild vorbereiten. Separater Verwaltungsschlüssel, kein manuell eingetragener Home-Assistant-Dauerschlüssel.",
+      "steps": [
+        "Betreuung prüft veröffentlichtes ARM64-Paket. Installiert genau diese vereinbarte App-Version.",
+        "Startet die App; /health, /api/status, tatsächliche Version und Rechnerart im bereinigten Protokoll prüfen.",
+        "Öffnet Standard-/zusätzliches Dashboard, Übersicht, Fehlerseite und Verwaltung. Werte, Gerätezuordnungen und direkter Heimnetzzugriff müssen funktionieren.",
+        "Nur die beiden freigegebenen Geräte je einmal schalten. Gesperrte Geräte unbedienbar; Betreuung prüft zusätzlich serverseitige Ablehnung.",
+        "Testdashboard mit Bild speichern, App neu starten: beides bleibt erhalten.",
+        "Betreuung stoppt/startet Core. Daten und interne Verbindung erholen sich ohne Dashboard-App-Neustart.",
+        "Betreuung prüft Protokolle auf Architektur-/Komponentenfehler, Schlüssel und interne Rohdaten. Testdaten danach entfernen."
+      ],
+      "expected": "Echtes natives ARM64-Paket ohne Nachbildung anderer Rechnerart oder Komponentenfehler. Verbindung, direkter Anschluss, Steuerfreigaben und gespeicherte Daten wie auf x86-64.",
+      "failIf": "ARM-Paket fehlt/startet nur emuliert oder gar nicht; funktions- oder sicherheitsrelevante Unterschiede bei Funktionen, Berechtigungen oder Speicherung.",
+      "record": "Hardware, Version, Seiten, Freigaben und Neustartergebnis nennen. Eine Paketliste allein beweist keine reale ARM-Laufzeit.",
+      "definitionHash": "38caa9bfcfd0cbce972b4c351a27c9bfb491370c7b7a4aa35f372dae7607b8cd"
+    },
+    {
+      "testId": "MT-58",
+      "title": "Hintergrundbilder und Seitentitel auf dem alten iPad prüfen",
+      "goal": "Eigene Bilder pro Dashboard stören weder Karten noch Navigation oder Einzelansicht.",
+      "preparation": "iPad mini 1, iOS 9.3.5 vom Home-Bildschirm; Verwaltung nur am separaten modernen Gerät. Betreuung bereitet Standard und A/B mit drei harmlosen JPEG-/PNG-Bildern vor. A: Titel aus, ganzes Bild sichtbar, Abdunklung 30. B: Titel an, Bild füllt Fläche, Abdunklung 0. Standard: andere Position/Abdunklung. Je 0/1/wenige/viele Karten, lange Namen, Messwert/Fenster, freigegebene Lampe/Heizung und künstlich nicht erreichbar. Fehlendes Bild nur in Testumgebung.",
+      "steps": [
+        "Zu Beginn nur nach Absprache alten Website-Zwischenspeicher leeren, nötige Daten vorher sichern. Direkte Testadresse auf Home-Bildschirm legen und starten. Version/Quellkennung von Betreuung und Ausrichtung notieren.",
+        "Standard, A, B öffnen. Je eigenes Bild, Position, Skalierung und Abdunklung; kein Bild der vorherigen Seite.",
+        "A: weder Titel noch leerer Titelplatz; Übersicht, Warnanzeige, Verbindung, Uhr und Farbumschaltung bleiben. B: Titel sichtbar.",
+        "0, 1, wenige, viele Karten jeweils hoch und quer prüfen; jeweils hoch → quer → hoch drehen.",
+        "Kurzer Inhalt: Bild bis unten, Aktualisierungszeile unten. Langer Inhalt: Zeile nach Inhalt, nicht auf Karten schwebend. Kein seitliches Scrollen.",
+        "Dunkel → Hell → Dunkel, neu laden und Dashboards wechseln. Bild, Abdunklung, Titel und Farbe bleiben unabhängig richtig.",
+        "Einzelansicht für Messwert, Lampe, Heizung öffnen. Inhalt und Abdunklung über dem Bild; freigegebene Tasten bedienbar, Bild fängt keine Berührungen ab.",
+        "Übersicht und Fehlerseite über interne Schaltflächen öffnen und zurück. Exaktes Ausgangsdashboard, kein normales Safari, gleiche Serveradresse und Anschlussnummer.",
+        "Altes Bild auf iPad gespeichert lassen. Am anderen Gerät Bild ersetzen und speichern. Nur Dashboard neu laden, Zwischenspeicher nicht leeren: neues Bild erscheint. Betreuung nennt anonyme alte/neue Bildkennung.",
+        "In kontrollierter Umgebung fehlenden Bildverweis vorbereiten lassen. Seite lädt ohne Bild, Tasten und Navigation bleiben nutzbar. Gültige Einstellung wiederherstellen."
+      ],
+      "expected": "Dashboardbilder/-einstellungen vermischen sich nicht beim Wechsel, Drehen, Laden oder Farbwechsel. Verborgener Titel ohne Leerraum, Navigation bleibt. Bild füllt Höhe, Aktualisierungszeile mittig im normalen Seitenfluss ohne Kartenüberlappung. Einzelansicht bedienbar darüber. Navigation bleibt im Vollbild; Bildersatz ohne manuelles Leeren, fehlendes Bild ohne Absturz.",
+      "failIf": "Falsches/altes Bild, weiße Lücke, seitliches Scrollen, überlappende/feststehende Aktualisierungszeile, leerer Titelplatz, fehlende Navigation, unbedienbare Einzelansicht oder falsche Rückkehr/Safari-Wechsel.",
+      "record": "Dashboard A/B/Standard, Kartenanzahl, Ausrichtung und Schritt nennen. Bildersatz bereinigt vorher/nachher belegen.",
+      "definitionHash": "25e21ee4b8c9b0e0690d8a7be42c85887d9a60a9bceba77d4b2294b436ebfa03"
+    },
+    {
+      "testId": "MT-69",
+      "title": "Raumkarte einrichten, aufklappen und bedienen",
+      "goal": "Raumkarte, Vorschau, Bild und Geräte passen auf dem echten iPad zusammen.",
+      "preparation": "Aktuelles Safari am Mac für Verwaltung, iPad mini 1 mit iOS 9.3.5 vom Home-Bildschirm. Betreuung bereitet /d/room-audit, Abschnitt floor-test, Raumkarte room-test und HA-Raum „Testraum“ vor: Temperatur, Feuchte, Heizung, Anwesenheit, zwei Fenster, Licht, Schalter, Rollladen, Lüfter, Mediengerät, Schloss, Batterie, Sicherheitsmeldung. Alternativer Eintrag, harmloses JPEG/PNG, künstliche Fehler/Warnungen und lange Inhalte. Nur Licht/Heizung zur Steuerung freigegeben. Keine produktiven Sicherheitsgeräte oder Räume verändern.",
+      "steps": [
+        "Im Admin „Testraum“ wählen und automatische Vorschläge bewusst auslösen. Gemeinsam jede vorgeschlagene Zuordnung notieren.",
+        "Einen Vorschlag manuell ersetzen, speichern, neu laden: eigene Auswahl darf nicht still zurückgesetzt werden.",
+        "Raumbild hochladen, Vorschau prüfen, speichern und echtes Dashboard am iPad öffnen: dasselbe Bild.",
+        "Zugeklappt: Raumname, Haupttemperatur, je nach Größe Feuchte, Anwesenheit/Fenster, wichtigste Warnung. Fehlende freiwillige Werte entfallen.",
+        "Aufklapp-Taste einmal tippen: Details sichtbar, Symbol passend; erneut: Details weg. Betreuung prüft zusätzlich Zustandsbeschreibung für Vorlesefunktionen.",
+        "Aufgeklappt Lampe und Heizungs-Minus/Plus/Ein/Aus bedienen: keine Taste klappt Raumkarte zu oder schaltet doppelt.",
+        "Betreuung lässt je einen freiwilligen Eintrag unbekannt, nicht erreichbar und fehlend werden. Nach Neuladen bleibt restliche Karte nutzbar.",
+        "Ein/zwei offene Fenster, niedrige Batterie, Sicherheitswarnung mit künstlichen Daten prüfen. Warnstufe mit Fehlerseite derselben Momentaufnahme vergleichen.",
+        "Klein, normal, breit, hoch und groß hochkant/quer prüfen, auch lange Namen/Werte. Bei aufgeklappter Karte und laufender Bedienung drehen: keine Überläufe, abgeschnittenen Tasten oder leer gestreckten Großkarten.",
+        "Dashboard neu laden: Bild und Konfiguration bleiben. Bild im Admin entfernen: sicherer nutzbarer Zustand ohne Bild.",
+        "Nur Betreuung entfernt Raum aus künstlicher Testzuordnung, nie aus echtem Alltagssystem. Admin warnt, manuelle Zuordnungen/Dashboard bleiben."
+      ],
+      "expected": "Vorschau und Dashboard zeigen dasselbe lesbare Bild ohne Berührungen zu blockieren. Einmaliges Auf-/Zuklappen; Tasten klappen nicht zu. Manuelle Auswahl bleibt. Jede Größe sinnvoll ohne Überlauf. Warnstufen wie zentrale Fehlerseite. Nur ausdrücklich freigegebenes Licht/Heizung schreibt; andere Rollen reine Anzeige. Fehlender Raum/Eintrag/Bild bricht Karte nicht.",
+      "failIf": "Auf-/Zuklappen fehlt/doppelt; Taste klappt zu oder steuert unerlaubte Gerätetypen; Bild fehlt trotz Vorschau/fängt Berührung ab; Auswahl überschrieben; Größen/Drehen führen zu Überlauf oder unbedienbaren/leeren Großkarten.",
+      "record": "Größe, Ausrichtung, auf-/zugeklappt und Schritt notieren. Vorschau-/Dashboardunterschied mit bereinigten Bildern belegen. Fehlende Vorbereitung nennen.",
+      "definitionHash": "9c53a8392aaee0e136fef0c0dd1f3e669a5813198dfd7bc6b1d1ee0584be364d"
+    }
+  ]
+}
+```
