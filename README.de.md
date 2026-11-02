@@ -489,6 +489,11 @@ davon unberührt.
 
 ![Dashboard-Verwaltung im Admin-Bereich](docs/screenshots/admin/dashboard-management.png)
 
+Das Entfernen eines Dashboards wird innerhalb der Verwaltung bestätigt und erst
+mit „Änderungen speichern“ übernommen:
+
+![Bestätigung zum Entfernen eines Testdashboards](docs/screenshots/admin/dashboard-delete.png)
+
 #### Dashboard-Hintergrund
 
 ![Hintergrund-Upload und Darstellungseinstellungen im Admin-Bereich](docs/screenshots/admin/dashboard-background.png)
@@ -660,13 +665,16 @@ Vollständige Anleitungen: `docs/DEPLOYMENT.md` und `docs/RELEASING.md`.
 
 ## Releases, Support und Lizenz
 
-Der aktuelle Release Candidate ist **1.0.0-rc.8 Public Test
+Der aktuelle Release Candidate ist **1.0.0-rc.9 Public Test
 Release**. Er dient Community-, HAOS-, LXC- und Legacy-iPad-Tests, ist kein
 Stable Release und verändert `latest` nicht. Testschwerpunkte, sichere
 LXC-/App-Updates, Rollback und Fehlerberichte stehen in
-den [RC.8-Releasehinweisen](release/notes/1.0.0-rc.8.md). RC.8 behebt das
-Speichern größerer Admin-Konfigurationen (Issue #5), ohne Dashboard-Neuaufbau.
-Die bisherigen RC.7-Abnahmedokumente bleiben historische Evidenz.
+den [RC.9-Releasehinweisen](release/notes/1.0.0-rc.9.md). RC.9 korrigiert die
+Thermostatsteuerung bei fehlender optionaler Schrittweite, das Löschen von
+Dashboards bei unterdrückten Browserdialogen und Raumkarten-Überlappung/Flackern.
+Konfigurationen bleiben erhalten; kein Rückbau nötig. Die RC.8-Speichergrenzen-
+Korrektur bleibt enthalten. Frühere Abnahmen bleiben historische Evidenz;
+erneute Tests auf dem echten iPad und HAOS stehen aus.
 
 Release Candidates und stabile Releases verwenden SemVer-Tags. Jeder Release
 enthält ein versioniertes Standalone-Archiv und `SHA256SUMS`; Container stehen

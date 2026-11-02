@@ -469,6 +469,11 @@ independent Focus geometry remains unchanged.
 
 ![Dashboard management in the Admin area](docs/screenshots/admin/dashboard-management.png)
 
+Dashboard removal is confirmed inside the administration page and only applied
+after saving changes:
+
+![Confirmation before removing a demo dashboard](docs/screenshots/admin/dashboard-delete.png)
+
 #### Dashboard Background
 
 ![Background upload and display settings in the Admin area](docs/screenshots/admin/dashboard-background.png)
@@ -635,13 +640,15 @@ Complete instructions: `docs/DEPLOYMENT.md` and `docs/RELEASING.md`.
 
 ## Releases, Support, and License
 
-The current release candidate is the **1.0.0-rc.8 Public Test
+The current release candidate is the **1.0.0-rc.9 Public Test
 Release**. It is intended for community, HAOS, LXC, and legacy-iPad testing,
 is not stable, and does not update `latest`. Testing focus, safe App/LXC
 updates, rollback, and defect reporting are documented in
-the [RC.8 release notes](release/notes/1.0.0-rc.8.md). RC.8 fixes larger Admin
-configuration saves (Issue #5), without rebuilding dashboards. Existing RC.7
-acceptance documents remain historical evidence.
+the [RC.9 release notes](release/notes/1.0.0-rc.9.md). RC.9 fixes thermostat
+controls with an omitted optional step, dashboard deletion when browser dialogs
+are suppressed, and Room Card overlap/flicker. Configuration is preserved; no
+dashboard rebuild is needed. The RC.8 save-limit fix is retained. Previous
+acceptance remains historical evidence; real iPad and HAOS retesting is pending.
 
 Release candidates and stable releases use SemVer tags. Every release contains
 a versioned standalone archive and `SHA256SUMS`; containers are available as

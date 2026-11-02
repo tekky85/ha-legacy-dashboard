@@ -8,6 +8,28 @@ Semantic Versioning and use the `vMAJOR.MINOR.PATCH` form.
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.9 – 2026-11-02
+
+### Fixed
+
+- Community reports #8/#9: an omitted/null optional Climate temperature step
+  uses the existing 0.5-degree control default instead of disabling an otherwise
+  authorized single-setpoint thermostat. Explicit invalid steps, missing ranges,
+  unsupported features, unavailable entities and missing grants remain blocked.
+- Dashboard deletion uses an in-page confirmation instead of a native browser
+  prompt that may be suppressed in embedded views. It remains an explicit local
+  draft change requiring Save; the default/last dashboard stays protected.
+- Editing a dashboard title no longer replaces a pressed action button during
+  blur/change before its click can be delivered.
+- Room rows do not shrink below their contents in legacy Flexbox. Refreshes
+  reconcile Room Cards in place while retaining
+  background layers, expanded state, scroll and control elements.
+- Asset cache version 56; no configuration schema change or HA write expansion.
+  Local/browser regressions are not physical iPad/HAOS acceptance. Rapid-tap
+  page zoom and any remaining integration-specific control failures need retest.
+- Updated the compatible transitive dependency `follow-redirects` to 1.16.2
+  to resolve GHSA-mrwp-f3q8-3g9p without weakening the production audit gate.
+
 ## 1.0.0-rc.8 – 2026-10-24
 
 ### Fixed

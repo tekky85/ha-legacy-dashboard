@@ -81,6 +81,11 @@ jobs:
       - name: Run real-browser card matrix gate
         run: npm run test:card-matrix-browser
 
+      - name: Run community hotfix browser regressions
+        run: |
+          npm install --prefix "$RUNNER_TEMP/hotfix-browser-tools" --no-save --ignore-scripts --package-lock=false playwright@1.51.1
+          CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$RUNNER_TEMP/hotfix-browser-tools/node_modules" node test/community-hotfix-browser.js
+
       - name: Check production dependency audit
         run: npm audit --omit=dev --audit-level=moderate
 

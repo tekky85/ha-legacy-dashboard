@@ -14,6 +14,7 @@
     let entityRuleLoadError = "";
     let entityRulesConfiguredOnly = false;
     let roomEditorEntities = null;
+    let pendingDashboardDeleteId = null;
 
     const ROOM_ENTITY_FIELDS = [
         {id: "temperature", label: "Primäre Temperatur", multiple: false, domains: ["sensor"]},
@@ -74,6 +75,9 @@
     }
 
     function closeDialog(dialog) {
+        if (dialog.id === "dashboardDeleteDialog") {
+            pendingDashboardDeleteId = null;
+        }
         if (typeof dialog.close === "function") {
             dialog.close();
         } else {
@@ -2309,7 +2313,9 @@
                     title: event.target.value
                 });
                 renderDashboardList();
-                renderEditor();
+                // Do not remove a button between pointer-down/blur and click.
+                elements.dashboardEditor.querySelector("#editorTitle").textContent =
+                    dashboard.title;
             } else if (event.target.dataset.field === "section-title") {
                 admin.Sections.update(
                     dashboard.id,
@@ -2509,12 +2515,12 @@
             } else if (button.dataset.action === "dashboard-duplicate") {
                 openDashboardForm("duplicate");
             } else if (button.dataset.action === "dashboard-delete") {
-                if (window.confirm(
-                    "Dashboard „" + dashboard.title + "“ wirklich löschen?"
-                )) {
-                    admin.Dashboards.remove(dashboard.id);
-                    renderAll();
+                if (admin.State.getDraft().defaultDashboardId === dashboard.id) {
+                    throw new Error("Wählen Sie zuerst ein anderes Standard-Dashboard.");
                 }
+                pendingDashboardDeleteId = dashboard.id;
+                elements.dashboardDeleteTitle.textContent = dashboard.title;
+                openDialog(elements.dashboardDeleteDialog);
             } else if (button.dataset.action === "room-add") {
                 openRoomForm(null);
             } else if (button.dataset.action === "widget-add") {
@@ -3021,6 +3027,7 @@
             "dashboardForm", "dashboardDialogMode", "dashboardSourceId",
             "dashboardDialogTitle", "dashboardTitleInput", "dashboardIdInput",
             "dashboardFormError", "entityDialog", "entitySearch",
+            "dashboardDeleteDialog", "dashboardDeleteTitle", "dashboardDeleteConfirm",
             "entityDomainFilter", "entityStatus", "entityList",
             "widgetDialog", "widgetForm", "widgetDialogMode", "widgetIdInput",
             "widgetDialogTitle", "widgetEntityValue", "widgetTypeValue",
@@ -3055,6 +3062,21 @@
     }
 
     function bindEvents() {
+        elements.dashboardDeleteDialog.addEventListener("close", function () {
+            pendingDashboardDeleteId = null;
+        });
+        elements.dashboardDeleteConfirm.addEventListener("click", function () {
+            try {
+                if (!pendingDashboardDeleteId) { return; }
+                admin.Dashboards.remove(pendingDashboardDeleteId);
+                closeDialog(elements.dashboardDeleteDialog);
+                renderAll();
+                showNotice("Dashboard im Entwurf entfernt. Zum Übernehmen Änderungen speichern.", false);
+            } catch (error) {
+                closeDialog(elements.dashboardDeleteDialog);
+                showNotice(error.message, true);
+            }
+        });
         elements.loginForm.addEventListener("submit", handleLogin);
         elements.logoutButton.addEventListener("click", function () {
             if (previewRefreshTimer !== null) {

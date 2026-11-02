@@ -495,12 +495,12 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
     const systemHtml = read("src/public/system.html");
 
     assert.ok(
-        indexHtml.indexOf("/js/core/theme.js?v=55") <
-            indexHtml.indexOf("/css/style.css?v=55")
+        indexHtml.indexOf("/js/core/theme.js?v=56") <
+            indexHtml.indexOf("/css/style.css?v=56")
     );
     assert.ok(
-        systemHtml.indexOf("/js/core/theme.js?v=55") <
-            systemHtml.indexOf("/css/style.css?v=55")
+        systemHtml.indexOf("/js/core/theme.js?v=56") <
+            systemHtml.indexOf("/css/style.css?v=56")
     );
     assert.equal(
         (indexHtml.match(/\/js\/core\/theme\.js/g) || []).length,
@@ -510,7 +510,7 @@ test("Legacy-Routen laden dasselbe Theme früh und ohne Inline-Skript", function
         (systemHtml.match(/\/js\/core\/theme\.js/g) || []).length,
         1
     );
-    assert.match(indexHtml, /\/js\/app\.js\?v=55/);
-    assert.match(systemHtml, /\/js\/system\/summary\.js\?v=55/);
-    assert.match(systemHtml, /\/js\/system\/errors\.js\?v=55/);
+    assert.match(indexHtml, /\/js\/app\.js\?v=56/);
+    assert.match(systemHtml, /\/js\/system\/summary\.js\?v=56/);
+    assert.match(systemHtml, /\/js\/system\/errors\.js\?v=56/);
 });

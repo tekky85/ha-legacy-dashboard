@@ -494,4 +494,7 @@ async function main() {
     }
 }
 
-main().catch(function (error) { process.stderr.write(error.message + "\n"); process.exitCode = 1; });
+if (require.main === module) {
+    main().catch(function (error) { process.stderr.write(error.message + "\n"); process.exitCode = 1; });
+}
+module.exports = {server: server, dashboardState: dashboardState, adminConfiguration: adminConfiguration};

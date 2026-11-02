@@ -767,7 +767,7 @@ test(
             );
             assert.match(
                 index.text,
-                /src="\/js\/app\.js\?v=55"/
+                /src="\/js\/app\.js\?v=56"/
             );
 
             const manifest = await request(
@@ -786,7 +786,7 @@ test(
             const applicationScript = await request(
                 gatewayPort,
                 "GET",
-                "/js/app.js?v=55"
+                "/js/app.js?v=56"
             );
 
             assert.equal(applicationScript.status, 200);
@@ -812,7 +812,7 @@ test(
             );
             assert.match(
                 adminPage.text,
-                /src="\/admin\/js\/app\.js\?v=55"/
+                /src="\/admin\/js\/app\.js\?v=56"/
             );
             assert.doesNotMatch(
                 adminPage.text,
@@ -1880,6 +1880,28 @@ test(
                 temperature: 21.5
             }]);
 
+        });
+
+        await t.test("fehlende optionale Schrittweite erlaubt validierte Off-Setpoints ohne Einschalten", async function () {
+            for (const entityId of [SECOND_CLIMATE_ENTITY, THIRD_CLIMATE_ENTITY]) {
+                resetMock();
+                delete mock.additionalStates[entityId].attributes.target_temp_step;
+                const result = await request(gatewayPort, "POST", "/api/climate/temperature", {
+                    entity_id: entityId, temperature: 21.3
+                });
+                assert.equal(result.status, 200);
+                assert.equal(result.json.temperature, 21.5);
+                assert.equal(mock.additionalStates[entityId].state, "off");
+                assert.equal(mock.climatePowerCalls.length, 0);
+                assert.deepEqual(mock.serviceCalls, [{entity_id: entityId, temperature: 21.5}]);
+            }
+            resetMock();
+            mock.additionalStates[SECOND_CLIMATE_ENTITY].attributes.target_temp_step = 0;
+            const invalid = await request(gatewayPort, "POST", "/api/climate/temperature", {
+                entity_id: SECOND_CLIMATE_ENTITY, temperature: 21
+            });
+            assert.equal(invalid.status, 409);
+            assert.equal(mock.serviceCalls.length, 0);
         });
 
         await t.test("Climate unavailable und Off-State-Servicefehler bleiben kontrolliert", async function () {

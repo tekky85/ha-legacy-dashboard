@@ -1,5 +1,35 @@
 # Sprint 27.4 – Pilotstatus und Übergabe
 
+## Nachtrag – tatsächliche Eingänge und Community-Hotfix, 2. November 2026
+
+Die folgenden Eingänge ersetzen nicht rückwirkend den historischen Pilotstand
+weiter unten. Zwei öffentliche Berichte stammen von demselben Alias `t_isTr`,
+nicht von zwei nachgewiesen unabhängigen Testpersonen:
+
+- [Issue #8](https://github.com/tekky85/ha-legacy-dashboard/issues/8),
+  25. Oktober, RC.8: PASS 0 / FAIL 1 (MT-01) / NOT_TESTED 71.
+- [Issue #9](https://github.com/tekky85/ha-legacy-dashboard/issues/9),
+  26. Oktober, RC.8 / Test-Center 27.4.1: PASS 4 (MT-02/05/06/08),
+  FAIL 4 (MT-01/04/09/11), NOT_TESTED 64. Umgebung laut Bericht:
+  HA-App, HA 2026.10.3, iPad mini Wi-Fi / iOS 9.3.5 / Safari.
+
+Beide angehängten JSON-Berichte wurden lesend gegen den vorhandenen Validator
+geprüft: gültig, unveränderter Kataloghash, keine Formatwarnung. Rohberichte
+wurden nicht ins Repository übernommen. Kein Zusammenzählen zu unabhängiger
+Abnahme: MT-01/09 melden denselben Klimabedienungsbereich. Für MT-04/05/08
+fehlt die klare Dokumentation des geforderten modernen Admin-/Mausbrowsers;
+gemeldete PASS sind noch keine verifizierte vollständige Anforderungsabnahme.
+
+RC.9 adressiert die lokal reproduzierten Ursachenpfade: fehlende optionale
+Thermostat-Schrittweite, blockierte native Bestätigung/verlorener Klick nach
+Titeländerung und Room-DOM-Neuaufbau/Legacy-Flexkompression. Die konkreten
+Thermostatattribute des Testers liegen nicht vor. Echte RC.9-Nachprüfung ist
+NOT TESTED; alte RC.8-Ergebnisse bleiben unverändert. Ein neuer RC.9-Bericht
+soll MT-01/09, MT-04 und MT-11 erneut prüfen. Rapid-Tap-Zoom bleibt gesondert
+offen. Keine manuelle iPad-/HAOS-Abnahme oder finale Stable-Freigabe abgeleitet.
+
+---
+
 Basis: Branch `main`, Commit `f027eeb` (vollständiger Startcommit im Git-Protokoll).
 Datum: 18. Oktober 2026.
 

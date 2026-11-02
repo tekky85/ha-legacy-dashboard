@@ -1,5 +1,19 @@
 # Reproduzierbare Produkt-Screenshots
 
+Nachtrag vom 2. November 2026: `admin/dashboard-delete.png` zeigt den echten
+neuen RC.9-Dialog aus der lokalen Real-App-Demo, nicht ein generiertes Mockup.
+Aufnahme mit `test/community-hotfix-browser.js`, aktuelle produktive Admin-
+HTML/CSS/JS-Dateien, generische lokale Daten, Fake-Token nur im Browserprofil.
+Viewport 1440×1100, eingebetteter Admin 1400×1000; PNG ist der Dialogausschnitt
+590×220. Keine Zugangsdaten, privaten Namen/Adressen oder Protokolle sichtbar;
+PNG visuell geprüft. Wiederholung nach Installation des dokumentierten
+Test-Playwright: `HOTFIX_SCREENSHOT_DIR=/tmp/ha-hotfix-captures node test/community-hotfix-browser.js`.
+Der Renderer benötigt dabei nur localhost; NODE_PATH/CHROME_BIN wie im
+Testkoordinator-Handbuch setzen. Ausgabe `dashboard-delete-rc9.png` entspricht
+dem neuen Galerieeintrag. Die übrige Galerie dokumentiert weiter den unten
+genannten Stand; die Layoutkorrektur stellt die beabsichtigte Room-Darstellung
+wieder her und behauptet keinen neuen realen iPad-Screenshot.
+
 Die Galerie wurde am 14. September 2026 aus den unveränderten produktiven
 HTML-, CSS- und JavaScript-Dateien auf Basis von Commit `f406bf7` aufgenommen.
 `test/capture-doc-screenshots.js` stellt dafür ausschließlich auf `127.0.0.1`

@@ -5,6 +5,19 @@
 No user-facing changes have been recorded after the current public test
 release.
 
+## 1.0.0-rc.9 – 2026-11-02
+
+- Community fixes: optional missing Climate target step no longer disables
+  authorized thermostat +/-; explicit invalid capability/range data stay blocked.
+- In-page dashboard deletion confirmation works without native browser dialogs;
+  removal still needs Save and preserves default/last-dashboard protection.
+- Room Card text rows resist legacy flex compression; polling updates content
+  in place without recreating room backgrounds or resetting scroll/expansion.
+- Keeps `/data`, schema 12, backgrounds, narrow HA write grants and App
+  permissions unchanged. Back up, update (do not uninstall), restart and retest.
+- Real iPad/HAOS acceptance and rapid-tap zoom checks remain pending.
+- Compatible `follow-redirects` 1.16.2 security update; production audit unchanged.
+
 ## 1.0.0-rc.8 – 2026-10-24
 
 - Fixed Issue #5: full Admin configuration saves use an authenticated 1 MiB

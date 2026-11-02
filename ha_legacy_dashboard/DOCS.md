@@ -48,6 +48,12 @@ cards or recreate dashboards to update: existing `/data` configuration and
 backgrounds are retained without a schema migration. Back up first. Previously
 unsaved edits from a rejected request cannot be recovered by an update.
 
+RC.9 also handles omitted optional thermostat steps, confirms dashboard deletion
+inside the Admin UI and preserves Room Card DOM/backgrounds during refresh.
+Deletion remains a draft operation requiring Save. Back up and update in place;
+no schema migration, new HA permission or dashboard rebuild is required.
+Retest affected devices and iOS 9 layouts; real-device acceptance is still pending.
+
 No Long-Lived Home Assistant access token is configured in App options. The
 backend uses the server-side `SUPERVISOR_TOKEN` with the Core REST and
 WebSocket proxies. The browser sees only the existing sanitized gateway APIs.

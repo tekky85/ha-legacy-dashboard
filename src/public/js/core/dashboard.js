@@ -16,6 +16,10 @@ var Dashboard = {
 
     controlsDisabled: false,
 
+    renderedContainer: null,
+
+    nextMarkup: null,
+
 
     addWidget: function (widget) {
 
@@ -91,6 +95,7 @@ var Dashboard = {
         this.sectionGroups = [];
         this.states = {};
         this.controlsDisabled = false;
+        this.renderedContainer = null;
 
 
         orderedSections =
@@ -266,6 +271,8 @@ var Dashboard = {
 
         this.sectionGroups = [];
 
+        this.nextMarkup = {};
+
 
         if (!this.sections.length) {
 
@@ -364,12 +371,14 @@ var Dashboard = {
 
 
         /*
-         * Nur ein DOM-Schreibvorgang.
-         * Das ist insbesondere auf alten Geräten schneller.
+         * Initialer Aufbau in einem Schreibvorgang. Bei Aktualisierungen
+         * bleiben Room-DOM, Bildschichten und Scrollposition erhalten.
          */
 
-        container.innerHTML =
-            html;
+        if (!this.updateCards(container)) {
+            container.innerHTML = html;
+        }
+        this.renderedContainer = container;
 
 
         this.applyRoomAppearances(container);
@@ -385,6 +394,91 @@ var Dashboard = {
 
 
     renderWidget: function (widget, states) {
+
+        var markup = this.widgetMarkup(widget, states);
+        if (this.nextMarkup) {
+            this.nextMarkup[widget.id] = markup;
+        }
+        return markup;
+
+    },
+
+
+    // Keep the established replacement behavior for other card types. Room
+    // children are reconciled in place, including transient busy/disabled
+    // attributes after errors; background/scroll/touch nodes survive polling.
+    updateCards: function (container) {
+        var cards;
+        var indexed = {};
+        var index;
+        var widget;
+        var card;
+        var holder;
+        if (this.renderedContainer !== container ||
+            !container.getElementsByClassName || !document.createElement) {
+            return false;
+        }
+        cards = container.getElementsByClassName("card");
+        if (cards.length !== this.widgets.length) { return false; }
+        for (index = 0; index < cards.length; index++) {
+            indexed[cards[index].getAttribute("data-widget-id")] = cards[index];
+        }
+        for (index = 0; index < this.widgets.length; index++) {
+            if (!indexed[this.widgets[index].id]) { return false; }
+        }
+        for (index = 0; index < this.widgets.length; index++) {
+            widget = this.widgets[index];
+            card = indexed[widget.id];
+            holder = document.createElement("div");
+            holder.innerHTML = this.nextMarkup[widget.id];
+            if (widget.type === "room") {
+                this.patchRoomNode(card, holder.firstChild);
+            } else {
+                card.parentNode.replaceChild(holder.firstChild, card);
+            }
+        }
+        return true;
+    },
+
+
+    patchRoomNode: function (current, next) {
+        var index;
+        var attribute;
+        var child;
+        if (current.nodeType !== next.nodeType || current.nodeName !== next.nodeName) {
+            current.parentNode.replaceChild(next.cloneNode(true), current);
+            return;
+        }
+        if (current.nodeType === 3) {
+            if (current.nodeValue !== next.nodeValue) { current.nodeValue = next.nodeValue; }
+            return;
+        }
+        // Inline style belongs to the validated appearance/layout helpers.
+        // Keeping it avoids clearing a loaded background on every poll.
+        for (index = current.attributes.length - 1; index >= 0; index--) {
+            attribute = current.attributes[index];
+            if (attribute.name !== "style" && !next.hasAttribute(attribute.name)) {
+                current.removeAttribute(attribute.name);
+            }
+        }
+        for (index = 0; index < next.attributes.length; index++) {
+            attribute = next.attributes[index];
+            if (current.getAttribute(attribute.name) !== attribute.value) {
+                current.setAttribute(attribute.name, attribute.value);
+            }
+        }
+        for (index = 0; index < next.childNodes.length; index++) {
+            child = current.childNodes[index];
+            if (!child) { current.appendChild(next.childNodes[index].cloneNode(true)); }
+            else { this.patchRoomNode(child, next.childNodes[index]); }
+        }
+        while (current.childNodes.length > next.childNodes.length) {
+            current.removeChild(current.lastChild);
+        }
+    },
+
+
+    widgetMarkup: function (widget, states) {
 
         if (widget.type === "room") {
             return widget.render(

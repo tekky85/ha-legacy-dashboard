@@ -2842,3 +2842,73 @@ technische Durchführungshilfen bei Bedarf gezielt vereinfachen. Reale iPad-,
 HAOS- und bisher offene Steuerungsbefunde werden durch diesen Portaltest
 nicht als bestanden oder behoben markiert. Bereits vorhandene lokale
 Owner-Ergebnisse/Auditänderungen bleiben getrennt und unverändert.
+
+## Community-Hotfix RC.9 – 2. November 2026
+
+Ausgangscommit `c18c2cf`, Branch `main`. Der Nutzer hat die öffentliche
+Veröffentlichung von `v1.0.0-rc.9`, GitHub-Prerelease, GHCR-Multi-Arch und
+Standalone-Paket ausdrücklich freigegeben. Frühere Tags/Artefakte bleiben
+unverändert; kein Stable-/`latest`-Update, kein Abschluss des gesamten 27.1-K.
+
+Quellen: Community-Berichte [#8](https://github.com/tekky85/ha-legacy-dashboard/issues/8)
+und [#9](https://github.com/tekky85/ha-legacy-dashboard/issues/9), beide RC.8,
+derselbe Alias. Zwei formal gültige Reports, kein Nachweis zweier unabhängiger
+Tester. Vier gemeldete PASS im neueren Bericht sind nicht automatisch bestätigte
+Anforderungsabnahme; insbesondere fehlt die klare Admin-/Desktop-Gerätezuordnung.
+Keine Rohberichte, Personendaten oder produktiven HA-Zugänge übernommen.
+
+Implementierung:
+
+- `src/services/climate-power.js`: fehlende/null optionale Schrittweite nutzt
+  die vorhandene Celsius-Frontend-Vorgabe 0,5. Gültige explizite Schritte bleiben
+  maßgeblich; ungültige Schritte, fehlende Min/Max/Target, fehlende Capability,
+  Nichterreichbarkeit und fehlende Steuerfreigabe bleiben gesperrt. Zwei weitere
+  Entity-IDs werden auch per HTTP im ausgeschalteten Zustand geprüft: nur
+  `climate.set_temperature`, kein implizites Einschalten. Tatsächliche Attribute
+  des Community-Thermostats fehlen; eine weitere Ursache bleibt möglich.
+- `src/admin/js/app.js`, `src/admin/index.html`: anwendungsinterne Bestätigung
+  statt unterdrückbarem nativen Browserdialog; Titeländerung entfernt nicht mehr
+  die gedrückte Aktion vor dem Klick. Abbrechen/Verwerfen erhalten den Zustand,
+  Entfernen braucht Save, Default/letztes Dashboard bleiben geschützt. Kein
+  Löschen oder Ändern von HA-Geräten. API-/Persistenzmodell unverändert.
+- `src/public/js/core/dashboard.js`: Room-DOM wird im vorhandenen Element
+  abgeglichen statt pro Poll ersetzt. Hintergrund, Aufklappzustand, Scroll und
+  Tasten bleiben erhalten. Auch Busy/Disabled werden nach Fehlern korrekt
+  abgeglichen; fehlende Steuerfreigaben bleiben deaktiviert. Andere Kartentypen
+  behalten ihre bisherige Ersetzungslogik. Sections/Grid/Focus bleiben getrennt.
+- `src/public/css/style.css`: Room-Zeilen schrumpfen nicht unter ihre Textinhalte;
+  aufgeklappte Inhalte scrollen. Legacy-Flexkompression wurde kontrolliert
+  nachgebildet, nicht als physischer Safari-Test ausgegeben. Cacheversion 56
+  ist auf Wall-/System-/Admin-Assets und Manifest konsistent.
+- Kompatibles transientes Sicherheitsupdate `follow-redirects` 1.16.2 behebt
+  GHSA-mrwp-f3q8-3g9p; unverändertes Audit-Gate verlangt null Advisories.
+
+Evidenz:
+
+- Vollständiges Release-Gate: Syntax JS/Shell, Versionskonsistenz, Secret-Scan,
+  vollständige Regression. Gezielt ergänzt: vier Unitfälle plus HTTP-Fall für
+  mehrere Thermostate mit fehlender Schrittweite, aktive/off und negative Fälle.
+- `test/community-hotfix-browser.js --baseline`: betroffene RC.8-JS-/CSS-Dateien
+  aus unverändertem Tag reproduzieren Überlappung, DOM-Ersatz und unterdrückte
+  Löschbestätigung. Der positive Lauf prüft Layout, Wertänderung, Bild/Scroll,
+  Steuerfehler-Erholung, Sperren, Aufklappen und Löschen/Save/Discard/Reload.
+- Lokale Browser-Card-Matrix: **1576 Fälle, 0 Fehler**, über denselben Harness
+  mit Playwright. Der lokale CLI-Dump-Aufruf lief nach 120 s in einen Timeout;
+  das bestehende CLI-Gate bleibt in CI und Release verpflichtend, zusätzlich
+  läuft dort die neue fokussierte Browserprüfung.
+- Echter neuer Admin-Dialog-Screenshot aus localhost-Demo visuell auf private
+  Daten geprüft; README DE/EN synchron ergänzt. Keine generierten Produktbilder.
+- Konfigurationsschema 12, Datenpfade, Hintergründe, Sicherheitsgrenzen und
+  HA-App-/Standalone-Modi unverändert. Tests nur localhost/Fake-Credentials,
+  keine Produktions-`.env`, keine echte HA-Verbindung. LXC nicht verändert.
+
+Offen: reale RC.9-Nachprüfung für MT-01/09, MT-04, MT-11 auf passendem Gerät,
+App-Update/Neustart und `/data`-Erhalt auf HAOS sowie Standalone/LXC-Update.
+Vorher sichern, nicht deinstallieren oder Dashboards zurückbauen. Im Test-Center
+neuen Bericht für RC.9 beginnen. Alte Fehler bleiben historisch unverändert;
+Rapid-Tap-Seitenzoom ist nicht behoben/abgenommen. Kein physisches PASS und
+keine finale RC-/Stable-Freigabe aus lokalen Tests abgeleitet.
+
+Update-/Rollback- und Nachtestanleitung:
+[RC.9-Releasehinweise](../release/notes/1.0.0-rc.9.md).
+Publikationsnachweis wird erst nach erfolgreichem Release-Workflow festgestellt.

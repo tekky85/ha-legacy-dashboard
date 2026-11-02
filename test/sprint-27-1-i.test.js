@@ -14,6 +14,7 @@ const SHOTS = [
     "dashboards/focus-card.png",
     "dashboards/sections-room-card.png",
     "admin/dashboard-management.png",
+    "admin/dashboard-delete.png",
     "admin/dashboard-background.png",
     "admin/sections.png",
     "admin/layout-editor.png",
@@ -49,8 +50,13 @@ test("RQ-08-02 gallery files are real readable PNGs with declared dimensions", f
         const height = content.readUInt32BE(20);
 
         assert.equal(signature, "89504e470d0a1a0a", relativePath + " must be PNG");
-        assert.ok(width >= 768, relativePath + " width must be documentation-readable");
-        assert.ok(height >= 720, relativePath + " height must be documentation-readable");
+        if (relativePath === "admin/dashboard-delete.png") {
+            // Reviewed native dialog crop, not a scaled-down full page.
+            assert.equal(width, 590); assert.equal(height, 220);
+        } else {
+            assert.ok(width >= 768, relativePath + " width must be documentation-readable");
+            assert.ok(height >= 720, relativePath + " height must be documentation-readable");
+        }
         assert.match(relativePath, /^[a-z0-9-]+\/[a-z0-9-]+\.png$/);
     });
 });

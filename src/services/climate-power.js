@@ -146,7 +146,11 @@ function temperatureConstraints(state) {
 
     const minimum = finiteNumber(attributes.min_temp);
     const maximum = finiteNumber(attributes.max_temp);
-    const step = finiteNumber(attributes.target_temp_step);
+    // HA permits an absent target step. Match the existing Celsius wall
+    // controls' 0.5 default, but never mask an explicitly invalid step.
+    const stepMissing = attributes.target_temp_step === null ||
+        typeof attributes.target_temp_step === "undefined";
+    const step = stepMissing ? 0.5 : finiteNumber(attributes.target_temp_step);
     const target = finiteNumber(attributes.temperature);
     const supportedFeatures = finiteNumber(
         attributes.supported_features

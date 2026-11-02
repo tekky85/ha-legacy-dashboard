@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>HA Legacy Dashboard – Administration</title>
-    <link rel="stylesheet" href="/admin/css/admin.css?v=55">
+    <link rel="stylesheet" href="/admin/css/admin.css?v=56">
 </head>
 <body>
     <a class="skip-link" href="#adminMain">Zum Inhalt springen</a>
@@ -160,7 +160,7 @@
             </div>
 
             <footer class="admin-version">
-                HA Legacy Dashboard · Version 1.0.0-rc.8
+                HA Legacy Dashboard · Version 1.0.0-rc.9
             </footer>
         </section>
     </main>
@@ -198,6 +198,18 @@
                 <button class="button primary" type="submit">Übernehmen</button>
             </div>
         </form>
+    </dialog>
+
+    <dialog id="dashboardDeleteDialog" aria-labelledby="dashboardDeleteHeading">
+        <div class="dialog-form">
+            <h2 id="dashboardDeleteHeading">Dashboard entfernen?</h2>
+            <p>Dashboard „<strong id="dashboardDeleteTitle"></strong>“ mit seinen Karten aus der lokalen Konfiguration entfernen? Home-Assistant-Geräte bleiben unverändert.</p>
+            <p>Die Änderung wird erst mit „Änderungen speichern“ übernommen. Bis dahin können Sie sie verwerfen.</p>
+            <div class="dialog-actions">
+                <button type="button" class="button secondary" data-close-dialog="dashboardDeleteDialog">Abbrechen</button>
+                <button type="button" class="button danger" id="dashboardDeleteConfirm">Dashboard entfernen</button>
+            </div>
+        </div>
     </dialog>
 
     <dialog id="entityRulesDialog" class="entity-rules-dialog" aria-labelledby="entityRulesDialogTitle">
@@ -453,19 +465,19 @@
         </form>
     </dialog>
 
-    <script src="/admin/js/auth.js?v=55" defer></script>
-    <script src="/admin/js/api.js?v=55" defer></script>
-    <script src="/admin/js/state.js?v=55" defer></script>
-    <script src="/admin/js/layout.js?v=55" defer></script>
-    <script src="/admin/js/sections.js?v=55" defer></script>
-    <script src="/admin/js/dashboards.js?v=55" defer></script>
-    <script src="/admin/js/widgets.js?v=55" defer></script>
-    <script src="/admin/js/rooms.js?v=55" defer></script>
-    <script src="/admin/js/entities.js?v=55" defer></script>
-    <script src="/admin/js/system-dashboards.js?v=55" defer></script>
-    <script src="/admin/js/entity-rules.js?v=55" defer></script>
-    <script src="/js/core/icons.js?v=55" defer></script>
-    <script src="/js/core/presentation.js?v=55" defer></script>
-    <script src="/admin/js/app.js?v=55" defer></script>
+    <script src="/admin/js/auth.js?v=56" defer></script>
+    <script src="/admin/js/api.js?v=56" defer></script>
+    <script src="/admin/js/state.js?v=56" defer></script>
+    <script src="/admin/js/layout.js?v=56" defer></script>
+    <script src="/admin/js/sections.js?v=56" defer></script>
+    <script src="/admin/js/dashboards.js?v=56" defer></script>
+    <script src="/admin/js/widgets.js?v=56" defer></script>
+    <script src="/admin/js/rooms.js?v=56" defer></script>
+    <script src="/admin/js/entities.js?v=56" defer></script>
+    <script src="/admin/js/system-dashboards.js?v=56" defer></script>
+    <script src="/admin/js/entity-rules.js?v=56" defer></script>
+    <script src="/js/core/icons.js?v=56" defer></script>
+    <script src="/js/core/presentation.js?v=56" defer></script>
+    <script src="/admin/js/app.js?v=56" defer></script>
 </body>
 </html>
