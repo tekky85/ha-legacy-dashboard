@@ -2911,4 +2911,26 @@ keine finale RC-/Stable-Freigabe aus lokalen Tests abgeleitet.
 
 Update-/Rollback- und Nachtestanleitung:
 [RC.9-Releasehinweise](../release/notes/1.0.0-rc.9.md).
-Publikationsnachweis wird erst nach erfolgreichem Release-Workflow festgestellt.
+Veröffentlichung verifiziert:
+
+- Tag `v1.0.0-rc.9` bindet unverändert Commit
+  `6c098965608b9572ac6f58ef84598b55b908ded2`; gepusht auf `origin/main`.
+- [Release-Workflow 41398850793](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/41398850793)
+  erfolgreich: Release-Gate, Browsermatrix, Hotfix-Browserprüfung, Audit,
+  amd64-/aarch64-Build, Manifest, Container-Smoke, RC-Evidenz und Veröffentlichung.
+  Das Stable-Gate ist für dieses Prerelease absichtlich übersprungen.
+- [Öffentliches RC.9-Prerelease](https://github.com/tekky85/ha-legacy-dashboard/releases/tag/v1.0.0-rc.9)
+  ist kein Draft; Paket, `SHA256SUMS` und `rc-result.json/.md` sind vorhanden.
+- GHCR anonym lesbar; Manifest für `linux/amd64` und `linux/arm64` unabhängig
+  geprüft. Digest:
+  `sha256:0620287fc7c172c60c127885849a957e35698a4b21b490b2f7d0d80ec31b57a5`.
+- Öffentlich heruntergeladenes Standalone-Paket gegen SHA256SUMS geprüft: OK.
+  SHA256 `4bee877a456b822c5d46281cd83a01aa1adcdd4f911978a7ddf2ea74c2427bb0`.
+  Commit, Digest und Paketchecksumme stimmen mit `rc-result.json` überein.
+- Vollständiges lokales Release-Gate **437/437**, Card-Matrix **1576/1576**,
+  Produktionsaudit **0 Advisories**; normale CI
+  [41398396636](https://github.com/tekky85/ha-legacy-dashboard/actions/runs/41398396636)
+  ebenfalls einschließlich Multi-Arch-Build grün.
+- Alle realen LXC-/HAOS-/iPad-Einträge des kandidatenspezifischen Nachweises
+  bleiben `NOT TESTED`; dessen Stable-Empfehlung bleibt entsprechend `BLOCKED`.
+  Distribution veröffentlicht ist keine Behauptung abgeschlossener Abnahme.
